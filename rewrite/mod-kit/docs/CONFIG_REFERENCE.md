@@ -1,5 +1,7 @@
 # 配置索引：从目标定位到文件
 
+局外初始货币、商品位/库存、刷新次数及恢复条件使用 API 2 的 `metagame`；战役说明UI/目标展示使用 `stageIntroPresentation`，真实目标沿用胜负规则。见[配置指南](porting/METAGAME_AND_BRIEFING.md)及[示例](../examples/feedback-config/README.md)。
+
 结果 `player_control` 切换所扮演势力，`victory_rules.victoryRules` 替换本局胜负条件，`victory_default` 恢复原规则，`ending.key/outcome` 指定结局，见[字段与示例](porting/SCENARIO_CONTROL.md)。
 
 剧本条件/结果/选择按钮：`rewrite/extension.json` 的 `scenarioEvents` 指向事件 JSON；全字段及函数入口见[剧本事件接口](porting/SCENARIO_EVENTS.md)。

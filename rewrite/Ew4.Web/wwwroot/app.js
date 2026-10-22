@@ -17,7 +17,7 @@ const images = new Map(), libraries = new Map();
 let errorTimer, aiRunning = false;
 const unitNavigation=new Ew4UnitNavigation.Cycle();
 let findingUnit=false;
-let leavingSession = false;
+let sessionTransition = false, aiTask = null, aiStopRequested = false;
 let skipAi = false, aiFocus = null, mapBounds, finishPresentation;
 const battleDialogues = [];
 const presentationWaiters = new Set();
@@ -34,17 +34,17 @@ window.ew4SetAppVisible=visible=>{appVisible=visible;if(visible)requestRender();
 document.addEventListener('visibilitychange',()=>{if(document.hidden)suspendRendering();else requestRender();});
 new MutationObserver(requestRender).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden']});
 for(const event of ['pointerdown','pointermove','pointerup','wheel','input','change','click'])document.addEventListener(event,requestRender,{passive:true});
-const battlefield = new Ew4Battlefield.Renderer({image,sprite,animation,libraries,get imageRevision(){return imageRevision;},get effects(){return effects;},get manifest(){return manifest;},get geographicLanguage(){return settings.geographicLanguage;},cityLabel:(name,cell)=>{
+const battlefield = new Ew4Battlefield.Renderer({image,sprite,animation,libraries,get imageRevision(){return imageRevision;},get effects(){return effects;},get manifest(){return manifest;},get geographicLanguage(){return settings.geographicLanguage;},cityLabel:(name,cell,rasterScale=1)=>{
   const translated=manifest.maps[state.map].cityNames?.[cell];
   const text=translated?.name===name?translated[settings.cityLanguage]:Ew4MenuArt.cityName(name,settings.cityLanguage,cityNames);
-  return originalTextRenderer.element(text,'font_city_labels_hd','#ffffff');
+  return originalTextRenderer.element(text,'font_city_labels_hd','#ffffff',undefined,'left',{rasterScale});
 }});
-const menus = new Ew4Menus.Menus({rpc,button,uiImage,countryImage,labels:labelImage,text:(value,font,color,width,align,options)=>originalTextRenderer?.element(value,font,color,width,align,options)||document.createTextNode(value),detail:detailWindow,start,loadLibrary,image,animation,libraries,notice,main:showMain,
+const menus = new Ew4Menus.Menus({rpc,button,uiImage,countryImage,labels:labelImage,text:(value,font,color,width,align,options)=>originalTextRenderer?.element(value,font,color,width,align,options)||document.createTextNode(value),prose:(...args)=>originalTextRenderer.prose(...args),detail:detailWindow,start,loadLibrary,image,animation,libraries,notice,main:showMain,
   get manifest(){return manifest;},get catalog(){return catalog;},refreshCatalog:async()=>{catalog=await rpc('catalog');},tutorialUi,popup:popupOpen,load:(slot,mode)=>load(slot,mode),deploy:(unit,commander)=>act('deploy',{unit,commander}),act,
   refresh:async()=>{if(state&&!$('play').hidden){await installState(await rpc('action',{op:'state',revision:state.revision}));}},get menuArt(){return menuArt;},closeDetail});
 let chosenScenario, chosenCountry, countryChoices = [], showGrid = false, selectedAt = 0;
 const victoryUi = new Ew4VictoryUI.Results({
-  ready:next=>!busy&&!skipAi&&$('loading-screen').hidden&&state===next&&battlefield.state===next&&[...images.values()].every(img=>img.complete),
+  ready:next=>!busy&&!skipAi&&!sessionTransition&&$('pause').hidden&&$('loading-screen').hidden&&state===next&&battlefield.state===next&&[...images.values()].every(img=>img.complete),
   get manifest(){return manifest;},detail:detailWindow,button,uiImage,notice,
   text:(...args)=>originalTextRenderer.element(...args),portrait:name=>menus.portrait(name),close:closeDetail,
   title:key=>$('detail-title').replaceChildren(labelImage(key,manifest.strings[key]||key,$('detail-title'))),
@@ -52,7 +52,7 @@ const victoryUi = new Ew4VictoryUI.Results({
   continue:async result=>{if(result.nextScenario)await start(result.nextScenario,null,null);else await showMain();},exit:showMain
 });
 const localMultiplayerUi = new Ew4LocalMultiplayer.LocalMultiplayer({rpc,detail:detailWindow,button,close:closeDetail,main:showMain,
-  text:(...args)=>originalTextRenderer.element(...args),ready:()=>!busy&&!aiRunning&&!skipAi&&$('loading-screen').hidden,
+  text:(...args)=>originalTextRenderer.element(...args),ready:()=>!busy&&!aiRunning&&!skipAi&&!sessionTransition&&$('pause').hidden&&$('loading-screen').hidden,
   restart:next=>start(next.scenario,next.startCountry,next.localMultiplayer.humanFactions)});
 let tutorial, tutorialRect;
 let settings={music:50,sound:50,speed:2,hd:true,screen:100,eventSize:100,cityLanguage:'en',geographicLanguage:'en',localMultiplayer:false,skipTurnFast:false,followAi:false};
@@ -65,7 +65,8 @@ function sizeUi() {
   document.documentElement.style.setProperty('--startup-reserve',reserve+'px');
   const scale = Math.min(innerWidth / 568, Math.max(1,innerHeight-reserve) / 320)*settings.screen/100;
   document.documentElement.style.setProperty('--ui-scale', scale);
-  document.documentElement.style.setProperty('--battle-scale', Math.max(.8, scale));
+  const battleScale=Math.min(Math.max(scale,48/27,innerHeight/300),innerWidth/420,innerHeight/180);
+  document.documentElement.style.setProperty('--battle-scale', battleScale);
   const baseEventScale = Math.min(1.5, innerWidth*.84/360, innerHeight*.74/264)*settings.screen/100;
   const eventHeight=innerHeight>=innerWidth?Math.min(400,innerHeight*.74/baseEventScale):264;
   // Bound the slider itself so each step still enlarges the popup on small screens.
@@ -90,10 +91,12 @@ function originalLabels() {
   }
 }
 async function showMain() {
-  if(leavingSession)return;
-  leavingSession=true;
-  const wasBusy=busy;busy=true;
+  if(sessionTransition)return;
+  sessionTransition=true;
+  const wasBusy=busy&&!aiRunning;
   try {
+    await stopAi();
+    busy=true;
     if(state)await rpc('leave',{revision:state.revision});
     state=undefined;selected=undefined;selection=undefined;tutorial=null;tutorialRect=null;
     battleDialogues.length=0;
@@ -107,7 +110,7 @@ async function showMain() {
     $('campaign-screen').hidden=true;$('hq-screen').hidden=true;
     $('tutorial-talk').hidden=true;$('tutorial-focus').hidden=true;
   } catch(error) { notice(error.message); }
-  finally { busy=wasBusy;leavingSession=false; }
+  finally { busy=wasBusy;sessionTransition=false; }
 }
 function notice(text) { $('notice').textContent = text; $('notice').hidden = false; clearTimeout(errorTimer); errorTimer = setTimeout(() => $('notice').hidden = true, 5500); }
 async function rpc(route, args = {}) {
@@ -228,8 +231,10 @@ async function loadLibrary(name) {
 function visualProfile(unit,world=state){return unit&&(effects?.profile(unit.profile,world?.factions.find(f=>f.id===unit.owner))||manifest.profiles[unit.profile]);}
 async function installState(next, center = false) {
   closeSingleAction();
+  const resetPause=center;
+  const previous=state;
   center=center||!!(state&&(state.map!==next.map||state.scenario!==next.scenario||state.width!==next.width||state.height!==next.height||state.playerFaction!==next.playerFaction));
-  if(center){effects?.clear();damageNumbers?.clear();deaths.clear();battleDialogues.length=0;unitNavigation.reset();}
+  if(center){effects?.clear();damageNumbers?.clear();deaths.clear();combatMotions.clear();battlefield.resetMotions();battleDialogues.length=0;unitNavigation.reset();}
   const keepUnit=center?null:selected?.id,keepCell=center?null:selection?.cell;
   const used = [...new Set([...next.units,...(state?.units||[])].map(u => visualProfile(u,next)?.library).filter(Boolean))];
   await Promise.all([...used, 'choose', 'maptext', 'anim_fire', 'anim_upgrade', 'anim_smoke'].map(loadLibrary));
@@ -242,6 +247,7 @@ async function installState(next, center = false) {
     if(moves.length){
       state={...state,units:state.units.map(u=>{const move=moves.find(m=>m.unit===u.id);return move?{...u,cell:move.path.at(-1)}:u;})};
       await playMovements(moves);
+      playOccupationSound(next,moves);
     }
     await playCombat(next.combat,new Set(state.units.filter(u=>!next.units.some(v=>v.id===u.id)).map(u=>u.id)));
   }
@@ -254,6 +260,11 @@ async function installState(next, center = false) {
   if(!center&&!(aiRunning&&skipAi)&&state&&next.revision>state.revision){
     const units=[...next.units,...state.units],handled=new Set();
     for(const notice of next.notices||[]){
+      if(notice.kind==='battle.medal_dropped'){
+        const unit=units.find(u=>u.id===notice.target);
+        if(unit){const p=point(unit.cell);effects?.timeline('getmedal',p.x,p.y,{speed:Math.sqrt(settings.speed)});effects?.sound('sfx_lvup.wav');}
+        continue;
+      }
       if(notice.kind==='battle.kill_context'){
         const source=units.find(u=>u.id===notice.subject),victim=state.units.find(u=>u.id===notice.target);
         const speaker=source&&!next.units.some(u=>u.id===source.id)?{...source,health:0}:source;
@@ -276,27 +287,55 @@ async function installState(next, center = false) {
     }
   }
   state = next; selected = undefined; selection = undefined; $('selection').hidden = true;
+  if(!center&&!skipAi&&previous&&next.revision>previous.revision)playAttachedEffects(previous,next);
   presentBattleDialogue();
   if (center || !mapBounds) mapBounds = Ew4Battlefield.cameraBounds(state, manifest.maps[state.map]);
-  $('menu').hidden = true; $('play').hidden = false; $('pause').hidden = true;
+  $('menu').hidden = true; $('play').hidden = false;
+  if(resetPause)$('pause').hidden = true;
   if (center) centerPlayer(); else clampView();
   refreshHud();
   motions.clear(); arrivals.clear();
   const now=performance.now(), stepMs=movementStepMs();
   if (!center && !fastSkipping()) {
     const moves=skipAi&&next.combat?.movements?.length?next.combat.movements:next.movements||[];
-    if(!next.combat||skipAi)for(const move of moves)if(!move.instant&&move.path.length>1){motions.set(move.unit,{path:move.path,started:now,stepMs});const a=point(move.path.at(-2)),b=point(move.path.at(-1));facings.set(move.unit,b.x<a.x?-1:1);}
-    if(!skipAi)for(const id of next.recruited || []){arrivals.set(id,now);const unit=state.units.find(u=>u.id===id),p=unit&&point(unit.cell);if(p)effects?.effect('effect_recruit.xml',p.x,p.y,{speed:Math.sqrt(settings.speed)});}
+    if(!next.combat||skipAi)for(const move of moves)if(!move.instant&&move.path.length>1){combatMotions.delete(move.unit);motions.set(move.unit,{path:move.path,started:now,stepMs});const a=point(move.path.at(-2)),b=point(move.path.at(-1));facings.set(move.unit,b.x<a.x?-1:1);if(!skipAi)playMovementSound(move);}
+    if(!skipAi)for(const id of next.recruited || []){const unit=state.units.find(u=>u.id===id);if(!unit||unit.category==='fort'||!next.notices?.some(n=>n.kind==='unit.recruited'&&n.subject===id))continue;arrivals.set(id,now);const p=point(unit.cell);effects?.sound('sfx_draft.wav');effects?.effect('effect_recruit.xml',p.x,p.y,{speed:Math.sqrt(settings.speed)});}
     const duration=Math.max(...[...motions.values()].map(m=>(m.path.length-1)*stepMs),...([...arrivals.keys()].map(id=>{
       const unit=state.units.find(u=>u.id===id),p=visualProfile(unit),lib=libraries.get(p?.library),item=lib?.byName.get(p?.motions.ready);
       return Math.max(Ew4Battlefield.recruitDuration(Math.sqrt(settings.speed)),(item?.duration||1)/(lib?.fps||24)*1000);
     })),0);
     updateAiCamera(now);
     if(duration)await presentationDelay(duration);
+    if(!next.combat&&!skipAi)playOccupationSound(next,moves);
   }
   motions.clear();arrivals.clear();
   requestRender();
   if(!center&&state.activeFaction===state.playerFaction&&!state.dialogue){const unit=state.units.find(u=>u.id===keepUnit);const cell=unit?.cell??(keepUnit?null:keepCell);if(cell!=null)await selectCell(cell,true);}
+}
+function playAttachedEffects(previous,next){
+  const oldUnits=new Map(previous.units.map(u=>[u.id,u])),units=new Map(next.units.map(u=>[u.id,u])),upgraded=new Set(),healed=new Set(),commanders=new Set(),speed=Math.sqrt(settings.speed);
+  for(const notice of next.notices||[]){
+    if(['battle.experience','unit.trained','unit.item_used'].includes(notice.kind)){
+      const unit=units.get(notice.subject),old=oldUnits.get(notice.subject);
+      if(unit&&old&&unit.veterancy!==old.veterancy&&!upgraded.has(unit.id)){
+        upgraded.add(unit.id);const p=point(unit.cell);effects?.effect('effect_upgrade.xml',p.x,p.y,{speed});
+        if(notice.kind==='battle.experience')effects?.sound('sfx_lvup.wav');
+      }
+    }
+    if(notice.kind==='unit.healed')healed.add(notice.subject);
+    if(notice.kind==='commander.rank_advanced'||notice.kind==='commander.title_advanced'){
+      const key=notice.kind+':'+notice.subject,unit=next.units.find(u=>u.commanderId===notice.subject);
+      if(unit&&!commanders.has(key)){
+        commanders.add(key);const p=point(unit.cell);effects?.timeline(notice.kind==='commander.rank_advanced'?'upgraderank':'upgradenobility',p.x,p.y,{speed});
+      }
+    }
+  }
+  if(next.suppliedUnit)healed.add(next.suppliedUnit);
+  for(const id of healed){const unit=units.get(id),old=oldUnits.get(id);
+    if(unit&&old&&unit.health>old.health&&!upgraded.has(id)){
+      const p=point(unit.cell);effects?.sound('sfx_supply.wav');effects?.effect('effect_recover.xml',p.x,p.y,{speed});
+    }
+  }
 }
 function killDialogueMatches(rule,next,speaker,victim){
   const when=rule.when;
@@ -321,7 +360,7 @@ function presentBattleDialogue(){
 function fastSkipping(){return aiRunning&&skipAi&&settings.skipTurnFast;}
 function movementStepMs(){return aiRunning&&skipAi?65:255/Math.sqrt(settings.speed);}
 function clearAiPresentation(){
-  motions.clear();arrivals.clear();deaths.clear();combatMotions.clear();effects?.clear();damageNumbers?.clear();finishPresentation?.();
+  motions.clear();arrivals.clear();deaths.clear();combatMotions.clear();battlefield.resetMotions();effects?.clear();damageNumbers?.clear();finishPresentation?.();
 }
 function followingAi(){return aiRunning&&settings.followAi&&!fastSkipping()&&aiFocus&&!state?.factions.find(f=>f.id===state.activeFaction)?.human;}
 function focusAiAction(next){
@@ -339,9 +378,14 @@ function updateAiCamera(time){
 }
 function presentationDelay(duration){requestRender();return new Promise(resolve=>{const timer=setTimeout(done,duration);function done(){clearTimeout(timer);presentationWaiters.delete(done);if(!presentationWaiters.size)finishPresentation=null;requestRender();resolve();}presentationWaiters.add(done);finishPresentation=()=>{for(const finish of [...presentationWaiters])finish();};});}
 function beginDeath(id){if(!deaths.has(id))deaths.set(id,{started:performance.now(),duration:500/Math.sqrt(settings.speed)});}
+function playMovementSound(move){const unit=state.units.find(u=>u.id===move.unit);if(unit)effects?.moveSound(visualProfile(unit),unit.category,state.cells[move.path.at(-1)]?.sea);}
+function playOccupationSound(next,moves){
+  for(const move of moves)if(!move.instant&&move.path.length>1){const cell=move.path.at(-1),site=next.cells[cell];
+    if(site.buildingKind&&site.buildingKind!=='farmland'&&next.notices?.some(n=>n.kind==='cell.owner_changed'&&Number(n.subject)===cell))effects?.sound('sfx_occupy.wav');}
+}
 async function playMovements(moves){
   const started=performance.now(),stepMs=movementStepMs();
-  for(const move of moves)if(!move.instant&&move.path.length>1)motions.set(move.unit,{path:move.path,started,stepMs});
+  for(const move of moves)if(!move.instant&&move.path.length>1){combatMotions.delete(move.unit);motions.set(move.unit,{path:move.path,started,stepMs});playMovementSound(move);}
   await presentationDelay(Math.max(0,...moves.filter(m=>!m.instant).map(m=>(m.path.length-1)*stepMs)));motions.clear();
 }
 async function playCombat(combat,destroyed=new Set()){
@@ -356,23 +400,18 @@ async function playCombat(combat,destroyed=new Set()){
     if(!unit||!target)continue;
     const profile=visualProfile(unit),lib=libraries.get(profile?.library);if(!lib)continue;
     const facing=point(target.cell).x<point(unit.cell).x?-1:1;
-    const segments=[],firing=effects?.motion(profile,'attack',facing),timeline=(firing?.effect||'')+(facing<0?' left':' right'),firstShot=effects?.firstEvent(timeline)??0,lastShot=effects?.lastEvent(timeline);let duration=0;
-    for(const action of ['attack','reload','finish']){const motion=effects?.motion(profile,action,facing),name=motion?.name||profile.motions[action],item=lib.byName.get(name);if(!item)continue;const rate=speed*Number(motion?.speed||1);let length=item.duration/lib.fps*1000/rate;if(action==='attack'&&lastShot!=null)length=Math.min(length,(lastShot+.2+(unit.category==='artillery'?.2:0))*1000/speed);segments.push({name,start:duration,end:duration+length,speed:rate,directional:motion?.dir==='left'||motion?.dir==='right'});duration+=length;}
-    if(!duration)continue;
-    const hitAt=lastShot==null?segments[0].end:Math.max(segments[0].end,(lastShot+.2)*1000/speed);
-    plans.push({id,targetId,damage,critical,unit,target,profile,facing,timeline,segments,duration,hitAt,firstShot:firstShot*1000/speed});
+    const plan=effects.attackPlan(profile,lib,unit.category,facing,speed);if(!plan.duration)continue;
+    plans.push({id,targetId,damage,critical,unit,target,profile,facing,...plan});
   }
   // Source windups differ (artillery 1.7s, fortress 0s). Align the actual
-  // salvo, then keep both attack poses until the shared backend hit is shown.
+  // salvo and hit timing. Body clips continue independently without extra input waits.
   const firstShot=Math.max(0,...plans.map(p=>p.firstShot));
   for(const plan of plans)plan.delay=firstShot-plan.firstShot;
   const impactAt=Math.max(0,...plans.map(p=>p.delay+p.hitAt));
   const started=performance.now();
   await Promise.all(plans.map(async plan=>{
     const {id,targetId,damage,critical,unit,target,profile,facing,timeline,segments,delay}=plan;
-    const hold=impactAt-delay-segments[0].end;
-    segments[0].end+=hold;
-    for(const segment of segments.slice(1)){segment.start+=hold;segment.end+=hold;}
+    const hold=impactAt-delay-plan.attackBasis;
     const duration=delay+plan.duration+hold;
     facings.set(id,facing);
     const p=point(unit.cell),q=point(target.cell);
@@ -386,7 +425,7 @@ async function playCombat(combat,destroyed=new Set()){
       if(id===combat.attacker&&combat.splashTarget){const splash=state.units.find(u=>u.id===combat.splashTarget);if(splash){const hit=point(splash.cell);damageNumbers?.add(combat.splashDamage,false,hit.x,hit.y,speed);playImpact(profile,splash,combat.splashDamage,facing,speed);if(destroyed.has(splash.id))beginDeath(splash.id);}}
     }
     if(!(aiRunning&&skipAi))await presentationDelay(Math.max(0,started+duration-performance.now()));
-    combatMotions.delete(id);
+    // The renderer retires any remaining recovery frames without locking input.
   }));
 }
 function playImpact(profile,target,damage,facing,speed){
@@ -406,7 +445,7 @@ async function start(scenario, country, localPlayers) {
       const available=new Set((await rpc('local-players',{scenario,country})).map(f=>f.id));
       localPlayers=localPlayers.filter(id=>available.has(id));
     }
-    await withLoading(async()=>{tutorial=null; await installState(await rpc('start', {scenario, country,localPlayers}), true); await beginTutorial();});
+    await withLoading(async()=>{tutorial=null;stageIntroOpen=false;await installState(await rpc('start', {scenario, country,localPlayers}), true);showStageIntro();await beginTutorial();});
   }
   finally { busy = false; $('countries').querySelectorAll('button').forEach(b => b.disabled = false); if(state)refreshHud(); }
 }
@@ -454,14 +493,14 @@ function refreshHud() {
   }
   $('end-turn').disabled = busy || !active.human || state.phase !== 'Active' || !!state.dialogue;
   $('undo-move').hidden = !active.human;
-  $('undo-move').disabled = busy || !(selected ? selection?.undo : state.undoUnit);
+  $('undo-move').disabled = busy || !selected || !selection?.undo;
   $('next-unit').hidden = !active.human;
   $('next-unit').disabled = busy || findingUnit || !Ew4UnitNavigation.groups(state).some(units=>units.length);
   $('skip-ai').hidden = active.human || state.phase === 'Finished' || !!state.dialogue;
   $('skip-ai').disabled = skipAi;
   refreshAiProgress();
-  $('dialogue').hidden = !state.dialogue || !!state.scenarioPopup;
-  $('scenario-event').hidden = !state.scenarioPopup;
+  $('dialogue').hidden = !state.dialogue || !!state.scenarioPopup || stageIntroOpen;
+  $('scenario-event').hidden = !state.scenarioPopup || stageIntroOpen;
   if(state.scenarioPopup){
     const popup=state.scenarioPopup;
     const content=$('scenario-event-content'), choices=$('scenario-event-choices'), event=$('scenario-event');
@@ -478,8 +517,11 @@ function refreshHud() {
       picture.alt=popup.imageAlt||popup.title;
     }else picture.removeAttribute('src');
     const eventText=$('scenario-event-text');
-    eventText.textContent=Ew4OriginalUI.availableText(popup.text);
-    void Ew4OriginalUI.prepareText(popup.text).then(()=>{if(state?.scenarioPopup===popup)eventText.textContent=Ew4OriginalUI.availableText(popup.text);});
+    const proseWidth=Math.max(40,eventText.clientWidth||300);
+    if(eventText.ew4Text!==popup.text||eventText.ew4Width!==proseWidth){
+      eventText.replaceChildren(originalTextRenderer.prose(popup.text,'font_text_1_cn_hd','#404040',proseWidth));
+      eventText.ew4Text=popup.text;eventText.ew4Width=proseWidth;
+    }
     $('scenario-event-text').hidden=!popup.text;
     choices.replaceChildren();
     for(const choice of popup.choices){
@@ -501,7 +543,7 @@ function refreshHud() {
   localMultiplayerUi.sync(state);
 }
 async function act(op, extra = {}) {
-  if (busy || !state) return;
+  if (busy || !state || stageIntroOpen) return;
   if(state.localBattleDialogue){
     if(op!=='dialogue')return;
     battleDialogues.shift();
@@ -517,12 +559,25 @@ async function act(op, extra = {}) {
   } finally { busy = false; refreshHud(); }
   if (op === 'end' || op === 'dialogue' || op === 'event_choice') await runAi();
 }
-async function runAi() {
+function runAi() {
+  if(aiTask)return aiTask;
+  if(sessionTransition||!$('pause').hidden)return Promise.resolve();
+  aiTask=runAiLoop().finally(()=>{aiTask=null;});
+  return aiTask;
+}
+async function stopAi(){
+  if(!aiTask)return;
+  aiStopRequested=true;skipAi=true;clearAiPresentation();
+  // Join the in-flight command before replacing its session or using its revision to leave.
+  await aiTask;
+}
+async function runAiLoop() {
   if (aiRunning) return;
+  aiStopRequested=false;
   aiRunning = true; skipAi = false;
   try {
     busy=true;refreshHud();
-    while (aiCanContinue(state)) {
+    while (aiCanContinue(state)&&$('pause').hidden&&!aiStopRequested) {
       if(fastSkipping()){
         const batch=await rpc('action',{op:'ai_batch',revision:state.revision});
         if(batch.baseRevision!==state.revision)throw Error('回合状态不同步');
@@ -537,15 +592,15 @@ async function runAi() {
         }
         if(batch.error)throw Error(failure(batch.error.code,batch.error.message));
       }else await installState(await rpc('action', {op:'ai', revision:state.revision}));
-      if(!skipAi)await new Promise(resolve => setTimeout(resolve, 180/settings.speed));
+      if(!skipAi&&$('pause').hidden)await new Promise(resolve => setTimeout(resolve, 180/settings.speed));
     }
   } catch (error) {
     try{await installState(await rpc('action',{op:'state'}));}catch(_){}
     notice(error.message);
   }
-  finally { busy = false; aiRunning = false; skipAi = false; aiFocus=null; refreshHud();requestRender(); }
+  finally { busy = false; aiRunning = false; skipAi = false; aiStopRequested=false; aiFocus=null; if(state)refreshHud();requestRender(); }
 }
-function aiCanContinue(next){return next&&!next.dialogue&&!next.scenarioPopup&&next.phase!=='Finished'&&!next.factions.find(f=>f.id===next.activeFaction).human;}
+function aiCanContinue(next){return !stageIntroOpen&&next&&!next.dialogue&&!next.scenarioPopup&&next.phase!=='Finished'&&!next.factions.find(f=>f.id===next.activeFaction).human;}
 async function selectCell(cell,restore=false,selectOnly=false) {
   if ((!restore&&busy) || !state || cell < 0 || cell >= state.cells.length || !state.cells[cell].active) return;
   closeSingleAction();
@@ -618,7 +673,13 @@ function toolButton(icon,title,action){const b=button('',action,$('actions'));b.
   if(icon==='disband'){const img=new Image(33,33);img.alt='';img.src='/disband.png';b.append(img);}
   else b.append(uiImage('button_'+(icon==='general'?'generals':icon)+'.png',33));
   b.dataset.tutorialId=({general:'btn_general',items:'btn_item',city:'btn_city',factory:'btn_factory',stable:'btn_stable',dock:'btn_dock',buildfortress:'btn_fortress',builddefense:'btn_defense',buyship:'btn_ship',training:'btn_training',buildupgrade:'btn_upgrade'})[icon]||'';return b;}
-let detailReturn,detailRevision=0;
+let detailReturn,detailRevision=0,stageIntroOpen=false;
+function showStageIntro(){
+  if(!state?.stageIntro||state.phase==='Finished')return;
+  stageIntroOpen=true;
+  menus.stageIntro(state.stageIntro,()=>{stageIntroOpen=false;refreshHud();void runAi();});
+  refreshHud();
+}
 function confirmDisband(unit,refund,anchor){openSingleAction('disband','解散部队',{cost:refund,affordable:true,warning:selection.disbandWarning},anchor,{unit:unit.id},true);}
 function popupOpen(element){element.classList.remove('popup-opening');void element.offsetWidth;element.classList.add('popup-opening');}
 function closeDetail(){const back=detailReturn;detailReturn=null;menus.dismissSkillTip();$('detail-modal').hidden=true;if(back)back();}
@@ -878,18 +939,19 @@ function render(time) {
   if(!renderDirty&&time-lastRenderTime<1000/30-.5){renderRequest=requestAnimationFrame(render);return;}
   renderDirty=false;lastRenderTime=time;
   const playVisible=state&&!$('play').hidden;
+  const menuVisible=!$('menu').hidden;
   const covered=['pause','settings','detail-modal','mod-manager','loading-screen'].some(id=>!$(id).hidden);
-  const animated=(!$('campaign-screen').hidden||!$('countries').hidden)||playVisible&&!covered&&!fastSkipping()&&
+  const animated=menuVisible&&(!$('campaign-screen').hidden||!$('countries').hidden)||playVisible&&!covered&&!fastSkipping()&&
     (battlefield.animated||motions.size||arrivals.size||deaths.size||combatMotions.size||effects?.instances.length||damageNumbers?.instances.length||selection);
   if(animated)renderRequest=requestAnimationFrame(render);
-  if(manifest)menus.draw(time);
+  if(manifest&&menuVisible)menus.draw(time);
   positionSingleAction();
   if(tutorial&&!$('play').hidden)positionTutorial();
   if(tutorial?.wait?.name==='wait action'&&!busy&&!aiRunning)tutorial.notify({type:'action'}).catch(e=>notice(e.message));
   if(!$('countries').hidden&&!$('menu').hidden)drawStrategicMap(time);
-  if(!playVisible||covered||fastSkipping())return;
+  if(!playVisible||covered&&!stageIntroOpen||fastSkipping())return;
   const w=canvas.clientWidth,h=canvas.clientHeight;
-  const dpr=settings.hd?Math.max(1,Math.min(window.devicePixelRatio||1,2,Math.sqrt(3*1024*1024/Math.max(1,w*h)))):1;
+  const dpr=settings.hd?Math.max(1,Math.min(window.devicePixelRatio||1,3,Math.sqrt(6*1024*1024/Math.max(1,w*h)))):1;
   if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);}
   viewport={w,h,dpr};updateAiCamera(time);clampView();ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#688e91';ctx.fillRect(0,0,w,h);
   ctx.translate(w/2,h/2);ctx.scale(view.zoom,view.zoom);ctx.translate(-view.x,-view.y);
@@ -997,20 +1059,32 @@ $('local-multiplayer-mode').onchange=e=>{if(!$('play').hidden){e.target.checked=
 function persistSettings(){try{localStorage.setItem('ew4.settings',JSON.stringify(settings));}catch(_){} }
 $('close-detail').onclick=async()=>{closeDetail();await tutorialUi('winbtn_close');};
 $('show-grid').onchange=e=>{showGrid=e.target.checked;try{localStorage.setItem('ew4.showGrid',String(showGrid));}catch(_){notice('无法保存设定');}};
-$('menu-button').onclick=()=>$('pause').hidden=false;$('resume').onclick=()=>$('pause').hidden=true;
+$('menu-button').onclick=()=>$('pause').hidden=false;
+$('resume').onclick=()=>{$('pause').hidden=true;if(!busy)runAi().catch(e=>notice(e.message));};
 $('end-turn').onclick=()=>act('end').catch(e=>notice(e.message));
-$('undo-move').onclick=()=>act('undo',{unit:selected?.id||state.undoUnit}).then(()=>tutorialUi('btn_undo')).catch(e=>notice(e.message));
+$('undo-move').onclick=()=>{if(!selected||!selection?.undo||$('undo-move').disabled)return;return act('undo',{unit:selected.id}).then(()=>tutorialUi('btn_undo')).catch(e=>notice(e.message));};
 $('next-unit').onclick=()=>findNextUnit().catch(e=>notice(e.message));
 $('skip-ai').onclick=()=>{skipAi=true;clearAiPresentation();if(fastSkipping())aiFocus=null;refreshHud();requestRender();};
 $('dialogue').onclick=()=>{
   if($('dialogue').hidden||!$('pause').hidden||!$('settings').hidden||state?.scenarioPopup)return;
   act('dialogue').catch(e=>notice(e.message));
 };
-$('save').onclick=()=>menus.saveMenu(true,catalog.scenarios.find(s=>s.id===state.scenario).mode,tutorial?.checkpoint()).catch(e=>notice(e.message));
-async function load(slot=0,saveMode=mode){if(busy)return;busy=true;try{await withLoading(async()=>{tutorial=null;await installState(await rpc('load',{slot,mode:saveMode}),true);$('detail-modal').hidden=true;await beginTutorial(state.tutorialCheckpoint);});}catch(e){notice(e.message);}finally{busy=false;if(state){refreshHud();await runAi();}}}
+$('save').onclick=()=>{
+  if(busy||aiRunning||sessionTransition){notice('请等待当前行动完成后再保存');return;}
+  if(state)return menus.saveMenu(true,catalog.scenarios.find(s=>s.id===state.scenario).mode,tutorial?.checkpoint()).catch(e=>notice(e.message));
+};
+async function load(slot=0,saveMode=mode){if(busy)return;busy=true;try{await withLoading(async()=>{tutorial=null;stageIntroOpen=false;await installState(await rpc('load',{slot,mode:saveMode}),true);$('detail-modal').hidden=true;showStageIntro();await beginTutorial(state.tutorialCheckpoint);});}catch(e){notice(e.message);}finally{busy=false;if(state){refreshHud();await runAi();}}}
 $('continue').onclick=()=>menus.saveMenu(false,mode).catch(e=>notice(e.message));
-$('restart').onclick=()=>{if(state&&!busy)start(state.scenario,catalog.scenarios.find(s=>s.id===state.scenario)?.mode===2?(state.startCountry??state.factions.find(f=>f.id===state.playerFaction).country):null,state.localMultiplayer?.humanFactions??null).catch(e=>notice(e.message));};
-$('return-menu').onclick=()=>{if(busy){notice('请等待当前行动完成');return;}showMain();};
+$('restart').onclick=async()=>{
+  if(!state||sessionTransition)return;
+  if(busy&&!aiRunning){notice('请等待当前行动完成');return;}
+  sessionTransition=true;
+  const scenario=state.scenario,country=catalog.scenarios.find(s=>s.id===scenario)?.mode===2?(state.startCountry??state.factions.find(f=>f.id===state.playerFaction).country):null;
+  const players=state.localMultiplayer?.humanFactions??null;
+  try{await stopAi();await start(scenario,country,players);}catch(e){notice(e.message);}
+  finally{sessionTransition=false;}
+};
+$('return-menu').onclick=()=>{if(busy&&!aiRunning){notice('请等待当前行动完成');return;}return showMain();};
 window.ew4Back=()=>{
   if(pendingAction){closeSingleAction();return 'handled';}
   const visible=id=>!$(id).hidden;
@@ -1049,13 +1123,15 @@ async function initializeClient(){
   document.querySelectorAll('.main-entry').forEach(button=>button.disabled=true);$('continue').disabled=true;
   try{
     Ew4Startup.pending('游戏目录与资源索引');
-    const [c,m,names,fx,pages,visuals]=await Promise.all([rpc('catalog'),startupJson('/content/manifest.json'),startupJson('city-names.json'),startupJson('/content/effects.json'),startupJson('conquest-pages.json'),startupJson('/content/unit-visuals.json')]);
+    const [c,m,names,fx,pages,visuals,presentation]=await Promise.all([rpc('catalog'),startupJson('/content/manifest.json'),startupJson('city-names.json'),startupJson('/content/effects.json'),startupJson('conquest-pages.json'),startupJson('/content/unit-visuals.json'),startupJson('/content/presentation.json')]);
     Ew4Startup.pending('内置字库');
     const text=new Ew4OriginalUI.TextRenderer(m);await text.prepare();
     Ew4Startup.pending('菜单图像');
     const art=new Ew4MenuArt.MenuArt({manifest:m,image});await art.prepare();
     catalog=c;manifest=m;cityNames=names;conquestPages=pages;menuArt=art;
+    fx.elements??=presentation.elements;fx.sounds=[...new Set([...fx.sounds,...presentation.sounds])];
     effects=new Ew4Effects.Effects({image,sprite,animation,libraries,get manifest(){return manifest;},volume:()=>settings.sound},fx,visuals);
+    effects.preloadSounds(presentation.sounds);
     originalTextRenderer=text;
     Ew4Startup.pending('战斗图像与界面');
     const fightFonts=await startupJson('/content/fight-font.json');

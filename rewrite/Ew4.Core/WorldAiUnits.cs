@@ -74,10 +74,11 @@ public static partial class WorldAi
         if (command.ExpectedRevision != plan.ExpectedRevision || command.UnitId != plan.UnitId)
             throw new RuleViolation("ai.unit_selection", "Unit command does not match its plan");
         WorldChange change;
+        var executionState = state with { AiRandomState = plan.FinalRandomState };
         switch (command)
         {
-            case AiStrikeCommand strike: change = ExecuteStrike(state, strike, battleRules); break;
-            case AiMoveCommand move: change = ExecuteMove(state, move, rules, battleRules); break;
+            case AiStrikeCommand strike: change = ExecuteStrike(executionState, strike, battleRules); break;
+            case AiMoveCommand move: change = ExecuteMove(executionState, move, rules, battleRules); break;
             case AiStrategicCommand strategic:
                 change = ExecuteStrategic(state, new(plan.ExpectedRevision, plan.UnitId, plan.InitialRandomState, plan.FinalRandomState,
                     new[] { new AiCandidate<AiStrategicCommand>(strategic, plan.Candidates[index].Score) }), 0, rules);
@@ -91,7 +92,8 @@ public static partial class WorldAi
                 break;
             default: throw new RuleViolation("ai.command", "Unsupported unit AI command");
         }
-        var committed = change.State with { AiRandomState = plan.FinalRandomState };
+        var committed = command is AiStrikeCommand or AiMoveCommand ? change.State
+            : change.State with { AiRandomState = plan.FinalRandomState };
         committed.Validate();
         return change with { State = committed };
     }

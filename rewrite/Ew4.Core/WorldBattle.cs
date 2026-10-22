@@ -22,6 +22,7 @@ public sealed record WorldBattleRules
     public bool CheckFactionSurvival { get; init; } = true;
     public bool ResolveIgnition { get; init; } = true;
     public bool RecalculateLocalMorale { get; init; } = true;
+    public bool CollectMedals { get; init; }
     public int InstallationDestructionProbability { get; init; } = 35;
     public int KillMoraleProbability { get; init; } = 30;
     public int SuppressionProbability { get; init; } = 25;
@@ -177,6 +178,7 @@ public static class WorldBattle
                 RecordKill(attacker, splash);
                 ClearInstallation(splash.Cell);
             }
+            CollectMedals(attacker, defender, battle.Dealt, battle.Taken);
             ConsumeWeapon(attacker.Id);
             if (battle.Counterattack) ConsumeWeapon(defender.Id);
             RefreshLocalMorale();
@@ -201,6 +203,19 @@ public static class WorldBattle
             state = state with { Revision = checked(before.Revision + 1) };
             state.Validate();
             return new(state, notices);
+        }
+
+        private void CollectMedals(UnitState attacker, UnitState defender, int dealt, int taken)
+        {
+            if (!rules.CollectMedals || state.LocalMultiplayer != null || !state.Factions.Any(f => f.Human && !f.Defeated)) return;
+            // Native 825d4 checks attacker, then defender, against the same defender tile.
+            var random = new AiRandom(state.AiRandomState);
+            var site = state.Cells[defender.Cell];
+            foreach (var (unit, damage) in new[] { (attacker, dealt), (defender, taken) })
+                if (state.Factions.Single(f => f.Id == unit.Owner).Human
+                    && BattleMedals.Drops(damage, site.BuildingKind, site.BuildingLevel, (int)random.Next(100)))
+                    notices.Add(new("battle.medal_dropped", unit.Owner, 1) { Target = unit.Id });
+            state = state with { AiRandomState = random.State };
         }
 
         private void ConsumeWeapon(string id)

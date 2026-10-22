@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import shutil
 import xml.etree.ElementTree as ET
+from export_presentation_assets import export as export_presentation
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "apk_work/original/assets"
@@ -53,7 +54,9 @@ def export_effects():
         bindings[key] = next(candidate for candidate in candidates if candidate in motions)
     data = dict(timelines=timelines, definitions=definitions, motions=motions, bindings=bindings, sounds=sounds)
     (OUTPUT / "effects.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    report = dict(timelines=len(timelines), definitions=len(definitions), sounds=len(sounds), sources=sources, errors=0)
+    presentation = export_presentation()
+    report = dict(timelines=len(timelines), definitions=len(definitions), sounds=presentation["sounds"],
+                  elementGroups=presentation["elementGroups"], sources=sources, errors=0)
     (ROOT / "rewrite/reports/frontend_effect_export.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     return {k: v for k, v in report.items() if k != "sources"}
 

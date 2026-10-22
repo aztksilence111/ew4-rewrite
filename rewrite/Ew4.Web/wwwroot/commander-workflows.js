@@ -90,7 +90,7 @@
   proto.itemButton=function(item,quantity,select){
     const b=this.api.button('',select,document.createElement('div'));b.className='native-item';b.setAttribute('aria-label',item?.name||'空物品位');
     b.append(this.api.uiImage(item?.image||'item_blank.png',45));
-    if(quantity>1){const n=document.createElement('span');n.className='item-quantity';n.append(this.lettering(quantity,'font_char_2_hd','#ebe6e1'));b.append(n);}
+    if(item&&Number.isFinite(quantity)&&(item.consumable||quantity>1)){const n=document.createElement('span');n.className='item-quantity';n.append(this.lettering(quantity,'font_char_2_hd','#ebe6e1'));b.append(n);}
     return b;
   };
   proto.equipment=function(id){
@@ -197,25 +197,43 @@
   };
   proto.shop=async function(cell=-1,snapshot){
     if(!this.data)this.data=await this.api.rpc('headquarters');
-    const data=snapshot||await this.api.rpc('commerce',{cell}),l=this.native('form_shop',async()=>{this.data=await this.api.rpc('headquarters');this.drawRoster();await this.api.refresh();});
-    if(cell<0){
-      const refresh=this.api.button('',async()=>{
+    let data=snapshot||await this.api.rpc('commerce',{cell}),pending=false,refresh;
+    const l=this.native('form_shop',async()=>{this.data=await this.api.rpc('headquarters');this.drawRoster();await this.api.refresh();});
+    const refreshLabel=()=>{
+      if(!refresh)return;
+      refresh.replaceChildren(this.api.uiImage('button_refresh.png',20,22));
+      const count=data.refresh?.remaining;
+      if(count!=null)refresh.append(this.lettering(count,'font_char_2_hd','#ebe6e1'));
+      refresh.title='刷新商品'+(count==null?'':'（剩余 '+count+' 次）');refresh.setAttribute('aria-label',refresh.title);
+    };
+    const transact=async op=>{
+      if(pending||!l.current())return;
+      pending=true;if(refresh)refresh.disabled=true;
+      const command=l.get('btn_buy'),wasDisabled=command.disabled;command.disabled=true;
+      try{
+        const next=await this.api.rpc('commerce',{cell,revision:data.revision,...op});
         if(!l.current())return;
-        const next=await this.api.rpc('commerce',{cell,revision:data.revision,op:'refresh'});
-        this.data=await this.api.rpc('headquarters');this.drawRoster();
-        if(l.current())await this.shop(cell,next);
-      },l.body);
-      refresh.className='shop-refresh';refresh.setAttribute('aria-label','刷新商品');refresh.title='刷新商品';
-      refresh.append(this.api.uiImage('button_refresh.png',20,22));
+        data=next;
+        if(op.op==='refresh'){
+          renderSeller();if(buying)clearSelection();
+        }else{renderSeller();renderBuyer();clearSelection();}
+        refreshLabel();
+      }finally{pending=false;if(refresh)refresh.disabled=false;command.disabled=wasDisabled;}
+    };
+    if(cell<0){
+      refresh=this.api.button('',()=>transact({op:'refresh'}),l.body);
+      refresh.className='shop-refresh native-command blue';refreshLabel();
     }
     let chosen,buying;
     const choose=(item,buy,b,offer)=>{
+      if(pending)return;
       chosen={item,offer};buying=buy;for(const n of l.body.querySelectorAll('.native-item'))n.setAttribute('aria-pressed',String(n===b));
+      l.hide('btn_buy',false);
       l.get('btn_buy').style.width=b.offsetWidth+'px';
       l.text('group_info/text_name',item.name);l.text('text_desc',item.description);l.text('text_price',buy?offer.price:data.sales.find(s=>s.id===item.id)?.price||0);l.text('btn_buy',this.text(buy?'text_buy':'text_sell'));
       const price=buy?offer.price:0;
       const command=l.action('btn_buy',this.text(buy?'text_buy':'text_sell')+' '+item.name,async()=>{
-        const next=await this.api.rpc('commerce',{cell,revision:data.revision,op:buying?'buy':'sell',offer:chosen.offer?.id,item:chosen.item.id});this.data=await this.api.rpc('headquarters');this.drawRoster();this.shop(cell,next);
+        await transact({op:buying?'buy':'sell',offer:chosen.offer?.id,item:chosen.item.id});
       },buy?offer.available&&data.medals>=price:item.available>0);
       const itemRect=b.getBoundingClientRect(),body=l.body.getBoundingClientRect(),scale=body.width/l.width;
       const itemTop=(itemRect.top-body.top)/scale,itemLeft=(itemRect.left-body.left)/scale;
@@ -223,13 +241,20 @@
       Object.assign(command.style,{left:itemLeft+'px',top:(above?itemTop-command.offsetHeight:itemTop+b.offsetHeight)+'px'});
       this.api.popup(command);
     };
-    for(let slot=0;slot<14;slot++){const offer=data.offers.find(o=>o.slot===slot),item=offer&&data.items.find(i=>i.id===offer.itemId);let b=this.itemButton(item,offer?.remaining,()=>offer&&choose(item,true,b,offer));b.disabled=!offer;if(offer)b.classList.toggle('unavailable-item',!offer.available);l.get('grid_seller').append(b);}
-    for(const item of data.items.filter(i=>i.quantity>0)){let b=this.itemButton(item,item.quantity,()=>choose(item,false,b));l.get('grid_buyer').append(b);}
-    for(const key of ['grid_seller','grid_buyer']){const grid=l.get(key);while(grid.children.length<14){const b=this.itemButton(null,0,()=>{});b.disabled=true;grid.append(b);}}
+    const renderSeller=()=>{
+      const grid=l.get('grid_seller');grid.replaceChildren();
+      for(let slot=0;slot<14;slot++){const offer=data.offers.find(o=>o.slot===slot),item=offer&&data.items.find(i=>i.id===offer.itemId);let b=this.itemButton(item,offer?.remaining,()=>offer&&choose(item,true,b,offer));b.disabled=!offer;if(offer)b.classList.toggle('unavailable-item',!offer.available);grid.append(b);}
+    };
+    const renderBuyer=()=>{
+      const grid=l.get('grid_buyer');grid.replaceChildren();
+      for(const item of data.items.filter(i=>i.quantity>0)){let b=this.itemButton(item,item.quantity,()=>choose(item,false,b));grid.append(b);}
+      while(grid.children.length<14){const b=this.itemButton(null,0,()=>{});b.disabled=true;grid.append(b);}
+    };
+    const clearSelection=()=>{chosen=null;buying=false;l.hide('btn_buy');l.text('group_info/text_name','');l.text('text_desc',this.text('text_sellersays'),{color:'235,230,225,255'});l.text('text_price','');};
+    renderSeller();renderBuyer();
     l.text('group_seller/text_name',this.text('name_Seller'),{color:'235,230,225,255'});
-    l.text('group_info/text_name','');l.text('text_desc',this.text('text_sellersays'),{color:'235,230,225,255'});l.text('text_price','');l.text('text_discount',data.commerce?'-'+data.commerce*4+'%':'');l.hide('btn_buy');
+    clearSelection();l.text('text_discount',data.commerce?'-'+data.commerce*4+'%':'');
     const merchant=l.get('group_seller');merchant.setAttribute('aria-label',this.text('name_Seller'));
-    for(const b of l.body.querySelectorAll('.native-item:not(:disabled)')){const click=b.onclick;b.onclick=e=>{l.hide('btn_buy',false);click(e);};}
     this.commerceStars(l,data.commerce);
   };
   proto.exchange=async function(cell,snapshot){

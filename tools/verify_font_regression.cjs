@@ -34,7 +34,7 @@ const base=process.env.EW4_TEST_URL||'http://127.0.0.1:5185';
     await shot('after-main');
     report.renderer=await page.evaluate(()=>{
       const renderer=originalTextRenderer;
-      const a=renderer.element('伦敦 LONDON','font_city_labels_hd'),other=new Ew4OriginalUI.TextRenderer({fonts:{font_city_labels_hd:{height:99}}});other.measure=renderer.measure;
+      const a=renderer.element('伦敦 LONDON','font_city_labels_hd'),other=new Ew4OriginalUI.TextRenderer({fonts:{font_city_labels_hd:{height:26,glyphs:{}}}});other.measure=renderer.measure;
       const b=other.element('伦敦 LONDON','font_city_labels_hd'),canvas=a.firstChild,p=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;
       let white=0,black=0;for(let i=0;i<p.length;i+=4)if(p[i+3]>160){if(p[i]>240&&p[i+1]>240&&p[i+2]>240)white++;if(p[i]<30&&p[i+1]<30&&p[i+2]<30)black++;}
       const long=renderer.element('奥斯曼土耳其帝国','font_text_2_cn_hd','#373737',84,'left',{size:11.5,singleLine:true});
@@ -42,7 +42,7 @@ const base=process.env.EW4_TEST_URL||'http://127.0.0.1:5185';
       return {white,black,equal:canvas.toDataURL()===b.firstChild.toDataURL(),long:{size:Number(long.dataset.size),width:long.firstChild.width/2,height:long.firstChild.height/2},multi:multi.lines.length};
     });
     check(report.renderer.white>50&&report.renderer.black>30,'Chinese/English city names retain separate white fill and black outline');
-    check(report.renderer.equal,'imported bitmap style and metrics cannot change the bundled font');
+    check(!report.renderer.equal,'original city atlas and metrics are used ahead of bundled fallback');
     check(report.renderer.long.width===84&&report.renderer.long.size<11.5&&report.renderer.long.height<18,'long names fit one line without stretching or exceeding the requested width');
     check(report.renderer.multi>2,'descriptions retain explicit and automatic line breaks');
     await page.locator('#main-settings').click();await page.waitForTimeout(260);await shot('after-settings');

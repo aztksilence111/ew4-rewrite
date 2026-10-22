@@ -26,6 +26,8 @@ public sealed partial class ExtensionLoader
     public int ApiVersion { get; private set; } = 1;
     public LegacySkillParameters? LegacySkills { get; private init; }
     public IReadOnlyDictionary<string, int?> DeploymentLimits { get; private init; } = new Dictionary<string, int?>();
+    public MetagameRules Metagame { get; private init; } = new();
+    public IReadOnlyDictionary<string, StageIntroPresentation> StageIntroPresentations { get; private init; } = new Dictionary<string, StageIntroPresentation>();
     public IReadOnlyDictionary<string, CommanderDialogueLines> CommanderDialogues { get; private init; } = new Dictionary<string, CommanderDialogueLines>();
     private ExtensionLoader(RuleEventBus bus, string revision, ExtensionBinding[] units, ExtensionBinding[] commanders,
         Dictionary<string, ExtensionVictoryRules> victories, Dictionary<string, ExtensionLayout> layouts,
@@ -34,7 +36,8 @@ public sealed partial class ExtensionLoader
     private sealed record Manifest(int Schema, int ApiVersion, string[]? Skills = null, string[]? Traits = null,
         string? UnitBindings = null, string? CommanderBindings = null, string? VictoryRules = null, string? Presentation = null, string[]? Scripts = null,
         string? ScenarioEvents = null, string[]? Statuses = null, string? VictoryPresentation = null, string? LegacySkillParameters = null,
-        string? CommanderDialogues = null, string? ItemBindings = null, string? DeploymentLimits = null);
+        string? CommanderDialogues = null, string? ItemBindings = null, string? DeploymentLimits = null, string? Metagame = null,
+        string? StageIntroPresentation = null);
     private sealed record LegacySkillFile(int Schema, Dictionary<string, Dictionary<string, double>> Skills);
     private sealed record DeploymentLimitFile([property: JsonNumberHandling(JsonNumberHandling.Strict)] int Schema,
         [property: JsonNumberHandling(JsonNumberHandling.Strict)] Dictionary<string, int?>? Limits);
@@ -70,6 +73,14 @@ public sealed partial class ExtensionLoader
         if (m.Schema != 1 || m.ApiVersion is not (1 or 2)) throw new RuleViolation("extension.version", "Unsupported extension schema/API version");
         if (m.ApiVersion == 1 && m.Statuses != null) throw new RuleViolation("extension.version", "Statuses require API 2");
         var deploymentLimits = new Dictionary<string, int?>();
+        var metagame = new MetagameRules();
+        if (m.Metagame != null)
+        {
+            if (m.ApiVersion < 2) throw new RuleViolation("extension.version", "Metagame rules require API 2");
+            metagame = Read<JsonElement>(m.Metagame).Deserialize<MetagameRules>(new JsonSerializerOptions(Json) { NumberHandling = JsonNumberHandling.Strict })
+                ?? throw new RuleViolation("metagame.configuration", "Missing metagame configuration");
+            metagame.Validate();
+        }
         if (m.DeploymentLimits != null)
         {
             if (m.ApiVersion < 2) throw new RuleViolation("extension.version", "Deployment limits require API 2");
@@ -173,6 +184,9 @@ public sealed partial class ExtensionLoader
         var layouts = m.Presentation == null ? new Dictionary<string, ExtensionLayout>() : Read<Dictionary<string, ExtensionLayout>>(m.Presentation);
         var victoryScreens = m.VictoryPresentation == null ? new Dictionary<string, VictoryPresentation>() : Read<Dictionary<string, VictoryPresentation>>(m.VictoryPresentation);
         if (victoryScreens.Count > 0) VictoryPresentation.Validate(victoryScreens, read("client/manifest.json"), read);
+        if (m.StageIntroPresentation != null && m.ApiVersion < 2) throw new RuleViolation("extension.version", "Stage intro presentation requires API 2");
+        var introScreens = m.StageIntroPresentation == null ? new Dictionary<string, StageIntroPresentation>() : Read<Dictionary<string, StageIntroPresentation>>(m.StageIntroPresentation);
+        if (introScreens.Count > 0) StageIntroPresentation.Validate(introScreens, read("client/manifest.json"), read);
         foreach (var layout in layouts)
             if (layout.Value == null || layout.Key is not ("commander" or "unit") || layout.Value.Mode is not ("list" or "grid" or "positioned")
                 || layout.Value.Columns is < 1 or > 16 || layout.Value.Gap is < 0 or > 32 || layout.Value.IconSize is < 12 or > 64
@@ -201,7 +215,7 @@ public sealed partial class ExtensionLoader
         string revision = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(string.Join('\n', loaded.Select(p => p.Key + ":" + Convert.ToHexStringLower(SHA256.HashData(p.Value)))))));
         return new(new(skills, runtime, statuses), revision, units, commanders, victories, layouts, scenarioEvents)
             { ApiVersion = m.ApiVersion, VictoryPresentations = victoryScreens, LegacySkills = legacySkills, CommanderDialogues = commanderDialogues,
-                ItemBindings = items, DeploymentLimits = deploymentLimits };
+                ItemBindings = items, DeploymentLimits = deploymentLimits, Metagame = metagame, StageIntroPresentations = introScreens };
         bool Known(string id) => skills.ContainsKey(id) || id.StartsWith("ew4.skill.", StringComparison.Ordinal)
             && int.TryParse(id[10..], out int value) && value is >= 0 and < 40 || BuiltinTraits.Contains(id);
     }

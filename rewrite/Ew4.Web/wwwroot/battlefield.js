@@ -61,8 +61,9 @@
     return '#'+[red,green,blue].map(v=>v.toString(16).padStart(2,'0')).join('');
   }
   function flagPosition(p){return {x:p.x-27,y:p.y-45};}
+  function moraleSprite(morale){return ({'-3':'morale_down3.png','-2':'morale_down2.png','-1':'morale_down1.png','1':'morale_up.png'})[morale]||null;}
   function objectiveMarker(site,unit){return site?.objectiveMarker||(site?.objective?1:0)||unit?.objectiveMarker||(unit?.objective?1:0);}
-  function recruitOffset(elapsed,speed=1){const t=Math.max(0,Math.min(1,elapsed/recruitDuration(speed)));return t===1?0:-72*(1-t)*(1-t);}
+  function recruitOffset(elapsed,speed=1){const t=Math.max(0,Math.min(1,elapsed/recruitDuration(speed)));return t>=1?0:-60*(1-t);}
   function terrainRows(site) {
     const info=site.tileInfo;if(!info)return [];
     const rows=[];
@@ -87,7 +88,32 @@
     return points.length?{left:Math.min(...points.map(p=>p[0])),top:Math.min(...points.map(p=>p[1])),right:Math.max(...points.map(p=>p[0])),bottom:Math.max(...points.map(p=>p[1]))}:null;
   }
   class Renderer {
-    constructor(api) {this.api=api;this.surface=new Ew4MapSurface.Surface();this.cityLabels=new Map();this.mapLabels=new Map();this.unitFrames=new Map();this.unitFramePixels=0;this.unitLibraryIds=new WeakMap();this.nextLibraryId=1;}
+    constructor(api) {this.api=api;this.surface=new Ew4MapSurface.Surface();this.cityLabels=new Map();this.mapLabels=new Map();this.unitFrames=new Map();this.unitFramePixels=0;this.unitLibraryIds=new WeakMap();this.nextLibraryId=1;this.resetMotions();}
+    resetMotions(){this.unitMotions=new Map();this.motionSelection=null;}
+    syncMotions(){
+      for(const [id,combat] of this.combatMotions||[])if(!this.stationedHasUnit(id)||this.time>=combat.started+(combat.delay||0)+(combat.segments.at(-1)?.end||0))this.combatMotions.delete(id);
+      for(const id of this.unitMotions.keys())if(!this.stationedHasUnit(id))this.unitMotions.delete(id);
+      const unit=this.selection&&this.selected,eligible=unit&&unit.owner===this.state.playerFaction&&this.state.activeFaction===this.state.playerFaction&&!unit.constructionTurns&&!this.combatMotions?.has(unit.id);
+      const token=eligible?unit.id+':'+this.selectedAt:null;
+      if(token===this.motionSelection?.token)return;
+      const previous=this.motionSelection?.id;
+      if(previous&&!this.combatMotions?.has(previous))this.unitMotions.set(previous,{action:'undoready',started:this.time,playing:true});
+      this.motionSelection=eligible?{id:unit.id,token}:null;
+      if(eligible)this.unitMotions.set(unit.id,{action:'ready',started:this.selectedAt??this.time,playing:true});
+    }
+    stationedHasUnit(id){return this.unitIds.has(id);}
+    motionPose(unit,profile,lib,facing,time,moving=false){
+      let pose=this.unitMotions.get(unit.id)||{action:'ready',playing:false};
+      if(moving||unit.constructionTurns>0){pose={action:unit.constructionTurns>0?'build':'ready',playing:false};this.unitMotions.set(unit.id,pose);}
+      let native=this.api.effects?.motion(profile,pose.action,facing),item=lib.byName.get(native?.name||profile.motions[pose.action]||profile.motions.ready);
+      if(pose.action==='undoready'&&!native&&!profile.motions.undoready){pose={action:'ready',playing:false};this.unitMotions.set(unit.id,pose);native=this.api.effects?.motion(profile,'ready',facing);item=lib.byName.get(native?.name||profile.motions.ready);}
+      let tick=pose.playing?(time-pose.started)/1000*lib.fps*Number(native?.speed||1):0;
+      if(pose.playing&&(!item||tick>=item.duration)){
+        pose={action:pose.action==='ready'?'attack':'ready',playing:false};this.unitMotions.set(unit.id,pose);
+        native=this.api.effects?.motion(profile,pose.action,facing);item=lib.byName.get(native?.name||profile.motions[pose.action]||profile.motions.ready);tick=0;
+      }
+      return {native,item,tick};
+    }
     frame(scene,time) {
       Object.assign(this,scene);this.time=time;
       if(this.preparedState!==this.state){
@@ -95,40 +121,59 @@
         this.preparedMap=this.map;this.preparedState=this.state;
         this.factions=new Map(this.state.factions.map(f=>[f.id,f]));
         this.stationed=new Map(this.state.units.map(u=>[u.cell,u]));
+        this.unitIds=new Set(this.state.units.map(u=>u.id));
         this.orderedUnits=[...this.state.units].sort((a,b)=>a.cell-b.cell);
         this.objectiveCells=[];
         this.state.cells.forEach((site,cell)=>{if(site.active&&objectiveMarker(site,this.stationed.get(cell)))this.objectiveCells.push(cell);});
         this.groundSignature=JSON.stringify([this.state.width,this.state.cells,this.state.factions.map(f=>[f.id,f.color])]);
         this.visibleKey=null;
       }
+      this.syncMotions();
       const r=this.visibleRect,visibleKey=[r.left,r.top,r.width,r.height].join(',');
       if(this.visibleKey!==visibleKey){
-        this.visibleKey=visibleKey;this.visibleCells=[];
-        const width=this.state.width,height=this.state.height;
-        const firstRow=Math.max(0,Math.floor((r.top-120+18)/54)),lastRow=Math.min(height-1,Math.ceil((r.top+r.height+120+18)/54));
-        for(let row=firstRow;row<=lastRow;row++){
-          const offset=row%2*32,firstCol=Math.max(0,Math.floor((r.left-120-offset)/64)),lastCol=Math.min(width-1,Math.ceil((r.left+r.width+120-offset)/64));
-          for(let col=firstCol;col<=lastCol;col++){const cell=row*width+col,p=point(cell,width);if(this.visible(p))this.visibleCells.push({cell,p,site:this.state.cells[cell]});}
-        }
-        this.visibleUnits=this.orderedUnits.filter(unit=>this.visible(point(unit.cell,width)));
+        this.visibleKey=visibleKey;this.visibleCells=this.cellsInRect(r);
+        this.visibleUnits=this.orderedUnits.filter(unit=>this.visible(point(unit.cell,this.state.width)));
       }
-      this.animated=!!this.selection||this.visibleUnits.some(u=>u.burning>0||badgeAlpha(u,this.state,300)!==1||flagAnimated(u,this.state)&&this.factions.get(u.owner)?.flag&&!this.factions.get(u.owner)?.flagImage)||
+      this.animated=!!this.selection||this.visibleUnits.some(u=>this.unitMotions.get(u.id)?.playing||u.burning>0||u.category==='fort'&&u.health>0&&u.maxHealth-u.health>=80||badgeAlpha(u,this.state,300)!==1||flagAnimated(u,this.state)&&this.factions.get(u.owner)?.flag&&!this.factions.get(u.owner)?.flagImage)||
         this.visibleCells.some(({site,cell})=>site.active&&(objectiveMarker(site,this.stationed.get(cell))||site.buildingKind==='port'&&site.owner&&!this.stationed.has(cell)));
-      // Original 84e30: neutral/terrain, ownership, map mask/text/borders, grid, objects, selection.
-      this.staticGround();this.objectives();this.flags();this.units();this.labels();this.highlights();
+      // Keep flags above all unit bodies, including ships on adjacent cells.
+      this.staticGround();this.objectives();this.units();this.flags();this.unitMarkers();this.labels();this.highlights();
+    }
+    cellsInRect(r){
+      const cells=[],width=this.state.width,height=this.state.height;
+      const firstRow=Math.max(0,Math.floor((r.top-120+18)/54)),lastRow=Math.min(height-1,Math.ceil((r.top+r.height+120+18)/54));
+      for(let row=firstRow;row<=lastRow;row++){
+        const offset=row%2*32,firstCol=Math.max(0,Math.floor((r.left-120-offset)/64)),lastCol=Math.min(width-1,Math.ceil((r.left+r.width+120-offset)/64));
+        for(let col=firstCol;col<=lastCol;col++){const cell=row*width+col;cells.push({cell,p:point(cell,width),site:this.state.cells[cell]});}
+      }
+      return cells;
     }
     staticGround(){
       const target=this.draw,matrix=target.getTransform(),size=target.canvas;
-      const key=[matrix.a,matrix.b,matrix.c,matrix.d,matrix.e,matrix.f,size.width,size.height,this.api.imageRevision||0,this.api.geographicLanguage||'en',Ew4OriginalUI.revision].join(',');
-      if(this.staticKey!==key||this.staticSignature!==this.groundSignature||this.staticMap!==this.map){
+      const key=[matrix.a,matrix.b,matrix.c,matrix.d,size.width,size.height,this.api.imageRevision||0,this.api.geographicLanguage||'en',Ew4OriginalUI.revision].join(',');
+      const dx=matrix.e-this.staticX,dy=matrix.f-this.staticY;
+      if(this.staticKey!==key||this.staticSignature!==this.groundSignature||this.staticMap!==this.map||
+        !(dx<=0&&dy<=0&&dx+this.staticCanvas.width>=size.width&&dy+this.staticCanvas.height>=size.height)){
         const canvas=this.staticCanvas||(this.staticCanvas=document.createElement('canvas'));
-        canvas.width=size.width;canvas.height=size.height;
-        this.draw=canvas.getContext('2d');this.draw.setTransform(matrix);
-        this.ground();this.facilities(true);this.terrain(false);this.ownership();this.mapTiles();this.mapText();this.borders();this.terrain(true);this.facilities(false);
-        this.draw=target;this.staticKey=key;this.staticSignature=this.groundSignature;this.staticMap=this.map;
+        // Retain terrain beyond the viewport so camera motion can crop the existing bitmap.
+        const margin=Math.max(0,Math.min(Math.ceil(Math.min(size.width,size.height)*.35),
+          Math.floor((Math.sqrt((size.width-size.height)**2+4*10*1024*1024)-size.width-size.height)/4)));
+        canvas.width=size.width+margin*2;canvas.height=size.height+margin*2;
+        this.staticX=Math.round(matrix.e)+margin;this.staticY=Math.round(matrix.f)+margin;
+        const rect=this.visibleRect,cells=this.visibleCells;
+        this.visibleRect={left:-this.staticX/matrix.a,top:-this.staticY/matrix.d,width:canvas.width/matrix.a,height:canvas.height/matrix.d};
+        this.visibleCells=this.cellsInRect(this.visibleRect);
+        this.draw=canvas.getContext('2d');this.draw.setTransform(matrix.a,matrix.b,matrix.c,matrix.d,this.staticX,this.staticY);
+        try{
+          this.draw.fillStyle='#688e91';this.draw.fillRect(this.visibleRect.left,this.visibleRect.top,this.visibleRect.width,this.visibleRect.height);
+          this.ground();this.facilities(true);this.terrain(false);this.ownership();this.mapTiles();this.mapText();this.borders();this.terrain(true);this.facilities(false);
+        }finally{this.draw=target;this.visibleRect=rect;this.visibleCells=cells;}
+        this.staticKey=key;this.staticSignature=this.groundSignature;this.staticMap=this.map;
+        this.staticBuilds=(this.staticBuilds||0)+1;
       }
       this.staticState=this.state;
-      target.save();target.resetTransform();target.drawImage(this.staticCanvas,0,0);target.restore();
+      target.save();target.resetTransform();
+      target.drawImage(this.staticCanvas,this.staticX-matrix.e,this.staticY-matrix.f,size.width,size.height,0,0,size.width,size.height);target.restore();
     }
     ground() {
       const {draw,visibleRect:r}=this, pattern=this.api.image('images/map_pt@2x.png');
@@ -254,10 +299,14 @@
     }
     units() {
       const {draw,state,time}=this;
+      this.visibleUnitMarkers=[];
       // Native movement emitters render behind the unit bodies, using HD-to-map scale.
+      const activeTrails=new Set();
       for(const [id,motion] of this.motions){const unit=state.units.find(u=>u.id===id);if(!unit)continue;
-        const p=pose(motion,state.width,time);if(p.moving&&this.visible(p))this.api.effects?.trail(unit.id,p.x,p.y,unit.category,state.cells[p.cell??unit.cell]?.sea,time);
+        const p=pose(motion,state.width,time),profile=this.api.effects?.profile(unit.profile,this.factions.get(unit.owner))||this.api.manifest.profiles[unit.profile];
+        if(p.moving){activeTrails.add(id);this.api.effects?.trail(unit.id,p.x,p.y,Number(profile?.grade||0),state.cells[p.cell??unit.cell]?.sea,time,this.visible(p),this.arrivalSpeed||1);}
       }
+      this.api.effects?.finishTrails?.(activeTrails,time);
       this.api.effects?.frame(draw,time,'ground',this.visibleRect);
       const units=this.motions.size?this.orderedUnits.filter(u=>this.motions.has(u.id)||this.visible(point(u.cell,state.width))):this.visibleUnits;
       for(const unit of units){
@@ -274,9 +323,9 @@
         else if(lib){
           const combat=this.combatMotions?.get(unit.id),elapsed=combat?time-combat.started-(combat.delay||0):0;
           const segment=elapsed>=0?(combat?.segments.find(s=>elapsed<s.end)||combat?.segments.at(-1)):null;
-          const action=unit.constructionTurns>0?'build':motion&&p.moving?'move':'ready',native=this.api.effects?.motion(profile,action,facing),item=lib.byName.get(segment?.name||native?.name||profile.motions[action]||profile.motions.ready);
-          const started=this.arrivals.get(unit.id)??(this.selected?.id===unit.id?this.selectedAt:null);
-          const tick=segment?Math.min((elapsed-segment.start)*segment.speed/1000*lib.fps,Math.max(0,(item?.duration||1)-1)):action==='move'?(time-motion.started)/1000*lib.fps*Number(native?.speed||1)*(300/motion.stepMs):started!=null?Math.min((time-started)/1000*lib.fps*Number(native?.speed||1),Math.max(0,(item?.duration||1)-1)):0;
+          if(combat)this.unitMotions.set(unit.id,{action:'ready',playing:false});
+          const idle=this.motionPose(unit,profile,lib,facing,time,motion&&p.moving),native=idle.native,item=segment?lib.byName.get(segment.name):idle.item;
+          const tick=segment?Math.min((elapsed-segment.start)*segment.speed/1000*lib.fps,Math.max(0,(item?.duration||1)-1)):idle.tick;
           const directional=segment?segment.directional:native?.dir==='left'||native?.dir==='right';
           draw.save();draw.translate(p.x+facing*profile.x,p.y+profile.y);draw.scale((directional?1:facing)*profile.scale*.5,.5);
           this.unitAnimation(lib,item,tick);draw.restore();
@@ -290,16 +339,30 @@
         draw.restore();
         if(unit.transport&&unit.category!=='naval'&&unit.category!=='fort')this.api.sprite('buildings','ship_mark.png',p.x+19,p.y+17);
         if(unit.burning>0){const fire=this.api.libraries.get('anim_fire'),item=fire?.byName.get(['1','3','2'][unit.burning-1]);if(item){draw.save();draw.globalAlpha=.5;draw.translate(p.x,p.y);this.api.animation(fire,item,time/1000*fire.fps);draw.restore();}}
+        if(!death&&unit.category==='fort'&&unit.health>0){const damaged=Math.max(0,Math.min(3,Math.floor((unit.maxHealth-unit.health)/80)));if(damaged)this.api.effects?.element?.('damaged '+damaged,p.x,p.y,time,draw);}
         const rank=Number(unit.veterancy);if(rank>0)this.api.sprite('buildings','rank_'+rank+'.png',p.x+8,p.y-8);
-        if(death){draw.restore();continue;}
+        if(!death)this.visibleUnitMarkers.push({unit,p});
+        draw.restore();
+      }
+    }
+    unitMarkers(){
+      // Draw every flag after all bodies so nearby ships cannot cover them.
+      const {state}=this;
+      for(const {unit,p} of this.visibleUnitMarkers||[]){
+        // Native 5335c -> 60b50 draws the effective state, including after reload.
+        const morale=moraleSprite(unit.morale);
+        if(morale)this.api.sprite('buildings',morale,p.x+15,p.y-25);
+      }
+      for(const {unit,p} of this.visibleUnitMarkers||[]){
         const faction=this.factions.get(unit.owner);this.flag(faction?.flag,p,flagAnimated(unit,state),faction?.flagImage);
+      }
+      for(const {unit,p} of this.visibleUnitMarkers||[]){
         if(unit.commanderImage){
           // Portrait and pointer use different atlas anchors; the portrait sits inside
           // the white board, with the pointer tip on the unit (native board refy=74).
           this.api.sprite('commandermark','board_smallgenerals.png',p.x,p.y-8);
           this.api.sprite('commandermark',unit.commanderImage+'.png',p.x,p.y-32);
         }
-        draw.restore();
       }
     }
     unitAnimation(lib,item,tick){
@@ -323,10 +386,15 @@
     labels() {
       if(this.zoom<=.5)return;
       const {draw,state}=this;
+      const density=Math.max(1,Math.min(4,Math.ceil(draw.getTransform().a/2)));
       for(const {site:c,cell:i,p} of this.visibleCells){if(!c.active||!c.name)continue;
-        const key=i+':'+c.name;
-        if(!this.cityLabels.has(key))this.cityLabels.set(key,this.api.cityLabel(c.name,i).firstElementChild);
-        const label=this.cityLabels.get(key);draw.save();draw.shadowColor='#292929';draw.shadowBlur=2;draw.drawImage(label,p.x-label.width/4,p.y+29,label.width/2,label.height/2);draw.restore();}
+        const key=i+':'+c.name+':'+density;
+        if(!this.cityLabels.has(key)){
+          if(this.cityLabels.size>=1024)this.cityLabels.delete(this.cityLabels.keys().next().value);
+          this.cityLabels.set(key,this.api.cityLabel(c.name,i,density).firstElementChild);
+        }
+        const label=this.cityLabels.get(key),width=label.width/density/2,height=label.height/density/2;
+        draw.drawImage(label,p.x-width/2,p.y+29,width,height);}
     }
     highlights() {
       const range=new Set(this.selection?.range),targets=new Set(this.selection?.targets);
@@ -349,5 +417,5 @@
     }
     visible(p,padding=120) {const r=this.visibleRect;return p.x>=r.left-padding&&p.x<=r.left+r.width+padding&&p.y>=r.top-padding&&p.y<=r.top+r.height+padding;}
   }
-  root.Ew4Battlefield=Object.freeze({point,neighbor,cameraBounds,hex,pose,badgeAlpha,badgeColor,selectionHostile,recruitDuration,recruitOffset,flagFrame,flagAnimated,healthColor,flagPosition,objectiveMarker,terrainRows,animationBounds,Renderer});
+  root.Ew4Battlefield=Object.freeze({point,neighbor,cameraBounds,hex,pose,badgeAlpha,badgeColor,selectionHostile,recruitDuration,recruitOffset,flagFrame,flagAnimated,healthColor,flagPosition,moraleSprite,objectiveMarker,terrainRows,animationBounds,Renderer});
 })(globalThis);

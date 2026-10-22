@@ -300,10 +300,11 @@ public static class WorldTurns
             TerritoryClaims.Expand(map, state.Cells, expansion, state.Units.Select(u => u.Cell).ToArray(), faction.Id), faction.Id);
         cells = cells.Select(c => c.Owner == faction.Id ? c with { BuildingUpgradesThisTurn = 0 } : c).ToArray();
         var expanded = state with { Cells = cells };
+        var occupied = new HashSet<int>(expanded.Units.Select(u => u.Cell));
         var units = expanded.Units.Select(unit =>
         {
             if (unit.Owner != faction.Id) return unit;
-            int local = LocalPenalty(expanded, map, unit.Cell, unit.Owner, rules.NeutralCamps);
+            int local = LocalPenalty(expanded, map, unit.Cell, unit.Owner, rules.NeutralCamps, occupied);
             var refreshed = UnitLifecycle.Refresh(new()
             {
                 Health = unit.Combatant.Health, MaximumHealth = unit.Combatant.Profile.MaxHealth, BaseHealth = unit.Combatant.Profile.MaxHealth,
@@ -335,9 +336,12 @@ public static class WorldTurns
     }
 
     public static int LocalPenalty(WorldState state, HexMap map, int center, string owner, IReadOnlyCollection<string>? neutralCamps = null)
+        => LocalPenalty(state, map, center, owner, neutralCamps, new HashSet<int>(state.Units.Select(u => u.Cell)));
+
+    internal static int LocalPenalty(WorldState state, HexMap map, int center, string owner, IReadOnlyCollection<string>? neutralCamps,
+        HashSet<int> occupied)
     {
         map.Check(center);
-        var occupied = new HashSet<int>(state.Units.Select(u => u.Cell));
         var neighbors = Enumerable.Range(0, 6).Select(direction => map.Neighbor(center, direction)).ToArray();
         bool hostile(int cell) => cell >= 0 && state.Cells[cell].Owner is string faction && !WorldDiplomacy.Allied(state, faction, owner);
         var active = neighbors.Where(i => i >= 0 && state.Cells[i].Terrain.Active).ToArray();

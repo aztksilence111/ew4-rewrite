@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "apiVersion": 2,
+  "metagame": "rewrite/metagame.json",
+  "stageIntroPresentation": "rewrite/stage-intro.json",
+  "victoryRules": "rewrite/victory.json"
+}

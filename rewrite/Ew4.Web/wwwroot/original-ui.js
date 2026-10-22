@@ -105,33 +105,45 @@
     repaintFonts();
   }
   class TextRenderer {
-    constructor(manifest){this.fonts=manifest.fonts;}
+    constructor(manifest){this.fonts=manifest.fonts;this.sheets=new Map();}
     get fontFamily(){return fontFamily;}
     async prepare(){
       await prepareFonts();
       this.measure=document.createElement('canvas').getContext('2d');
+      await Promise.all(Object.keys(this.fonts).filter(name=>this.fonts[name].glyphs).map(name=>this.sheet(name).decode()));
+    }
+    sheet(name){
+      if(!this.sheets.has(name)){const image=new Image();image.src='/content/images/'+encodeURIComponent(name)+'.png';this.sheets.set(name,image);}
+      return this.sheets.get(name);
+    }
+    glyph(char,font){
+      const names=[font];
+      if(!font.startsWith('font_city'))names.push('font_text_1_cn_hd','font_text_2_cn_hd','font_text_3_cn_hd','font_text_4_cn_hd');
+      for(const name of names){const definition=this.fonts[name],record=definition?.glyphs?.[char.codePointAt(0)],sheet=this.sheets.get(name);
+        if(record&&sheet?.naturalWidth)return {record,sheet,height:definition.height};}
+      return null;
     }
     layout(text,font,width=Infinity,options={}){
-      // Font roles determine size; imported bitmap ink, outlines and metrics are never used.
       const heights={font_text_1_cn_hd:24,font_text_2_cn_hd:24,font_text_3_cn_hd:26,font_text_4_cn_hd:32,font_char_1_hd:18,font_char_2_hd:24,font_char_3_hd:28,font_char_4_hd:42,font_ascii:16,font_city:13,font_city_hd:26,font_city_labels_hd:26};
-      let height=options.size?options.size*2:heights[font]||24;
+      let height=options.size?options.size*2:this.fonts[font]?.height||heights[font]||24;
       const lines=[{glyphs:[],width:0}],limit=Number.isFinite(width)?Math.max(1,width*2-8):Infinity,extended=true;
-      let value=availableText(text).replace(/\\n/g,'\n');
+      let value=displayText(text).replace(/\\n/g,'\n');
       const typeface=options.numeric?numberFamily:fontFamily;
       const setFont=()=>{this.measure.font=height+'px '+typeface;this.measure.fontKerning='none';};
+      const advance=char=>{const glyph=this.glyph(char,font);return glyph?glyph.record[6]*height/glyph.height:this.measure.measureText(availableText(char)).width;};
       setFont();
       if(options.singleLine){
         value=value.replace(/[\r\n]+/g,' ');
-        const natural=[...value].reduce((sum,char)=>sum+this.measure.measureText(char).width,0);
+        const natural=[...value].reduce((sum,char)=>sum+advance(char),0);
         const heightLimit=options.maxHeight?Math.max(1,options.maxHeight*2-10)/height:1;
         height*=Math.min(1,natural?limit/natural:1,heightLimit);setFont();
       }
       for(const char of value){
         if(char==='\r')continue;
         if(char==='\n'){lines.push({glyphs:[],width:0});continue;}
-        const advance=this.measure.measureText(char).width;
-        let line=lines.at(-1);if(!options.singleLine&&line.width&&line.width+advance>limit){line={glyphs:[],width:0};lines.push(line);}
-        line.glyphs.push({char,x:line.width});line.width+=advance;
+        const step=advance(char);
+        let line=lines.at(-1);if(!options.singleLine&&line.width&&line.width+step>limit){line={glyphs:[],width:0};lines.push(line);}
+        line.glyphs.push({char,x:line.width,glyph:this.glyph(char,font)});line.width+=step;
       }
       const natural=Math.max(1,...lines.map(l=>l.width));
       return {lines,height,extended,width:Number.isFinite(limit)?options.shrinkWidth?Math.min(limit,natural):limit:natural};
@@ -139,29 +151,45 @@
     element(text,font='font_text_2_cn_hd',color='#404040',width,align='left',options={}){
       const span=document.createElement('span');span.className='original-text';span.setAttribute('aria-label',String(text));
       const canvas=document.createElement('canvas');canvas.setAttribute('aria-hidden','true');span.append(canvas);
-      const padding=4,outlined=font.startsWith('font_city');
+      const padding=4,outlined=font.startsWith('font_city'),rasterScale=options.rasterScale||1;
       const typeface=options.numeric?numberFamily:fontFamily;
-      span.dataset.font=font;span.dataset.typeface=typeface;
+      span.dataset.font=font;span.dataset.typeface=font;
       span.dataset.color=outlined?'#ffffff':color;
       const redraw=()=>{
         const layout=this.layout(text,font,width,options);span.dataset.size=String(layout.height/2);
-        canvas.width=Math.ceil(layout.width+padding*2);canvas.height=Math.ceil(layout.lines.length*(layout.height+2)+padding*2);
-        canvas.style.width=canvas.width/2+'px';canvas.style.height=canvas.height/2+'px';
+        canvas.width=Math.ceil((layout.width+padding*2)*rasterScale);canvas.height=Math.ceil((layout.lines.length*(layout.height+2)+padding*2)*rasterScale);
+        canvas.style.width=canvas.width/rasterScale/2+'px';canvas.style.height=canvas.height/rasterScale/2+'px';
         const draw=canvas.getContext('2d');draw.clearRect(0,0,canvas.width,canvas.height);
+        draw.scale(rasterScale,rasterScale);
         for(const [row,line] of layout.lines.entries()){
           const offset=align==='center'?(layout.width-line.width)/2:align==='right'?layout.width-line.width:0;
-          for(const {char,x} of line.glyphs){
+          for(const {char,x,glyph} of line.glyphs){
             const y=row*(layout.height+2)+padding;
+            if(glyph){
+              const [sx,sy,w,h,dx,dy]=glyph.record,scale=layout.height/glyph.height;
+              draw.drawImage(glyph.sheet,sx,sy,w,h,padding+offset+x-dx*scale,y-dy*scale,w*scale,h*scale);continue;
+            }
             draw.font=layout.height+'px '+typeface;draw.fontKerning='none';draw.textBaseline='top';
-            if(outlined){draw.strokeStyle='#000000';draw.lineWidth=2;draw.lineJoin='round';draw.strokeText(char,padding+offset+x,y);}
-            draw.fillStyle=outlined?'#ffffff':color||'#404040';draw.fillText(char,padding+offset+x,y);
+            const fallback=availableText(char);
+            if(outlined){draw.strokeStyle='#000000';draw.lineWidth=2;draw.lineJoin='round';draw.strokeText(fallback,padding+offset+x,y);}
+            draw.fillStyle=outlined?'#ffffff':color||'#404040';draw.fillText(fallback,padding+offset+x,y);
           }
         }
+        if(!outlined){draw.globalCompositeOperation='source-in';draw.fillStyle=color||'#404040';draw.fillRect(0,0,canvas.width/rasterScale,canvas.height/rasterScale);draw.globalCompositeOperation='source-over';}
       };
       canvas.ew4Repaint=redraw;if(typeof WeakRef==='function')paintTargets.add(new WeakRef(canvas));
-      redraw();void prepareText(text,options.numeric?numberFamilies:families).then(()=>{if(typeof WeakRef!=='function')redraw();});return span;
+      const fallback=[...String(text)].filter(char=>!this.glyph(char,font)).join('');
+      redraw();if(fallback)void prepareText(fallback,options.numeric?numberFamilies:families).then(()=>{if(typeof WeakRef!=='function')redraw();});return span;
     }
     replace(element,text,font,color,width,align){element.replaceChildren(this.element(text,font,color,width,align));}
+    prose(text,font,color,width){
+      const body=document.createElement('span');body.className='original-prose';
+      const lines=this.layout(text,font,width).lines;
+      // Keep long event prose in small canvases so Android never allocates a page-sized texture.
+      for(let i=0;i<lines.length;i+=6){const chunk=lines.slice(i,i+6).map(line=>line.glyphs.map(g=>g.char).join('')).join('\n');
+        const span=this.element(chunk,font,color,width);span.style.display='block';span.style.margin='-2px 0';body.append(span);}
+      return body;
+    }
     forElement(element,text){
       const style=getComputedStyle(element),number=/^[\d.,%+\-/ ]+$/.test(text);
       const singleLine=!!element.closest('button,h1,h2,.commander-name,.native-caption')||element.hasAttribute('data-label');
@@ -169,6 +197,9 @@
       const px=value=>parseFloat(value)||0;
       let width=element.clientWidth||px(style.width);
       width-=px(style.paddingLeft)+px(style.paddingRight);
+      const notice=element.id==='notice';
+      // A toast's DOM text width can be narrower than the native bitmap glyphs.
+      if(notice)width=Math.max(1,document.documentElement.clientWidth*.9-px(style.paddingLeft)-px(style.paddingRight)-px(style.borderLeftWidth)-px(style.borderRightWidth));
       if(singleLine){
         // Reserve icon and sibling space before fitting text into a fixed control.
         const siblings=[...element.children].filter(child=>!child.matches('.original-text')&&getComputedStyle(child).position!=='absolute');
@@ -177,11 +208,11 @@
       }
       const font=number?'font_char_2_hd':element.closest('h1,h2')?'font_text_4_cn_hd':'font_text_2_cn_hd';
       const bounded=(singleLine||paragraph)&&width>8?width:undefined;
-      return this.element(text,font,style.color,bounded,style.textAlign,{size:px(style.fontSize)||12,singleLine,shrinkWidth:singleLine});
+      return this.element(text,font,style.color,bounded,style.textAlign,{size:px(style.fontSize)||12,singleLine,shrinkWidth:singleLine||notice});
     }
     paintTree(rootElement){
       const walker=document.createTreeWalker(rootElement,NodeFilter.SHOW_TEXT),nodes=[];
-      // Long event prose uses DOM text so scrolling does not composite one oversized canvas.
+      // Event prose is rendered in bounded chunks by refreshHud.
       while(walker.nextNode()){const node=walker.currentNode;if(!node.textContent.trim()||node.parentElement.closest('#startup-status,#scenario-event-text,.original-text,script,style,canvas,select,option,textarea,output,[hidden]')||!node.parentElement.getClientRects().length)continue;nodes.push(node);}
       for(const node of nodes)node.replaceWith(this.forElement(node.parentElement,node.textContent));
     }

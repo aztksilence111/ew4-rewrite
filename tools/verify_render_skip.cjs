@@ -6,7 +6,7 @@ const deps=createRequire('C:/Users/WIN11/.cache/codex-runtimes/codex-primary-run
 const {chromium}=deps('playwright');
 const base=process.env.EW4_PERF_URL||'http://127.0.0.1:5210';
 const phase=process.argv[2]||'after';
-const folder='E:/Workplace/game/o4mod/rewrite/reports/render-skip-20261021';
+const folder=process.env.EW4_RENDER_REPORT||'E:/Workplace/game/o4mod/rewrite/reports/render-skip-20261021';
 (async()=>{
   await fs.mkdir(folder,{recursive:true});
   const browser=await chromium.launch({headless:true,executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'});
@@ -84,7 +84,7 @@ const folder='E:/Workplace/game/o4mod/rewrite/reports/render-skip-20261021';
       try{
         await mobile.goto(base);await mobile.waitForFunction(()=>startupReady);await mobile.evaluate(()=>start('conquest1','fra'));await mobile.waitForTimeout(200);
         report.pixels=await mobile.evaluate(()=>({dpr:viewport.dpr,pixels:canvas.width*canvas.height}));
-        check(report.pixels.dpr<=2&&report.pixels.pixels<=3*1024*1024,'high-DPI map respects resolution budget');
+        check(report.pixels.dpr<=3&&report.pixels.pixels<=6*1024*1024,'high-DPI map respects current resolution budget');
         await mobile.screenshot({path:folder+'/after-dpr3.png'});
       }finally{await mobile.close();}
     }

@@ -6,6 +6,18 @@ namespace Ew4.Client;
 
 public sealed partial class ClientGame
 {
+    private object? StageIntro(string scenario)
+    {
+        var presentation = content.Presentations.Values.FirstOrDefault(p => p.Id == scenario || p.Alternate == scenario);
+        if (presentation == null || content.Scenarios.Single(s => s.Id == scenario).Mode != 1) return null;
+        var source = content.Battle(scenario);
+        var screen = content.Extensions.StageIntroPresentations.GetValueOrDefault(scenario) ?? content.Extensions.StageIntroPresentations.GetValueOrDefault("*");
+        var rules = Require().Session.World.ScenarioVictory ?? Require().Rules.Turns.Victory.Custom;
+        return new { title = content.Label(screen?.Title ?? content.Scenarios.Single(s => s.Id == scenario).Name),
+            description = content.Label(screen?.Description ?? presentation.Description), commander = screen?.Commander ?? presentation.Commander,
+            objectives = content.Label(screen?.Objectives ?? rules?.DescriptionKey ?? ""),
+            minimumRatingRound = source.Header[12], highestRatingRound = source.Header[13], presentation = screen };
+    }
     private GameSession SettleBattle(GameSession session)
     {
         if (string.IsNullOrEmpty(session.BattleId))

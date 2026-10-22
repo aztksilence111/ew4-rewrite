@@ -49,9 +49,10 @@ internal static class WorldDeaths
     {
         var map = new HexMap(state.Width, state.Height);
         var factions = state.Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
+        var occupied = new HashSet<int>(state.Units.Select(u => u.Cell));
         return state with { Units = state.Units.Select(unit =>
         {
-            int local = WorldTurns.LocalPenalty(state, map, unit.Cell, unit.Owner, neutralCamps);
+            int local = WorldTurns.LocalPenalty(state, map, unit.Cell, unit.Owner, neutralCamps, occupied);
             int morale = TurnEconomy.Morale(unit.Morale.Baseline, unit.Morale.Duration, local, factions[unit.Owner].Shortage,
                 unit.Support.Logistics || unit.Combatant.Has(Ew4Combat.Skill(22)), unit.Combatant.Has(Ew4Combat.Skill(3)));
             return unit with { LocalPenalty = local, Morale = unit.Morale with { Effective = morale }, Combatant = unit.Combatant with { Morale = morale } };

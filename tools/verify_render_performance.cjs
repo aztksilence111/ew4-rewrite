@@ -33,7 +33,7 @@ const base=process.env.EW4_PERF_URL||'http://127.0.0.1:5185';
     report.cache=await page.evaluate(async()=>{
       const wait=()=>new Promise(requestAnimationFrame),waitFrames=async()=>{requestRender();await wait();await wait();};
       const key=battlefield.staticKey;await waitFrames();const reused=key===battlefield.staticKey;
-      view.x+=48;await waitFrames();const panned=key!==battlefield.staticKey;
+      const builds=battlefield.staticBuilds;view.x+=48;await waitFrames();const panned=builds===battlefield.staticBuilds;
       const panKey=battlefield.staticKey;view.zoom*=.9;await waitFrames();const zoomed=panKey!==battlefield.staticKey;
       const old=state;state={...state,cells:state.cells.map((c,i)=>i===state.units[0].cell?{...c,owner:state.playerFaction}:c)};
       await waitFrames();const changed=battlefield.staticState===state;
@@ -77,7 +77,7 @@ const base=process.env.EW4_PERF_URL||'http://127.0.0.1:5185';
     await shot('cached-battlefield');
     for(const size of [{width:844,height:390},{width:390,height:844}]){
       await page.setViewportSize(size);await page.waitForTimeout(120);
-      check(await page.evaluate(()=>battlefield.staticCanvas.width===canvas.width&&battlefield.staticCanvas.height===canvas.height),'static cache follows viewport dimensions at '+size.width);
+      check(await page.evaluate(()=>battlefield.staticCanvas.width>=canvas.width&&battlefield.staticCanvas.height>=canvas.height&&battlefield.staticCanvas.width*battlefield.staticCanvas.height<=10*1024*1024),'static cache covers viewport within its pixel budget at '+size.width);
       check(await page.locator('#map').evaluate(c=>{const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;const s=new Set();for(let i=0;i<d.length;i+=4*397)s.add(d[i]+','+d[i+1]+','+d[i+2]);return s.size>20;}),'nonblank battlefield at '+size.width);await shot('cached-'+size.width);
     }
     await page.setViewportSize({width:1280,height:720});

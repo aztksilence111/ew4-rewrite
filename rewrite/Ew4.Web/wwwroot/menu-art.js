@@ -50,6 +50,13 @@
       const width=image.naturalWidth/ratio*textureScale,height=image.naturalHeight/ratio*textureScale;
       draw.drawImage(image,centerX-cx*scale,centerY-cy*scale,width*scale,height*scale);
     }
+    strategicCamera(definition,scale,textureScale){
+      const {image,ratio}=this.strategic,cx=Number(definition.centerx||410),cy=Number(definition.centery||288);
+      const width=image.naturalWidth/ratio*textureScale*scale,height=image.naturalHeight/ratio*textureScale*scale;
+      // Native 8e4c0: reserve the 130px sidebar, center on the full-height map, clamp its edges.
+      const clamp=(offset,total,viewport)=>total<=viewport?(total-viewport)/2:Math.max(0,Math.min(total-viewport,offset));
+      return {x:cx*scale-clamp(cx*scale-219,width,438),y:cy*scale-clamp(cy*scale-160,height,320)};
+    }
   }
   function cityName(name,language,names){
     if(language==='zh')return names[name]||name;

@@ -81,15 +81,26 @@ async function publish(){
   if(!release)release=await request('/repos/'+repo+'/releases','POST',{tag_name:tag,target_commitish:head,
     name:version+' - '+(process.env.EW4_RELEASE_TITLE||'Runtime and gameplay updates'),body:fs.readFileSync(notes,'utf8'),draft:true,prerelease:false});
   const files=fs.readdirSync(path.join(build,'assets'));
+  const progress={source:head,tag,releaseId:release.id,draft:release.draft,verified:[],pending:files};
+  const saveProgress=()=>fs.writeFileSync(path.join(build,'release-upload-progress.json'),JSON.stringify({...progress,updatedAt:new Date().toISOString()},null,2));
+  saveProgress();
   for(const name of files){
     const file=path.join(build,'assets',name),sha=crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
     const old=release.assets.find(a=>a.name===name);
-    if(old){if(old.digest!=='sha256:'+sha)throw Error('Existing release asset differs: '+name);continue;}
+    if(old){
+      if(old.digest!=='sha256:'+sha||old.size!==fs.statSync(file).size)throw Error('Existing release asset differs: '+name);
+      progress.verified.push(name);progress.pending=progress.pending.filter(x=>x!==name);saveProgress();continue;
+    }
+    console.log('Uploading '+name+' '+fs.statSync(file).size+' bytes to '+(release.draft?'draft':'existing release'));
     const asset=await request(release.upload_url.split('{')[0]+'?name='+encodeURIComponent(name),'POST',undefined,file);
     if(asset.size!==fs.statSync(file).size||asset.digest!=='sha256:'+sha)throw Error('Uploaded asset mismatch '+name);
+    progress.verified.push(name);progress.pending=progress.pending.filter(x=>x!==name);saveProgress();
     console.log('Verified upload '+name+' '+asset.size);
   }
+  const staged=await request('/repos/'+repo+'/releases/'+release.id);
+  if(staged.assets.length!==files.length||staged.assets.some(a=>!files.includes(a.name)))throw Error('Unexpected staged release assets');
   release=await request('/repos/'+repo+'/releases/'+release.id,'PATCH',{draft:false,make_latest:'true',body:fs.readFileSync(notes,'utf8')});
+  progress.draft=false;saveProgress();
   fs.writeFileSync(path.join(build,'release-remote.json'),JSON.stringify({url:release.html_url,tag:release.tag_name,source:head,
     assets:release.assets.map(a=>({name:a.name,size:a.size,digest:a.digest,url:a.browser_download_url}))},null,2));
   console.log(JSON.stringify({url:release.html_url,assets:release.assets.length,source:head}));
@@ -111,6 +122,11 @@ async function audit(){
   fs.writeFileSync(path.join(build,'remote-audit.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
 }
 (async()=>{
-  if(action==='inspect'){const r=await request('/repos/'+repo);console.log(JSON.stringify({repo:r.full_name,branch:r.default_branch}));}
+  if(action==='inspect'){
+    const r=await request('/repos/'+repo),remote=await request('/repos/'+repo+'/git/ref/heads/main');
+    const releases=await request('/repos/'+repo+'/releases?per_page=10');
+    console.log(JSON.stringify({repo:r.full_name,branch:r.default_branch,source:remote.object.sha,
+      releases:releases.map(x=>({tag:x.tag_name,draft:x.draft,assets:x.assets.length}))}));
+  }
   else if(action==='push')await push();else if(action==='publish')await publish();else await audit();
 })().catch(e=>{console.error(e.message);process.exitCode=1;});

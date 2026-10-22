@@ -157,6 +157,8 @@ input,select,textarea{font-family:inherit;font-synthesis:none}
 #dialogue{position:fixed;inset:0;z-index:3;display:flex;align-items:flex-end;justify-content:center}
 #play:has(>#dialogue:not([hidden]))>#menu-button{z-index:4}
 body:has(#play:not([hidden])>#dialogue:not([hidden])) :is(#pause,#settings,#detail-modal,#mod-manager){z-index:5}
+#play:has(>#scenario-event:not([hidden]))>#menu-button{z-index:9}
+body:has(#play:not([hidden])>#pause:not([hidden])) :is(#pause,#settings,#detail-modal,#mod-manager){z-index:9}
 #dialogue-ok{position:relative;margin:0;width:325px;height:83px;flex:none;background:none;color:#404040;transform:scale(var(--ui-scale));transform-origin:center bottom;isolation:isolate;text-align:left;filter:none}
 #dialogue-ok::before{content:"";position:absolute;inset:-5px -7px -8px;border:12.5px solid transparent;border-image:url("/content/ui/image_ui_hd/board_dialog_ex.png") 25 fill stretch;z-index:-1;pointer-events:none}
 #dialogue-portrait{position:absolute;left:10px;top:7px;width:78px;height:78px}
@@ -225,6 +227,13 @@ body:has(#play:not([hidden])>#dialogue:not([hidden])) :is(#pause,#settings,#deta
 .native-layout button:not(.native-command):active{background-image:var(--pressed-art)}
 .native-list{align-items:flex-start;align-content:start;overflow:auto;scrollbar-width:none;touch-action:pan-x pan-y}
 .native-list::-webkit-scrollbar{display:none}
+.stage-intro-scroll{display:block;overflow-x:hidden;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#87817a #ded9d0;touch-action:pan-y;overscroll-behavior:contain;white-space:normal;line-height:0}
+.stage-intro-scroll::-webkit-scrollbar{width:6px}
+.stage-intro-scroll::-webkit-scrollbar-thumb{background:#87817a}
+.stage-intro-scroll::-webkit-scrollbar-track{background:#ded9d0}
+.stage-intro-block{display:block;margin:6px 0 0;padding:0;max-width:100%}
+.stage-intro-image{display:block;max-width:100%;height:auto;object-fit:contain;margin:0 auto 3px}
+.stage-intro-objectives{margin-top:8px}
 .native-list>.commander-card{flex:none}
 .native-item{position:relative;width:45px;height:45px;min-width:45px;flex:none;padding:0;background:url('/content/ui/image_item_hd/item_blank.png') center/100% 100%;overflow:visible}
 .native-item>img{display:block;width:45px;height:45px;pointer-events:none}
@@ -299,7 +308,13 @@ body:has(#play:not([hidden])>#dialogue:not([hidden])) :is(#pause,#settings,#deta
 .disband-refund{display:flex;justify-content:center;align-items:center;gap:14px;margin:10px 0}
 .disband-refund>span{display:flex;align-items:center;gap:3px}
 .native-layout[data-layout=form_shop] .native-grid{overflow-x:hidden}
-.native-layout[data-layout=form_shop] .shop-refresh{position:absolute;right:0;top:-27px;width:32px;height:25px;padding:0;display:flex;align-items:center;justify-content:center;background:transparent;border:0;border-left:1px solid #777;z-index:2}
+.native-layout[data-layout=form_shop] .shop-refresh{position:absolute;right:8px;bottom:8px;width:60px;height:32px;padding:0;display:flex;align-items:center;justify-content:center;gap:3px;background:transparent;border-width:0;z-index:2}
+.campaign-stars{position:absolute;left:0;top:0;width:22px;height:45px;pointer-events:none}
+.campaign-stars>img{position:absolute;width:7.5px;height:7px}
+.stage-condition-title{position:absolute;left:2px;top:2px;width:176px;height:20px;background:url("/content/ui/image_ui_hd/Board_generalinfomarker.png") center/100% 100% no-repeat;display:flex;justify-content:center;align-items:center}
+.commander-card[aria-pressed=true] .deploy-card-confirm{animation:deploy-popup 200ms ease-out both;transform-origin:center}
+@keyframes deploy-popup{from{transform:translateX(-50%) scale(.15)}75%{transform:translateX(-50%) scale(1.03)}to{transform:translateX(-50%) scale(1)}}
+@media(prefers-reduced-motion:reduce){.commander-card[aria-pressed=true] .deploy-card-confirm{animation:none}}
 .shop-refresh>img{pointer-events:none;object-fit:contain}
 .shop-refresh:disabled{opacity:.45}
 .native-layout[data-layout=form_regroup] [data-native-id=grid_preview]>div{display:flex;align-items:center;gap:8px}

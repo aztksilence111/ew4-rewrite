@@ -1,5 +1,7 @@
 # 技能、特性与胜负规则扩展（API 1/2）
 
+2026-10-22 增补：[局外配置与战役说明](METAGAME_AND_BRIEFING.md)，API 2 的 `metagame` 支持初始资源、商品位/库存及刷新恢复条件；`stageIntroPresentation` 支持任务窗口布局和目标文字，实际目标沿用胜负规则。
+
 上将名额可通过 API 2 的 `deploymentLimits` 引用 JSON，支持全局默认与指定剧本覆盖；不配置保持当前限制，示例及存档规则见[上将名额模板](../../examples/deployment-limits/README.md)。
 
 物品与装备现在可通过 API 2 的 `itemBindings` 复用本指南的技能、事件和 Lua，支持保留/替换原效果、装备主动/被动技能及消耗品使用效果，见[物品接口](ITEM_EFFECTS.md)及[模板](../../examples/item-effects/README.md)。

@@ -207,6 +207,7 @@ public sealed partial class RuleEventBus
             var next = after.Units.SingleOrDefault(u => u.Id == unit.Id);
             int damage = unit.Combatant.Health - (next?.Combatant.Health ?? 0);
             if (damage > 0) notices.Add(new("battle.damage", unit.Id, damage));
+            else if (damage < 0) notices.Add(new("unit.healed", unit.Id, -(long)damage));
             if (next == null) notices.Add(new("unit.destroyed", unit.Id));
             else if (next.Cell != unit.Cell) notices.Add(new("unit.moved", unit.Id, next.Cell));
         }

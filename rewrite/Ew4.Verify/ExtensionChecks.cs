@@ -65,6 +65,9 @@ internal static class ExtensionChecks
         var funds = world.Factions.Single(f => f.Id == unit.Owner).Resources;
         var change = WorldSkillActions.Execute(world, world.Revision, unit.Id, "heal", null, bus, started.Rules.Movement);
         Check(change.State.Units.Single(u => u.Id == unit.Id).Combatant.Health == Math.Min(before.Combatant.Profile.MaxHealth, before.Combatant.Health + 9), "active skill heals");
+        Check(change.Notices.Count(n => n.Kind == "unit.healed" && n.Subject == unit.Id && n.Value == 9) == 1,
+            "actual extension healing emits one positive health delta");
+        Check(!RuleEventBus.ChangeNotices(change.State, change.State).Any(n => n.Kind == "unit.healed"), "unchanged health emits no healing cue");
         Check(change.State.Factions.Single(f => f.Id == unit.Owner).Resources == new Resources(funds.Money - 3, funds.Industry - 2, funds.Food - 1), "active skill exact cost");
         Check(change.State.ExtensionState[unit.Id + "/heal/uses"] == 1 && change.State.ExtensionState[unit.Id + "/heal/ready"] == world.Round + 2, "instance state and cooldown");
         Reject(() => WorldSkillActions.Execute(change.State, change.State.Revision, unit.Id, "heal", null, bus, started.Rules.Movement), "cooldown repeated action");

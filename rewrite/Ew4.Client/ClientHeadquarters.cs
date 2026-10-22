@@ -19,14 +19,28 @@ public sealed partial class ClientGame
             localAccount = JsonSerializer.Deserialize<PlayerAccount>(File.ReadAllBytes(Profile), Json)
                 ?? throw new RuleViolation("account.format", "Invalid local account");
         }
-        else localAccount = new PlayerAccount { Id = "local", ContentRevision = content.Catalogs.Accounts.SourceRevision, Medals = 20_000_000, Badges = 20_000_000 };
+        else localAccount = new PlayerAccount { Id = "local", ContentRevision = content.Catalogs.Accounts.SourceRevision,
+            Medals = content.Extensions.Metagame.InitialMedals, Badges = content.Extensions.Metagame.InitialBadges };
         if (localAccount.CommanderOffers.Count == 0)
             for (int group = 0; group < 3; group++) localAccount = DrawCommanders(localAccount, group);
         localAccount.Validate();
         if (localAccount.ContentRevision != content.Catalogs.Accounts.SourceRevision)
             throw new RuleViolation("account.content", "Local account requires a content migration");
         foreach (var owned in localAccount.Roster) AccountCommanders.Resolve(owned, content.Catalogs.Accounts.Rules());
+        var balances = localAccount.RefreshBalances.ToDictionary(p => p.Key, p => p.Value);
+        foreach (var (key, policy) in content.Extensions.Metagame.Refresh.Where(p => p.Value.Limit.HasValue))
+            if (!balances.ContainsKey(key)) balances[key] = new(policy.Initial ?? policy.Limit!.Value, Now(), RefreshUses.Victories(localAccount));
+        if (balances.Count != localAccount.RefreshBalances.Count)
+            StoreAccount(localAccount with { Revision = checked(localAccount.Revision + 1), RefreshBalances = balances });
         return localAccount;
+    }
+    private DateTimeOffset Now() => clock?.Invoke() ?? DateTimeOffset.UtcNow;
+    private RefreshPolicy? RefreshPolicy(string target) => content.Extensions.Metagame.Refresh.GetValueOrDefault(target);
+    private object RefreshView(PlayerAccount account, string target)
+    {
+        var policy = RefreshPolicy(target);
+        int? remaining = policy?.Limit == null ? null : RefreshUses.Recover(account.RefreshBalances[target], policy, Now(), RefreshUses.Victories(account)).Remaining;
+        return new { limit = policy?.Limit, remaining, recovery = policy?.Recovery };
     }
     private void StoreAccount(PlayerAccount next)
     {
@@ -45,7 +59,9 @@ public sealed partial class ClientGame
     {
         var account = Account(); var locked = LockedCommanders();
         var sources = content.Catalogs.Runtime.SourceTrees.GetProperty("def_commander.xml").GetProperty("children");
-        return new { account.Revision, account.Medals, account.Badges, sectionCapacity = CommanderSectionCapacity, skillLayout = content.Extensions.Layouts.GetValueOrDefault("commander"), offers = account.CommanderOffers, roster = account.Roster.Select(c => new { c.Id, c.DefinitionId, c.Learning, c.Training, c.Items, c.Tag,
+        return new { account.Revision, account.Medals, account.Badges, sectionCapacity = CommanderSectionCapacity,
+            refresh = Enumerable.Range(0, 3).ToDictionary(i => i, i => RefreshView(account, "academy." + i)),
+            skillLayout = content.Extensions.Layouts.GetValueOrDefault("commander"), offers = account.CommanderOffers, roster = account.Roster.Select(c => new { c.Id, c.DefinitionId, c.Learning, c.Training, c.Items, c.Tag,
             locked = locked.Contains(c.Id), rankPrice = PromotionPrice(c, false), titlePrice = PromotionPrice(c, true), fullPrice = FullPromotionPrice(c),
             healthBonus = content.Catalogs.Combat.RankHealth[c.Learning.Rank.Level.ToString(CultureInfo.InvariantCulture)],
             healing = content.Catalogs.Combat.TitleHealing[c.Learning.Title.Level.ToString(CultureInfo.InvariantCulture)] }),
@@ -146,7 +162,8 @@ public sealed partial class ClientGame
             return new { learning = preview.Roster.Single(c => c.Id == receiver.Id).Learning, price = rules.InheritanceMedals };
         }
         else if (command.Op == "refresh")
-            next = DrawCommanders(account, command.Group) with { Revision = checked(account.Revision + 1) };
+            next = DrawCommanders(RefreshUses.Consume(account, "academy." + command.Group, RefreshPolicy("academy." + command.Group), Now()), command.Group)
+                with { Revision = checked(account.Revision + 1) };
         else if (command.Op is "recruit" or "recruit_badge")
         {
             var source = content.Catalogs.Runtime.SourceTrees.GetProperty("def_commander.xml").GetProperty("children").EnumerateArray()

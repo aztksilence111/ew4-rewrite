@@ -18,6 +18,54 @@
   }
   function inView(rect,x,y,radius){return !rect||x+radius>=rect.left&&x-radius<=rect.left+rect.width&&y+radius>=rect.top&&y-radius<=rect.top+rect.height;}
   function own(object,key){return object&&Object.prototype.hasOwnProperty.call(object,key)?object[key]:undefined;}
+  class ParticleEmitter {
+    constructor(definition,event,seed,options={}){
+      this.parameters=definition.parameters;this.event=event;this.seed=seed>>>0;this.time=0;this.credit=0;this.particles=[];
+      this.until=options.continuous?Infinity:Math.max(0,Math.min(Number(definition.life),options.emissionLife??Infinity));
+      this.enabled=true;this.emitted=0;this.peak=0;this.previous={x:0,y:0,time:0};this.position={...this.previous};
+      this.maximumLife=Math.max(Number(this.parameters.life?.min||0),Number(this.parameters.life?.max||0),1/60);
+    }
+    random(){this.seed=(Math.imul(this.seed,1664525)+1013904223)>>>0;return this.seed/4294967296;}
+    value(key,fallback=0){const p=this.parameters[key];return p?Number(p.min??fallback)+(Number(p.max??p.min??fallback)-Number(p.min??fallback))*this.random():fallback;}
+    move(x,y,time){this.previous=this.position;this.position={x,y,time};}
+    stop(time=this.time){this.until=Math.min(this.until,Math.max(0,time));}
+    get alive(){return this.time<this.until||this.particles.length>0;}
+    spawn(at){
+      const p=this.parameters,angle=Number(this.event.rot||0)*Math.PI/180,direction=this.value('angle')*Math.PI/180+angle;
+      const life=Math.max(1/60,this.value('life',.5)),speed=this.value('speed'),area=p.settings?.type==='area';
+      const dx=area?(this.random()-.5)*Number(p.settings?.width||0):0,dy=area?(this.random()-.5)*Number(p.settings?.height||0):0;
+      const span=this.position.time-this.previous.time,f=span>0?Math.max(0,Math.min(1,(at-this.previous.time)/span)):1;
+      const x=this.previous.x+(this.position.x-this.previous.x)*f,y=this.previous.y+(this.position.y-this.previous.y)*f;
+      this.particles.push({image:p.image,tracks:p.lifetrack,born:at,age:0,life,
+        x:x+Number(this.event.x||0)+dx*Math.cos(angle)-dy*Math.sin(angle),y:y+Number(this.event.y||0)+dx*Math.sin(angle)+dy*Math.cos(angle),
+        vx:Math.cos(direction)*speed,vy:Math.sin(direction)*speed,gravity:this.value('gravity'),scale:this.value('scale',1),rotation:this.value('rotangle')*Math.PI/180+angle,spin:this.value('rotspeed'),
+        color:[this.value('r',255),this.value('g',255),this.value('b',255),this.value('a',255)]});
+      this.emitted++;this.peak=Math.max(this.peak,this.particles.length);
+    }
+    advance(target){
+      const step=1/60,end=Math.floor((Math.max(0,target)+1e-9)/step)*step;
+      if(end<=this.time)return;
+      if(end>=this.until+this.maximumLife){this.particles.length=0;this.time=end;return;}
+      if(end-this.time>this.maximumLife+1){this.particles.length=0;this.credit=0;this.time=Math.max(this.time,Math.floor((end-this.maximumLife)/step)*step);}
+      // Invisible continuous trails keep their clock, without replaying discarded births.
+      if(!this.enabled&&!this.particles.length){this.credit=0;this.time=end;return;}
+      while(this.time+step<=end+1e-9){
+        for(let i=this.particles.length-1;i>=0;i--){
+          const p=this.particles[i],life=p.age/p.life;
+          p.x+=p.vx*track(p.tracks,life,'speed')*step;p.y+=p.vy*track(p.tracks,life,'speed')*step;
+          p.vy+=p.gravity*track(p.tracks,life,'gravity')*step;p.rotation+=p.spin*track(p.tracks,life,'rotspeed')*step;p.age+=step;
+          if(p.age>=p.life){this.particles[i]=this.particles[this.particles.length-1];this.particles.pop();}
+        }
+        const emissionStep=Math.max(0,Math.min(step,this.until-this.time));
+        if(this.enabled&&emissionStep>0){
+          this.credit+=Math.max(0,track(this.parameters.timetrack,this.time,'quantity','time',0))*emissionStep;
+          const count=Math.floor(this.credit+1e-9);this.credit=Math.max(0,this.credit-count);
+          for(let n=0;n<Math.min(count,100-this.particles.length);n++)this.spawn(this.time+emissionStep);
+        }
+        this.time+=step;
+      }
+    }
+  }
   class UnitVisuals {
     constructor(manifest,data,config){
       if(config&&config.schema!==1)throw new Error('Unsupported unit-visuals schema');
@@ -73,49 +121,57 @@
     }
   }
   class Effects {
-    constructor(api,data,visuals){this.api=api;this.data=data;this.visuals=new UnitVisuals(api.manifest||{profiles:{}},data,visuals);this.instances=[];this.tints=new Map();this.voices=new Set();this.trails=new Map();this.serial=1;}
+    constructor(api,data,visuals){this.api=api;this.data=data;this.visuals=new UnitVisuals(api.manifest||{profiles:{}},data,visuals);this.instances=[];this.tints=new Map();this.voices=new Set();this.audio=new Map();this.trails=new Map();this.serial=1;}
     profile(id,faction){return this.visuals.resolve(id,faction);}
     motion(profile,action,facing){const source=this.visuals.definition(typeof profile==='string'?this.data.bindings[profile]:profile?.visualMotion),side=facing<0?'left':'right';
       return source?.motions.find(m=>m.type===action&&Number(m.index||0)===0&&(m.dir===side||(!m.dir||m.dir==='all')));}
     firstEvent(name){const events=this.data.timelines[name];return events?.length?Math.min(...events.map(e=>Number(e.at)||0)):null;}
     lastEvent(name){const events=this.data.timelines[name];return events?.length?Math.max(...events.map(e=>Number(e.at)||0)):null;}
-    clear(){this.instances=[];this.trails.clear();for(const voice of this.voices){voice.pause();voice.src='';}this.voices.clear();}
+    attackPlan(profile,lib,category,facing,speed){
+      const firing=this.motion(profile,'attack',facing),timeline=(firing?.effect||'')+(facing<0?' left':' right'),last=this.lastEvent(timeline),segments=[];
+      let visualDuration=0,duration=0,attackBasis=0;
+      for(const action of ['attack','reload','finish']){
+        const motion=this.motion(profile,action,facing),name=motion?.name||profile.motions[action],item=lib.byName.get(name);if(!item)continue;
+        const rate=speed*Number(motion?.speed||1),length=item.duration/lib.fps*1000/rate;
+        const basis=action==='attack'&&last!=null?Math.min(length,(last+.2+(category==='artillery'?.2:0))*1000/speed):length;
+        if(!segments.length)attackBasis=basis;
+        segments.push({name,start:visualDuration,end:visualDuration+length,speed:rate,directional:motion?.dir==='left'||motion?.dir==='right'});
+        visualDuration+=length;duration+=basis;
+      }
+      return {segments,timeline,visualDuration,duration,attackBasis,hitAt:last==null?attackBasis:Math.max(attackBasis,(last+.2)*1000/speed),firstShot:(this.firstEvent(timeline)??0)*1000/speed};
+    }
+    clear(){this.instances=[];this.trails.clear();for(const voice of this.voices){voice.pause();try{voice.currentTime=0;}catch(_){}}this.voices.clear();}
+    preloadSounds(files){for(const file of files||[])if(this.data.sounds.includes(file)&&!this.audio.has(file)){const audio=new Audio('/content/sounds/'+file);audio.preload='auto';this.audio.set(file,audio);}}
     sound(file){if(!file||!this.data.sounds.includes(file)||!this.api.volume())return;
-      const voice=new Audio('/content/sounds/'+file);voice.volume=this.api.volume()/100;this.voices.add(voice);
-      voice.onended=()=>this.voices.delete(voice);voice.play().catch(()=>this.voices.delete(voice));}
+      let pool=this.audio.get(file);if(!pool){pool=new Audio('/content/sounds/'+file);pool.preload='auto';this.audio.set(file,pool);}
+      const voice=this.voices.has(pool)?pool.cloneNode():pool;voice.volume=this.api.volume()/100;this.voices.add(voice);
+      voice.onended=voice.onerror=()=>this.voices.delete(voice);voice.play().catch(()=>this.voices.delete(voice));}
+    moveSound(profile,category,sea){this.sound(sea?'sfx_naval.wav':category==='cavalry'?(profile?.unitIndex===9?'sfx_armourmove.wav':'sfx_cavalrymove.wav'):'sfx_leg.wav');}
     timeline(name,x,y,options={}){
       const events=this.data.timelines[name];if(!events)return 0;
-      const instance={x,y,events,started:options.started??performance.now(),speed:options.speed||1,scale:options.scale||1,done:new Set(),particles:[],seed:this.serial++};
+      const instance={x,y,events,started:options.started??performance.now(),speed:options.speed||1,scale:options.scale||1,done:new Set(),emitters:[],get particles(){return this.emitters.flatMap(e=>e.particles);},seed:this.serial++};
       this.instances.push(instance);return this.lastEvent(name)*1000/instance.speed;
     }
-    effect(name,x,y,options={}){this.instances.push({x,y,events:[{type:'effect',name,at:0}],started:performance.now(),speed:options.speed||1,scale:options.scale||1,layer:options.layer,quantityScale:options.quantityScale??1,emissionLife:options.emissionLife,done:new Set(),particles:[],seed:this.serial++});}
-    trail(id,x,y,category,sea,time){
-      const last=this.trails.get(id)??time-50;if(time-last<50)return;this.trails.set(id,time);
-      const kind=sea?4:category==='infantry'?1:category==='cavalry'?2:3;
-      this.effect('effect_moving'+kind+'.xml',x,y,{emissionLife:.05,scale:.5,quantityScale:sea?1:.35,layer:'ground'});
+    effect(name,x,y,options={}){const instance={x,y,events:[{type:'effect',name,at:0}],started:options.started??performance.now(),speed:options.speed||1,scale:options.scale||1,layer:options.layer,continuous:options.continuous,emissionLife:options.emissionLife,done:new Set(),emitters:[],get particles(){return this.emitters.flatMap(e=>e.particles);},seed:this.serial++};this.instances.push(instance);return instance;}
+    trail(id,x,y,grade,sea,time,visible=true,speed=1){
+      const kind=sea?4:grade===0?1:grade===1?2:3;let trail=this.trails.get(id);
+      if(trail&&trail.kind!==kind){this.stopTrail(trail,time);this.trails.delete(id);trail=null;}
+      if(!trail){const instance=this.effect('effect_moving'+kind+'.xml',x,y,{continuous:true,scale:.5,layer:'ground',started:time,speed});trail={kind,instance};this.trails.set(id,trail);}
+      const instance=trail.instance,elapsed=(time-instance.started)/1000*instance.speed;
+      instance.enabled=visible;instance.trailPosition={x:(x-instance.x)/instance.scale,y:(y-instance.y)/instance.scale,time:elapsed};
+    }
+    stopTrail(trail,time){const i=trail.instance,elapsed=(time-i.started)/1000*i.speed;i.continuous=false;i.emissionLife=elapsed;for(const e of i.emitters)e.stop(elapsed);}
+    finishTrails(active,time){for(const [id,trail] of this.trails)if(!active.has(id)){this.stopTrail(trail,time);this.trails.delete(id);}}
+    get particles(){return this.instances.flatMap(i=>i.emitters.flatMap(e=>e.particles));}
+    element(name,x,y,time,draw){
+      for(const element of this.data.elements?.[name]||[]){const lib=this.api.libraries.get(element.res),item=lib?.byName.get(element.name);if(!item)continue;
+        draw.save();draw.translate(x+Number(element.x||0),y+Number(element.y||0));draw.scale(Number(element.hscale||1),Number(element.vscale||1));this.api.animation(lib,item,time/1000*lib.fps,0,draw);draw.restore();}
     }
     emit(instance,event){
       this.sound(event.sound);
       if(event.type==='animation'||event.type==='image')return;
       const definitions=this.data.definitions[event.name];if(!definitions)return;
-      let seed=instance.seed;const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
-      for(const emitter of definitions){
-        const p=emitter.parameters,get=(key,fallback=0)=>{const a=p[key];return a?Number(a.min??fallback)+(Number(a.max??a.min??fallback)-Number(a.min??fallback))*random():fallback;};
-        const emissionLife=Math.min(Number(emitter.life),instance.emissionLife??Infinity),step=1/60,angle=Number(event.rot||0)*Math.PI/180;
-        const burst=p.settings?.mode==='once';
-        for(let time=0,credit=burst?Math.max(0,track(p.timetrack,0,'quantity','time',0)):random();time<emissionLife;time+=step){
-          if(!burst)credit+=Math.max(0,track(p.timetrack,time,'quantity','time',0))*Math.min(step,emissionLife-time)*(instance.quantityScale??1);
-          while(credit>=1){credit--;
-            const direction=get('angle')*Math.PI/180+angle,life=get('life',.5),speed=get('speed');
-            const dx=(random()-.5)*Number(p.settings?.width||0),dy=(random()-.5)*Number(p.settings?.height||0);
-            instance.particles.push({image:p.image,tracks:p.lifetrack,born:Number(event.at||0)+time,life,
-              x:Number(event.x||0)+dx*Math.cos(angle)-dy*Math.sin(angle),y:Number(event.y||0)+dx*Math.sin(angle)+dy*Math.cos(angle),
-              vx:Math.cos(direction)*speed,vy:Math.sin(direction)*speed,gravity:get('gravity'),scale:get('scale',1),rotation:get('rotangle')*Math.PI/180+angle,spin:get('rotspeed'),
-              color:[get('r',255),get('g',255),get('b',255),get('a',255)]});
-          }
-          if(burst)break;
-        }
-      }
+      for(const definition of definitions)instance.emitters.push(new ParticleEmitter(definition,event,Math.imul(instance.seed,65537)+instance.emitters.length,instance));
     }
     texture(name,color){
       const atlas=this.api.manifest.atlases.eff,sprite=atlas?.[name],image=this.api.image('images/eff.png');
@@ -135,6 +191,11 @@
         const elapsed=(time-instance.started)/1000*instance.speed;
         if(elapsed<0)return true;
         instance.events.forEach((event,index)=>{if(elapsed>=Number(event.at||0)&&!instance.done.has(index)){instance.done.add(index);this.emit(instance,event);}});
+        for(const emitter of instance.emitters){
+          emitter.enabled=instance.enabled!==false;
+          if(instance.trailPosition)emitter.move(instance.trailPosition.x,instance.trailPosition.y,instance.trailPosition.time);
+          emitter.advance(elapsed-Number(emitter.event.at||0));
+        }
         let visualAlive=false;
         for(const event of instance.events){
           const age=elapsed-Number(event.at||0);if(age<0)continue;
@@ -153,19 +214,19 @@
             draw.save();draw.translate(x,y);draw.scale(Number(event.scale||1)*instance.scale,Number(event.scale||1)*instance.scale);this.api.sprite('eff',event.name,0,0,1,draw);draw.restore();
           }
         }
-        for(const p of instance.particles){const age=elapsed-p.born;if(age<0||age>p.life)continue;const life=age/p.life,scale=p.scale*track(p.tracks,life,'scale'),s=instance.scale;
+        for(const emitter of instance.emitters)for(const p of emitter.particles){const life=p.age/p.life,scale=p.scale*track(p.tracks,life,'scale'),s=instance.scale;
           const alpha=Math.max(0,Math.min(1,p.color[3]*track(p.tracks,life,'a')/255));if(alpha<=1/255)continue;
-          const speed=track(p.tracks,life,'speed'),gravity=track(p.tracks,life,'gravity');
           const width=Number(p.image.width)*scale*s,height=Number(p.image.height)*scale*s;
-          const x=instance.x+(p.x+p.vx*age*speed)*s,y=instance.y+(p.y+p.vy*age*speed+p.gravity*age*age*.5*gravity)*s;
-          const radius=Math.hypot(width,height)/2;
+          const x=instance.x+p.x*s,y=instance.y+p.y*s,sprite=this.api.manifest.atlases.eff?.[p.image.file];
+          const anchorX=sprite?Number(sprite.refx||0)/sprite.w:.5,anchorY=sprite?Number(sprite.refy||0)/sprite.h:.5;
+          const radius=Math.hypot(width,height)*Math.max(anchorX,1-anchorX,anchorY,1-anchorY);
           if(!inView(visibleRect,x,y,radius))continue;
           const color=p.color.map((v,i)=>v*track(p.tracks,life,['r','g','b','a'][i])),texture=this.texture(p.image?.file,color);if(!texture)continue;
-          draw.save();draw.translate(x,y);draw.rotate(p.rotation+p.spin*age*track(p.tracks,life,'rotspeed'));draw.globalAlpha=alpha;draw.globalCompositeOperation=p.image.blend==='add'?'lighter':'source-over';draw.drawImage(texture,-width/2,-height/2,width,height);draw.restore();
+          draw.save();draw.translate(x,y);draw.rotate(p.rotation);draw.globalAlpha=alpha;draw.globalCompositeOperation=p.image.blend==='add'?'lighter':'source-over';draw.drawImage(texture,-width*anchorX,-height*anchorY,width,height);draw.restore();
         }
-        return visualAlive||instance.done.size<instance.events.length||instance.particles.some(p=>elapsed<p.born+p.life);
+        return visualAlive||instance.done.size<instance.events.length||instance.emitters.some(e=>e.alive);
       });
     }
   }
-  root.Ew4Effects={Effects,UnitVisuals,DamageNumbers,impact,track};
+  root.Ew4Effects={Effects,ParticleEmitter,UnitVisuals,DamageNumbers,impact,track};
 })(globalThis);

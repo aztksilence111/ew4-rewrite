@@ -2,6 +2,7 @@
 (function(root){
   class Menus {
     constructor(api){this.api=api;this.chapter=null;this.rating=null;this.rosterRating=null;this.recruiting=false;this.tagDraft=null;this.tagSaving=false;
+      addEventListener('resize',()=>requestAnimationFrame(()=>this.fitStageIntro()));
       document.getElementById('campaign-back').onclick=()=>{document.getElementById('campaign-screen').hidden=true;};
       document.getElementById('hq-back').onclick=()=>{
         if(this.tagSaving)return;
@@ -82,7 +83,11 @@
       for(const presentation of Object.values(this.catalog.presentations).filter(s=>s.chapter===chapter.id)){
         if(presentation.hidden&&!this.catalog.unlockedCampaigns?.includes(presentation.id))continue;
         const scenario=this.catalog.scenarios.find(s=>s.id===presentation.id);if(!scenario)continue;
-        const b=this.api.button('',()=>this.chooseBattle(presentation,b),list);b.className='country-entry';b.setAttribute('aria-label',scenario.name);b.setAttribute('aria-pressed','false');b.append(this.lettering(scenario.name,'font_text_2_cn_hd','#404040',132,'center',{singleLine:true}));
+        const b=this.api.button('',()=>this.chooseBattle(presentation,b),list);b.className='country-entry';b.dataset.campaign=presentation.id;b.setAttribute('aria-label',scenario.name);b.setAttribute('aria-pressed','false');b.append(this.lettering(scenario.name,'font_text_2_cn_hd','#404040',132,'center',{singleLine:true}));
+        const stars=Math.max(0,Math.min(5,this.catalog.campaignStars?.[presentation.id]||0));
+        if(stars){const strip=document.createElement('span');strip.className='campaign-stars';strip.setAttribute('aria-label',stars+'星');
+          // Native 440a4 uses HD points (8,8), (12,22), (16,36), (12,50), (8,64).
+          for(let i=0;i<stars;i++){const image=this.api.uiImage('star_campaign.png',7.5,7);image.style.left=[4,6,8,6,4][i]+'px';image.style.top=[4,11,18,25,32][i]+'px';strip.append(image);}b.append(strip);}
       }
       document.getElementById('campaign-screen').hidden=false;list.scrollTop=0;list.firstElementChild?.click();
       this.slideInSidebar(list);
@@ -102,15 +107,56 @@
         presentation.countries.forEach((country,index)=>{const name=this.api.catalog?.countries?.[country]?.name||this.text('name_'+country),b=this.api.button('',()=>{chosen=index;for(const c of body.children)c.setAttribute('aria-pressed',String(c===b));},body);b.setAttribute('aria-label',name);b.append(this.countryFlag(country,51,30),this.api.labels('country_'+country,name));if(!index)b.click();});
       }else await this.api.start(presentation.id,null);
     }
+    stageIntro(intro,onClose){
+      const screen=intro.presentation||{},bindings=screen.bindings||{description:'text_desc',commander:'tcmder',minimumRatingRound:'text_victory',highestRatingRound:'text_bestvic'};
+      const api=screen.layout?{...this.api,manifest:{...this.manifest,layouts:{...this.manifest.layouts,form_mod_stageintro:screen.layout}}}:this.api;
+      const l=this.introLayout=new Ew4NativeUI.Layout(api,screen.layout?'form_mod_stageintro':'form_stageintro',onClose);
+      l.body.classList.add('stage-intro');this.fitStageIntro();
+      document.getElementById('detail-title').replaceChildren(this.lettering(intro.title,'font_text_4_cn_hd','#ebe6e1',300,'center',{singleLine:true}));
+      if(bindings.commander){
+        if(intro.commander){const portrait=document.createElement('div');portrait.className='commander-card';
+          const name=document.createElement('span');name.className='commander-name';name.append(this.lettering(this.text('name_'+intro.commander),'font_text_2_cn_hd','#ebe6e1',78,'center',{singleLine:true}));portrait.append(this.portrait(intro.commander+'.png'),name);l.fill(bindings.commander,portrait);
+        }else l.hide(bindings.commander);
+      }
+      const prose=(key,value)=>{if(bindings[key]){const target=l.get(bindings[key]),a=target.nativeAttributes,width=parseFloat(target.style.width)-10;
+        target.classList.add('stage-intro-scroll');target.tabIndex=0;target.setAttribute('aria-label',key==='description'?'战役说明':'任务目标');
+        const font=(a.font||'font_text_1').replace(/^(font_text_\d)$/, '$1_cn_hd'),color='rgba('+(a.color||a.textcolor||'64,64,64,255').split(',').map((v,i)=>i===3?Number(v)/255:Number(v)).join(',')+')';
+        const text=value=>this.api.prose(this.text(value||''),font,color,width);
+        target.replaceChildren(text(value));
+        if(key==='description')for(const block of screen.content||[]){const node=document.createElement('figure');node.className='stage-intro-block';node.dataset.contentType=block.type;
+          if(block.type==='text')node.append(text(block.text));
+          else{const image=block.type==='commander'?this.portrait(block.commander+'.png'):block.image.startsWith('rewrite/')?Object.assign(document.createElement('img'),{src:'/content/extensions/'+block.image.slice(8).split('/').map(encodeURIComponent).join('/')}):this.api.uiImage(block.image);
+            image.removeAttribute('width');image.removeAttribute('height');image.classList.add('stage-intro-image');image.style.width=Math.min(width,block.width||(block.type==='commander'?78:width))+'px';image.alt=this.text(block.text||(block.type==='commander'?'name_'+block.commander:''));image.draggable=false;node.append(image);
+            const caption=block.text||(block.type==='commander'?'name_'+block.commander:'');if(caption)node.append(text(caption));}
+          target.append(node);}
+        if(key==='description'&&intro.objectives&&!bindings.objectives){const goal=document.createElement('div');goal.className='stage-intro-objectives';goal.append(text(intro.objectives));target.append(goal);}
+      }};
+      prose('description',intro.description);prose('objectives',intro.objectives);
+      for(const [group,key,binding,override,value] of [['group_condwin','text_victory','minimumRatingRound',screen.victoryText,intro.minimumRatingRound],['group_condlost','text_bestvic','highestRatingRound',screen.bestVictoryText,intro.highestRatingRound]]){
+        if(!screen.layout){const heading=document.createElement('div');heading.className='stage-condition-title';heading.append(this.lettering(this.text(key),'font_text_2_cn_hd','#ebe6e1',176,'center',{singleLine:true}));l.get(group).append(heading);
+          if(bindings[binding])l.get(bindings[binding]).style.height='32px';
+          if(override!=null)l.hide(group+'/text_round');}
+        if(bindings[binding])l.text(bindings[binding],override==null?value:this.text(override));
+      }
+      if(bindings.victoryLabel)l.text(bindings.victoryLabel,this.text('text_victory'));
+      if(bindings.bestVictoryLabel)l.text(bindings.bestVictoryLabel,this.text('text_bestvic'));
+      if(bindings.close)l.action(bindings.close,'关闭',()=>this.api.closeDetail());
+    }
+    fitStageIntro(){
+      const l=this.introLayout;if(!l?.current())return;
+      const base=Number(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale'))||1;
+      l.body.parentElement.style.setProperty('--ui-scale',Math.min(base,(innerWidth-24)/l.width,(innerHeight-24)/l.height));
+    }
     draw(time){
       if(document.getElementById('campaign-screen').hidden||!this.battle)return;
       const surface=document.getElementById('campaign-map'),draw=surface.getContext('2d'),lib=this.api.libraries.get('strategicmap');if(!lib)return;
       const rect=surface.getBoundingClientRect(),ratio=Math.min(devicePixelRatio||1,3),w=Math.round(rect.width*ratio),h=Math.round(rect.height*ratio);
       if(surface.width!==w||surface.height!==h){surface.width=w;surface.height=h;}
       draw.setTransform(w/568,0,0,h/320,0,0);draw.clearRect(0,0,568,320);
-      const definition=this.manifest.strategic[this.battle.id]||{},cx=Number(definition.centerx||410),cy=Number(definition.centery||288),scale=Number(definition.scale||1);
-      draw.save();this.api.menuArt.drawStrategic(draw,definition,scale);
-      draw.translate(205,128);draw.scale(scale,scale);if(lib.byName.has(definition.name))this.api.animation(lib,lib.byName.get(definition.name),time/180,0,draw);draw.restore();
+      const definition=this.manifest.strategic[this.battle.id]||{},scale=Number(definition.scale||1),textureScale=this.manifest.uiOverrides?.strategic?1:.8;
+      const camera=this.api.menuArt.strategicCamera(definition,scale,textureScale);
+      draw.save();this.api.menuArt.drawStrategic(draw,definition,scale,camera.x,camera.y,textureScale);
+      draw.translate(camera.x,camera.y);draw.scale(scale,scale);if(lib.byName.has(definition.name))this.api.animation(lib,lib.byName.get(definition.name),time/180,0,draw);draw.restore();
     }
     tutorialMenu(){
       const body=this.api.detail('tutorial_label',250,200);body.className='tutorial-menu';
@@ -200,7 +246,8 @@
       if(!this.recruiting)for(const [i,card] of [...roster.children].entries()){card.style.gridRow=i%2+1;card.style.gridColumn=Math.floor(i/2)+1;}
       for(const id of ['hq-recruit-band','hq-refresh','hq-buy-buttons'])document.getElementById(id)?.remove();
       if(this.recruiting){const band=document.createElement('div');band.id='hq-recruit-band';screen.insertBefore(band,roster);
-        const refresh=this.api.button('',async()=>{this.offer=null;await this.transact({op:'refresh',group:this.rating});},screen);refresh.id='hq-refresh';refresh.className='native-command blue';refresh.setAttribute('aria-label','刷新将领');for(let i=0;i<3;i++)refresh.append(this.api.uiImage('button_refresh.png',13,16));this.drawPurchases();}
+        const refresh=this.api.button('',async()=>{this.offer=null;await this.transact({op:'refresh',group:this.rating});},screen);refresh.id='hq-refresh';refresh.className='native-command blue';refresh.setAttribute('aria-label','刷新将领');for(let i=0;i<3;i++)refresh.append(this.api.uiImage('button_refresh.png',13,16));
+        const remaining=data.refresh?.[this.rating]?.remaining;if(remaining!=null){refresh.append(this.lettering(remaining,'font_char_2_hd','#ebe6e1'));refresh.title='剩余 '+remaining+' 次';}this.drawPurchases();}
       roster.scrollLeft=scroll;this.headquartersControls();
       const count=document.getElementById('hq-count');
       count.hidden=this.recruiting;count.replaceChildren(this.lettering(entries.length+' / '+slots,'font_char_2_hd','#404040'));

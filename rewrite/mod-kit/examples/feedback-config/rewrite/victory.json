@@ -1,0 +1,8 @@
+{
+  "campaign1_01": {
+    "win": { "type": "round_reached", "round": 3 },
+    "roundLimit": 8,
+    "requirePlayerSurvival": true,
+    "descriptionKey": "保持己方存续，坚守至第3回合。"
+  }
+}

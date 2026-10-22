@@ -20,8 +20,8 @@ assert.equal(Ew4Battlefield.selectionHostile(relationState,0),true);assert.equal
 relationState.factions.push({id:'neutral',camp:40,neutral:true});
 for(const [owner,color] of [['player','blue'],['ally','blue'],['enemy','red'],['third','red'],['neutral','black']]){assert.equal(Ew4Battlefield.badgeColor(relationState,owner),color);checks++;}
 relationState.cells.push({owner:'neutral'});assert.equal(Ew4Battlefield.selectionHostile(relationState,4),true);checks++;
-assert.equal(Ew4Battlefield.recruitOffset(0),-72);assert.equal(Ew4Battlefield.recruitOffset(Ew4Battlefield.recruitDuration()),0);
-assert.ok(Ew4Battlefield.recruitOffset(100)<Ew4Battlefield.recruitOffset(200));checks+=3;
+assert.equal(Ew4Battlefield.recruitOffset(0),-60);assert.equal(Ew4Battlefield.recruitOffset(Ew4Battlefield.recruitDuration()),0);
+assert.equal(Ew4Battlefield.recruitOffset(Ew4Battlefield.recruitDuration()/2),-30);checks+=3;
 for(const test of vectors.coastCases){assert.deepEqual(Ew4MapSurface.coastTriangles(test.neighbors),test.triangles);checks++;}
 for(let mask=0;mask<64;mask++){
   const neighbors=Array.from({length:6},(_,d)=>({active:true,sea:false,owner:mask&(1<<d)?'other':'self'}));
@@ -44,11 +44,10 @@ for(const v of services.impacts){assert.equal(Ew4Effects.impact(v.weapon,v.categ
 const effects=JSON.parse(fs.readFileSync('rewrite/data/client/effects.json','utf8'));
 const engine=new Ew4Effects.Effects({},effects);
 for(const [name,definitions] of Object.entries(effects.definitions)){
-  const instance={seed:1,particles:[]};engine.emit(instance,{type:'effect',name,at:0});
-  assert.ok(instance.particles.every(p=>['x','y','vx','vy','life','scale','rotation'].every(k=>Number.isFinite(p[k]))),name);checks++;
-  if(definitions.every(e=>e.parameters.settings.mode==='once')){
-    const quantity=definitions.reduce((n,e)=>n+Math.floor(Ew4Effects.track(e.parameters.timetrack,0,'quantity','time',0)),0);
-    assert.equal(instance.particles.length,quantity,'original burst population '+name);checks++;
+  const instance={seed:1,emitters:[]};engine.emit(instance,{type:'effect',name,at:0});
+  for(const emitter of instance.emitters){emitter.advance(.1);
+    assert.ok(emitter.particles.every(p=>['x','y','vx','vy','life','scale','rotation'].every(k=>Number.isFinite(p[k]))),name);checks++;
+    assert.ok(emitter.peak<=100,'original emitter capacity '+name);checks++;
   }
 }
 const report={checks,errors:0,scope:'256 native mixed-coast submissions, 64 HD border masks, original packed color and interpolation coverage; not Android pixel acceptance.'};

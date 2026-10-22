@@ -200,7 +200,7 @@ public static class SessionActions
         if (change.State.Revision != checked(state.World.Revision + 1) || change.State.ScenarioId != state.World.ScenarioId
             || change.State.ContentRevision != state.World.ContentRevision)
             throw new RuleViolation("session.world_revision", "World transaction must advance this scenario once");
-        var next = SyncPlayer(state with { Revision = checked(state.Revision + 1), World = change.State }).Copy(); next.Validate();
+        var next = BattleMedals.Collect(SyncPlayer(state with { Revision = checked(state.Revision + 1), World = change.State }), change.Notices).Copy(); next.Validate();
         return new(next, change.Notices.ToArray());
     }
 }

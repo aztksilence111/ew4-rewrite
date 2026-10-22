@@ -1,6 +1,31 @@
 using System.Text.Json;
 using Ew4.Core;
 
+if (args.ElementAtOrDefault(1) == "--turn-performance")
+{
+    TurnPerformanceChecks.Run(Path.GetFullPath(args[0]), args.ElementAtOrDefault(2) ?? "sample"); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--medal-drops-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { medalDropChecks = MedalDropChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--feedback-undo-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { feedbackUndoChecks = FeedbackUndoChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--feedback-configuration-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { feedbackConfigurationChecks = FeedbackConfigurationChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--naval-deployment-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { navalDeploymentChecks = NavalDeploymentChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
 if (args.ElementAtOrDefault(1) == "--deployment-limits-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { deploymentLimitChecks = DeploymentLimitChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
@@ -65,7 +90,7 @@ if (args.Length == 2 && args[1] == "--mechanics-only")
 }
 if (args.Length == 2 && args[1] == "--client-only")
 {
-    Console.WriteLine(JsonSerializer.Serialize(new { clientChecks = ClientChecks.Run(root), errors = 0 }));
+    Console.WriteLine(JsonSerializer.Serialize(new { clientChecks = ClientChecks.Run(root), navalDeploymentChecks = NavalDeploymentChecks.Run(root), errors = 0 }));
     return;
 }
 if (args.Length == 2)

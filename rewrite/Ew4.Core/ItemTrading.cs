@@ -38,9 +38,15 @@ public sealed record PlayerAccount
     public IReadOnlyList<string> UnlockedCampaigns { get; init; } = Array.Empty<string>();
     public IReadOnlyDictionary<string, int> CampaignStars { get; init; } = new Dictionary<string, int>();
     public IReadOnlyDictionary<string, BattleResult> BattleResults { get; init; } = new Dictionary<string, BattleResult>();
+    public IReadOnlyDictionary<string, long> CollectedMedalReceipts { get; init; } = new Dictionary<string, long>();
     public ItemMarket? HeadquartersStock { get; init; }
+    public IReadOnlyDictionary<string, RefreshBalance> RefreshBalances { get; init; } = new Dictionary<string, RefreshBalance>();
     public void Validate()
     {
+        if (CollectedMedalReceipts.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Value < 0))
+            throw new RuleViolation("account.medal_receipts", "Invalid collected medal receipt");
+        if (RefreshBalances.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Value == null || p.Value.Remaining < 0 || p.Value.Victories < 0))
+            throw new RuleViolation("account.refresh", "Invalid refresh balance");
         if (string.IsNullOrWhiteSpace(Id) || string.IsNullOrWhiteSpace(ContentRevision) || Revision < 0 || Medals < 0 || Badges < 0
             || Inventory.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Value < 1))
             throw new RuleViolation("account.state", "Invalid account identity, balance or inventory");
@@ -69,6 +75,8 @@ public sealed record PlayerAccount
     public PlayerAccount Copy() => this with { Inventory = Inventory.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal), Roster = Roster.Select(c => c.Copy()).ToArray(),
         CommanderOffers = CommanderOffers.ToDictionary(p => p.Key, p => (IReadOnlyList<string>)p.Value.ToArray()), ClaimedRewards = ClaimedRewards.ToArray(), UnlockedCampaigns = UnlockedCampaigns.ToArray(),
         CampaignStars = CampaignStars.ToDictionary(p => p.Key, p => p.Value), BattleResults = BattleResults.ToDictionary(p => p.Key, p => p.Value),
+        CollectedMedalReceipts = CollectedMedalReceipts.ToDictionary(p => p.Key, p => p.Value),
+        RefreshBalances = RefreshBalances.ToDictionary(p => p.Key, p => p.Value),
         HeadquartersStock = HeadquartersStock == null ? null : HeadquartersStock with { Offers = HeadquartersStock.Offers.ToArray() } };
 }
 

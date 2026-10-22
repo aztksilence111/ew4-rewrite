@@ -29,6 +29,13 @@ public sealed record RosterDeploymentRules
 
 public static class RosterDeployment
 {
+    public static bool IsDeploymentLocation(WorldState world, UnitState unit)
+    {
+        var cell = world.Cells[unit.Cell];
+        return cell.Terrain.Active && (cell.Owner == unit.Owner
+            || cell.Terrain.Sea && unit.Combatant.Profile.Category == "naval");
+    }
+
     public static bool CanDeploy(GameSession state, string unitId, string commanderId, RosterDeploymentRules rules)
     {
         var world = state.World;
@@ -37,7 +44,7 @@ public static class RosterDeployment
         return world.Phase == TurnPhase.Active && world.PendingDialogue == null && world.ActiveFaction == state.PlayerFaction
             && world.Factions.Any(f => f.Id == world.ActiveFaction && f.Human && !f.Defeated)
             && unit != null && unit.Owner == world.ActiveFaction && unit.CommanderId == null
-            && world.Cells[unit.Cell].Terrain.Active && world.Cells[unit.Cell].Owner == unit.Owner
+            && IsDeploymentLocation(world, unit)
             && quota != null && !(quota.CommanderIds.Count >= quota.Limit)
             && state.Account.Roster.Any(c => c.Id == commanderId)
             && world.Commanders.All(c => c.Id != commanderId) && state.TavernCandidates.All(c => c.CommanderId != commanderId)

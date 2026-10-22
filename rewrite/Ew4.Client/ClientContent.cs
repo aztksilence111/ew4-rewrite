@@ -108,6 +108,12 @@ public sealed class ClientContent
             throw new RuleViolation("scenario.reference", "Event rules reference an unknown scenario");
         if (Extensions.DeploymentLimits.Keys.Any(id => id != "*" && !Scenarios.Any(s => s.Id == id)))
             throw new RuleViolation("extension.deployment_limit", "Deployment limits reference an unknown scenario");
+        if (Extensions.StageIntroPresentations.Keys.Any(id => id != "*" && !Scenarios.Any(s => s.Id == id)))
+            throw new RuleViolation("extension.stage_intro", "Stage intro references an unknown scenario");
+        if (Extensions.Metagame.ShopSlots?.Any(s => s.Items?.Any(id => !Catalogs.Items.Rules().Definitions.ContainsKey(id)
+                || s.Pool == "consumable" && !Catalogs.Items.Rules().Definitions[id].Equipment.Consumable
+                || s.Pool == "equipment" && Catalogs.Items.Rules().Definitions[id].Equipment.Consumable) == true) == true)
+            throw new RuleViolation("metagame.item", "Shop slot references an unknown item or mismatched pool");
     }
 
     public string Label(string key) => Strings.TryGetValue(key, out string? label) ? label : Strings.TryGetValue("name_" + key, out label) ? label : key;
@@ -150,6 +156,7 @@ public sealed class ClientContent
                 RosterDeployments = started.Session.RosterDeployments.Select(q => q with { Limit = limit }).ToArray() } };
         // Apply playable rules after import so existing scenario/save fingerprints stay compatible.
         started = started with { Rules = started.Rules with { Battle = started.Rules.Battle with {
+            CollectMedals = choice.Mode is 1 or 2 && localPlayers == null,
             Combat = started.Rules.Battle.Combat with { LethalStrikePreventsCounterattack = true } } } };
         if (choice.Mode is 1 or 2)
         {

@@ -107,13 +107,17 @@ internal static class ConsumableChecks
         long rev = menu.GetProperty("revision").GetInt64();
         view = Call("action", new { op = "use_item", revision = rev, unit = target.Id, item = Key(12) });
         Check(view.GetProperty("units").EnumerateArray().Single(u => u.GetProperty("id").GetString() == target.Id).GetProperty("morale").GetInt32() == 1, "client installs actual morale effect");
+        Check(view.GetProperty("suppliedUnit").ValueKind == JsonValueKind.Null, "morale item does not request healing presentation");
         Call("action", new { op = "use_item", revision = rev, unit = target.Id, item = Key(12) }, false);
         menu = Call("items", new { unit = target.Id });
         Check(menu.GetProperty("items").EnumerateArray().Single(i => i.GetProperty("id").GetString() == Key(12)).GetProperty("quantity").GetInt64() == 2, "repeat click never consumes twice");
         var persisted = JsonSerializer.Deserialize<PlayerAccount>(File.ReadAllBytes(Path.Combine(clientFolder, "account.json")), ClientGame.Json)!;
         Check(persisted.Inventory[Key(12)] == 2, "account inventory persisted immediately");
+        view = Call("action", new { op = "use_item", revision = view.GetProperty("revision").GetInt64(), unit = target.Id, item = Key(13) });
+        Check(view.GetProperty("suppliedUnit").GetString() == target.Id, "healing item requests supply presentation once");
         client = new ClientGame(content, clientFolder);
         view = Call("load", new { mode = 2 });
+        Check(view.GetProperty("suppliedUnit").ValueKind == JsonValueKind.Null, "load does not replay supply presentation");
         Check(view.GetProperty("units").EnumerateArray().Single(u => u.GetProperty("id").GetString() == target.Id).GetProperty("morale").GetInt32() == 1, "auto save survives fresh client load");
         Check(Call("items", new { unit = target.Id }).GetProperty("items").EnumerateArray().Single(i => i.GetProperty("id").GetString() == Key(12)).GetProperty("quantity").GetInt64() == 2, "reload preserves consumed inventory");
         File.WriteAllText(Path.Combine(folder, "backend.json"), JsonSerializer.Serialize(new { checks, errors = 0, target = new { target.Id, target.Cell }, clientFolder }, ClientGame.Json));

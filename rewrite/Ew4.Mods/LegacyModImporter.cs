@@ -114,7 +114,9 @@ internal sealed class LegacyModImporter
             if (stem == "tex_mainmenu_back_ip5@2x") Write("ui/main.png", image.Crop(0, 0, image.Width, 776).Png());
         }
         ConvertMenuAssets();
-        foreach (string font in new[] { "font_fight_num", "font_fight_num_hd" })
+        foreach (string font in new[] { "font_text_1_cn_hd", "font_text_2_cn_hd", "font_text_3_cn_hd", "font_text_4_cn_hd",
+            "font_char_1_hd", "font_char_2_hd", "font_char_3_hd", "font_char_4_hd", "font_ascii", "font_city", "font_city_hd",
+            "font_city_labels_hd", "font_fight_num", "font_fight_num_hd" })
         {
             if (names.Contains(font + ".fnt")) manifest["fonts"]![font] = LegacyBinary.Font(Read(font + ".fnt"));
             if (names.Contains(font + ".png")) Write("images/" + font + ".png", Read(font + ".png"));
@@ -328,16 +330,24 @@ internal sealed class LegacyModImporter
     }
     private void ConvertEffects()
     {
-        if (!names.Contains("def_motion.xml")) return;
+        if (!names.Any(n => n is "def_motion.xml" or "def_elementanim.xml" or "def_effectsanim.xml"
+            || n.StartsWith("effect", StringComparison.Ordinal) && n.EndsWith(".xml", StringComparison.Ordinal)
+            || n.EndsWith(".wav", StringComparison.Ordinal) || n.EndsWith(".ogg", StringComparison.Ordinal) || n.EndsWith(".mp3", StringComparison.Ordinal))) return;
         var fx = ModFiles.Object(baseline.Read("client/effects.json")); var motions = new JsonObject(); var bindings = new JsonObject();
-        foreach (var e in Xml("def_motion.xml").Elements()) { var m = LegacyCatalogConverter.Attr(e); m["motions"] = new JsonArray(e.Elements().Select(x => (JsonNode)LegacyCatalogConverter.Attr(x)).ToArray()); motions[(string)e.Attribute("name")!] = m; }
-        foreach (var (id, p) in manifest["profiles"]!.AsObject())
+        if (names.Contains("def_motion.xml"))
         {
-            string kind = (string)p!["kind"]!, variant = id.Split('.')[2]; int grade = p["grade"]!.GetValue<int>() + 1;
-            bindings[id] = new[] { $"{kind} {variant} {grade}", $"{kind} {grade}", kind }.First(motions.ContainsKey);
+            foreach (var e in Xml("def_motion.xml").Elements()) { var m = LegacyCatalogConverter.Attr(e); m["motions"] = new JsonArray(e.Elements().Select(x => (JsonNode)LegacyCatalogConverter.Attr(x)).ToArray()); motions[(string)e.Attribute("name")!] = m; }
+            foreach (var (id, p) in manifest["profiles"]!.AsObject())
+            {
+                string kind = (string)p!["kind"]!, variant = id.Split('.')[2]; int grade = p["grade"]!.GetValue<int>() + 1;
+                bindings[id] = new[] { $"{kind} {variant} {grade}", $"{kind} {grade}", kind }.First(motions.ContainsKey);
+            }
+            fx["motions"] = motions; fx["bindings"] = bindings;
+            Json("unit-visuals.json", UnitVisualConfiguration.FromLegacy(Xml("def_motion.xml"), manifest["profiles"]!.AsObject()));
         }
-        fx["motions"] = motions; fx["bindings"] = bindings;
-        Json("unit-visuals.json", UnitVisualConfiguration.FromLegacy(Xml("def_motion.xml"), manifest["profiles"]!.AsObject()));
+        if (names.Contains("def_elementanim.xml"))
+            fx["elements"] = new JsonObject(Xml("def_elementanim.xml").Elements().Select(e => KeyValuePair.Create<string, JsonNode?>(
+                (string)e.Attribute("name")!, new JsonArray(e.Elements().Select(x => (JsonNode)LegacyCatalogConverter.Attr(x)).ToArray()))));
         if (names.Contains("def_effectsanim.xml"))
             fx["timelines"] = new JsonObject(Xml("def_effectsanim.xml").Elements().GroupBy(e => (string)e.Attribute("name")!).Select(g => g.Last()).Select(e => KeyValuePair.Create<string, JsonNode?>((string)e.Attribute("name")!,
                 new JsonArray(e.Elements().SelectMany(g => g.Elements().Select(x => { var a = LegacyCatalogConverter.Attr(x); a["type"] = (string)g.Attribute("type")!; return (JsonNode)a; })).ToArray()))));
@@ -347,6 +357,14 @@ internal sealed class LegacyModImporter
             fx["definitions"]![file] = new JsonArray(root.Elements().Select(e => (JsonNode)new JsonObject { ["life"] = (string)e.Attribute("life")!,
                 ["parameters"] = new JsonObject(e.Elements().Select(p => KeyValuePair.Create<string, JsonNode?>((string)p.Attribute("name")!, p.HasElements ? new JsonArray(p.Elements().Select(t => (JsonNode)LegacyCatalogConverter.Attr(t)).ToArray()) : new JsonObject(p.Attributes().Where(a => a.Name.LocalName != "name").Select(a => KeyValuePair.Create<string, JsonNode?>(a.Name.LocalName, JsonValue.Create(a.Value))))))) }).ToArray());
         }
+        var requestedSounds = fx["timelines"]!.AsObject().SelectMany(p => p.Value!.AsArray()).Select(e => (string?)e!["sound"])
+            .Where(s => !string.IsNullOrWhiteSpace(s)).ToHashSet(StringComparer.Ordinal);
+        var soundFiles = names.Where(n => n.EndsWith(".wav", StringComparison.Ordinal) || n.EndsWith(".ogg", StringComparison.Ordinal)
+            || n.EndsWith(".mp3", StringComparison.Ordinal) && requestedSounds.Contains(Path.GetFileName(n))).ToArray();
+        foreach (string file in soundFiles.Where(n => n.EndsWith(".mp3", StringComparison.Ordinal)))
+            Write("sounds/" + Path.GetFileName(file), Read(file));
+        fx["sounds"] = new JsonArray(fx["sounds"]!.AsArray().Select(n => n!.GetValue<string>()).Concat(soundFiles.Select(Path.GetFileName))
+            .Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).Select(n => JsonValue.Create(n)).ToArray());
         Json("effects.json", fx);
     }
 }

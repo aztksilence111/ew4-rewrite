@@ -684,8 +684,8 @@
     },
     {
       "path": "client/effects.json",
-      "bytes": 501789,
-      "sha256": "6cc0c1741524852db7c12784ba9b9fabcc5a590ffd62e83f80bab91ab5d71e5d"
+      "bytes": 504812,
+      "sha256": "36fd052bbbbc9cd52a7bd5be5fc1e7234d5dc127cec387d5cea2017b48b99244"
     },
     {
       "path": "client/fonts/coverage.json",
@@ -10841,6 +10841,51 @@
       "path": "client/countries.json",
       "bytes": 5959,
       "sha256": "cb0a5095bfcd2f2e074b4e88a385babb97339be3bae95b3c4c1c969db4f1d744"
+    },
+    {
+      "path": "client/presentation.json",
+      "bytes": 3035,
+      "sha256": "49dc78dc54e93ad42896ee7188d32f309d2fb968a0714d6028a11c2aff1adce3"
+    },
+    {
+      "path": "client/sounds/sfx_armourmove.wav",
+      "bytes": 22004,
+      "sha256": "1d03b3843a23599ecd6413648899fc50b9488eaeb17a9452bf16c3231aa923f4"
+    },
+    {
+      "path": "client/sounds/sfx_cavalrymove.wav",
+      "bytes": 64558,
+      "sha256": "e9233a952a6747d7292dbb7f49b43e4e2bbdb0bd91dbc4a5af9a7cd1ba65b00e"
+    },
+    {
+      "path": "client/sounds/sfx_draft.wav",
+      "bytes": 7318,
+      "sha256": "057fbccce312834632ea854780d3d4475cd61609a17d3b5d9943c731126f94c9"
+    },
+    {
+      "path": "client/sounds/sfx_leg.wav",
+      "bytes": 21006,
+      "sha256": "0387a81a45d01615fdaccdf94d0066b58d5f16b7bc88576e8be6db1617794c48"
+    },
+    {
+      "path": "client/sounds/sfx_lvup.wav",
+      "bytes": 20044,
+      "sha256": "2a057c558b251547fabcafdb6d4bb8d8d59d939c91eec9b9803f04f89737d1e8"
+    },
+    {
+      "path": "client/sounds/sfx_naval.wav",
+      "bytes": 16550,
+      "sha256": "f2be4d3a692a8c22c6468502e8829c7f0851f662161fd3ddbf62967153ead1f2"
+    },
+    {
+      "path": "client/sounds/sfx_occupy.wav",
+      "bytes": 22074,
+      "sha256": "c73d1315ae8225c81953a99e6dec0eaa7809309b83a340258a5021f341ddb8e6"
+    },
+    {
+      "path": "client/sounds/sfx_supply.wav",
+      "bytes": 24290,
+      "sha256": "3a8617d2479fdfc59e46042a24987c1a5048d42e95d96cfe960fdd1f579ffcb1"
     }
   ]
 }

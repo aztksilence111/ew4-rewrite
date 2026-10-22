@@ -17,6 +17,7 @@ public sealed class MovementHistory
     public void Clear() { moves.Clear(); attackers.Clear(); round = 0; faction = ""; }
     public void Reset(WorldState world) { moves.Clear(); attackers.Clear(); round = world.Round; faction = world.ActiveFaction; }
     public void Observe(WorldState world) { if (world.Round != round || world.ActiveFaction != faction) Reset(world); }
+    public void Invalidate(WorldState world) { Observe(world); moves.Clear(); }
     public void Attack(string unit) => attackers.Add(unit);
     public void Forget(string unit) { moves.RemoveAll(m => m.Unit == unit || m.Removed.Any(u => u.Id == unit)); attackers.Remove(unit); }
     public MovementHistoryState Save() => new(round, faction, moves.ToArray(), attackers.ToArray());
@@ -26,9 +27,16 @@ public sealed class MovementHistory
         if (saved == null || saved.Round != round || saved.Faction != faction) return;
         moves.AddRange(saved.Moves); attackers.UnionWith(saved.Attackers);
     }
-    public void Record(WorldState before, WorldState after, string unitId, int[] path)
+    public void Record(WorldState before, WorldState after, string unitId, int[] path, IReadOnlyList<WorldNotice>? notices = null)
     {
         Observe(before);
+        if (EventTriggered(before, after, notices)) { Invalidate(after); return; }
+        if (before.Cells.Where((c, i) => c.Owner != after.Cells[i].Owner && after.Cells[i].Owner == before.ActiveFaction)
+            .Any(c => c.Objective || c.BlocksTerritoryExpansion))
+        {
+            moves.RemoveAll(m => m.Unit == unitId);
+            return;
+        }
         var unit = before.Units.Single(u => u.Id == unitId);
         var moved = after.Units.Single(u => u.Id == unitId);
         moves.Add(new(unitId, unit.Cell, moved.Cell, unit.RemainingMovement, path,
@@ -39,14 +47,21 @@ public sealed class MovementHistory
     }
     public MovementCheckpoint? Available(WorldState world, string? unit = null)
     {
-        if (world.Round != round || world.ActiveFaction != faction || world.PendingDialogue != null) return null;
+        if (world.Round != round || world.ActiveFaction != faction || world.PendingDialogue != null || world.Phase != TurnPhase.Active) return null;
         return moves.LastOrDefault(m => (unit == null || m.Unit == unit) && !attackers.Contains(m.Unit)
             && world.Units.Any(u => u.Id == m.Unit && u.Owner == faction && u.Cell == m.Destination)
             && world.Units.Count(u => u.Cell == m.Origin) < world.Limits.UnitsPerCell
             && m.Removed.All(old => !world.Units.Any(u => u.Id == old.Id || u.Cell == old.Cell))
             && m.Owners.All(c => c.Cell >= 0 && c.Cell < world.Cells.Count && world.Cells[c.Cell].Owner == c.After
+                && !(c.After == faction && (world.Cells[c.Cell].Objective || world.Cells[c.Cell].BlocksTerritoryExpansion))
                 && !world.Units.Any(u => u.Id != m.Unit && u.Cell == c.Cell && u.Owner != c.Before)));
     }
+    internal static bool EventTriggered(WorldState before, WorldState after, IReadOnlyList<WorldNotice>? notices)
+        => notices?.Any(n => n.Kind is "event.triggered" or "scenario.triggered" or "scenario.choice") == true
+            || !before.TriggeredEvents.SequenceEqual(after.TriggeredEvents)
+            || !before.TriggeredScenarioEvents.SequenceEqual(after.TriggeredScenarioEvents)
+            || before.ScenarioEventProgress.Count != after.ScenarioEventProgress.Count
+            || before.ScenarioEventProgress.Any(p => !after.ScenarioEventProgress.TryGetValue(p.Key, out var progress) || progress != p.Value);
     public (WorldChange Change, int[] Path) Undo(WorldState world, string? unit = null)
     {
         var entry = Available(world, unit) ?? throw new RuleViolation("client.undo_move", "This unit has no available movement to undo");

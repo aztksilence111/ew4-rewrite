@@ -1,0 +1,9 @@
+{
+  "campaign1_01": {
+    "content": [
+      { "type": "text", "text": "增援指挥官" },
+      { "type": "commander", "commander": "Napoleon", "text": "拿破仑少校将协助作战。" },
+      { "type": "image", "image": "rewrite/images/briefing.png", "text": "战役地图参考", "width": 240 }
+    ]
+  }
+}

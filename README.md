@@ -1,13 +1,22 @@
 # EW4 rewrite
 
 本仓库保存 rewrite 游戏源码、运行资源、地图制作配置和 Mod 制作指南。
+名称约定：**r版**就是 **rewrite版**的简称，后续不再另行注明。
 项目仓库：[aztksilence111/ew4-rewrite](https://github.com/aztksilence111/ew4-rewrite)，公开仓库。
 项目状态见 [STATUS.md](STATUS.md)，开发说明见 [rewrite/README.md](rewrite/README.md)，
 Mod 制作资料见 [rewrite/mod-kit/README.md](rewrite/mod-kit/README.md)。
 
+新会话直接续接：[r版手感与原版表现断点](rewrite/HANDOFF_FEEL_RESTORATION.md)。士气、勋章、附属效果及士气计算优化已接，地图/移动开发侧复核通过；继续原时钟/动作链和原版同局外观对照。[5404干净预览](http://127.0.0.1:5404)，无新APK或发布。
+
 ## 当前快照
 
-2026-10-22：当前 0.2.10 在 0.2.9 基础上新增指挥部三档筛选、60槽及标签模式，按三星到一星逐列上下排列，加入条件击杀台词、物品效果扩展、全局国家/兵模配置和过回合显示开关。
+本轮发行 0.2.13（APK code16）：整合 0.2.12 后移动端显示、AI 暂停、旗帜/撤回、动作表现、士气、随机勋章及计算优化。[发行说明](rewrite/RELEASE_0.2.13_20261022.md)与[发布进度](rewrite/RELEASE_PROGRESS_0.2.13_20261022.md)分别记录内容和验证步骤，下载见[GitHub Releases](https://github.com/aztksilence111/ew4-rewrite/releases/latest)。实际远端完成依据为本次构建目录的 `remote-audit.json`；以下未打包记录为开发历史，真机验收仍待。
+
+2026-10-22：[四项反馈修复](reverse/FEEDBACK_UNDO_FIX_20261022.md)已修存档国旗、空地撤回入口、保存拆行和说明将领块，新增占城事件/红黄圈不能撤回条件；93新增专项、108配置、20+172浏览器及Web/Android Compile通过。[5395独立预览](http://127.0.0.1:5395)，未打新APK或发布。[当前待办](rewrite/GOALS.md)同步，士气演出、随机掉落、OTF及长期目标另列，真机验收保留。
+
+2026-10-22：[兵模、动画与特效修复](reverse/PRESENTATION_RESTORATION_20261022.md)已恢复完整动作、选中/取消衔接、粒子发射/轨迹/参考点、移动尾迹及动作声音，补接受损炮台烟雾和Mod音效兼容。攻击/反击同步及操作等待保持；招募绝对速度待核定。本轮源码已修，[独立预览](http://127.0.0.1:5381)，未生成新APK或发布。
+
+2026-10-22：0.2.10 发行记录在 0.2.9 基础上新增指挥部三档筛选、60槽及标签模式，按三星到一星逐列上下排列，加入条件击杀台词、物品效果扩展、全局国家/兵模配置和过回合显示开关。后续本地APK已到0.2.13/code15，实际发行范围与本地源码状态分别见STATUS及发行记录。
 [开放规则 API 1/2](rewrite/mod-kit/docs/porting/RULE_EXTENSIONS.md)提供动态技能、离线 Lua 和可配置胜负条件；完整作者指南和示例随 Web 包提供。
 [0.2.10 发布说明](rewrite/RELEASE_0.2.10_20261022.md)记录验证范围和已知限制；APK 未进行本轮真机运行验收。下载见[GitHub Releases](https://github.com/aztksilence111/ew4-rewrite/releases/latest)。Web 包完整解压后双击 `Start-Web.cmd`，无需安装 .NET。
 
