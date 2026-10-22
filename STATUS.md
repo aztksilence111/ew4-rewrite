@@ -1,5 +1,7 @@
 # 项目短锚点
 
+- **0.2.13 已正式发布并远端复核通过：[Release](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.13-20261022)、[完成记录](rewrite/RELEASE_PROGRESS_0.2.13_20261022.md)。** Web ZIP 154456920 字节、ARM64 APK 125674540 字节/code16及两份校验附件已上传；180项发行浏览器检查通过，源码/标签/四附件大小与SHA-256一致，remote-audit errors=0。包源码6f937fe，后续提交仅补发布记录/工具修正；真机仍待。
+
 - **本轮 0.2.13 发行入口：[发布进度](rewrite/RELEASE_PROGRESS_0.2.13_20261022.md)、[发行说明](rewrite/RELEASE_0.2.13_20261022.md)。** 用户已授权同步当前全部源码、构建 Web 与 ARM64 APK 并上传 Release；APK 0.2.13/code16 高于本地测试 code15。实时阶段与错误见 `build/release-0.2.13-20261022/progress.json`，精确提交与附件见 `assets/release-manifest.json`，远端完成依据为 `remote-audit.json` 的 errors=0。包含 AI 暂停、显示/撤回、表现、士气/掉落及计算优化；真机和原版绝对时钟/同局外观对照仍待。以下“无新APK/未发布”为各历史阶段，不代表本轮最终状态。
 
 - **手感续接本轮：[士气性能优化](reverse/TURN_MORALE_PERFORMANCE_20261022.md)、[地图移动复核](reverse/MAP_MOVEMENT_RECHECK_20261022.md)。** 固定252单位士气计算0.883→0.426ms/分配3.54→0.31MB，完整存档与双RNG一致；核心310933/客户端2179+24、快进14/地图及选国检查通过，Web独立构建与Android ARM64 Compile均0警告错误。[5404干净预览](http://127.0.0.1:5404)，无新APK/发布/设备操作。下一步原上游时钟/招募链和原版同局地图对照，见[断点](rewrite/HANDOFF_FEEL_RESTORATION.md)；下方为阶段历史。

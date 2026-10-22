@@ -7,6 +7,12 @@ if(!['inspect','push','publish','audit'].includes(action)||!buildArg||!version||
 const build=path.resolve(cwd,buildArg),tag='v'+version+'-'+date;
 const notes=path.join(cwd,'rewrite','RELEASE_'+version+'_'+date+'.md');
 function git(...args){return cp.execFileSync('git',args,{cwd,maxBuffer:64*1024*1024});}
+function releaseFiles(manifest){
+  const names=[...manifest.files.map(f=>f.name),'release-manifest.json','SHA256SUMS.txt'];
+  if(new Set(names).size!==names.length||names.some(n=>path.basename(n)!==n||!n||n.includes('\\')))
+    throw Error('Invalid release asset manifest');
+  return names;
+}
 const credential=cp.execFileSync('git',['credential','fill'],{cwd,input:'protocol=https\nhost=github.com\n\n',encoding:'utf8',
   env:{...process.env,GIT_TERMINAL_PROMPT:'0',GCM_INTERACTIVE:'never'}});
 const token=credential.split(/\r?\n/).find(s=>s.startsWith('password='))?.slice(9);
@@ -80,7 +86,7 @@ async function publish(){
   let release=list.find(r=>r.tag_name===tag);
   if(!release)release=await request('/repos/'+repo+'/releases','POST',{tag_name:tag,target_commitish:head,
     name:version+' - '+(process.env.EW4_RELEASE_TITLE||'Runtime and gameplay updates'),body:fs.readFileSync(notes,'utf8'),draft:true,prerelease:false});
-  const files=fs.readdirSync(path.join(build,'assets'));
+  const files=releaseFiles(manifest);
   const progress={source:head,tag,releaseId:release.id,draft:release.draft,verified:[],pending:files};
   const saveProgress=()=>fs.writeFileSync(path.join(build,'release-upload-progress.json'),JSON.stringify({...progress,updatedAt:new Date().toISOString()},null,2));
   saveProgress();
@@ -107,18 +113,21 @@ async function publish(){
 }
 async function audit(){
   const head=git('rev-parse','HEAD').toString().trim();
+  const manifest=JSON.parse(fs.readFileSync(path.join(build,'assets/release-manifest.json'))),source=manifest.source;
+  git('merge-base','--is-ancestor',source,head);
   const remote=await request('/repos/'+repo+'/git/ref/heads/main');
   const tagged=await request('/repos/'+repo+'/git/ref/tags/'+tag);
-  if(remote.object.sha!==head||tagged.object.sha!==head)throw Error('Remote source or tag mismatch');
+  if(remote.object.sha!==head||tagged.object.sha!==source)throw Error('Remote source or tag mismatch');
   const release=await request('/repos/'+repo+'/releases/tags/'+tag);
   if(release.draft)throw Error('Release not published');
-  const files=fs.readdirSync(path.join(build,'assets'));
+  const files=releaseFiles(manifest);
   if(release.assets.length!==files.length)throw Error('Unexpected release assets');
   for(const asset of release.assets){
+    if(!files.includes(asset.name))throw Error('Unexpected release asset '+asset.name);
     const file=path.join(build,'assets',asset.name),sha=crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
     if(asset.digest!=='sha256:'+sha||asset.size!==fs.statSync(file).size)throw Error('Remote checksum mismatch '+asset.name);
   }
-  const report={source:head,tag,url:release.html_url,assets:release.assets.map(a=>({name:a.name,bytes:a.size,digest:a.digest})),errors:0};
+  const report={source,repositoryHead:head,tag,url:release.html_url,assets:release.assets.map(a=>({name:a.name,bytes:a.size,digest:a.digest})),errors:0};
   fs.writeFileSync(path.join(build,'remote-audit.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
 }
 (async()=>{

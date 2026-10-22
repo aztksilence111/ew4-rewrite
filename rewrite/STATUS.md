@@ -1,5 +1,7 @@
 # 重构短锚点
 
+- **0.2.13 已完成：[正式下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.13-20261022)、[阶段及异常记录](RELEASE_PROGRESS_0.2.13_20261022.md)。** 源码6f937fe、Web ZIP、ARM64 APK/code16及两校验附件已同步，180浏览器检查通过，远端标签/四附件摘要及大小审核errors=0。后续提交仅记录结果和修正发布清单，不改包内游戏源码；真机待验收。
+
 - **本轮 0.2.13 发行入口：[发布进度](RELEASE_PROGRESS_0.2.13_20261022.md)、[发行说明](RELEASE_0.2.13_20261022.md)。** 已获用户授权同步当前源码并上传 Web/APK；ARM64 APK 0.2.13/code16，沿用旧证书。包含 AI 暂停、移动端显示、旗帜/撤回、动画/士气/掉落与计算优化；实时进度及错误在 `build/release-0.2.13-20261022/progress.json`，源码和附件在 `assets/release-manifest.json`，仅 `remote-audit.json` errors=0 证明远端完成。真机、原时钟/招募绝对速度及原版同局对照保留待验；下方“未打包/未发布”均为历史阶段。
 
 - **手感续接本轮：[性能](../reverse/TURN_MORALE_PERFORMANCE_20261022.md)、[地图移动](../reverse/MAP_MOVEMENT_RECHECK_20261022.md)。** 固定252单位士气占格集合批量复用，0.883→0.426ms、3.54→0.31MB，世界/会话存档哈希与双RNG一致。核心310933/客户端2179+24、快进14/原绘制13731/镜头875/旗帜29/渲染21/尺寸46/选国22通过。Web独立输出与Android ARM64 Compile零警告错误，[5404干净预览](http://127.0.0.1:5404)。原全局时钟/招募链及原版同局外观、真机仍待，不打APK/发布；[断点](HANDOFF_FEEL_RESTORATION.md)已更新，下方为历史。
