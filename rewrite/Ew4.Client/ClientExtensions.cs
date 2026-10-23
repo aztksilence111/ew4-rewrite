@@ -15,7 +15,7 @@ public sealed partial class ClientGame
         int number = slot.Id.StartsWith("ew4.skill.", StringComparison.Ordinal) && int.TryParse(slot.Id[10..], out int id) ? id + 1 : 0;
         return new(slot.Id, slot.InstanceId, slot.Level, slot.Order, slot.X, slot.Y,
             content.Label(number > 0 ? "name_skill_" + number.ToString("00") : slot.Id),
-            number > 0 ? content.Label("desc_skill_" + number.ToString("00")) : "",
+            number > 0 ? LegacySkillDescription(number) : "",
             number > 0 ? "skill_" + number.ToString("00") + ".png" : null, "passive", "self", 0, new(0, 0, 0));
     }
     private ClientSkillView[] SkillViews(Combatant unit) => RuleEventBus.Slots(unit).OrderBy(s => s.Order).Select(SkillView).ToArray();

@@ -90,11 +90,13 @@ function sizeUi() {
   const root=document.documentElement,style=getComputedStyle(root);
   const insets=Object.fromEntries(['left','right','top','bottom'].map(side=>[side,parseFloat(style.getPropertyValue('--screen-safe-'+side))||0]));
   screenLayout=Ew4ScreenLayout.measure({width:innerWidth,height:innerHeight,screen:settings.screen,reserve,insets,
-    touch:matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>0});
+    touch:matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>0,
+    webMenu:location.hostname!=='ew4.local'});
   const {uiScale:scale,width,height,safeWidth,safeHeight}=screenLayout;
   root.dataset.screenProfile=screenLayout.profile;root.dataset.screenOrientation=screenLayout.orientation;
+  root.dataset.menuProfile=screenLayout.menuProfile;
   root.style.setProperty('--startup-reserve',reserve+'px');
-  for(const [name,value] of Object.entries({'ui-scale':scale,'battle-scale':screenLayout.battleScale,
+  for(const [name,value] of Object.entries({'ui-scale':scale,'menu-scale':screenLayout.menuScale,'battle-scale':screenLayout.battleScale,
     'battle-compact-scale':screenLayout.compactScale,'battle-hud-scale':screenLayout.hudScale,
     'pause-scale':screenLayout.pauseScale,'talk-scale':screenLayout.talkScale}))root.style.setProperty('--'+name,value);
   for(const [name,value] of Object.entries({'screen-width':width,'screen-height':height,'screen-safe-width':safeWidth,'screen-safe-height':safeHeight,

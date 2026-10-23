@@ -121,6 +121,39 @@ internal static class LegacySkillParameterChecks
         byte[] ConfiguredRead(string path) => files.TryGetValue(path, out var data) ? data : BaseRead(path);
         var original = new ClientContent(BaseRead, ["conquest1.btl"]);
         var content = new ClientContent(ConfiguredRead, ["conquest1.btl"]);
+        Dictionary<string, string> Descriptions(ClientContent source)
+        {
+            var host = new ClientGame(source, Path.Combine(root, "rewrite/reports/skill-descriptions-20261023", Guid.NewGuid().ToString("N")));
+            JsonElement Call(string route, object? command = null)
+            {
+                using var response = JsonDocument.Parse(host.Dispatch("/api/" + route, JsonSerializer.Serialize(command, ClientGame.Json)));
+                Check(response.RootElement.GetProperty("ok").GetBoolean(), "description API " + route);
+                return response.RootElement.GetProperty("data").Clone();
+            }
+            var skills = Call("headquarters").GetProperty("definitions").EnumerateArray().SelectMany(d => d.GetProperty("skills").EnumerateArray())
+                .GroupBy(s => s.GetProperty("id").GetString()!).ToDictionary(g => g.Key, g => g.First().GetProperty("description").GetString()!);
+            var battle = Call("start", new { scenario = "conquest1", country = "fra" });
+            Check(battle.GetProperty("units").EnumerateArray().SelectMany(u => u.GetProperty("skills").EnumerateArray())
+                .All(s => skills[s.GetProperty("id").GetString()!] == s.GetProperty("description").GetString()), "battle and headquarters descriptions agree");
+            return skills;
+        }
+        var defaultDescriptions = Descriptions(original);
+        var configuredDescriptions = Descriptions(content);
+        Check(defaultDescriptions.Count == 40 && defaultDescriptions.Values.All(s => !string.IsNullOrWhiteSpace(s)), "all original skills described");
+        Check(defaultDescriptions[Ew4Combat.Skill(0)] == original.Label("desc_skill_01"), "flag qualification retained");
+        Check(Enumerable.Range(1, 39).All(id => defaultDescriptions[Ew4Combat.Skill(id)] != original.Label("desc_skill_" + (id + 1).ToString("00"))), "remaining descriptions explain numeric effects or mechanism");
+        foreach (string id in parameters.Skills.Keys)
+            Check(defaultDescriptions[id] != configuredDescriptions[id], "description follows configured parameters " + id);
+        Check(defaultDescriptions[Ew4Combat.Skill(14)].Contains("全部回避减伤") && defaultDescriptions[Ew4Combat.Skill(29)].Contains("建筑提供的回避减伤"), "horn and siege explain different evasion scopes");
+        Check(defaultDescriptions[Ew4Combat.Skill(31)].Contains("10%") && configuredDescriptions[Ew4Combat.Skill(31)].Contains("25%"), "displayed probability follows configuration");
+        Check(defaultDescriptions[Ew4Combat.Skill(4)].Contains("50%") && configuredDescriptions[Ew4Combat.Skill(4)].Contains("125%"), "displayed multiplier follows configuration");
+        Check(defaultDescriptions[Ew4Combat.Skill(30)].Contains("40%") && configuredDescriptions[Ew4Combat.Skill(30)].Contains("75%"), "displayed savings use the complement of cost percent");
+        Check(configuredDescriptions[Ew4Combat.Skill(33)].Contains("提高2级") && configuredDescriptions[Ew4Combat.Skill(33)].Contains("至7级"), "displayed teaching gain and cap follow configuration");
+        var customStrings = (IDictionary<string, string>)content.Strings;
+        string oldHorn = customStrings["desc_skill_15"];
+        customStrings["desc_skill_15"] = "Mod自定义军号说明";
+        Check(Descriptions(content)[Ew4Combat.Skill(14)] == "Mod自定义军号说明", "custom legacy wording retains priority");
+        customStrings["desc_skill_15"] = oldHorn;
         var start = content.Start("conquest1", "fra");
         Check(start.Rules.Battle.Combat.LegacySkills == content.Extensions.LegacySkills && start.Rules.Commanders.LegacySkills == content.Extensions.LegacySkills
             && start.Rules.Roster.Assignment.LegacySkills == content.Extensions.LegacySkills && start.Rules.Tavern.Assignment.LegacySkills == content.Extensions.LegacySkills,
@@ -197,6 +230,7 @@ internal static class LegacySkillParameterChecks
             Effects = [new() { Event = "combat.modify_damage", Operation = "damage_multiplier", Value = 3 }] },
             new ExtensionSkill { Id = Ew4Combat.Skill(6) }, new ExtensionSkill { Id = Ew4Combat.Skill(19) }, new ExtensionSkill { Id = Ew4Combat.Skill(33) } }, ExtensionLoader.Json);
         var replacement = new ClientContent(ConfiguredRead, ["conquest1.btl"]);
+        Check(Descriptions(replacement)[Ew4Combat.Skill(4)] == "", "full replacement uses its own description without original numeric text");
         var overridden = replacement.Catalogs.Runtime.Profiles.Values.First().Profile.LegacySkillOverrides;
         var a = Actor("infantry", 4) with { Profile = Actor().Profile with { LegacySkillOverrides = overridden } };
         Check(Ew4Combat.Calculate(a, Actor("fort"), 2, new(123), new() { LegacySkills = parameters, Extensions = replacement.Extensions.Bus }).DefenderDamage == 30,

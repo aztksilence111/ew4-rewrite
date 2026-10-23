@@ -5,7 +5,7 @@
   --screen-safe-bottom:env(safe-area-inset-bottom,0px);
 }
 .modal{inset:0;padding:var(--screen-safe-top) var(--screen-safe-right) var(--screen-safe-bottom) var(--screen-safe-left)}
-#menu-stage{left:50%;top:50%;width:var(--menu-width,568px);height:var(--menu-height,320px)}
+#menu-stage{left:50%;top:50%;width:var(--menu-width,568px);height:var(--menu-height,320px);transform:translate(-50%,-50%) scale(var(--menu-scale,var(--ui-scale)))}
 #main-menu nav{right:var(--menu-safe-right,0px);top:calc(115px + (var(--menu-height,320px) - 320px) / 2)}
 #main-menu .game-title{margin-left:calc((var(--menu-width,568px) - 568px) / 2);margin-top:calc((var(--menu-height,320px) - 320px) / 2)}
 #mod-open{margin-left:var(--menu-safe-left,0px);margin-bottom:var(--menu-safe-bottom,0px)}
@@ -46,8 +46,8 @@
   --popup-start:scale(calc(var(--effective-detail-scale) * .15));
   --popup-overshoot:scale(calc(var(--effective-detail-scale) * 1.03));
 }
-:root[data-screen-orientation=portrait] #main-menu{background-size:cover!important;background-position:center!important}
-:root[data-screen-orientation=portrait] #main-menu .game-title{left:50%!important;top:8%!important;margin:0;transform:translateX(-50%)}
-:root[data-screen-orientation=portrait] #main-menu nav{left:50%;right:auto;top:40%;transform:translateX(-50%);width:max(134px,calc(190px / var(--ui-scale)));gap:calc(12px / var(--ui-scale))}
-:root[data-screen-orientation=portrait] #main-menu .main-entry{width:100%;height:max(33px,calc(48px / var(--ui-scale)))}
-:root[data-screen-orientation=portrait] #main-menu .main-entry>.original-text{transform:translateX(3px) scale(max(1,calc(1 / var(--ui-scale))))}
+:root:not([data-menu-profile=web])[data-screen-orientation=portrait] #main-menu{background-size:cover!important;background-position:center!important}
+:root:not([data-menu-profile=web])[data-screen-orientation=portrait] #main-menu .game-title{left:50%!important;top:8%!important;margin:0;transform:translateX(-50%)}
+:root:not([data-menu-profile=web])[data-screen-orientation=portrait] #main-menu nav{left:50%;right:auto;top:40%;transform:translateX(-50%);width:max(134px,calc(190px / var(--ui-scale)));gap:calc(12px / var(--ui-scale))}
+:root:not([data-menu-profile=web])[data-screen-orientation=portrait] #main-menu .main-entry{width:100%;height:max(33px,calc(48px / var(--ui-scale)))}
+:root:not([data-menu-profile=web])[data-screen-orientation=portrait] #main-menu .main-entry>.original-text{transform:translateX(3px) scale(max(1,calc(1 / var(--ui-scale))))}

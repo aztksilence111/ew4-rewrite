@@ -7,7 +7,7 @@
 .compat-math .main-entry{display:flex;align-items:center;justify-content:center}
 .compat-math .original-text canvas{height:var(--ew4-text-height,auto)!important}
 .compat-math #scenario-event .scenario-event-dialog{height:264px}
-.compat-math[data-screen-orientation=portrait] #main-menu nav{width:var(--compat-main-width,190px)}
-.compat-math[data-screen-orientation=portrait] #main-menu .main-entry{height:var(--compat-main-height,48px)}
-.compat-math[data-screen-orientation=portrait] #main-menu .main-entry>.original-text{transform:translateX(3px) scale(var(--compat-main-text-scale,1))}
+.compat-math:not([data-menu-profile=web])[data-screen-orientation=portrait] #main-menu nav{width:var(--compat-main-width,190px)}
+.compat-math:not([data-menu-profile=web])[data-screen-orientation=portrait] #main-menu .main-entry{height:var(--compat-main-height,48px)}
+.compat-math:not([data-menu-profile=web])[data-screen-orientation=portrait] #main-menu .main-entry>.original-text{transform:translateX(3px) scale(var(--compat-main-text-scale,1))}
 @media(orientation:portrait){.compat-math #scenario-event .scenario-event-dialog{height:var(--event-available-height,400px)}}
