@@ -18,4 +18,4 @@
 - 旧综合布局测试的竖屏菜单最小 44 像素断言随新需求改为等比尺寸检查；多人浏览器旧 Canvas2D 专用像素探针更新为兼容现有 Pixi，随后完整复测通过。
 - 本地测试 APK 0.2.18/code21 已验证 2291 项资源/本轮程序集、原证书 v2/v3、16KiB 对齐，运行源码 187 份构建期间变化 0。该包是中间测试产物，正式交付采用 0.2.19/code22。
 
-证据：`build/android-menu-aspect-20261024`；正式双端构建及发布见 `rewrite/RELEASE_PROGRESS_0.2.19_20261024.md`。验证使用隔离账户，不改玩家 5191 档案。未连接 Android 真机，仍需实机复测。
+证据：`build/android-menu-aspect-20261024`；正式双端构建及发布见 `rewrite/RELEASE_PROGRESS_0.2.19_20261024.md`。0.2.19/code22 已发布至 [GitHub Release](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.19-20261024)，源码3abe88c，双端及两校验附件远端摘要核对通过。验证使用隔离账户，不改玩家 5191 档案。未连接 Android 真机，仍需实机复测。
