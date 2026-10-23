@@ -6,11 +6,9 @@
       ||!state.factions.some(f=>f.id===state.activeFaction&&f.human&&!f.defeated))return result;
     for(const unit of state.units){
       if(unit.owner!==state.playerFaction||unit.health<=0||unit.morale===-3||unit.constructionTurns>0)continue;
-      const move=unit.canMove,attack=!unit.acted;
+      const move=unit.canNavigateMove===true,attack=unit.canAttack===true&&!unit.acted;
       if(!move&&!attack)continue;
-      // Attack availability here means an unspent attack, even without a target in range.
-      // Forts have no movement to spend and belong with other untouched units.
-      const untouched=attack&&(move||unit.category==='fort');
+      const untouched=!unit.acted&&(unit.remainingMovement>0||unit.category==='fort');
       result[untouched?0:1].push(unit);
     }
     return result;

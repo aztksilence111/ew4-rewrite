@@ -27,6 +27,7 @@ public sealed partial class ExtensionLoader
     public LegacySkillParameters? LegacySkills { get; private init; }
     public IReadOnlyDictionary<string, int?> DeploymentLimits { get; private init; } = new Dictionary<string, int?>();
     public IReadOnlyDictionary<string, int> FormationCounts { get; private init; } = new Dictionary<string, int>();
+    public IReadOnlyDictionary<string, string> CampaignVisibility { get; private init; } = new Dictionary<string, string>();
     public MetagameRules Metagame { get; private init; } = new();
     public IReadOnlyDictionary<string, StageIntroPresentation> StageIntroPresentations { get; private init; } = new Dictionary<string, StageIntroPresentation>();
     public IReadOnlyDictionary<string, CommanderDialogueLines> CommanderDialogues { get; private init; } = new Dictionary<string, CommanderDialogueLines>();
@@ -38,7 +39,8 @@ public sealed partial class ExtensionLoader
         string? UnitBindings = null, string? CommanderBindings = null, string? VictoryRules = null, string? Presentation = null, string[]? Scripts = null,
         string? ScenarioEvents = null, string[]? Statuses = null, string? VictoryPresentation = null, string? LegacySkillParameters = null,
         string? CommanderDialogues = null, string? ItemBindings = null, string? DeploymentLimits = null, string? Metagame = null,
-        string? StageIntroPresentation = null, string? FormationCounts = null);
+        string? StageIntroPresentation = null, string? FormationCounts = null, string? CampaignVisibility = null);
+    private sealed record CampaignVisibilityFile(int Schema, Dictionary<string, string>? Visibility);
     private sealed record LegacySkillFile(int Schema, Dictionary<string, Dictionary<string, double>> Skills);
     private sealed record DeploymentLimitFile([property: JsonNumberHandling(JsonNumberHandling.Strict)] int Schema,
         [property: JsonNumberHandling(JsonNumberHandling.Strict)] Dictionary<string, int?>? Limits);
@@ -77,6 +79,16 @@ public sealed partial class ExtensionLoader
         if (m.ApiVersion == 1 && m.Statuses != null) throw new RuleViolation("extension.version", "Statuses require API 2");
         var deploymentLimits = new Dictionary<string, int?>();
         var formationCounts = new Dictionary<string, int>();
+        var campaignVisibility = new Dictionary<string, string>();
+        if (m.CampaignVisibility != null)
+        {
+            if (m.ApiVersion < 2) throw new RuleViolation("extension.version", "Campaign visibility requires API 2");
+            var visibility = Read<CampaignVisibilityFile>(m.CampaignVisibility);
+            if (visibility.Schema != 1 || visibility.Visibility == null || visibility.Visibility.Any(p =>
+                string.IsNullOrWhiteSpace(p.Key) || p.Value is not ("original" or "visible" or "hidden")))
+                throw new RuleViolation("extension.campaign_visibility", "Invalid campaign visibility schema, scenario or mode");
+            campaignVisibility = visibility.Visibility;
+        }
         if (m.FormationCounts != null)
         {
             if (m.ApiVersion < 2) throw new RuleViolation("extension.version", "Formation counts require API 2");
@@ -227,7 +239,8 @@ public sealed partial class ExtensionLoader
         string revision = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(string.Join('\n', loaded.Select(p => p.Key + ":" + Convert.ToHexStringLower(SHA256.HashData(p.Value)))))));
         return new(new(skills, runtime, statuses), revision, units, commanders, victories, layouts, scenarioEvents)
             { ApiVersion = m.ApiVersion, VictoryPresentations = victoryScreens, LegacySkills = legacySkills, CommanderDialogues = commanderDialogues,
-                ItemBindings = items, DeploymentLimits = deploymentLimits, FormationCounts = formationCounts, Metagame = metagame, StageIntroPresentations = introScreens };
+                ItemBindings = items, DeploymentLimits = deploymentLimits, FormationCounts = formationCounts, CampaignVisibility = campaignVisibility,
+                Metagame = metagame, StageIntroPresentations = introScreens };
         bool Known(string id) => skills.ContainsKey(id) || id.StartsWith("ew4.skill.", StringComparison.Ordinal)
             && int.TryParse(id[10..], out int value) && value is >= 0 and < 40 || BuiltinTraits.Contains(id);
     }

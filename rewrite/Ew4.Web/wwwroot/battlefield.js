@@ -209,53 +209,35 @@
     mapText() {
       const lib=this.api.libraries.get('maptext');if(!lib)return;
       if(this.mapLabelSource!==lib.texture||this.mapFontRevision!==Ew4OriginalUI.revision){this.mapLabelSource=lib.texture;this.mapFontRevision=Ew4OriginalUI.revision;this.mapLabels.clear();}
-      const density=Math.max(1,Math.min(4,Math.ceil(Math.hypot(this.draw.getTransform().a,this.draw.getTransform().b))));
+      const density=1;
       for(const label of this.map.labels||[]){const p={x:Number(label.tx),y:Number(label.ty)};if(!this.visible(p,Math.max(Number(label.width),Number(label.height))))continue;
         const chinese=this.api.geographicLanguage==='zh'&&label.textZh;
-        const originalNames={greatbritain:'GREAT BRITAIN',poptugal:'PORTUGAL',struit_of_gibraltar:'STRAIT OF GIBRALTAR',tyrehenian_sea:'TYRRHENIAN SEA'};
-        const labelText=chinese?label.textZh:label.text||originalNames[label.libName]||label.libName.replace(/^l_s_([a-z])$/i,'$1').replace(/_/g,' ').toUpperCase();
         const opacity=Number.isFinite(label.opacity)?Math.max(0,Math.min(1,label.opacity)):60/255;
         const key=label.libName+':'+density+':'+opacity+':'+(chinese?'zh':'en');
         if(!this.mapLabels.has(key)){
           const item=lib.byName.get(label.libName);let bounds=animationBounds(lib,item);if(!bounds)continue;
-          let size=Number(label.size),angle=Number(label.angle||0),length=Number(label.letteringLength);
-          const sea=label.sea??/sea|ocean|gulf|channel|bay|strait|struit/i.test(label.libName);
-          // Original Europe/America labels store letters and transforms rather than text metrics.
-          if(!label.text){
-            const indices=item.layers?.[0]?.[0]?.indices||[],first=lib.elements[indices[0]?.[0]];
-            angle=first?Math.atan2(first.transform[1],first.transform[0])*180/Math.PI:0;
-            const radians=angle*Math.PI/180,c=Math.cos(radians),s=Math.sin(radians),points=[];
-            for(const [elementId,childId] of indices){const e=lib.elements[elementId],b=animationBounds(lib,lib.items[childId]);if(!b)continue;
-              const [a,d,f,g,x,y]=e.transform;
-              for(const [px,py] of [[b.left,b.top],[b.right,b.top],[b.right,b.bottom],[b.left,b.bottom]]){
-                const tx=a*px+f*py+x,ty=d*px+g*py+y;points.push({x:tx*c+ty*s,y:-tx*s+ty*c});
-              }
-            }
-            length=points.length?Math.max(...points.map(p=>p.x))-Math.min(...points.map(p=>p.x)):Number(label.width);
-            size=Math.max(8,points.length?(Math.max(...points.map(p=>p.y))-Math.min(...points.map(p=>p.y)))*1.1:Number(label.height));
-          }
-          {
-            const radians=angle*Math.PI/180,w=length/2+size*.2+5,h=size*.7+5;
-            const x=Math.abs(Math.cos(radians))*w+Math.abs(Math.sin(radians))*h,y=Math.abs(Math.sin(radians))*w+Math.abs(Math.cos(radians))*h;
+          if(chinese){
+            const angle=Number(label.angle||0)*Math.PI/180,w=Number(label.letteringLength)/2+Number(label.size)*.2+5,h=Number(label.size)*.7+5;
+            const x=Math.abs(Math.cos(angle))*w+Math.abs(Math.sin(angle))*h,y=Math.abs(Math.sin(angle))*w+Math.abs(Math.cos(angle))*h;
             bounds={left:-x,top:-y,right:x,bottom:y};
           }
           const ratio=lib.pixelRatio||1,left=Math.floor(bounds.left/ratio)-3,top=Math.floor(bounds.top/ratio)-3;
           const width=Math.ceil(bounds.right/ratio)-left+3,height=Math.ceil(bounds.bottom/ratio)-top+3;
           const canvas=document.createElement('canvas');canvas.width=width*density;canvas.height=height*density;
           const draw=canvas.getContext('2d');draw.scale(density,density);draw.translate(-left,-top);draw.globalAlpha=opacity;
-          {
-            void Ew4OriginalUI.prepareText(labelText);
-            const height=size,text=[...Ew4OriginalUI.availableText(labelText)];
-            draw.rotate(angle*Math.PI/180);
-            draw.font=(sea?'italic ':'')+height+'px '+Ew4OriginalUI.fontFamily;
+          if(chinese){
+            void Ew4OriginalUI.prepareMapText(label.textZh,!label.sea);
+            const height=Number(label.size),text=[...Ew4OriginalUI.availableText(label.textZh)],length=Number(label.letteringLength);
+            draw.rotate(Number(label.angle||0)*Math.PI/180);
+            draw.font=(label.sea?'italic ':'')+height+'px '+(label.sea?'':'"EW4 Serif",')+Ew4OriginalUI.mapFontFamily;
             draw.fontKerning='none';draw.textBaseline='alphabetic';
             const widths=text.map(char=>draw.measureText(char).width),natural=widths.reduce((a,b)=>a+b,0);
             const scale=Math.min(1,length/natural),spacing=text.length>1?Math.max(0,(length-natural*scale)/(text.length-1)):0;
-            draw.scale(scale,1);draw.fillStyle=sea?'#ffffff':'#303333';
+            draw.scale(scale,1);draw.fillStyle=label.sea?'#ffffff':'#303333';
             let x=-Math.max(length,natural*scale)/2/scale;
             const metrics=draw.measureText(text.join('')),baseline=(metrics.actualBoundingBoxAscent-metrics.actualBoundingBoxDescent)/2;
             for(let i=0;i<text.length;i++){draw.fillText(text[i],x,baseline);x+=widths[i]+spacing/scale;}
-          }
+          }else this.api.animation(lib,item,0,0,draw);
           // Bound zoom-level caches while retaining labels at their actual render density.
           if(this.mapLabels.size>=96)this.mapLabels.delete(this.mapLabels.keys().next().value);
           this.mapLabels.set(key,{canvas,left,top,width,height});

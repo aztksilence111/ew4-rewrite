@@ -401,6 +401,10 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             content.Catalogs.Combat.Context.TerrainDefense.TryGetValue(cell.DefenseTerrain, out var penalties);
             return new { income, defense = level?.DefensePercent ?? 0, penalties };
         }
+        var navigationMoves = world.Phase == TurnPhase.Active && world.ActiveFaction == session.PlayerFaction
+            && world.PendingDialogue == null
+            ? WorldActions.MovableUnits(world, session.PlayerFaction, current.Rules.Movement).ToHashSet()
+            : new HashSet<string>();
         bool CanAttack(UnitState unit) => unit.Owner == world.ActiveFaction && world.Phase == TurnPhase.Active
             && world.PendingDialogue == null && AttackTargets(world, unit).Any();
         object? DialoguePresentation()
@@ -457,6 +461,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                 objectiveMarker = u.Objective ? 1 : originalUnits.TryGetValue(u.Id, out var markedUnit) && markedUnit.Objective == 2 ? 2 : 0,
                 canMove = u.Combatant.Profile.Category != "fort" && u.RemainingMovement > 0 && u.Morale.Effective != -3 && u.Combatant.ConstructionTurns == 0,
                 canAttack = CanAttack(u),
+                canNavigateMove = navigationMoves.Contains(u.Id),
                 veterancy = u.Veterancy, morale = u.Morale.Effective,
                 facing = originalUnits.TryGetValue(u.Id, out var source) ? source.Facing : 1,
                 commanderDefinitionId = CommanderDefinitionId(u),

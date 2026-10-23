@@ -238,6 +238,49 @@ public static class WorldActions
         return Movement.Reachable(new(state.Width, state.Height), context.Cells, unit.Cell, context.Actor, rules.Search);
     }
 
+    public static IReadOnlyCollection<string> MovableUnits(WorldState state, string owner, WorldMoveRules configuration)
+    {
+        var units = state.Units.Where(u => u.Owner == owner && u.Combatant.Health > 0
+            && u.Combatant.Profile.Category != "fort" && u.RemainingMovement > 0
+            && u.Morale.Effective != -3 && u.Combatant.ConstructionTurns == 0).ToArray();
+        if (units.Length == 0) return Array.Empty<string>();
+        var context = MovementContext(state, units[0]);
+        var occupied = state.Units.Select(u => u.Cell).ToHashSet();
+        var map = new HexMap(state.Width, state.Height);
+        var result = new List<string>();
+        foreach (var unit in units)
+        {
+            var actor = MovementActorFor(unit, context.Actor.Camp);
+            if (configuration.Extensions != null)
+            {
+                int budget = configuration.Extensions.MovementBudget(unit.Combatant);
+                actor = actor with { FullBudget = budget, Remaining = Math.Min(unit.RemainingMovement, budget) };
+            }
+            bool open = false, throughOccupied = false;
+            if (actor.Remaining <= 0) continue;
+            for (int direction = 0; direction < 6; direction++)
+            {
+                int next = map.Neighbor(unit.Cell, direction);
+                if (next < 0) continue;
+                int? cost = Movement.EntryCost(context.Cells[unit.Cell], context.Cells[next], (direction + 3) % 6, actor, configuration.Search);
+                if (!cost.HasValue || cost.Value > actor.Remaining && !configuration.Search.AllowOverdrawnEntry) continue;
+                if (!occupied.Contains(next)) { open = true; break; }
+                throughOccupied = true;
+            }
+            // Usually a single legal step proves availability. Search only when allies may block the first landing.
+            if (open || throughOccupied && Movement.Reachable(map, context.Cells, unit.Cell, actor, configuration.Search)
+                .Keys.Any(cell => !occupied.Contains(cell))) result.Add(unit.Id);
+        }
+        return result;
+    }
+
+    private static MovementActor MovementActorFor(UnitState unit, string camp) => new()
+    {
+        Category = unit.Combatant.Profile.Category, Camp = camp, Transport = unit.Transport,
+        Geography = unit.Combatant.Geography || unit.Combatant.Has(Ew4Combat.Skill(1)),
+        FullBudget = Math.Max(unit.ExtensionMovementLimit ?? unit.Combatant.Profile.Movement, unit.RemainingMovement), Remaining = unit.RemainingMovement
+    };
+
     internal static (MovementCell[] Cells, MovementActor Actor) MovementContext(WorldState state, UnitState unit)
     {
         var campIndex = state.Factions.ToDictionary(f => f.Id, f => f.Camp, StringComparer.Ordinal);
@@ -245,12 +288,7 @@ public static class WorldActions
             campIndex = state.Factions.ToDictionary(f => f.Id, f => WorldDiplomacy.Allied(state, unit.Owner, f.Id) ? "allied" : "other", StringComparer.Ordinal);
         var occupied = state.Units.GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => campIndex[g.First().Owner]);
         var cells = state.Cells.Select((c, i) => c.Terrain with { OccupantCamp = occupied.TryGetValue(i, out string camp) ? camp : null }).ToArray();
-        var actor = new MovementActor
-        {
-            Category = unit.Combatant.Profile.Category, Camp = campIndex[unit.Owner], Transport = unit.Transport,
-            Geography = unit.Combatant.Geography || unit.Combatant.Has(Ew4Combat.Skill(1)),
-            FullBudget = Math.Max(unit.ExtensionMovementLimit ?? unit.Combatant.Profile.Movement, unit.RemainingMovement), Remaining = unit.RemainingMovement
-        };
+        var actor = MovementActorFor(unit, campIndex[unit.Owner]);
         return (cells, actor);
     }
 }

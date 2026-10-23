@@ -49,7 +49,7 @@ def bootstrap_points():
 
 
 def build_subset(source, destination, points):
-    font = TTFont(source)
+    font = TTFont(source, fontNumber=0)
     options = subset.Options()
     options.recalc_timestamp = False
     options.drop_tables += ["FFTM"]
@@ -62,6 +62,19 @@ def build_subset(source, destination, points):
             table.cmap = {point: glyph for point, glyph in table.cmap.items() if point in points}
     if "fvar" in font:
         font = instantiateVariableFont(font, {"wght": 400}, inplace=True)
+    if source.name == "ukai.ttc":
+        notice = "2026-10-23: CN face extracted and converted to bounded Unicode WOFF2 subsets; glyph outlines unchanged."
+        font["name"].setName(notice, 10, 3, 1, 0x409)
+    if source.name.startswith("Liberation"):
+        # OFL reserved family names must not be retained by modified subsets.
+        combat = "Sans" in source.name
+        family = "EW4 Combat" if combat else "EW4 UI Latin"
+        postscript = "EW4Combat-BoldItalic" if combat else "EW4UILatin-Bold"
+        for record in font["name"].names:
+            replacement = {1: family, 3: postscript + ";20261023", 4: family, 6: postscript, 16: family}.get(record.nameID)
+            if replacement:
+                record.string = replacement.encode(record.getEncoding())
+        font["name"].setName("2026-10-23: renamed and subset for offline EW4 display; glyph outlines unchanged.", 10, 3, 1, 0x409)
     font.flavor = "woff2"
     font.save(destination)
     font.close()
@@ -81,6 +94,9 @@ def main():
             destination.write_bytes(archive.read(matches[0]))
 
     recipes = [
+        ("ukai.ttc", "ARPLUKaiCN.woff2", "EW4 UI Kai", "\u4e2d", "https://deb.debian.org/debian/pool/main/f/fonts-arphic-ukai/fonts-arphic-ukai_0.2.20080216.2-6_all.deb"),
+        ("LiberationSerif-Bold.ttf", "LiberationSerif-Bold.woff2", "EW4 UI Latin", "A", "https://deb.debian.org/debian/pool/main/f/fonts-liberation/fonts-liberation_2.1.5-3_all.deb"),
+        ("LiberationSans-BoldItalic.ttf", "LiberationSans-BoldItalic.woff2", "EW4 Combat", "0", "https://deb.debian.org/debian/pool/main/f/fonts-liberation/fonts-liberation_2.1.5-3_all.deb"),
         ("LXGWWenKai-Regular.ttf", "LXGWWenKai-Regular.woff2", "EW4 Kai", "A", "https://github.com/lxgw/LxgwWenKai/releases/tag/v1.530"),
         ("NotoSerifSC-Variable.ttf", "NotoSerifSC-Regular.woff2", "EW4 Serif", "A", "https://github.com/google/fonts/tree/main/ofl/notoserifsc"),
         ("Jigmo.ttf", "Jigmo.woff2", "EW4 Han", "\u4e00", "https://kamichikoichi.github.io/jigmo/Jigmo-20250912.zip"),
@@ -90,6 +106,8 @@ def main():
         ("unifont_upper-17.0.05.otf", "UnifontUpper.woff2", "EW4 Unicode Supplement", "\U00010000", "https://unifoundry.com/pub/unifont/unifont-17.0.05/"),
     ]
     (OUTPUT / "LXGWWenKai-OFL.txt").write_bytes((SOURCES / "OFL.txt").read_bytes())
+    for license_name in ("UKai-LICENSE.txt", "Liberation-LICENSE.txt"):
+        (OUTPUT / license_name).write_bytes((SOURCES / license_name).read_bytes())
     all_points = set()
     faces = []
     for source_name, filename, family, probe, upstream in recipes:
@@ -99,12 +117,16 @@ def main():
         if not destination.exists() and previous.exists():
             shutil.copyfile(previous, destination)
         source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
-        font = TTFont(source)
+        font = TTFont(source, fontNumber=0)
         points = {point for point, glyph in font.getBestCmap().items() if glyph != ".notdef"}
+        if family == "EW4 UI Latin":
+            points = {p for p in points if p < 0x250 or 0x1E00 <= p <= 0x1EFF or 0x2000 <= p <= 0x206F or 0x20A0 <= p <= 0x20CF}
+        elif family == "EW4 Combat":
+            points &= set(map(ord, "-0123456789"))
         assert ord(probe) in points, family
         all_points.update(points)
         font.close()
-        core = points & common if family in ("EW4 Kai", "EW4 Serif", "EW4 Unicode") else set()
+        core = points & common if family in ("EW4 UI Kai", "EW4 UI Latin", "EW4 Combat", "EW4 Kai", "EW4 Serif", "EW4 Unicode") else set()
         groups = [("core", core)] if core else []
         remaining = points - core
         for block in sorted({point // 2048 for point in remaining}):
@@ -112,7 +134,8 @@ def main():
         for key, characters in groups:
             relative = f"parts/{Path(filename).stem}-{key}.woff2"
             target = OUTPUT / relative
-            signature = hashlib.sha256((source_hash + json.dumps(sorted(characters))).encode()).hexdigest()
+            style_version = "ukai-cn-notice-v1" if source.name == "ukai.ttc" else "reserved-names-v1" if source.name.startswith("Liberation") else ""
+            signature = hashlib.sha256((source_hash + style_version + json.dumps(sorted(characters))).encode()).hexdigest()
             cache_file = SOURCES / (target.name + ".subset.json")
             if not target.exists() or not cache_file.exists() or json.loads(cache_file.read_text())["sha256"] != signature:
                 build_subset(source, target, characters)
@@ -128,7 +151,7 @@ def main():
             decoded = struct.unpack_from(">I", data, 16)[0]
             assert decoded <= MAX_DECODED_BYTES, f"Font subset exceeds decoded limit: {relative} ({decoded})"
             faces.append(dict(file=relative, family=family, probe=chr(min(characters)), glyphs=len(characters),
-                              bootstrap=key == "core", ranges=ranges(characters), decodedBytes=decoded,
+                              bootstrap=key == "core" and family not in ("EW4 UI Latin", "EW4 Combat"), ranges=ranges(characters), decodedBytes=decoded,
                               bytes=len(data), sha256=hashlib.sha256(data).hexdigest(), sourceSha256=source_hash, upstream=upstream))
         if previous.exists():
             assert previous.read_bytes() == destination.read_bytes(), "Preserve the previous full font before removing its runtime copy"

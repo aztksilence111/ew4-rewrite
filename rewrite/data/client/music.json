@@ -1,0 +1,6 @@
+{
+  "schema": 1,
+  "menu": "battle1.mp3",
+  "battle": ["battle1.mp3", "battle2.mp3", "battle3.mp3", "battle4.mp3"],
+  "defeat": "defeat_music.mp3"
+}

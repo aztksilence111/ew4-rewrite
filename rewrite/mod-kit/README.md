@@ -1,5 +1,7 @@
 # EW4 rewrite 离线 Mod 工具包
 
+战役初始显示与隐藏使用 [campaignVisibility 模板](examples/campaign-visibility/README.md)；背景音乐可通过 [client/music.json](data/client/music/README.md) 配置主菜单、随机战斗曲目和失败曲。
+
 全局国家表为 `client/countries.json`，独立于剧本；支持自由命名 ID、国旗/战斗/兵模分别配置，以及 BTL 内嵌 CNTR 长 ID 扩展，见[指南](docs/porting/GLOBAL_COUNTRIES.md)及[示例](examples/global-countries/README.md)。
 
 物品/装备可复用技能 JSON 与外置 Lua：通过 `itemBindings` 授予装备主动/被动技能或定义消耗品使用效果，见[接口说明](docs/porting/ITEM_EFFECTS.md)和[可打包示例](examples/item-effects/README.md)。

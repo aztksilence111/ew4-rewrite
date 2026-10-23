@@ -14,7 +14,7 @@ const base=process.env.EW4_TEST_URL||'http://127.0.0.1:5185';
   const ready=async()=>page.waitForFunction(()=>typeof originalTextRenderer!=='undefined'&&!!originalTextRenderer&&!!catalog);
   try{
     await page.goto(base+'/');await ready();
-    check(await page.evaluate(()=>document.documentElement.dataset.fontsReady==='true'&&document.fonts.check('32px "EW4 Kai"','中文城市')),'primary common subset is ready before rendering');
+    check(await page.evaluate(()=>document.documentElement.dataset.fontsReady==='true'&&document.fonts.check('32px "EW4 UI Kai"','中文城市')),'primary common subset is ready before rendering');
     check(report.fontRequests.length>0&&report.fontRequests.length<7&&report.fontRequests.every(url=>url.startsWith(base+'/content/')&&url.endsWith('.woff2')),'startup requests only local common subsets; rare fonts are deferred');
     const cdp=await page.context().newCDPSession(page);await cdp.send('DOM.enable');await cdp.send('CSS.enable');
     for(const [index,sample] of ['中文城市 LONDON 123','繁體龘靐齉','𠀀𠮷','𰀀𱍐𲎰','Русский Ελληνικά','日本語 한국어','العربية','★→'].entries()){

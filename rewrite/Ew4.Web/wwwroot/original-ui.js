@@ -1,7 +1,11 @@
 'use strict';
 (function(root){
-  const families=['EW4 Kai','EW4 Serif','EW4 Han','EW4 Han Plane 2','EW4 Han Plane 3','EW4 Unicode','EW4 Unicode Supplement'];
+  const mapFamilies=['EW4 Kai','EW4 Serif','EW4 Han','EW4 Han Plane 2','EW4 Han Plane 3','EW4 Unicode','EW4 Unicode Supplement'];
+  const families=['EW4 UI Latin','EW4 UI Kai',...mapFamilies];
   const fontFamily=families.map(name=>'"'+name+'"').join(',');
+  const mapFontFamily=mapFamilies.map(name=>'"'+name+'"').join(',');
+  const combatFamilies=['EW4 Combat',...families];
+  const combatFontFamily=combatFamilies.map(name=>'"'+name+'"').join(',');
   const numberFamilies=families;
   const numberFamily=numberFamilies.map(name=>'"'+name+'"').join(',');
   let fontPreparation,glyphRanges,coverage,revision=0,loadQueue=Promise.resolve();
@@ -88,7 +92,7 @@
       if(!response.ok)throw new Error('字库索引载入失败：coverage.json ('+response.status+')');
       const data=await response.json();
       if(data.schema!==1||data.loading!=='subsets-v1'||!Array.isArray(data.faces)||!Array.isArray(data.ranges)||
-        !data.faces.some(face=>face.bootstrap)||data.faces.some(face=>!families.includes(face.family)||!Array.isArray(face.ranges)||!/^parts\/[A-Za-z0-9-]+\.woff2$/.test(face.file)))throw new Error('字库索引无效：coverage.json');
+        !data.faces.some(face=>face.bootstrap)||data.faces.some(face=>!combatFamilies.includes(face.family)||!Array.isArray(face.ranges)||!/^parts\/[A-Za-z0-9-]+\.woff2$/.test(face.file)))throw new Error('字库索引无效：coverage.json');
       coverage=data;glyphRanges=data.ranges;
       for(const face of coverage.faces.filter(face=>face.bootstrap)){
         if(await loadFace(face)){document.documentElement.dataset.fontsReady='true';return;}
@@ -215,7 +219,7 @@
       for(const node of nodes)node.replaceWith(this.forElement(node.parentElement,node.textContent));
     }
   }
-  root.Ew4OriginalUI={TextRenderer,fontFamily,hasGlyph,displayText,availableText,prepareText,retryFonts,fontStatus,get revision(){return revision;}};
+  root.Ew4OriginalUI={TextRenderer,fontFamily,mapFontFamily,combatFontFamily,prepareMapText:(text,land=false)=>prepareText(text,land?['EW4 Serif',...mapFamilies]:mapFamilies),prepareCombatText:text=>prepareText(text,combatFamilies),hasGlyph,displayText,availableText,prepareText,retryFonts,fontStatus,get revision(){return revision;}};
   root.addEventListener?.('ew4uiscale',repaintFonts);
   if(typeof module!=='undefined')module.exports=root.Ew4OriginalUI;
 })(globalThis);

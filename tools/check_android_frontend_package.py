@@ -16,7 +16,7 @@ APK = ROOT / args.apk
 files = {}
 with zipfile.ZipFile(APK) as archive:
     assert archive.testzip() is None, "APK CRC failure"
-    for name in ("startup.js", "app.js", "index.html", "original-ui.js", "menu-art.js", "effects.js", "native-layout.js", "commander-workflows.js", "menus.js", "battlefield.js", "original-ui.css", "style.css", "city-names.json", "disband.png", "unit-navigation.js", "unit-search.png", "mods.js", "mods.css", "skill-ui.js"):
+    for name in ("startup.js", "app.js", "index.html", "original-ui.js", "menu-art.js", "effects.js", "native-layout.js", "commander-workflows.js", "menus.js", "battlefield.js", "music.js", "original-ui.css", "style.css", "city-names.json", "disband.png", "unit-navigation.js", "unit-search.png", "mods.js", "mods.css", "skill-ui.js"):
         relative = "assets/www/" + name
         source = ROOT / "rewrite/Ew4.Web/wwwroot" / name
         assert archive.read(relative) == source.read_bytes(), relative + " is stale"

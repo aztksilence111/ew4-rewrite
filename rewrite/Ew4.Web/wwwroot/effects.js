@@ -98,9 +98,9 @@
       const key=amount+':'+!!critical;
       if(!this.cache.has(key)){
         const canvas=document.createElement('canvas'),draw=canvas.getContext('2d'),text='-'+amount;
-        draw.font='72px '+Ew4OriginalUI.fontFamily;
+        draw.font='72px '+Ew4OriginalUI.combatFontFamily;
         canvas.width=Math.ceil(draw.measureText(text).width)+12;canvas.height=96;
-        draw.font='72px '+Ew4OriginalUI.fontFamily;draw.textBaseline='middle';draw.lineWidth=6;draw.lineJoin='round';
+        draw.font='72px '+Ew4OriginalUI.combatFontFamily;draw.textBaseline='middle';draw.lineWidth=6;draw.lineJoin='round';
         draw.strokeStyle='#000000';draw.strokeText(text,6,48);draw.fillStyle=critical?'#ff3030':'#ffffff';draw.fillText(text,6,48);
         this.cache.set(key,canvas);if(this.cache.size>128)this.cache.delete(this.cache.keys().next().value);
       }

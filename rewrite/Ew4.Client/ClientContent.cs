@@ -27,7 +27,7 @@ public sealed class ClientContent
     public bool CorrectOriginalEquipment { get; }
     private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<int, string>> scenarioCityNames;
 
-    public ClientContent(Func<string, byte[]> read, IEnumerable<string> battleFiles, bool correctOriginalEquipment = true)
+    public ClientContent(Func<string, byte[]> read, IEnumerable<string> battleFiles, bool correctOriginalEquipment = true, bool showHiddenCampaigns = true)
     {
         this.read = read;
         string Text(string name)
@@ -66,6 +66,12 @@ public sealed class ClientContent
         ItemDefinitions = XDocument.Parse(Text("def_item.xml")).Root!.Elements("item").ToArray();
         PrincessDefinitions = XDocument.Parse(Text("def_princess.xml")).Root!.Elements("Princess").ToArray();
         var battleEntries = XDocument.Parse(Text("def_battlelist.xml")).Root!.Elements("battle").ToArray();
+        bool Hidden(string id, bool original)
+        {
+            string visibility = Extensions.CampaignVisibility.GetValueOrDefault(id)
+                ?? Extensions.CampaignVisibility.GetValueOrDefault("*") ?? (showHiddenCampaigns ? "visible" : "original");
+            return visibility == "hidden" || visibility == "original" && original;
+        }
         var namesByScenario = new Dictionary<string, IReadOnlyDictionary<int, string>>();
         foreach (var entry in battleEntries.Where(e => e.Attribute("citynames") != null))
         {
@@ -87,8 +93,10 @@ public sealed class ClientContent
             int chapter = id.StartsWith("campaign", StringComparison.Ordinal) ? int.Parse(id[8..id.IndexOf('_')]) : 0;
             return new ScenarioPresentation(id, Label("desc_" + key), (string?)e.Attribute("commander"),
                 (string?)e.Attribute("age") ?? "", chapter, e.Attribute("file2") == null ? null : Path.GetFileNameWithoutExtension((string)e.Attribute("file2")!),
-                ((string?)e.Attribute("countries") ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries), (string?)e.Attribute("hide") == "1");
+                ((string?)e.Attribute("countries") ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries), Hidden(id, (string?)e.Attribute("hide") == "1"));
         }).ToDictionary(p => p.Id);
+        if (Extensions.CampaignVisibility.Keys.Any(id => id != "*" && (!Presentations.TryGetValue(id, out var p) || p.Chapter == 0)))
+            throw new RuleViolation("extension.campaign_visibility", "Visibility requires a campaign entry ID, not an alternate BTL ID");
         Chapters = XDocument.Parse(Text("def_battleline.xml")).Root!.Elements("line").Select((e, i) => new CampaignChapter(i + 1,
             Label((string)e.Attribute("name")!), (string)e.Attribute("start")!, (string)e.Attribute("end")!,
             ((string)e.Attribute("countries")!).Split(','))).ToArray();

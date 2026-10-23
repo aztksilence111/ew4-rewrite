@@ -9,6 +9,20 @@ internal static class ResourceValidation
     {
         void Need(string path) { ModFiles.PathName(path); if (!files.Contains(path)) throw new InvalidDataException("缺少依赖资源: " + path); }
         var manifest = ModFiles.Object(read("client/manifest.json"));
+        if (files.Contains("client/music.json"))
+        {
+            var music = ModFiles.Object(read("client/music.json"));
+            if ((int?)music["schema"] != 1 || music["battle"] is not JsonArray tracks || tracks.Count is < 1 or > 64
+                || music.Any(p => p.Key is not ("schema" or "menu" or "battle" or "defeat")))
+                throw new InvalidDataException("Invalid music configuration");
+            foreach (var track in tracks.Concat(new[] { music["menu"], music["defeat"] }))
+            {
+                string name = track?.GetValue<string>() ?? throw new InvalidDataException("Missing music track");
+                if (name.Contains('/') || !new[] { ".mp3", ".ogg", ".wav" }.Contains(Path.GetExtension(name)))
+                    throw new InvalidDataException("Invalid music filename: " + name);
+                Need("client/music/" + name);
+            }
+        }
         foreach (string id in content.Catalogs.Runtime.Profiles.Keys)
             if (manifest["profiles"]?[id] == null) throw new InvalidDataException("兵种缺少显示配置: " + id);
         if (files.Contains("frontend/conquest-pages.json"))

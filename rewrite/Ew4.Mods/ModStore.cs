@@ -61,7 +61,7 @@ public sealed partial class ModStore
         }
         catch (Exception e) when (Recoverable(e)) { return JsonSerializer.Serialize(new { error = e.Message }, ModFiles.Json); }
     }
-    private ClientGame NewGame(string? key, ModManifest? manifest) => new(baseline.Content(p => ReadFrom(key, manifest, p), manifest?.Scenarios ?? baseline.Scenarios),
+    private ClientGame NewGame(string? key, ModManifest? manifest) => new(baseline.Content(p => ReadFrom(key, manifest, p), manifest?.Scenarios ?? baseline.Scenarios, showHiddenCampaigns: manifest == null),
         manifest == null ? saves : ModFiles.Under(saves, $"mods/{manifest.Id}/{manifest.LogicRevision}"));
     public string Status()
     {

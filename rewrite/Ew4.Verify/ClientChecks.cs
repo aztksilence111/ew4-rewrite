@@ -6,7 +6,7 @@ internal static class ClientChecks
 {
     public static int Run(string root)
     {
-        int checks = 0;
+        int checks = UnitNavigationChecks.Run();
         void Check(bool value, string label) { checks++; if (!value) throw new InvalidOperationException("Client: " + label); }
         string assets = Path.Combine(root, "rewrite/data/original");
         byte[] Read(string path) => File.ReadAllBytes(path.StartsWith("original/", StringComparison.Ordinal) ? Path.Combine(assets, path[9..])
@@ -60,6 +60,14 @@ internal static class ClientChecks
                 attackMap.Distance(fort.Cell,u.Cell),fort.Combatant.Profile.MinimumRange,fort.Combatant.Profile.MaximumRange)==AttackBlock.None);
             Check(!displayed.GetProperty("canMove").GetBoolean(),"fort never pulses for movement");
             Check(displayed.GetProperty("canAttack").GetBoolean()==target,"fort badge requires a legal hostile target");
+        }
+        foreach (var displayed in view.GetProperty("units").EnumerateArray().Where(u => u.GetProperty("owner").GetString() == availabilityWorld.ActiveFaction))
+        {
+            var unit = availabilityWorld.Units.Single(u => u.Id == displayed.GetProperty("id").GetString());
+            var selectedView = Call("action", new { op = "select", cell = unit.Cell, revision = detailRevision });
+            Check(displayed.GetProperty("canNavigateMove").GetBoolean() == (unit.Combatant.Profile.Category != "fort"
+                && unit.Combatant.ConstructionTurns == 0 && selectedView.GetProperty("range").GetArrayLength() > 0),
+                "navigation move availability matches authoritative selection range");
         }
         var battleBounds = content.Battle("conquest1");
         var camera = view.GetProperty("cameraBounds");

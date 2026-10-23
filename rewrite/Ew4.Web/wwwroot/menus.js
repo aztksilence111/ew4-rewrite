@@ -103,8 +103,21 @@
     }
     async confirmBattle(presentation){
       if(presentation.alternate&&presentation.countries.length){
-        let chosen=0;const body=this.api.detail('country_label',234,150,()=>this.api.start(chosen?presentation.alternate:presentation.id,null));body.className='scenario-countries';
-        presentation.countries.forEach((country,index)=>{const name=this.api.catalog?.countries?.[country]?.name||this.text('name_'+country),b=this.api.button('',()=>{chosen=index;for(const c of body.children)c.setAttribute('aria-pressed',String(c===b));},body);b.setAttribute('aria-label',name);b.append(this.countryFlag(country,51,30),this.api.labels('country_'+country,name));if(!index)b.click();});
+        let chosen=0;const layout=new Ew4NativeUI.Layout({...this.api,detail:(title,width,height,_confirm,onClose)=>
+          this.api.detail(title,width,height,()=>this.api.start(chosen?presentation.alternate:presentation.id,null),onClose)},'form_selcountry');
+        const select=index=>{
+          chosen=index;const selected=layout.get(index?'btn_right':'btn_left'),marker=layout.get('group_select');
+          Object.assign(marker.style,{left:selected.style.left,top:selected.style.top,width:selected.style.width,height:selected.style.height,pointerEvents:'none'});
+          layout.text('group_select/text_nation',this.api.catalog.countries[presentation.countries[index]]?.name||this.text('name_'+presentation.countries[index]));
+          for(const [i,id] of ['btn_left','btn_right'].entries())layout.get(id).setAttribute('aria-pressed',String(i===index));
+        };
+        presentation.countries.slice(0,2).forEach((country,index)=>{
+          const side=index?'btn_right':'btn_left',name=this.api.catalog.countries[country]?.name||this.text('name_'+country);
+          const image=layout.get(side+'/image_nation_'+(index+1));
+          Object.assign(image.style,{width:'25.5px',height:'15px'});image.replaceChildren(this.countryFlag(country,25.5,15));
+          layout.text(side+'/text_nation_'+(index+1),name);layout.action(side,name,()=>select(index));
+        });
+        select(0);
       }else await this.api.start(presentation.id,null);
     }
     stageIntro(intro,onClose){

@@ -9,6 +9,10 @@ internal static class CampaignProgressChecks
     {
         int checks = 0;
         void Check(bool condition, string label) { checks++; if (!condition) throw new InvalidOperationException("Campaign progress: " + label); }
+        Check(content.Presentations.Values.All(p => !p.Hidden), "builtin hidden campaigns visible on a fresh profile");
+        byte[] Read(string path) => File.ReadAllBytes(path.StartsWith("data/", StringComparison.Ordinal)
+            ? Path.Combine(root, "rewrite/data/legacy", path[5..]) : Path.Combine(root, "rewrite/data", path));
+        content = new ClientContent(Read, content.Scenarios.Select(s => s.Id + ".btl"), showHiddenCampaigns: false);
         GameSession Cleared(string id)
         {
             var session = content.Start(id, null).Session;

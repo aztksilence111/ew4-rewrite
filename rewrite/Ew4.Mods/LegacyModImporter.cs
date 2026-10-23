@@ -130,6 +130,19 @@ internal sealed class LegacyModImporter
         ConvertEffects();
         foreach (string f in names.Where(n => n.EndsWith(".mp3", StringComparison.Ordinal) || n.EndsWith(".wav", StringComparison.Ordinal) || n.EndsWith(".ogg", StringComparison.Ordinal)))
             if (Changed(f)) Write((f.EndsWith(".mp3", StringComparison.Ordinal) ? "music/" : "sounds/") + Path.GetFileName(f), Read(f));
+        if (names.Contains("global_data.xml"))
+        {
+            string? menuMusic = (string?)ModFiles.Xml(Read("global_data.xml")).Descendants("data")
+                .FirstOrDefault(e => (string?)e.Attribute("name") == "BGMusic")?.Attribute("value");
+            if (!string.IsNullOrWhiteSpace(menuMusic))
+            {
+                ModFiles.PathName(menuMusic);
+                if (menuMusic.Contains('/') || !new[] { ".mp3", ".ogg", ".wav" }.Contains(Path.GetExtension(menuMusic)))
+                    throw new InvalidDataException("Invalid BGMusic filename");
+                if (names.Contains(menuMusic)) Write("music/" + menuMusic, Read(menuMusic));
+                var music = ModFiles.Object(baseline.Read("client/music.json"));music["menu"] = menuMusic;Json("music.json", music);
+            }
+        }
         Json("manifest.json", manifest);
         string[] scenarios = names.Where(n => !n.Contains('/') && n.EndsWith(".btl", StringComparison.Ordinal)).Select(Path.GetFileNameWithoutExtension).Select(n => n!).Order(StringComparer.Ordinal).ToArray();
         bool full = resources.FullPackage;

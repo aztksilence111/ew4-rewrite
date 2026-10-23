@@ -23,8 +23,8 @@ public sealed class ModBase(Func<string, byte[]> read, IEnumerable<string> files
         .Select(Path.GetFileNameWithoutExtension).Select(p => p!).ToArray();
     private string? revision;
     public string Revision => revision ??= ModFiles.Hash(Read("legacy/catalog.json").Concat(Read("client/manifest.json")).ToArray());
-    public ClientContent Content(Func<string, byte[]> reader, IEnumerable<string> scenarios) => new(path => reader(
-        path.StartsWith("data/", StringComparison.Ordinal) ? "legacy/" + path[5..] : path), scenarios.Select(s => s + ".btl"));
+    public ClientContent Content(Func<string, byte[]> reader, IEnumerable<string> scenarios, bool showHiddenCampaigns = false) => new(path => reader(
+        path.StartsWith("data/", StringComparison.Ordinal) ? "legacy/" + path[5..] : path), scenarios.Select(s => s + ".btl"), showHiddenCampaigns: showHiddenCampaigns);
 }
 
 internal static class ModFiles

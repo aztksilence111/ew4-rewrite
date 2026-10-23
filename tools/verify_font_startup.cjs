@@ -31,17 +31,25 @@ const base=process.env.EW4_TEST_URL||'http://127.0.0.1:5196',folder=path.resolve
    check(await page.evaluate(()=>Ew4OriginalUI.availableText('𠮷𰀀𲎰')==='𠮷𰀀𲎰'),'rare characters become available after deferred load');
    await page.locator('#rare-probe').evaluate(node=>node.remove());await hq(page);await page.screenshot({path:folder+'/normal-hq.png'});
   });
+  await scenario('slow combat font preserves menu labels',async route=>{
+   if(route.request().url().endsWith('/LiberationSans-BoldItalic-core.woff2'))await new Promise(resolve=>setTimeout(resolve,300));
+   await route.continue();
+  },async page=>{
+   await ready(page);
+   const labels=await page.locator('.main-entry').evaluateAll(nodes=>nodes.map(n=>{const c=n.querySelector('canvas'),p=c?.getContext('2d').getImageData(0,0,c.width,c.height).data;return {label:n.getAttribute('aria-label'),ink:p?[...p].filter((v,i)=>i%4===3&&v>128).length:0};}));
+   check(labels.length===5&&labels.every(n=>n.label&&n.ink>100),'delayed font cannot erase original menu text during startup');
+  });
   let primaryFailed=true;
-  await scenario('primary failure and recovery',route=>primaryFailed&&route.request().url().endsWith('/LXGWWenKai-Regular-core.woff2')?route.fulfill({status:404,body:'injected primary font failure'}):route.continue(),async page=>{
-   await ready(page);check((await page.locator('#startup-message').innerText()).includes('LXGWWenKai-Regular-core.woff2'),'failure names exact font file');
-   check(await page.evaluate(()=>document.fonts.check('32px "EW4 Serif"','中文城市')),'primary failure uses bundled serif fallback');
+  await scenario('primary failure and recovery',route=>primaryFailed&&route.request().url().endsWith('/ARPLUKaiCN-core.woff2')?route.fulfill({status:404,body:'injected primary font failure'}):route.continue(),async page=>{
+   await ready(page);check((await page.locator('#startup-message').innerText()).includes('ARPLUKaiCN-core.woff2'),'failure names exact font file');
+   check(await page.evaluate(()=>document.fonts.check('32px "EW4 Kai"','中文城市')),'primary failure uses bundled WenKai fallback');
    await hq(page);await page.screenshot({path:folder+'/fallback-hq.png'});
    check(await page.evaluate(()=>document.querySelector('#menu-stage').getBoundingClientRect().bottom<document.querySelector('#startup-status').getBoundingClientRect().top),'font failure status does not cover headquarters controls');
    primaryFailed=false;await page.locator('#startup-retry').click();await page.waitForFunction(()=>!Ew4OriginalUI.fontStatus.failures.length&&!startupRunning);
-   check(await page.evaluate(()=>document.fonts.check('32px "EW4 Kai"','中文城市')),'retry loads restored primary font');
+   check(await page.evaluate(()=>document.fonts.check('32px "EW4 UI Kai"','中文城市')),'retry loads restored primary font');
   });
-  await scenario('primary decoder rejects font',route=>route.request().url().endsWith('/LXGWWenKai-Regular-core.woff2')?route.fulfill({contentType:'font/woff2',body:'invalid WOFF2 bytes'}):route.continue(),async page=>{
-   await ready(page);check((await page.locator('#startup-message').innerText()).includes('LXGWWenKai-Regular-core.woff2'),'font decoder failure identifies file');
+  await scenario('primary decoder rejects font',route=>route.request().url().endsWith('/ARPLUKaiCN-core.woff2')?route.fulfill({contentType:'font/woff2',body:'invalid WOFF2 bytes'}):route.continue(),async page=>{
+   await ready(page);check((await page.locator('#startup-message').innerText()).includes('ARPLUKaiCN-core.woff2'),'font decoder failure identifies file');
    await hq(page);check(true,'font decoding failure still reaches populated headquarters');
   });
   let allFailed=true;

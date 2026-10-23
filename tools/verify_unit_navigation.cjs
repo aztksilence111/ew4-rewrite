@@ -1,23 +1,26 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs/promises'),path=require('node:path'),vm=require('node:vm'),{createRequire}=require('node:module');
 const {chromium}=createRequire('C:/Users/WIN11/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/_probe.cjs')('playwright');
-const base=process.argv[2]||'http://127.0.0.1:5280',folder=path.resolve('rewrite/reports/unit-navigation-safe-area-20261022');
+const base=process.argv[2]||'http://127.0.0.1:5426',folder=path.resolve(process.argv[3]||'build/unit-navigation-fix-20261023/browser');
 (async()=>{
   await fs.mkdir(folder,{recursive:true});
   const report={checks:0,errors:[],missing:[],screenshots:[],scope:'Pure unit-state cases and real shared Web UI; Android safe viewport sizes simulated, no device execution'};
   const check=(value,label)=>{assert.ok(value,label);report.checks++;};
   const sandbox={};vm.runInNewContext(await fs.readFile('rewrite/Ew4.Web/wwwroot/unit-navigation.js','utf8'),sandbox);
   const api=sandbox.Ew4UnitNavigation;
-  const unit=(id,fields={})=>({id,owner:'p',cell:0,health:100,morale:0,constructionTurns:0,category:'infantry',canMove:true,canAttack:false,remainingMovement:10,acted:false,...fields});
+  const unit=(id,fields={})=>({id,owner:'p',cell:0,health:100,morale:0,constructionTurns:0,category:'infantry',canMove:true,canNavigateMove:true,canAttack:false,remainingMovement:10,acted:false,...fields});
   const fixture={scenario:'test',round:1,activeFaction:'p',playerFaction:'p',phase:'Active',factions:[{id:'p',human:true}],units:[
-    unit('fresh-a'),unit('moved',{canMove:false,remainingMovement:0}),unit('fresh-b'),unit('attacked',{acted:true}),
-    unit('spent',{canMove:false,remainingMovement:0,acted:true}),unit('fort',{canMove:false,remainingMovement:0,category:'fort'}),
+    unit('fresh-a',{canAttack:true}),unit('moved',{canMove:false,canNavigateMove:false,canAttack:true,remainingMovement:0}),unit('fresh-b'),unit('attacked',{acted:true}),
+    unit('spent',{canMove:false,canNavigateMove:false,remainingMovement:0,acted:true}),unit('fort',{canMove:false,canNavigateMove:false,canAttack:true,remainingMovement:0,category:'fort'}),
+    unit('idle-fort',{canMove:false,canNavigateMove:false,remainingMovement:0,category:'fort'}),unit('blocked',{canNavigateMove:false}),
+    unit('moved-no-target',{canMove:false,canNavigateMove:false,remainingMovement:0}),
     unit('enemy',{owner:'e'}),unit('stunned',{morale:-3}),unit('building',{constructionTurns:2}),unit('dead',{health:0})]};
   const cycle=new api.Cycle(),expected=['fresh-a','fresh-b','fort','moved','attacked','fresh-a'];
   for(const id of expected)check(cycle.next(fixture)?.id===id,'priority cycle '+id);
-  check(api.groups(fixture)[0][0].canAttack===false,'untouched unit without a target remains eligible');
-  check(api.groups(fixture)[1].some(u=>u.id==='moved'),'moved unit with an unspent attack remains eligible without a target');
-  fixture.units[0].canMove=false;fixture.units[0].remainingMovement=0;
+  check(api.groups(fixture)[0].some(u=>u.id==='fresh-b'&&!u.canAttack),'unit with a legal move remains eligible without an attack target');
+  check(api.groups(fixture)[1].some(u=>u.id==='moved'),'moved unit with a legal attack remains eligible');
+  check(!api.groups(fixture).flat().some(u=>['idle-fort','blocked','moved-no-target'].includes(u.id)),'no-target forts, surrounded units and spent movers are excluded');
+  fixture.units[0].canMove=false;fixture.units[0].canNavigateMove=false;fixture.units[0].remainingMovement=0;
   check(cycle.next(fixture)?.id==='fresh-b','moving the last found unit cannot skip other untouched units');
   check(cycle.next(fixture)?.id==='fort','finish untouched tier before revisiting a moved unit');
   check(cycle.next(fixture)?.id==='fresh-a','a newly partial unit can be found again in the second tier');
@@ -33,6 +36,7 @@ const base=process.argv[2]||'http://127.0.0.1:5280',folder=path.resolve('rewrite
     await page.waitForFunction(()=>!busy&&!$('next-unit').disabled);
     const initial=await page.evaluate(()=>({revision:state.revision,units:JSON.stringify(state.units),ids:Ew4UnitNavigation.groups(state)[0].map(u=>u.id),zoom:view.zoom}));
     check(initial.ids.length>2,'real scenario has multiple untouched player units');
+    check(await page.evaluate(()=>!Ew4UnitNavigation.groups(state).flat().some(u=>!u.canNavigateMove&&!u.canAttack)),'real no-target forts are excluded');
     for(const id of initial.ids){
       await page.locator('#next-unit').click();
       await page.waitForFunction(id=>!findingUnit&&selected?.id===id,id);
@@ -51,11 +55,12 @@ const base=process.argv[2]||'http://127.0.0.1:5280',folder=path.resolve('rewrite
       const id=selected.id;
       if(cell===undefined)throw Error('No legal test move');
       await act('move',{cell});unitNavigation.reset();
-      return {id,cell,untouched:Ew4UnitNavigation.groups(state)[0].map(u=>u.id)};
+      return {id,cell,canAttack:state.units.find(u=>u.id===id).canAttack,untouched:Ew4UnitNavigation.groups(state)[0].map(u=>u.id)};
     });
     for(const id of moved.untouched){await page.locator('#next-unit').click();await page.waitForFunction(id=>!findingUnit&&selected?.id===id,id);}
     await page.locator('#next-unit').click();await page.waitForFunction(()=>!findingUnit);
-    check(await page.evaluate(id=>selected.id===id&&selected.remainingMovement===0&&!selected.acted,moved.id),'real moved/unattacked unit is found after untouched units');
+    check(await page.evaluate(({id,canAttack})=>canAttack?selected.id===id:!Ew4UnitNavigation.groups(state).flat().some(u=>u.id===id),moved),'real moved unit remains only when a legal attack exists');
+    check(await page.evaluate(()=>Number($('next-unit-count').dataset.count)===Ew4UnitNavigation.groups(state).flat().length),'badge and navigation share the same remaining-unit count');
     const before=await page.evaluate(()=>state.revision);
     let selectRequests=0;
     await page.route('**/api/action?**',async route=>{const args=JSON.parse(new URL(route.request().url()).searchParams.get('q'));if(args.op==='select'){selectRequests++;await new Promise(resolve=>setTimeout(resolve,180));}await route.continue();});
@@ -74,16 +79,31 @@ const base=process.argv[2]||'http://127.0.0.1:5280',folder=path.resolve('rewrite
         return {rects,w:innerWidth,h:innerHeight,canvas:[canvas.clientWidth,canvas.clientHeight],scale:+getComputedStyle(document.documentElement).getPropertyValue('--battle-scale')};
       });
       for(const r of bounds.rects)check(r.x>=-.1&&r.y>=-.1&&r.right<=width+.1&&r.bottom<=height+.1,name+' '+r.id+' fully inside safe viewport');
-      check(bounds.rects[0].right<bounds.rects[1].x,name+' search is right of undo with a gap');
+      check(Math.abs(bounds.rects[1].right-bounds.rects[2].right)<.1&&bounds.rects[1].bottom<bounds.rects[2].y,name+' honeycomb is aligned above the hourglass');
       check(bounds.canvas[0]===width&&bounds.canvas[1]===height,name+' canvas uses the same safe viewport');
-      for(const id of ['undo-move','next-unit','menu-button'])check(await page.locator('#'+id).evaluate(el=>{const r=el.getBoundingClientRect();return document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)===el;}),name+' '+id+' touch target is not covered');
+      for(const id of ['undo-move','next-unit','menu-button'])check(await page.locator('#'+id).evaluate(el=>{const r=el.getBoundingClientRect();return document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('button')===el;}),name+' '+id+' touch target is not covered');
+      check(await page.locator('#next-unit').evaluate(el=>{const r=el.getBoundingClientRect();return document.elementFromPoint(r.left-2,r.top-2)?.closest('button')!==el;}),name+' shadow does not intercept map input');
+      const badgeCases=await page.evaluate(()=>{
+        const saved=state,unit=state.units.find(u=>u.owner===state.playerFaction&&u.canNavigateMove),results=[];
+        for(const count of [0,1,9,99,100,999,1000,10000]){
+          state={...saved,units:Array.from({length:count},(_,i)=>({...unit,id:'badge-case.'+i}))};refreshHud();
+          const badge=$('next-unit-count'),b=$('next-unit'),canvas=badge.querySelector('canvas'),r=canvas.getBoundingClientRect(),p=b.getBoundingClientRect();
+          const pixels=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;
+          results.push({count,matches:badge.dataset.count===String(count),disabled:b.disabled,
+            inside:r.left>=p.left&&r.top>=p.top&&r.right<=p.right+.1&&r.bottom<=p.bottom+.1,
+            ink:pixels.some((v,i)=>i%4===3&&v>0)});
+        }
+        state=saved;refreshHud();return results;
+      });
+      for(const b of badgeCases)check(b.matches&&b.inside&&b.ink&&b.disabled===(b.count===0),name+' count '+b.count+' is correct, legible and inside the button');
       await page.screenshot({path:path.join(folder,name+'.png')});report.screenshots.push(name+'.png');
       await page.locator('#menu-button').click();await page.locator('#pause-settings').click();
       check(await page.locator('#confirm-settings').evaluate(el=>{const r=el.getBoundingClientRect();return r.x>=0&&r.y>=0&&r.right<=innerWidth&&r.bottom<=innerHeight;}),name+' settings confirm fits');
       await page.locator('#close-settings').click();await page.locator('#resume').click();
     }
-    await page.evaluate(()=>{state={...state,units:state.units.map(u=>u.owner===state.playerFaction?{...u,acted:true,canMove:false,remainingMovement:0}:u)};refreshHud();});
+    await page.evaluate(()=>{state={...state,units:state.units.map(u=>u.owner===state.playerFaction?{...u,acted:true,canMove:false,canNavigateMove:false,canAttack:false,remainingMovement:0}:u)};refreshHud();});
     check(await page.locator('#next-unit').isDisabled(),'no remaining units disables search');
+    check(await page.locator('#next-unit-count').getAttribute('data-count')==='0','zero remaining units displays zero');
     await page.evaluate(()=>{state={...state,activeFaction:state.factions.find(f=>!f.human).id};refreshHud();});
     check(await page.locator('#next-unit').isHidden(),'AI turn hides human search control');
     check(report.errors.length===0,'no browser exceptions');check(report.missing.length===0,'no missing resources');

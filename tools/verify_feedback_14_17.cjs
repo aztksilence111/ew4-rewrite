@@ -24,7 +24,9 @@ const base=process.argv[2]||'http://127.0.0.1:5420',folder=process.argv[3]||'bui
     check(report.fonts.sheets===0&&report.fonts.bitmapGlyph===null,'all UI text bypasses bitmap glyphs');
     check(report.fonts.pixels/report.fonts.cssWidth>=6&&report.fonts.ink>100,'mobile DPR3 text has dense nonblank raster');
     for(const [width,height] of [[844,390],[1280,720],[2376,1080],[544,248],[390,844]]){
-      await page.setViewportSize({width,height});await page.waitForTimeout(200);await page.evaluate(()=>showMain());await shot('menu-'+width);
+      await page.setViewportSize({width,height});await page.waitForTimeout(200);await page.evaluate(()=>showMain());
+      const labels=await page.locator('.main-entry').evaluateAll(nodes=>nodes.map(node=>{const c=node.querySelector('canvas'),p=c?.getContext('2d').getImageData(0,0,c.width,c.height).data;return {text:node.getAttribute('aria-label'),ink:p?[...p].filter((v,i)=>i%4===3&&v>128).length:0};}));
+      check(labels.length===5&&labels.every(label=>label.text&&label.ink>100),'all five main-menu captions remain visible '+width);await shot('menu-'+width);
       await page.evaluate(()=>start('conquest1','fra'));await page.waitForTimeout(200);
       await page.evaluate(()=>{const u=state.units.find(u=>u.owner===state.playerFaction&&u.canMove);return selectCell(u.cell,true,true);});
       check(await page.evaluate(()=>battlefield.mapLabels.size>0&&[...battlefield.mapLabels.values()].every(l=>l.canvas.width>0&&l.canvas.height>0)),'legacy geographic labels retain nonblank dimensions '+width);
@@ -43,18 +45,23 @@ const base=process.argv[2]||'http://127.0.0.1:5420',folder=process.argv[3]||'bui
     }
     await page.setViewportSize({width:844,height:390});
     report.geography=await page.evaluate(()=>{
-      const renderer=battlefield,old={map:renderer.map,draw:renderer.draw,visible:renderer.visible,mapLabels:renderer.mapLabels},samples=[];
+      const renderer=battlefield,old={map:renderer.map,draw:renderer.draw,visible:renderer.visible,mapLabels:renderer.mapLabels},samples=[],oldLanguage=settings.geographicLanguage;
       try{
+        settings.geographicLanguage='en';
         renderer.draw=document.createElement('canvas').getContext('2d');renderer.visible=()=>true;
         for(const name of ['europe','america','eastasia']){
           renderer.map={labels:[manifest.maps[name].labels[0]]};renderer.mapLabels=new Map();renderer.mapText();
-          const c=[...renderer.mapLabels.values()][0]?.canvas,pixels=c?.getContext('2d').getImageData(0,0,c.width,c.height).data;
-          samples.push({name,width:c?.width,height:c?.height,ink:pixels?[...pixels].filter((v,i)=>i%4===3&&v>0).length:0});
+          const cached=[...renderer.mapLabels.values()][0],c=cached?.canvas,pixels=c?.getContext('2d').getImageData(0,0,c.width,c.height).data;
+          const expected=document.createElement('canvas');expected.width=c.width;expected.height=c.height;
+          const draw=expected.getContext('2d'),label=renderer.map.labels[0],lib=renderer.api.libraries.get('maptext');
+          draw.translate(-cached.left,-cached.top);draw.globalAlpha=Number.isFinite(label.opacity)?Math.max(0,Math.min(1,label.opacity)):60/255;
+          renderer.api.animation(lib,lib.byName.get(label.libName),0,0,draw);
+          samples.push({name,width:c?.width,height:c?.height,originalArtworkPixels:c.toDataURL()===expected.toDataURL(),ink:pixels?[...pixels].filter((v,i)=>i%4===3&&v>0).length:0});
         }
-      }finally{Object.assign(renderer,old);}
+      }finally{Object.assign(renderer,old);settings.geographicLanguage=oldLanguage;}
       return samples;
     });
-    for(const sample of report.geography)check(sample.ink>50&&sample.width>10&&sample.height>10,'bundled geographic labels render in '+sample.name);
+    for(const sample of report.geography)check(sample.originalArtworkPixels&&sample.ink>50&&sample.width>10&&sample.height>10,'geographic label pixels match original artwork in '+sample.name);
     report.formations=await page.evaluate(()=>{
       const ids=[0,1,2].map(grade=>Object.keys(manifest.profiles).find(id=>manifest.profiles[id].grade===grade));
       const result=ids.map(id=>{const node=abilityGrid(id).querySelector('.formation-count');return {count:Number(node.dataset.count),filled:node.querySelectorAll('[data-filled="true"]').length,empty:[...node.querySelectorAll('[data-filled="false"]')].every(n=>n.style.opacity==='.2'||n.style.opacity==='0.2')};});

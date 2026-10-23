@@ -5,7 +5,7 @@ let catalog, manifest, cityNames={}, state, selected, selection, busy = false, m
 let conquestPages, conquestPage=0, conquestEntering=false, conquestRender=0;
 let originalTextRenderer, menuArt, imageRevision=0;
 let startupReady=false,startupRunning=false,startupError='';
-let effects,damageNumbers;
+let effects,damageNumbers,music;
 let originalTextQueued=false;
 const originalTextChanges=new MutationObserver(()=>{
   if(!originalTextRenderer||originalTextQueued)return;originalTextQueued=true;
@@ -30,7 +30,7 @@ function requestRender(){
   if(!renderRequest)renderRequest=requestAnimationFrame(render);
 }
 function suspendRendering(){cancelAnimationFrame(renderRequest);renderRequest=0;}
-window.ew4SetAppVisible=visible=>{appVisible=visible;if(visible)requestRender();else suspendRendering();};
+window.ew4SetAppVisible=visible=>{appVisible=visible;music?.setVisible(visible);if(visible)requestRender();else suspendRendering();};
 document.addEventListener('visibilitychange',()=>{if(document.hidden)suspendRendering();else requestRender();});
 new MutationObserver(requestRender).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden']});
 for(const event of ['pointerdown','pointermove','pointerup','wheel','input','change','click'])document.addEventListener(event,requestRender,{passive:true});
@@ -101,6 +101,7 @@ async function showMain() {
     busy=true;
     if(state)await rpc('leave',{revision:state.revision});
     state=undefined;selected=undefined;selection=undefined;tutorial=null;tutorialRect=null;
+    music?.menu();
     battleDialogues.length=0;
     detailReturn=null;victoryUi.reset();localMultiplayerUi.sync(null);
     closeSingleAction();menus.dismissSkillTip();menus.deployment=null;
@@ -289,6 +290,7 @@ async function installState(next, center = false) {
     }
   }
   state = next; selected = undefined; selection = undefined; $('selection').hidden = true;
+  music?.sync(next,center);
   if(!center&&!skipAi&&previous&&next.revision>previous.revision)playAttachedEffects(previous,next);
   presentBattleDialogue();
   if (center || !mapBounds) mapBounds = Ew4Battlefield.cameraBounds(state, manifest.maps[state.map]);
@@ -497,7 +499,14 @@ function refreshHud() {
   $('undo-move').hidden = !active.human;
   $('undo-move').disabled = busy || !selected || !selection?.undo;
   $('next-unit').hidden = !active.human;
-  $('next-unit').disabled = busy || findingUnit || !Ew4UnitNavigation.groups(state).some(units=>units.length);
+  const remainingUnits=Ew4UnitNavigation.groups(state).reduce((sum,units)=>sum+units.length,0);
+  $('next-unit').disabled = busy || findingUnit || !remainingUnits;
+  const unitCount=$('next-unit-count');
+  if(unitCount.dataset.count!==String(remainingUnits)){
+    unitCount.dataset.count=String(remainingUnits);
+    unitCount.replaceChildren(originalTextRenderer.element(remainingUnits,'font_char_2_hd','#ffffff',14,'right',{size:remainingUnits<100?8:remainingUnits<1000?6:4.5,singleLine:true}));
+    $('next-unit').title=$('next-unit').ariaLabel='寻找可行动部队（剩余 '+remainingUnits+'）';
+  }
   $('skip-ai').hidden = active.human || state.phase === 'Finished' || !!state.dialogue;
   $('skip-ai').disabled = skipAi;
   refreshAiProgress();
@@ -1053,7 +1062,7 @@ function openSettings(){for(const [id,key] of [['music-volume','music'],['sound-
 $('main-settings').onclick=()=>{if(startupReady)openSettings();};$('pause-settings').onclick=openSettings;
 $('close-settings').onclick=()=>$('settings').hidden=true;
 $('confirm-settings').onclick=()=>$('settings').hidden=true;
-for(const [id,key] of [['music-volume','music'],['sound-volume','sound'],['game-speed','speed'],['screen-size','screen'],['event-size','eventSize']])$(id).oninput=e=>{settings[key]=Number(e.target.value);persistSettings();sizeUi();};
+for(const [id,key] of [['music-volume','music'],['sound-volume','sound'],['game-speed','speed'],['screen-size','screen'],['event-size','eventSize']])$(id).oninput=e=>{settings[key]=Number(e.target.value);if(key==='music')music?.resume();persistSettings();sizeUi();};
 $('hd-mode').onchange=e=>{settings.hd=e.target.checked;persistSettings();};
 for(const [id,key] of [['skip-turn-fast','skipTurnFast'],['follow-ai','followAi']])$(id).onchange=e=>{
   settings[key]=e.target.checked;persistSettings();
@@ -1129,7 +1138,8 @@ async function initializeClient(){
   document.querySelectorAll('.main-entry').forEach(button=>button.disabled=true);$('continue').disabled=true;
   try{
     Ew4Startup.pending('游戏目录与资源索引');
-    const [c,m,names,fx,pages,visuals,presentation]=await Promise.all([rpc('catalog'),startupJson('/content/manifest.json'),startupJson('city-names.json'),startupJson('/content/effects.json'),startupJson('conquest-pages.json'),startupJson('/content/unit-visuals.json'),startupJson('/content/presentation.json')]);
+    const [c,m,names,fx,pages,visuals,presentation,musicConfiguration]=await Promise.all([rpc('catalog'),startupJson('/content/manifest.json'),startupJson('city-names.json'),startupJson('/content/effects.json'),startupJson('conquest-pages.json'),startupJson('/content/unit-visuals.json'),startupJson('/content/presentation.json'),startupJson('/content/music.json')]);
+    music?.dispose();music=new Ew4Music.Player(musicConfiguration,()=>settings.music);music.setVisible(appVisible);
     Ew4Startup.pending('内置字库');
     const text=new Ew4OriginalUI.TextRenderer(m);await text.prepare();
     Ew4Startup.pending('菜单图像');
@@ -1138,9 +1148,10 @@ async function initializeClient(){
     fx.elements??=presentation.elements;fx.sounds=[...new Set([...fx.sounds,...presentation.sounds])];
     effects=new Ew4Effects.Effects({image,sprite,animation,libraries,get manifest(){return manifest;},volume:()=>settings.sound},fx,visuals);
     effects.preloadSounds(presentation.sounds);
-    originalTextRenderer=text;
     Ew4Startup.pending('战斗图像与界面');
-    await Promise.all([Ew4OriginalUI.prepareText('-0123456789'),loadImage('images/eff.png')]);
+    await Promise.all([Ew4OriginalUI.prepareText('-0123456789'),Ew4OriginalUI.prepareCombatText('-0123456789'),loadImage('images/eff.png')]);
+    // Publish only after awaits so the mutation painter cannot consume initial label text.
+    originalTextRenderer=text;
     damageNumbers=new Ew4Effects.DamageNumbers();originalLabels();showMain();
     startupReady=true;
     Ew4Startup.ready();
