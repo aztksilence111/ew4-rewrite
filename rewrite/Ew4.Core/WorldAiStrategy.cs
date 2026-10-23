@@ -56,7 +56,7 @@ public static partial class WorldAi
         foreach (bool purchase in transportAvailable ? new[] { false, true } : new[] { false })
         {
             var mover = purchase ? unit with { Transport = true } : unit;
-            var context = WorldActions.MovementContext(state, mover);
+            var context = WorldActions.MovementContext(state, mover, rules.Movement);
             int[]? components = null;
             var distanceFields = new Dictionary<string, IReadOnlyDictionary<int, long>>(StringComparer.Ordinal);
             var reachable = Movement.Reachable(map, context.Cells, unit.Cell, context.Actor, rules.Movement.Search);

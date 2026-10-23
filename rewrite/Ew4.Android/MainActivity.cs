@@ -53,6 +53,10 @@ public sealed class MainActivity : Activity
         web = new WebView(this);
         web.Settings.JavaScriptEnabled = true;
         web.Settings.DomStorageEnabled = true;
+        // The shared music player gates initial playback on interaction and pauses
+        // in the background. WebView's additional gesture gate loses asynchronous
+        // scene/resource transitions on some Android versions.
+        web.Settings.MediaPlaybackRequiresUserGesture = false;
         web.Settings.AllowFileAccess = false;
         web.Settings.AllowContentAccess = false;
         web.Settings.MixedContentMode = MixedContentHandling.NeverAllow;
@@ -266,7 +270,7 @@ public sealed class MainActivity : Activity
                 byte[] bytes = path.StartsWith("/content/", StringComparison.Ordinal) ? store.Value.ReadContent(path[9..])
                     : path is "/conquest-pages.json" or "/city-names.json" ? store.Value.Read("frontend" + path) : read("www/" + path.TrimStart('/'));
                 if (!path.StartsWith("/content/", StringComparison.Ordinal)) bytes = store.Value.Frontend(bytes, Path.GetExtension(path));
-                string mime = Path.GetExtension(path) switch { ".html" => "text/html", ".js" => "text/javascript", ".css" => "text/css", ".json" => "application/json", ".png" => "image/png", ".mp3" => "audio/mpeg", ".wav" => "audio/wav", ".woff2" => "font/woff2", ".ttf" => "font/ttf", ".otf" => "font/otf", _ => "application/octet-stream" };
+                string mime = Path.GetExtension(path) switch { ".html" => "text/html", ".js" => "text/javascript", ".css" => "text/css", ".json" => "application/json", ".png" => "image/png", ".mp3" => "audio/mpeg", ".wav" => "audio/wav", ".ogg" => "audio/ogg", ".woff2" => "font/woff2", ".ttf" => "font/ttf", ".otf" => "font/otf", _ => "application/octet-stream" };
                 return new WebResourceResponse(mime, "UTF-8", 200, "OK", new Dictionary<string, string> { ["Cache-Control"] = "no-store" }, new MemoryStream(bytes));
             }
             catch (Exception error)

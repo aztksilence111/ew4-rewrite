@@ -398,6 +398,9 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             factionColors.Add(creation.Faction, factionColors[template]);
         }
         var sites = battle.EffectiveSites.ToDictionary(s => (int)s.Cell);
+        var economicCommanders = world.Units.Where(u => u.CommanderId != null).GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => g.First());
+        var previousEconomics = cellDeltaFrom?.Units.Where(u => u.CommanderId != null).GroupBy(u => u.Cell)
+            .ToDictionary(g => g.Key, g => g.First().Support.IncomeMultiplier);
         var originalUnits = battle.Armies.Select((army, index) => (army, id: world.ScenarioId + ".unit." + index))
             .ToDictionary(p => p.id, p => p.army);
         string? CommanderDefinitionId(UnitState unit) => session.Account.Roster.FirstOrDefault(c => c.Id == unit.CommanderId)?.DefinitionId
@@ -426,10 +429,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         {
             var definition = content.Catalogs.Buildings.Definitions.Values.SingleOrDefault(d => d.Kind == cell.BuildingKind);
             var level = definition?.Levels.ElementAtOrDefault(Math.Max(0, cell.BuildingLevel - 1));
-            var income = cell.IncomeOverride ?? level?.Turn.Income ?? new Resources(0, 0, 0);
-            if (cell.IncomeOverride == null && current.Rules.Turns.SiteIncomeOverrides.TryGetValue(index, out var specific)
-                && specific.Kind == cell.BuildingKind)
-                income = new(specific.Money ?? income.Money, specific.Industry ?? income.Industry, specific.Food ?? income.Food);
+            var income = WorldTurns.SiteIncome(cell, index, current.Rules.Turns, economicCommanders.GetValueOrDefault(index));
             content.Catalogs.Combat.Context.TerrainDefense.TryGetValue(cell.DefenseTerrain, out var penalties);
             return new { income, defense = level?.DefensePercent ?? 0, penalties };
         }
@@ -500,7 +500,8 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             baseRevision = deltaBase == null ? (long?)null : deliveredRevision,
             cells = cellDeltaFrom == null ? world.Cells.Select(CellView).ToArray() : null,
             cellUpdates = cellDeltaFrom == null ? null : world.Cells.Select((c, i) => (c, i))
-                .Where(p => p.c != cellDeltaFrom.Cells[p.i] || world.Jurisdictions?.CellCenters[p.i] != cellDeltaFrom.Jurisdictions?.CellCenters[p.i])
+                .Where(p => p.c != cellDeltaFrom.Cells[p.i] || world.Jurisdictions?.CellCenters[p.i] != cellDeltaFrom.Jurisdictions?.CellCenters[p.i]
+                    || (economicCommanders.GetValueOrDefault(p.i)?.Support.IncomeMultiplier ?? 1f) != previousEconomics!.GetValueOrDefault(p.i, 1f))
                 .Select(p => new { cell = p.i, value = CellView(p.c, p.i) }).ToArray(),
             units = deltaBase == null ? unitViews : null,
             unitUpdates = deltaBase == null ? null : unitViews.Where(u => !deliveredUnits.TryGetValue(u.GetProperty("id").GetString()!, out var prior) || !JsonElement.DeepEquals(prior, u)).ToArray(),

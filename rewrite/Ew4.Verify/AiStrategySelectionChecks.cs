@@ -173,6 +173,14 @@ internal static class AiStrategySelectionChecks
         Check(sailor.Transport && sailor.Cell == 1 && sailor.Combatant.AtSea && crossed.Revision == seaWorld.Revision + 1, "transport purchase then embarkation is one atomic strategic command");
         Check(crossed.Factions.Single(f => f.Id == actorUnit.Owner).Resources == new Resources(75, 91, 100)
             && crossedChange.Notices.Any(n => n.Kind == "unit.transport_purchased"), "strategic transport pays actual world quote and emits notice");
+        var seaStart = crossed with { Width = 9, Height = 1,
+            Units = [sailor with { RemainingMovement = 6 }, enemyUnit with { Cell = 8 }],
+            Cells = Enumerable.Range(0, 9).Select(i => new CellState { Owner = i == 8 ? enemyUnit.Owner : actorUnit.Owner,
+                BuildingKind = i == 8 ? "0" : null, BuildingLevel = i == 8 ? 1 : 0, Terrain = new() { Sea = i < 6 } }).ToArray() };
+        var seaStartPlan = WorldAi.StrategicCandidates(seaStart, sailor.Id, seaRules);
+        Check(seaStartPlan.Candidates.Single().Action.Destination == 3, "sea transport advances two cells toward an inland strategic goal");
+        Check(WorldAi.ExecuteStrategic(seaStart, seaStartPlan, 0, seaRules).State.Units.Single(u => u.Id == sailor.Id).Cell == 3,
+            "AI commits the same two-cell limit as player movement");
         byte[] seaBefore = WorldSave.Encode(seaWorld);
         var expensiveRules = seaRules with { Strategy = seaRules.Strategy with { Transport = transport with { Purchase = new() { Cost = new(1000, 9, 0) } } } };
         Reject(() => WorldAi.ExecuteStrategic(seaWorld, seaPlan, 0, expensiveRules), "purchase.resources");
@@ -196,11 +204,15 @@ internal static class AiStrategySelectionChecks
             foreach (int target in forward.Keys)
             {
                 var distances = Movement.DistancesTo(map, cells, [target], mover, moveRules);
+                var transportActor = Movement.AtOrigin(mover, new() { Sea = true });
+                var transportDistances = Movement.DistancesTo(map, cells, [target], transportActor, moveRules);
                 foreach (int source in forward.Keys)
                 {
+                    var sourceActor = Movement.AtOrigin(mover, cells[source]);
+                    var sourceDistances = cells[source].Sea ? transportDistances : distances;
                     bool found = forward[source].TryGetValue(target, out var reached);
-                    bool affordable = distances.TryGetValue(source, out long cost) && cost <= mover.FullBudget;
-                    Check(found == affordable && (!found || cost == mover.FullBudget - reached!.Remaining), "reverse directed-edge routing agrees with forward movement costs and turn budget");
+                    bool affordable = sourceDistances.TryGetValue(source, out long cost) && cost <= sourceActor.FullBudget;
+                    Check(found == affordable && (!found || cost == sourceActor.FullBudget - reached!.Remaining), "reverse directed-edge routing agrees with origin-specific movement costs and turn budget");
                 }
             }
         }

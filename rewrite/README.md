@@ -1,10 +1,14 @@
 # 现代核心重构
 
+2026-10-24：0.2.18 双端发行验证中，Windows x64 Web 与 Android ARM64 APK code21 包含运输、经济面板、Android 音乐及网格层级修复，继承 0.2.17 更新；见[发行说明](RELEASE_0.2.18_20261024.md)与[发布进度](RELEASE_PROGRESS_0.2.18_20261024.md)。
+
+2026-10-23：[运输、经济面板与Android音乐反馈修复](../reverse/R_FEEDBACK_TRANSPORT_ECONOMY_MUSIC_20261023.md)已完成开发验证，并生成本地0.2.17同签名测试APK。海上运输最多两格，经济技能加成进入城市面板，触摸音乐解锁及WebView播放设置修正；核心311034/客户端2693/Mod106和音乐浏览器69项通过。音乐实际出声待真机复测，未发布或更新玩家5191。
+
 2026-10-23：[0.2.16双端正式下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.16-20261023)，包含[战役同盟胜负、占领及失败显示修复](../reverse/CAMPAIGN_ALLIANCE_CAPTURE_20261023.md)；远端四附件核验完成，[发行记录](RELEASE_PROGRESS_0.2.16_20261023.md)。
 
 名称约定：**r版**就是 **rewrite版**的简称；后续使用“r版”时不再另行注明。
 
-最新发行：[0.2.16说明](RELEASE_0.2.16_20261023.md)、[逐阶段进度](RELEASE_PROGRESS_0.2.16_20261023.md)，APK code19。战役同盟胜负、占领归属及失败显示修复纳入，远端四附件审计errors=0；继承此前字体、隐藏战役和背景音乐。下方未打包记录描述历史阶段，原时钟/同局外观及设备验收仍待。
+上一正式发行：[0.2.17下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.17-20261023)、[逐阶段进度](RELEASE_PROGRESS_0.2.17_20261023.md)，APK code20。下方未打包记录描述历史阶段，当前发行以顶部进度为准，原时钟/同局外观及设备验收仍待。
 
 新会话续接：[手感与原版表现断点](HANDOFF_FEEL_RESTORATION.md)。已保存士气动画、随机勋章、动画时序/附属效果、性能及地图对照的范围、入口、验证和续接提示词，从第一个未完成阶段继续。
 

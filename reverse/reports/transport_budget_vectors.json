@@ -1,0 +1,226 @@
+[
+  {
+    "sea": false,
+    "transport": false,
+    "budget": 2,
+    "override": 0,
+    "expected": 2
+  },
+  {
+    "sea": false,
+    "transport": false,
+    "budget": 2,
+    "override": 30,
+    "expected": 30
+  },
+  {
+    "sea": false,
+    "transport": false,
+    "budget": 6,
+    "override": 0,
+    "expected": 6
+  },
+  {
+    "sea": false,
+    "transport": false,
+    "budget": 6,
+    "override": 30,
+    "expected": 30
+  },
+  {
+    "sea": false,
+    "transport": false,
+    "budget": 12,
+    "override": 0,
+    "expected": 12
+  },
+  {
+    "sea": false,
+    "transport": false,
+    "budget": 12,
+    "override": 30,
+    "expected": 30
+  },
+  {
+    "sea": false,
+    "transport": false,
+    "budget": 25,
+    "override": 0,
+    "expected": 25
+  },
+  {
+    "sea": false,
+    "transport": false,
+    "budget": 25,
+    "override": 30,
+    "expected": 30
+  },
+  {
+    "sea": false,
+    "transport": true,
+    "budget": 2,
+    "override": 0,
+    "expected": 2
+  },
+  {
+    "sea": false,
+    "transport": true,
+    "budget": 2,
+    "override": 30,
+    "expected": 30
+  },
+  {
+    "sea": false,
+    "transport": true,
+    "budget": 6,
+    "override": 0,
+    "expected": 6
+  },
+  {
+    "sea": false,
+    "transport": true,
+    "budget": 6,
+    "override": 30,
+    "expected": 30
+  },
+  {
+    "sea": false,
+    "transport": true,
+    "budget": 12,
+    "override": 0,
+    "expected": 12
+  },
+  {
+    "sea": false,
+    "transport": true,
+    "budget": 12,
+    "override": 30,
+    "expected": 30
+  },
+  {
+    "sea": false,
+    "transport": true,
+    "budget": 25,
+    "override": 0,
+    "expected": 25
+  },
+  {
+    "sea": false,
+    "transport": true,
+    "budget": 25,
+    "override": 30,
+    "expected": 30
+  },
+  {
+    "sea": true,
+    "transport": false,
+    "budget": 2,
+    "override": 0,
+    "expected": 2
+  },
+  {
+    "sea": true,
+    "transport": false,
+    "budget": 2,
+    "override": 30,
+    "expected": 30
+  },
+  {
+    "sea": true,
+    "transport": false,
+    "budget": 6,
+    "override": 0,
+    "expected": 6
+  },
+  {
+    "sea": true,
+    "transport": false,
+    "budget": 6,
+    "override": 30,
+    "expected": 30
+  },
+  {
+    "sea": true,
+    "transport": false,
+    "budget": 12,
+    "override": 0,
+    "expected": 12
+  },
+  {
+    "sea": true,
+    "transport": false,
+    "budget": 12,
+    "override": 30,
+    "expected": 30
+  },
+  {
+    "sea": true,
+    "transport": false,
+    "budget": 25,
+    "override": 0,
+    "expected": 25
+  },
+  {
+    "sea": true,
+    "transport": false,
+    "budget": 25,
+    "override": 30,
+    "expected": 30
+  },
+  {
+    "sea": true,
+    "transport": true,
+    "budget": 2,
+    "override": 0,
+    "expected": 2
+  },
+  {
+    "sea": true,
+    "transport": true,
+    "budget": 2,
+    "override": 30,
+    "expected": 2
+  },
+  {
+    "sea": true,
+    "transport": true,
+    "budget": 6,
+    "override": 0,
+    "expected": 2
+  },
+  {
+    "sea": true,
+    "transport": true,
+    "budget": 6,
+    "override": 30,
+    "expected": 2
+  },
+  {
+    "sea": true,
+    "transport": true,
+    "budget": 12,
+    "override": 0,
+    "expected": 2
+  },
+  {
+    "sea": true,
+    "transport": true,
+    "budget": 12,
+    "override": 30,
+    "expected": 2
+  },
+  {
+    "sea": true,
+    "transport": true,
+    "budget": 25,
+    "override": 0,
+    "expected": 2
+  },
+  {
+    "sea": true,
+    "transport": true,
+    "budget": 25,
+    "override": 30,
+    "expected": 2
+  }
+]

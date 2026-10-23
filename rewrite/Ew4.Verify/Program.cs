@@ -1,6 +1,11 @@
 using System.Text.Json;
 using Ew4.Core;
 
+if (args.ElementAtOrDefault(1) == "--r-feedback-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { rFeedbackChecks = RFeedbackChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
 if (args.ElementAtOrDefault(1) == "--performance-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { performanceContracts = PerformanceContractChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
@@ -177,6 +182,7 @@ int aiChecks = AiChecks.Run(root);
 int lifecycleChecks = LifecycleChecks.Run(root);
 int actionChecks = ActionChecks.Run(root);
 int movementCommitChecks = MovementCommitChecks.Run(root);
+movementCommitChecks += RFeedbackChecks.Run(root);
 int turnSettlementChecks = TurnSettlementChecks.Run(root);
 int worldTurnChecks = WorldTurnChecks.Run(root);
 int battleCommitChecks = BattleCommitChecks.Run(root);

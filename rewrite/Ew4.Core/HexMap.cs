@@ -89,6 +89,13 @@ public sealed record ReachableCell(int Cell, int Remaining, IReadOnlyList<int> P
 
 public static class Movement
 {
+    // Native 0x8dd7c caps searches starting at sea in a transport to two points.
+    // Keep an exhausted or partially spent budget exhausted/partial for custom move rules.
+    public static MovementActor AtOrigin(MovementActor actor, MovementCell origin) =>
+        actor.Transport && actor.Category != "naval" && origin.Sea
+            ? actor with { FullBudget = Math.Min(actor.FullBudget, 2), Remaining = Math.Min(actor.Remaining, 2) }
+            : actor;
+
     // A necessary (not sufficient) reachability filter. Union either legal edge
     // direction so one-way coasts can never cause a reachable target to be rejected.
     internal static int[] Components(HexMap map, IReadOnlyList<MovementCell> cells, MovementActor actor, MovementRules rules)
@@ -183,6 +190,7 @@ public static class Movement
         if (cells.Count != map.Count || actor.FullBudget < 0 || actor.Remaining < 0 || actor.Remaining > actor.FullBudget)
             throw new RuleViolation("movement.state", "Map/actor movement state is inconsistent");
         var rules = configuration ?? new MovementRules();
+        actor = AtOrigin(actor, cells[origin]);
         var remaining = new Dictionary<int, int> { [origin] = actor.Remaining };
         var parents = new Dictionary<int, int>();
         var queue = new SortedSet<(int NegativeRemaining, int Cell)> { (-actor.Remaining, origin) };

@@ -239,12 +239,7 @@ public static class WorldActions
 
     internal static IReadOnlyDictionary<int, ReachableCell> MovementRange(WorldState state, UnitState unit, WorldMoveRules rules)
     {
-        var context = MovementContext(state, unit);
-        if (rules.Extensions != null)
-        {
-            int budget = rules.Extensions.MovementBudget(unit.Combatant);
-            context = (context.Cells, context.Actor with { FullBudget = budget, Remaining = Math.Min(unit.RemainingMovement, budget) });
-        }
+        var context = MovementContext(state, unit, rules);
         return Movement.Reachable(new(state.Width, state.Height), context.Cells, unit.Cell, context.Actor, rules.Search);
     }
 
@@ -266,6 +261,7 @@ public static class WorldActions
                 int budget = configuration.Extensions.MovementBudget(unit.Combatant);
                 actor = actor with { FullBudget = budget, Remaining = Math.Min(unit.RemainingMovement, budget) };
             }
+            actor = Movement.AtOrigin(actor, context.Cells[unit.Cell]);
             bool open = false, throughOccupied = false;
             if (actor.Remaining <= 0) continue;
             for (int direction = 0; direction < 6; direction++)
@@ -291,7 +287,7 @@ public static class WorldActions
         FullBudget = Math.Max(unit.ExtensionMovementLimit ?? unit.Combatant.Profile.Movement, unit.RemainingMovement), Remaining = unit.RemainingMovement
     };
 
-    internal static (MovementCell[] Cells, MovementActor Actor) MovementContext(WorldState state, UnitState unit)
+    internal static (MovementCell[] Cells, MovementActor Actor) MovementContext(WorldState state, UnitState unit, WorldMoveRules? rules = null)
     {
         var campIndex = state.Factions.ToDictionary(f => f.Id, f => f.Camp, StringComparer.Ordinal);
         if (state.DiplomaticRelations.Count > 0)
@@ -299,6 +295,13 @@ public static class WorldActions
         var occupied = state.Units.GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => campIndex[g.First().Owner]);
         var cells = state.Cells.Select((c, i) => c.Terrain with { OccupantCamp = occupied.TryGetValue(i, out string camp) ? camp : null }).ToArray();
         var actor = MovementActorFor(unit, campIndex[unit.Owner]);
+        if (rules?.Extensions != null)
+        {
+            int budget = rules.Extensions.MovementBudget(unit.Combatant);
+            actor = actor with { FullBudget = budget, Remaining = Math.Min(unit.RemainingMovement, budget) };
+        }
+        // Reachable applies the sea-origin cap for this turn. Keep the land budget
+        // here so strategic routes can still include inland steps after landing.
         return (cells, actor);
     }
 }

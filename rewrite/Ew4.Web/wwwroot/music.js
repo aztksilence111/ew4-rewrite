@@ -6,7 +6,10 @@
       this.key=null;this.file=null;this.visible=true;this.unlocked=false;this.pending=null;this.failed=false;
       this.audio.addEventListener('error',()=>{this.failed=true;});
       this.gesture=()=>{this.unlocked=true;this.resume();};
-      document.addEventListener('pointerdown',this.gesture,{passive:true});document.addEventListener('keydown',this.gesture);
+      // Touch activation is granted at pointerup/click, not pointerdown. Capture also
+      // reaches controls that stop propagation; retry after a rejected early play.
+      this.gestures=['pointerdown','pointerup','click','keydown'];
+      for(const event of this.gestures)document.addEventListener(event,this.gesture,{passive:true,capture:true});
       this.visibility=()=>this.resume();document.addEventListener('visibilitychange',this.visibility);
     }
     menu(){this.select('menu',this.configuration.menu);}
@@ -38,7 +41,7 @@
     }
     dispose(){
       this.audio.pause();this.audio.removeAttribute('src');this.audio.load();
-      document.removeEventListener('pointerdown',this.gesture);document.removeEventListener('keydown',this.gesture);
+      for(const event of this.gestures)document.removeEventListener(event,this.gesture,true);
       document.removeEventListener('visibilitychange',this.visibility);
     }
   }

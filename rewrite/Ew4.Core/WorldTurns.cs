@@ -272,12 +272,17 @@ public static class WorldTurns
         return checked((int)healing);
     }
 
+    public static Resources SiteIncome(CellState cell, int cellId, WorldTurnRules rules, UnitState? commander)
+    {
+        var income = rules.Income(cell, cellId);
+        return commander?.CommanderId != null ? EconomyProduction.Scale(income, commander.Support.IncomeMultiplier) : income;
+    }
+
     internal static Resources FactionIncome(WorldState state, FactionState faction, WorldTurnRules rules)
     {
         var siteUnits = state.Units.Where(u => u.CommanderId != null).GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => g.First());
         var production = state.Cells.Select((c, i) => (c, i)).Where(p => p.c.Owner == faction.Id).Select(p =>
-            new ProductionSite(rules.Income(p.c, p.i),
-                siteUnits.TryGetValue(p.i, out var commander) ? commander.Support.IncomeMultiplier : (float?)null)).ToArray();
+            new ProductionSite(SiteIncome(p.c, p.i, rules, siteUnits.GetValueOrDefault(p.i)))).ToArray();
         return EconomyProduction.Calculate(production, faction.IncomeMultiplier, faction.IncomeBonus);
     }
 

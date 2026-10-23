@@ -150,8 +150,8 @@
       }
       this.animated=!!this.selection||this.visibleUnits.some(u=>badgeAlpha(u,this.state,300)!==1||!this.badgeOnly&&(this.unitMotions.get(u.id)?.playing||u.burning>0||u.category==='fort'&&u.health>0&&u.maxHealth-u.health>=80||flagAnimated(u,this.state)&&this.factions.get(u.owner)?.flag&&!this.factions.get(u.owner)?.flagImage))||
         this.visibleCells.some(({site,cell})=>site.active&&(objectiveMarker(site,this.stationed.get(cell))||!this.badgeOnly&&site.buildingKind==='port'&&site.owner&&!this.stationed.has(cell)));
-      // Keep flags above all unit bodies, including ships on adjacent cells.
-      this.staticGround();this.objectives();this.units();this.flags();this.unitMarkers();this.labels();this.highlights();
+      // Grid covers the ground/buildings, while units, flags and portraits stay above it.
+      this.staticGround();this.grid();this.objectives();this.units();this.flags();this.unitMarkers();this.labels();this.highlights();
     }
     async prewarm(state,map,rect){
       const surface=new Ew4MapSurface.Surface(),factions=new Map(state.factions.map(f=>[f.id,f]));
@@ -525,10 +525,16 @@
         const label=this.cityLabels.get(key),width=label.width/density/2*scale,height=label.height/density/2*scale;
         draw.drawImage(label,p.x-width/2,p.y+29*scale,width,height);}
     }
+    grid() {
+      if(!this.showGrid)return;
+      this.draw.strokeStyle='#33333360';this.draw.lineWidth=.7/this.zoom;
+      for(const {site,p} of this.visibleCells){if(!site.active)continue;
+        hex(this.draw,p.x,p.y);this.draw.stroke();
+      }
+    }
     highlights() {
       const range=new Set(this.selection?.range),targets=new Set(this.selection?.targets);
       for(const {site:c,cell:i,p} of this.visibleCells){if(!c.active)continue;
-        if(this.showGrid){hex(this.draw,p.x,p.y);this.draw.strokeStyle='#33333360';this.draw.lineWidth=.7/this.zoom;this.draw.stroke();}
         if(range.has(i)&&i!==this.selection.cell&&!this.stationed.has(i))this.api.sprite('buildings','move.png',p.x,p.y);
         if(targets.has(i))this.api.sprite('buildings','attack.png',p.x,p.y);
       }
