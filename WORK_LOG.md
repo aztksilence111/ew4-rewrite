@@ -660,3 +660,5 @@ EastAsiaMapVerify改用rewrite/local/eastasia-validation隔离档案，--builtin
 2026-10-23 PixiJS外部建议评估：结合既有测量及当前绘制代码，仅新增reverse/PIXI_RENDERER_ASSESSMENT_20261023.md并链接审计报告，再更新STATUS和本日志。认可图集/GPU批绘方向，明确Canvas可硬件加速、换Pixi不消除JS逐像素生成或C#热点；记录迁移适配/对照验收及离线Android约束。全部既定优化仍必做，库选型另按实测决定；实施暂停，本次无游戏修改、依赖接入、新实验或构建发布。
 
 2026-10-23 Pixi纸面评估边界纠正：用户拒绝两套优化渲染器并行实现/实机比较，要求只纸面评估并询问代差。仅修改Pixi报告，区分canvas元素/Canvas2D接口/GPU接口/Pixi库，记录游戏工作负载架构优势及单路线选型；撤销双路线对照前提及长期双后端维护暗示，再更新STATUS和本日志。若重构纸面倾向Pixi/WebGL，非最终迁移授权；全部既定优化范围不变，无代码/实验/构建操作。
+
+2026-10-23 战役/选国/音乐恢复：按用户后续授权，内置11个原隐藏关初始显示，API2 campaignVisibility可恢复原隐藏，导入Mod默认遵守XML；两处分支使用原form_selcountry布局，5份原MP3及菜单/随机战斗/失败循环、独立音量和后台暂停接入，支持音乐JSON及旧APK BGMusic导入。95份BTL哈希一致，84主入口及两个国家分支可达，原未引用campaign1_02b不计菜单入口。专项20/客户端2490/Mod17/浏览器59项6图通过，5首音轨均实际解码播放，资源闭包0错误；Web、Verify、ModChecks及本地Android ARM64 Compile零警告错误，语法及限定diff检查通过。先落reverse/CAMPAIGN_MUSIC_RESTORATION_20261023.md，再更新两级STATUS，最后本日志；5431改用独立干净档案。源码已由并行0.2.15发行任务纳入，本阶段不自行操作发行、玩家档案或真机。
