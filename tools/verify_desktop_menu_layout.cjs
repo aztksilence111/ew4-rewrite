@@ -9,7 +9,8 @@ const base=process.argv[2]||'http://127.0.0.1:5493',folder=path.resolve(process.
   const check=(pass,label)=>{assert.ok(pass,label);report.checks++;};
   const current={},baseline={};
   vm.runInNewContext(await fs.readFile('rewrite/Ew4.Web/wwwroot/screen-layout.js','utf8'),current);
-  vm.runInNewContext(execFileSync('git',['show','HEAD:rewrite/Ew4.Web/wwwroot/screen-layout.js'],{encoding:'utf8'}),baseline);
+  const baselineRef=process.env.EW4_LAYOUT_BASELINE||'HEAD';report.baseline=baselineRef;
+  vm.runInNewContext(execFileSync('git',['show',baselineRef+':rewrite/Ew4.Web/wwwroot/screen-layout.js'],{encoding:'utf8'}),baseline);
   for(const [width,height] of [[390,844],[844,390],[768,1024],[1280,800],[2550,1275]])for(const screen of [80,100,150]){
     for(const touch of [false,true])for(const insets of [{},{left:32,right:24,top:12,bottom:24}]){
       const input={width,height,screen,touch,insets,reserve:28},before=baseline.Ew4ScreenLayout.measure(input);
