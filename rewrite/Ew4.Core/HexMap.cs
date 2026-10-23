@@ -89,6 +89,35 @@ public sealed record ReachableCell(int Cell, int Remaining, IReadOnlyList<int> P
 
 public static class Movement
 {
+    // A necessary (not sufficient) reachability filter. Union either legal edge
+    // direction so one-way coasts can never cause a reachable target to be rejected.
+    internal static int[] Components(HexMap map, IReadOnlyList<MovementCell> cells, MovementActor actor, MovementRules rules)
+    {
+        var labels = Enumerable.Repeat(-1, map.Count).ToArray();
+        var queue = new Queue<int>();
+        int component = 0;
+        for (int start = 0; start < map.Count; start++)
+        {
+            if (labels[start] >= 0 || !cells[start].Active) continue;
+            labels[start] = component; queue.Enqueue(start);
+            while (queue.Count > 0)
+            {
+                int from = queue.Dequeue();
+                for (int direction = 0; direction < 6; direction++)
+                {
+                    int to = map.Neighbor(from, direction);
+                    if (to < 0 || !cells[to].Active || labels[to] >= 0) continue;
+                    int? forward = EntryCost(cells[from], cells[to], (direction + 3) % 6, actor, rules);
+                    int? reverse = EntryCost(cells[to], cells[from], direction, actor, rules);
+                    bool Legal(int? cost) => cost.HasValue && (cost.Value <= actor.FullBudget || rules.AllowOverdrawnEntry);
+                    if (!Legal(forward) && !Legal(reverse)) continue;
+                    labels[to] = component; queue.Enqueue(to);
+                }
+            }
+            component++;
+        }
+        return labels;
+    }
     // Reverse Dijkstra measures long routes without replacing the actor's per-turn budget.
     public static IReadOnlyDictionary<int, long> DistancesTo(HexMap map, IReadOnlyList<MovementCell> cells,
         IReadOnlyCollection<int> destinations, MovementActor actor, MovementRules? configuration = null)

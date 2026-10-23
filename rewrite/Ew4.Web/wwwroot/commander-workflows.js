@@ -57,7 +57,7 @@
     tags.id='hq-tags';tags.className='native-command'+(this.tagDraft?' orange':' blue');tags.setAttribute('aria-label',this.tagDraft?'确认标签':'标签');tags.title=this.tagDraft?'确认标签':'赋予标签';tags.setAttribute('aria-pressed',String(!!this.tagDraft));tags.disabled=this.tagSaving;
     tags.append(this.lettering(title,'font_text_3_cn_hd','#ebe6e1'));
   };
-  proto.dismissSkillTip=function(){this.skillPopup?.remove();this.skillEvents?.abort();this.skillPopup=null;this.skillAnchor=null;this.skillPinned=false;};
+  proto.dismissSkillTip=function(){this.skillPopup?.remove();this.skillEvents?.();this.skillEvents=null;this.skillPopup=null;this.skillAnchor=null;this.skillPinned=false;};
   proto.skillTip=function(anchor,skill,pin=false){
     if(this.skillAnchor===anchor&&this.skillPopup){if(pin){if(this.skillPinned)this.dismissSkillTip();else this.skillPinned=true;}return;}
     this.dismissSkillTip();this.skillAnchor=anchor;this.skillPinned=pin;
@@ -68,9 +68,12 @@
     tip.classList.toggle('tip-right',!left);tip.style.left=((left?a.left-d.left-165*scale:a.right-d.left+8*scale)/scale)+'px';
     tip.style.top=Math.max(27,Math.min(dialog.offsetHeight-tip.offsetHeight-4,(a.top-d.top)/scale+(anchor.offsetHeight-tip.offsetHeight)/2))+'px';
     tip.style.setProperty('--tip-arrow-top',Math.max(0,Math.min(tip.offsetHeight-19,(a.top+a.bottom-2*d.top)/2/scale-parseFloat(tip.style.top)-9.5))+'px');
-    tip.onclick=()=>this.dismissSkillTip();this.skillEvents=new AbortController();const signal=this.skillEvents.signal;
-    document.addEventListener('pointerdown',e=>{if(!anchor.contains(e.target)&&!tip.contains(e.target))this.dismissSkillTip();},{signal});
-    document.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();this.dismissSkillTip();}},{signal,capture:true});
+    tip.onclick=()=>this.dismissSkillTip();
+    const outside=e=>{if(!anchor.contains(e.target)&&!tip.contains(e.target))this.dismissSkillTip();};
+    const escape=e=>{if(e.key==='Escape'){e.stopPropagation();this.dismissSkillTip();}};
+    document.addEventListener('pointerdown',outside);
+    document.addEventListener('keydown',escape,true);
+    this.skillEvents=()=>{document.removeEventListener('pointerdown',outside);document.removeEventListener('keydown',escape,true);};
   };
   proto.promotionShortcut=function(card,held,onClose){
     if(!held||held.locked||held.learning.rank.level>=Math.max(...Object.keys(this.data.rankHealth).map(Number))&&held.learning.title.level>=Math.max(...Object.keys(this.data.titleHealing).map(Number)))return;

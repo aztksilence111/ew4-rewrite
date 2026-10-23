@@ -91,7 +91,7 @@ const base=process.argv[2]||'http://127.0.0.1:5420',folder=process.argv[3]||'bui
     });
     check(report.promotion.length===7&&report.promotion.every(n=>n.size>=12&&n.height===20),'all promotion values and prices enlarged');await shot('promotion');
     report.damage=await page.evaluate(()=>{damageNumbers.add(123,true,view.x,view.y);const c=damageNumbers.instances.at(-1).canvas;const pixels=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let red=0;for(let i=0;i<pixels.length;i+=4)if(pixels[i]>180&&pixels[i+1]<90&&pixels[i+3]>128)red++;return {red,width:c.width,height:c.height};});
-    check(report.damage.red>100&&report.damage.height===96,'damage digits render with bundled font and critical red');
+    check(report.damage.red>100&&report.damage.height===48,'damage digits render with original bitmap and critical red');
     check(report.errors.length===0&&report.missing.length===0,'no browser or resource failures');
   }catch(e){report.failure=e.message;throw e;}
   finally{await fs.writeFile(folder+'/verification.json',JSON.stringify(report,null,2));await browser.close();}

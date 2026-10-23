@@ -10,7 +10,8 @@ internal static class HeadquartersChecks
         int checks = 0;
         void Check(bool value, string label) { checks++; if (!value) throw new InvalidOperationException("Headquarters: " + label); }
         string assets = Path.Combine(root, "rewrite/data/original");
-        byte[] Read(string path) => File.ReadAllBytes(path.StartsWith("original/", StringComparison.Ordinal)
+        var overrides = new Dictionary<string, byte[]>();
+        byte[] Read(string path) => overrides.TryGetValue(path, out var bytes) ? bytes : File.ReadAllBytes(path.StartsWith("original/", StringComparison.Ordinal)
             ? Path.Combine(assets, path[9..]) : Path.Combine(root, "rewrite/data/legacy", path[5..]));
         var content = new ClientContent(Read, Directory.EnumerateFiles(assets, "*.btl"));
         string folder = Path.Combine(root, "rewrite/reports/headquarters-20261021", "run-" + Guid.NewGuid().ToString("N"));
@@ -21,10 +22,12 @@ internal static class HeadquartersChecks
             var response = result.RootElement;
             Check(response.GetProperty("ok").GetBoolean() == (error == null), route + ": " + response.GetRawText()[..Math.Min(150, response.GetRawText().Length)]);
             if (error != null) Check(response.GetProperty("code").GetString() == error, error);
+            if (error == "account.capacity") Check(response.GetProperty("message").GetString() == "该星级区将领已达上限，无法购买", "localized capacity message");
             return response.GetProperty(error == null ? "data" : "code").Clone();
         }
         var hq = Call("headquarters");
         Check(hq.GetProperty("sectionCapacity").GetInt32() == 20, "20 slots per section");
+        Check(hq.GetProperty("sectionCapacities").EnumerateArray().All(c => c.GetInt32() == 20), "default limits exposed for all sections");
         var offer = hq.GetProperty("offers").GetProperty("0")[0].GetString();
         hq = Call("commander", new { op = "recruit", revision = 0, commander = offer });
         string id = hq.GetProperty("roster")[0].GetProperty("id").GetString()!;
@@ -128,6 +131,46 @@ internal static class HeadquartersChecks
             hq = Call("commander", new { op = other.GetProperty("price").GetInt64() > 0 ? "recruit" : "recruit_badge", revision = 1, commander = otherId, group = otherGroup });
             Check(hq.GetProperty("roster").GetArrayLength() == 21, "full section does not block another section " + group);
         }
+        overrides["rewrite/extension.json"] = System.Text.Encoding.UTF8.GetBytes(
+            "{\"schema\":1,\"apiVersion\":2,\"metagame\":\"rewrite/metagame.json\"}");
+        overrides["rewrite/metagame.json"] = System.Text.Encoding.UTF8.GetBytes(
+            "{\"commanderSectionCapacities\":{\"0\":0,\"1\":1,\"2\":25}}");
+        var configured = new ClientContent(Read, Directory.EnumerateFiles(assets, "*.btl"));
+        Check(configured.Extensions.Revision != content.Extensions.Revision, "limits participate in extension fingerprint");
+        int[] limits = [0, 1, 25];
+        for (int group = 0; group < 3; group++)
+        {
+            var candidates = definitions.Where(d => d.GetProperty("recruitable").GetBoolean()
+                && Math.Clamp((d.GetProperty("rating").GetInt32() - 1) / 3, 0, 2) == group).Take(3).ToArray();
+            var template = configured.Catalogs.Accounts.FromDefinition(candidates[0].GetProperty("legacyId").GetInt32(), "template");
+            var roster = Enumerable.Range(0, Math.Max(0, limits[group] - 1)).Select(i => template.Copy() with { Id = "mod.capacity." + i }).ToArray();
+            var baseline = JsonSerializer.Deserialize<PlayerAccount>(File.ReadAllText(profile), ClientGame.Json)!;
+            string offerId = candidates[1].GetProperty("id").GetString()!;
+            var seeded = baseline with { ContentRevision = configured.Catalogs.Accounts.SourceRevision, Revision = 0, Roster = roster,
+                Inventory = roster.SelectMany(c => c.Items).GroupBy(x => x).ToDictionary(g => g.Key, g => g.LongCount()),
+                CommanderOffers = new Dictionary<int, IReadOnlyList<string>> { [group] = new[] { offerId, candidates[2].GetProperty("id").GetString()! } } };
+            File.WriteAllText(profile, JsonSerializer.Serialize(seeded, ClientGame.Json));
+            host = new ClientGame(configured, folder);
+            hq = Call("headquarters");
+            Check(hq.GetProperty("sectionCapacities").EnumerateArray().Select(c => c.GetInt32()).SequenceEqual(limits), "configured limits reach client");
+            if (limits[group] > 0)
+            {
+                hq = Call("commander", new { op = "recruit_badge", revision = 0, commander = offerId, group });
+                Check(hq.GetProperty("roster").GetArrayLength() == limits[group], "last configured slot accepted in section " + group);
+                offerId = candidates[2].GetProperty("id").GetString()!;
+            }
+            byte[] before = File.ReadAllBytes(profile);
+            foreach (string op in new[] { "recruit", "recruit_badge" }.Where(op => candidates[2].GetProperty(op == "recruit" ? "price" : "badgePrice").GetInt64() > 0))
+                Call("commander", new { op, revision = hq.GetProperty("revision").GetInt64(), commander = offerId, group }, "account.capacity");
+            Check(before.SequenceEqual(File.ReadAllBytes(profile)), "configured capacity failure preserves account bytes in section " + group);
+            host = new ClientGame(configured, folder);
+            Check(Call("headquarters").GetProperty("roster").GetArrayLength() == limits[group], "configured roster survives restart");
+        }
+        overrides["rewrite/metagame.json"] = System.Text.Encoding.UTF8.GetBytes("{\"commanderSectionCapacities\":{\"1\":7}}");
+        var sparse = new ClientContent(Read, Directory.EnumerateFiles(assets, "*.btl"));
+        Check(sparse.Extensions.Metagame.CommanderSectionCapacity(0) == 20 && sparse.Extensions.Metagame.CommanderSectionCapacity(1) == 7
+            && sparse.Extensions.Metagame.CommanderSectionCapacity(2) == 20, "omitted sections retain defaults");
+        Check(sparse.Extensions.Revision != configured.Extensions.Revision, "changed limits change logical fingerprint");
         return checks;
     }
 }

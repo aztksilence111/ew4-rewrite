@@ -19,14 +19,19 @@ public sealed record RefreshBalance(int Remaining, DateTimeOffset UpdatedAt, int
 public sealed record MarketSlot(int Slot, string Pool = "consumable", string[]? Items = null, bool Refresh = true, long? Quantity = 1);
 public sealed record MetagameRules
 {
+    public const int DefaultCommanderSectionCapacity = 20;
     public int Schema { get; init; } = 1;
     public long InitialMedals { get; init; } = 20_000_000;
     public long InitialBadges { get; init; } = 20_000_000;
     public IReadOnlyList<MarketSlot>? ShopSlots { get; init; }
+    public IReadOnlyDictionary<string, int> CommanderSectionCapacities { get; init; } = new Dictionary<string, int>();
     public IReadOnlyDictionary<string, RefreshPolicy> Refresh { get; init; } = new Dictionary<string, RefreshPolicy>();
+    public int CommanderSectionCapacity(int section) => CommanderSectionCapacities.GetValueOrDefault(
+        section.ToString(System.Globalization.CultureInfo.InvariantCulture), DefaultCommanderSectionCapacity);
     public void Validate()
     {
         if (Schema != 1 || InitialMedals < 0 || InitialBadges < 0 || Refresh == null
+            || CommanderSectionCapacities == null || CommanderSectionCapacities.Any(p => p.Key is not ("0" or "1" or "2") || p.Value < 0)
             || Refresh.Any(p => p.Key is not ("shop" or "academy.0" or "academy.1" or "academy.2") || p.Value == null)
             || ShopSlots != null && (ShopSlots.Any(s => s == null || s.Slot is < 0 or > 13
                 || s.Pool is not ("consumable" or "equipment" or "any") || s.Quantity < 0

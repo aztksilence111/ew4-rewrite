@@ -49,7 +49,8 @@ internal static class SingleActionChecks
         JsonElement Call(ClientGame host, string route, object args, bool success = true)
         {
             using var parsed = JsonDocument.Parse(host.Dispatch("/api/" + route, JsonSerializer.Serialize(args, ClientGame.Json)));
-            Check(parsed.RootElement.GetProperty("ok").GetBoolean() == success, route + " returns expected status");
+            Check(parsed.RootElement.GetProperty("ok").GetBoolean() == success, route + " returns expected status: " +
+                (parsed.RootElement.GetProperty("ok").GetBoolean() ? "ok" : parsed.RootElement.GetProperty("message").GetString()));
             return parsed.RootElement.GetProperty(success ? "data" : "code").Clone();
         }
         Resources Funds(WorldState state) => state.Factions.Single(f => f.Id == player).Resources;
@@ -155,6 +156,70 @@ internal static class SingleActionChecks
         var oldFortHost = Host("fort-unused", oldFort);
         Check(Call(oldFortHost, "action", new { op = "select", cell = fortCell, revision = oldFort.Revision })
             .GetProperty("disbandWarning").ValueKind == JsonValueKind.Null, "unused fort allowance does not produce misleading warning");
+        var builder = world.Units.First(u => u.Owner == player && u.Combatant.Profile.Category == "infantry");
+        builder = builder with { CommanderId = target.CommanderId, RemainingMovement = 1, Acted = false,
+            Combatant = builder.Combatant with { ConstructionTurns = 0, Skills = [] } };
+        var defenseWorld = world with {
+            Units = world.Units.Where(u => u.Id != builder.Id && u.Id != target.Id).Append(builder).ToArray(),
+            Cells = world.Cells.Select((c, i) => i == builder.Cell ? c with { Owner = player, BuildingKind = null,
+                BuildingLevel = 0, InstallationKind = null } : c).ToArray() };
+        string defenseFolder = Path.Combine(root, "build/installation-fix-20261023");
+        Directory.CreateDirectory(defenseFolder);
+        ClientGame DefenseHost(string name, WorldState snapshot)
+        {
+            snapshot.Validate();
+            var session = initial with { World = snapshot };
+            var host = Host("defense-" + name, session);
+            File.Copy(Path.Combine(folder, "defense-" + name + "-slot.json"), Path.Combine(defenseFolder, name + "-slot.json"), true);
+            return host;
+        }
+        foreach (string mode in new[] { "rich", "poor", "discount" })
+        {
+            var sample = defenseWorld with {
+                Factions = defenseWorld.Factions.Select(f => f.Id == player && mode == "poor" ? f with { Resources = new(0, 0, 0) } : f).ToArray(),
+                Units = defenseWorld.Units.Select(u => u.Id == builder.Id && mode == "discount" ? u with {
+                    Combatant = u.Combatant with { Skills = rules.Installations.Values.Select(r => r.Purchase.DiscountSkill!).ToArray() } } : u).ToArray() };
+            var host = DefenseHost(mode, sample);
+            var offers = Call(host, "action", new { op = "select", cell = builder.Cell, revision = initial.Revision }).GetProperty("installationOffers");
+            Check(offers.GetArrayLength() == 3, mode + " retains all three defense offers");
+            foreach (var offer in offers.EnumerateArray())
+            {
+                string id = offer.GetProperty("id").GetString()!;
+                var rule = rules.Installations[id];
+                var quote = offer.GetProperty("quote");
+                var cost = quote.GetProperty("cost").Deserialize<Resources>(ClientGame.Json)!;
+                Check(offer.GetProperty("kind").GetString() == rule.Kind && !string.IsNullOrWhiteSpace(offer.GetProperty("name").GetString()), "defense card ID has type and name");
+                Check(cost == WorldSupportActions.InstallationCost(sample, builder.Id, rule), "defense quote matches core");
+                Check(quote.GetProperty("affordable").GetBoolean() == (mode != "poor"), "defense affordability");
+                if (mode == "discount") Check(cost.Money < rule.Purchase.Cost.Money, "defense commander discount");
+                var fresh = DefenseHost(mode, sample);
+                var result = Call(fresh, "action", new { op = "installation", unit = builder.Id, offer = id, revision = initial.Revision }, mode != "poor");
+                if (mode == "poor")
+                {
+                    Check(result.GetString() == "purchase.resources", "poor defense purchase rejected");
+                    Check(Call(fresh, "action", new { op = "state" }).GetProperty("revision").GetInt64() == initial.Revision, "poor defense purchase leaves state unchanged");
+                    continue;
+                }
+                Check(result.GetProperty("cells")[builder.Cell].GetProperty("installationKind").GetString() == rule.Kind, "defense construction updates tile");
+                var funds = result.GetProperty("factions").EnumerateArray().Single(f => f.GetProperty("id").GetString() == player).GetProperty("resources").Deserialize<Resources>(ClientGame.Json)!;
+                Check(Funds(sample) == new Resources(funds.Money + cost.Money, funds.Industry + cost.Industry, funds.Food + cost.Food), "defense spends displayed quote");
+                Check(Call(fresh, "action", new { op = "installation", unit = builder.Id, offer = id, revision = initial.Revision }, false).GetString() == "client.stale", "duplicate defense confirmation rejected");
+                Check(Call(fresh, "action", new { op = "select", cell = builder.Cell, revision = initial.Revision + 1 }).GetProperty("installationOffers").GetArrayLength() == 0, "existing defense hides construction offers");
+            }
+        }
+        foreach (string mode in new[] { "building", "installed", "foreign", "cavalry" })
+        {
+            var sample = defenseWorld with {
+                Cells = defenseWorld.Cells.Select((c, i) => i != builder.Cell ? c : c with {
+                    BuildingKind = mode == "building" ? "city" : null, BuildingLevel = mode == "building" ? 1 : 0,
+                    InstallationKind = mode == "installed" ? "bunker" : null,
+                    Owner = mode == "foreign" ? original.Factions.First(f => f.Id != player).Id : player }).ToArray(),
+                Units = defenseWorld.Units.Select(u => u.Id == builder.Id && mode == "cavalry" ? u with {
+                    CommanderBase = null, Combatant = u.Combatant with { Profile = u.Combatant.Profile with { Category = "cavalry" } } } : u).ToArray() };
+            var host = DefenseHost(mode, sample);
+            Check(Call(host, "action", new { op = "select", cell = builder.Cell, revision = initial.Revision }).GetProperty("installationOffers").GetArrayLength() == 0, mode + " prevents defense construction");
+        }
+        File.WriteAllText(Path.Combine(defenseFolder, "backend.json"), JsonSerializer.Serialize(new { builder.Id, builder.Cell, errors = 0 }, ClientGame.Json));
         File.WriteAllText(Path.Combine(folder, "backend.json"), JsonSerializer.Serialize(new { checks, errors = 0,
             target = new { target.Id, target.Cell }, quotes = coreQuotes }, ClientGame.Json));
         return checks;

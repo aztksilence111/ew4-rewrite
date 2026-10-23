@@ -57,6 +57,8 @@ public static partial class WorldAi
         {
             var mover = purchase ? unit with { Transport = true } : unit;
             var context = WorldActions.MovementContext(state, mover);
+            int[]? components = null;
+            var distanceFields = new Dictionary<string, IReadOnlyDictionary<int, long>>(StringComparer.Ordinal);
             var reachable = Movement.Reachable(map, context.Cells, unit.Cell, context.Actor, rules.Movement.Search);
             if (reachable.Count <= 1) continue;
             var strategyUnit = new AiStrategyUnit(unit.Combatant.Health, unit.Combatant.Profile.MaxHealth, unit.RemainingMovement,
@@ -81,7 +83,8 @@ public static partial class WorldAi
                 foreach (var goal in goals.OrderByDescending(g => AiStrategy.GoalScore(strategyUnit, g.Facts, rules.Strategy.Scoring)).ThenBy(g => g.Cell))
                 {
                     var endpoints = new List<int>();
-                    for (int i = 0; i < state.Cells.Count; i++)
+                    // HexMap.Within preserves ascending cell order, including edge maps.
+                    foreach (int i in goal.Facts.HasUnit ? map.Within(goal.Cell, unit.Combatant.Profile.MaximumRange, true) : new[] { goal.Cell })
                     {
                         var cell = state.Cells[i];
                         if (!cell.Terrain.Active || occupants.ContainsKey(i) && i != unit.Cell
@@ -90,7 +93,15 @@ public static partial class WorldAi
                         if (i == goal.Cell && !goal.Facts.HasUnit || goal.Facts.HasUnit && d >= unit.Combatant.Profile.MinimumRange && d <= unit.Combatant.Profile.MaximumRange)
                             endpoints.Add(i);
                     }
-                    var distances = Movement.DistancesTo(map, context.Cells, endpoints, context.Actor, rules.Movement.Search);
+                    if (endpoints.Count == 0) continue;
+                    components ??= Movement.Components(map, context.Cells, context.Actor, rules.Movement.Search);
+                    if (!endpoints.Any(cell => components[cell] == components[unit.Cell])) continue;
+                    string fieldKey = string.Join(",", endpoints);
+                    if (!distanceFields.TryGetValue(fieldKey, out var distances))
+                    {
+                        if (distanceFields.Count >= 8) distanceFields.Clear();
+                        distanceFields[fieldKey] = distances = Movement.DistancesTo(map, context.Cells, endpoints, context.Actor, rules.Movement.Search);
+                    }
                     if (!distances.TryGetValue(unit.Cell, out long sourceDistance)) continue;
                     var landings = new List<AiStrategyDestination>();
                     foreach (int index in reachable.Keys.OrderBy(i => i))
@@ -143,6 +154,6 @@ public static partial class WorldAi
         notices.Add(new("ai.strategy_goal", command.UnitId, command.GoalCell));
         var next = moved.State with { Revision = checked(state.Revision + 1), AiRandomState = plan.FinalRandomState };
         next.Validate();
-        return new(next, notices);
+        return new(next, notices) { Movements = moved.Movements };
     }
 }

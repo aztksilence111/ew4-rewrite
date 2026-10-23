@@ -23,6 +23,10 @@ public static class WorldSave
     public static byte[] Encode(WorldState state)
     {
         state.Validate();
+        return EncodeValidated(state);
+    }
+    internal static byte[] EncodeValidated(WorldState state)
+    {
         byte[] payload = JsonSerializer.SerializeToUtf8Bytes(state, Options);
         using var stream = new MemoryStream();
         using (var writer = new Utf8JsonWriter(stream))
@@ -32,7 +36,7 @@ public static class WorldSave
             writer.WriteNumber("version", Version);
             writer.WriteString("sha256", Convert.ToHexStringLower(SHA256.HashData(payload)));
             writer.WritePropertyName("payload");
-            writer.WriteRawValue(payload);
+            writer.WriteRawValue(payload, skipInputValidation: true);
             writer.WriteEndObject();
         }
         return stream.ToArray();

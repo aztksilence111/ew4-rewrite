@@ -23,8 +23,9 @@
   }
   const edge=(a,b,x,y)=>(b[0]-a[0])*(y-a[1])-(b[1]-a[1])*(x-a[0]);
   const topLeft=(a,b)=>b[1]<a[1]||(b[1]===a[1]&&b[0]>a[0]);
-  function sample(texture,u,v) {
-    const x=u*texture.width-.5,y=v*texture.height-.5,ix=Math.floor(x),iy=Math.floor(y),fx=x-ix,fy=y-iy,out=[0,0,0,0];
+  function sample(texture,u,v,out=[0,0,0,0]) {
+    out.fill(0);
+    const x=u*texture.width-.5,y=v*texture.height-.5,ix=Math.floor(x),iy=Math.floor(y),fx=x-ix,fy=y-iy;
     for(let dy=0;dy<2;dy++)for(let dx=0;dx<2;dx++){
       const px=((ix+dx)%texture.width+texture.width)%texture.width,py=((iy+dy)%texture.height+texture.height)%texture.height;
       const index=(py*texture.width+px)*4,weight=(dx?fx:1-fx)*(dy?fy:1-fy);
@@ -39,14 +40,15 @@
       let [a,b,c]=triangle.map(v=>[...v]);if(edge(a,b,c[0],c[1])<0)[b,c]=[c,b];
       const area=edge(a,b,c[0],c[1]);if(area<1e-8)continue;
       const colors=[rgba(a[2]),rgba(b[2]),rgba(c[2])];
+      const tl0=topLeft(b,c),tl1=topLeft(c,a),tl2=topLeft(a,b),color=[0,0,0,0],texel=[0,0,0,0];
       const x0=Math.max(0,Math.floor((Math.min(a[0],b[0],c[0])+32)*ratio)),x1=Math.min(width,Math.ceil((Math.max(a[0],b[0],c[0])+32)*ratio));
       const y0=Math.max(0,Math.floor((Math.min(a[1],b[1],c[1])+36)*ratio)),y1=Math.min(height,Math.ceil((Math.max(a[1],b[1],c[1])+36)*ratio));
       for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){
-        const px=(x+.5)/ratio-32,py=(y+.5)/ratio-36,edges=[edge(b,c,px,py),edge(c,a,px,py),edge(a,b,px,py)];
-        if(edges.some((v,i)=>v< -1e-7||(Math.abs(v)<1e-7&&!topLeft([b,c,a][i],[c,a,b][i]))))continue;
-        const weights=edges.map(v=>v/area),color=[0,0,0,0];
-        for(let channel=0;channel<4;channel++)for(let i=0;i<3;i++)color[channel]+=colors[i][channel]*weights[i];
-        if(texture){const texel=sample(texture,a[3]*weights[0]+b[3]*weights[1]+c[3]*weights[2],a[4]*weights[0]+b[4]*weights[1]+c[4]*weights[2]);
+        const px=(x+.5)/ratio-32,py=(y+.5)/ratio-36,e0=edge(b,c,px,py),e1=edge(c,a,px,py),e2=edge(a,b,px,py);
+        if(e0< -1e-7||e1< -1e-7||e2< -1e-7||Math.abs(e0)<1e-7&&!tl0||Math.abs(e1)<1e-7&&!tl1||Math.abs(e2)<1e-7&&!tl2)continue;
+        const w0=e0/area,w1=e1/area,w2=e2/area;
+        for(let channel=0;channel<4;channel++)color[channel]=colors[0][channel]*w0+colors[1][channel]*w1+colors[2][channel]*w2;
+        if(texture){sample(texture,a[3]*w0+b[3]*w1+c[3]*w2,a[4]*w0+b[4]*w1+c[4]*w2,texel);
           for(let channel=0;channel<4;channel++)color[channel]*=texel[channel]/255;
         }
         const index=(y*width+x)*4,alpha=color[3]/255,oldAlpha=data[index+3]/255,outAlpha=alpha+oldAlpha*(1-alpha);

@@ -1,5 +1,29 @@
 # 重构短锚点
 
+- **2026-10-23 菜单/远景显示与血条修正并打含工事修复的新APK：[记录](../reverse/MOBILE_MENU_BADGES_20261023.md)。** 全视口菜单背景；兵牌远景居中并保尺寸，跳过兵模/姿态/旗帜/尾迹/受损特效及隐藏动画持续刷新；城市名保留，圆弧平滑缓存。专项273/布局1915/实际Chrome70 79/Pixi17场景/工事72通过，异常缺图0。`../build/mobile-feedback-20261023/ew4-rewrite-0.2.16-screen-badges-installations-test-arm64.apk`包含三工事修复，186输入变化0，2291包记录/程序集/签名/对齐通过。5492独立空白预览，未发布或真机验收，旧测试APK勿用于验收本轮功能。
+
+- **2026-10-23 防御工事空白选项已修：[记录](../reverse/INSTALLATION_UI_FIX_20261023.md)。** ew4.card.41/42/43与trench/fence/bunker混用导致图片名undefined；新增installationOffers传类型/文本键/实际报价，恢复三原图及说明/默认选中，资源不足标红禁确认。三工事普通/折扣均实际建成并精确扣款；单项185+原规则16281、客户端2567+24、浏览器72及Web/Android Compile通过，异常缺图0。5491空白独立预览，无新APK/发布/真机验收，旧测试APK不含本次修复。
+
+- **2026-10-23 全工作区更新测试APK已本地生成：[记录](../reverse/LOCAL_TEST_APK_20261023.md)。** ../build/all-updates-test-apk-20261023/ew4-rewrite-0.2.16-all-updates-test-20261023-arm64.apk，137.5MiB/SHA adfb4ce2…，0.2.16/code19原签名；包括最新完整视口及其他会话已落盘更新。186源码输入稳定，完整构建0警告错误，2291包记录/程序集/31兼容文件/v2-v3/16KiB核验通过；未提交或上传Git/Release，未装真机。此前“无新APK”为历史状态。
+
+- **2026-10-23 完整视口适配及左侧贴边已纠正：[记录](../reverse/SCREEN_VIEWPORT_FIT_20261023.md)。** 前轮图仍多64像素左距，原验收期望有误；现原生仅可见系统栏影响WebView尺寸，挖孔不再变成全高边带；前端地图/HUD用完整视口，浮动内容用独立safeWidth/safeHeight。资源栏x=0、撤回x=2，颜色/尺寸/裁影保持。布局1915、像素133、定位305、旧Chrome70 79及Android编译通过，异常缺图0；5490独立档案，无新APK/发布/真机验收，覆盖下条整条安全区避让策略。
+
+- **2026-10-23 后台Web测试已全部关闭，本机预览默认静音。** 停止17个游戏服务及5个遗留无头测试浏览器；localhost/127.0.0.1/[::1]每次加载将音乐/音效设为0，旧音量也不触发播放，可手动开启，Android规则保留。专项15项/错误0、Chrome70构建31文件通过，验证临时服务已关闭。下方旧预览地址不代表当前运行状态；证据：../build/web-test-audio-20261023/result.json。
+
+- **2026-10-23 手机贴边、暂停蓝带与黑影已修：[记录](../reverse/MOBILE_EDGE_LAYOUT_20261023.md)。** 按最新实机及参考图缩小按钮，额外边距2 CSS像素、裁外伸阴影不改色；遮罩覆盖全WebView并在内部避让，Android消费父层已应用Insets防止二次避让。布局1519/33组、定位305、遮罩四边像素121及Chrome70 79项通过，异常缺图0，Android ARM64 Compile通过。5490/PID36292独立档案预览，保留同期修改；无新APK/发布/实机验收，旧兼容测试APK不含本次修正。覆盖下文额外16像素及手机48/平板56的旧尺寸下限。
+
+- **2026-10-23 Chromium70兼容已接：[方案与报告](../reverse/CHROMIUM70_COMPAT_20261023.md)、[构建说明](../tools/frontend/README.md)。** Web与APK强制走统一ES2018/Chrome70产物，补globalThis/fromEntries/旧Image.decode和CSS回退、事件清理；Pixi/WebGL不可用或初始化失败时Canvas接管并保留触摸。实际Chrome70及Edge155各79项，启动16/Mod106/Pixi三视口等通过，0异常；完整ARM64包/31生成文件及源哈希/程序集/原证书v2/v3/16KiB核验通过。build/android70-20261023有同版本0.2.16/code19本地测试APK，未上传/真机验收；5485/PID32380干净预览，5483/5484测试服务已停，同期改动保留。
+
+- **2026-10-23 星级区购买上限及Mod接口完成：[记录](../reverse/COMMANDER_CAPACITY_20261023.md)、[接口](mod-kit/docs/porting/METAGAME_AND_BRIEFING.md)。** 满额提示“该星级区将领已达上限，无法购买”，保留失败选择并防止重复请求，消除再次点击null.id。API2 metagame.commanderSectionCapacities按0/1/2独立配置，省略各20，0禁止新增；指挥部空槽/计数同步。专项115+114、客户端2747+24、浏览器52及30/25/40真实Mod加载通过，0异常缺图，Web/Android Compile通过；5481/PID34300干净预览，无新APK或发布。
+
+- **2026-10-23 手机/平板统一适配完成：[记录](../reverse/SCREEN_TABLET_ADAPTATION_20261023.md)。** 新screen-layout模块使圆角/安全区只移动控件，手机主体至少48、平板至少56 CSS像素；窄屏工具栏滑动，平板菜单/弹窗/对白及旋屏适配，暂停超高已修。适配1198项/30布局/19图、定位273通过，异常缺图0；5478独立预览，无新APK/发布/设备验收。新两文件已入加载/包核对清单，保留同期自动快进和Pixi修改。
+
+- **2026-10-23 自动/手动快进已按最终澄清修正：[记录](../reverse/AUTO_TURN_FAST_20261023.md)。** 自动设置默认开启；关闭时仍显示左下按钮，点击即完整加速，旧快进效果固定启用。恢复此前误移除的按钮及安全区样式，剧情边界保留。专项36+桌面交互35通过，异常缺图0，三视口手动可点且两路径session/RNG一致。5480独立预览，无新APK/发布/真机验收；测试服务暂停布局限制另记。
+
+- **2026-10-23 PixiJS与性能专项：[断点](HANDOFF_PERFORMANCE_PIXI.md)、[报告](../reverse/PIXI_IMPLEMENTATION_20261023.md)。** 动态战场及合成走PixiJS7.4.3/WebGL，地图块/文字等保留Canvas2D；缓存/LOD/增量/AI重算/战略/存档优化已接。核心310933、客户端2569+24、专项190、原绘制13731及三视口/真实战斗/恢复、Web/Android Compile通过；两图状态事件及双RNG等价。桌面快进耗时减少25–32%、普通约49%，手机52秒和冷远景长帧待验。5475独立预览，无新APK/发行，保留同期界面修复。
+
+- **2026-10-23 实机右下按钮已调整：[记录](../reverse/MOBILE_CORNER_BUTTONS_20261023.md)。** 蜂巢/沙漏主体与点击范围改为暂停同尺寸；至少16 CSS像素圆角留白叠加安全区、9逻辑像素间距，蜂巢改为原灰底侧影。273项/9截图通过，异常缺图0；5477独立预览，未新打包APK或真机复测。150% HUD与全界面弹窗验收范围分开记录。
+
 - **0.2.16已正式发布：[下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.16-20261023)、[报告](../reverse/CAMPAIGN_ALLIANCE_CAPTURE_20261023.md)、[进度](RELEASE_PROGRESS_0.2.16_20261023.md)。** 战役同盟胜负、非接壤占领、失败原对白/结算、数字及旋屏背景修复已入包。源码ca82e6c，Web/ARM64 APK code19及两校验附件远端审计errors=0；核心310933/Mod106/独立运行11249/发行浏览器42+42通过，同证书v2/v3/16KiB通过。正式机制专项历史指纹问题见报告，5439隔离预览，真机未运行；下文是历史阶段记录。
 
 - **战役可见性、原版选国及音乐已接：[记录](../reverse/CAMPAIGN_MUSIC_RESTORATION_20261023.md)。** 11个原隐藏入口初始开放，84主入口/两个附加国家分支；API2 campaignVisibility支持original/visible/hidden，Mod默认遵守XML。原form_selcountry布局及5首MP3播放规则恢复，音乐JSON与旧包导入覆盖已验。专项20/客户端2490/Mod17/浏览器59通过，Web及Android Compile零警告错误，5431独立预览；真机待验。并行0.2.15发行状态见下条。

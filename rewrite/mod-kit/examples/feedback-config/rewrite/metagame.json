@@ -2,5 +2,6 @@
   "schema": 1,
   "initialMedals": 20000000,
   "initialBadges": 20000000,
+  "commanderSectionCapacities": { "0": 30, "1": 25, "2": 40 },
   "refresh": {}
 }

@@ -1,0 +1,13 @@
+.compat-flex-child{margin-top:var(--compat-margin-top)!important;margin-right:var(--compat-margin-right)!important;margin-bottom:var(--compat-margin-bottom)!important;margin-left:var(--compat-margin-left)!important}
+.compat-selectors .menu-bar::after{right:85px}
+.compat-selectors.compat-dialogue #menu-button{z-index:4}
+.compat-selectors.compat-dialogue #pause,.compat-selectors.compat-dialogue #settings,.compat-selectors.compat-dialogue #detail-modal,.compat-selectors.compat-dialogue #mod-manager{z-index:5}
+.compat-selectors.compat-event #menu-button,.compat-selectors.compat-paused #pause,.compat-selectors.compat-paused #settings,.compat-selectors.compat-paused #detail-modal,.compat-selectors.compat-paused #mod-manager{z-index:9}
+.compat-math .commander-skills.extension-skills .skill-row{height:var(--skill-icon,19px);min-height:20px}
+.compat-math .main-entry{display:flex;align-items:center;justify-content:center}
+.compat-math .original-text canvas{height:var(--ew4-text-height,auto)!important}
+.compat-math #scenario-event .scenario-event-dialog{height:264px}
+.compat-math[data-screen-orientation=portrait] #main-menu nav{width:var(--compat-main-width,190px)}
+.compat-math[data-screen-orientation=portrait] #main-menu .main-entry{height:var(--compat-main-height,48px)}
+.compat-math[data-screen-orientation=portrait] #main-menu .main-entry>.original-text{transform:translateX(3px) scale(var(--compat-main-text-scale,1))}
+@media(orientation:portrait){.compat-math #scenario-event .scenario-event-dialog{height:var(--event-available-height,400px)}}

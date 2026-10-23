@@ -154,15 +154,26 @@
       const typeface=options.numeric?numberFamily:fontFamily;
       span.dataset.font=font;span.dataset.typeface=font;
       span.dataset.color=outlined?'#ffffff':color;
+      let paintedKey;
       const redraw=()=>{
+        const uiScale=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale'))||1;
+        const requested=options.rasterScale||Math.max(1,Math.min(6,Math.ceil(uiScale*(root.devicePixelRatio||1))));
+        // A newly loaded subset only invalidates text whose resolved font actually changes.
+        const preferred=options.numeric?numberFamilies:families;
+        const faces=[...new Set([...displayText(text)].map(char=>{
+          const point=char.codePointAt(0);
+          for(const family of preferred){const face=loadedFaces.find(face=>face.family===family&&inRanges(point,face.ranges));if(face)return face.file;}
+          return '';
+        }))];
+        const key=JSON.stringify([requested,availableText(text),faces,this.fonts[font]?.height,options]);
+        if(key===paintedKey)return;
         const layout=this.layout(text,font,width,options);span.dataset.size=String(layout.height/2);
         const inkCenter=options.singleLine&&options.inkCenter&&options.maxHeight;
         const canvasHeight=inkCenter?options.maxHeight*2:layout.lines.length*(layout.height+2)+padding*2;
-        const uiScale=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale'))||1;
-        const requested=options.rasterScale||Math.max(1,Math.min(6,Math.ceil(uiScale*(root.devicePixelRatio||1))));
         const rasterScale=Math.min(requested,Math.sqrt(4*1024*1024/((layout.width+padding*2)*(layout.lines.length*(layout.height+2)+padding*2))));
         canvas.width=Math.ceil((layout.width+padding*2)*rasterScale);canvas.height=Math.ceil(canvasHeight*rasterScale);
         canvas.style.width=(layout.width+padding*2)/2+'px';canvas.style.height=canvasHeight/2+'px';
+        canvas.style.setProperty('--ew4-text-height',canvasHeight/2+'px');
         const draw=canvas.getContext('2d');draw.clearRect(0,0,canvas.width,canvas.height);
         draw.scale(rasterScale,rasterScale);
         draw.font=layout.height+'px '+typeface;draw.fontKerning='none';
@@ -184,6 +195,7 @@
           }
         }
         if(!outlined){draw.globalCompositeOperation='source-in';draw.fillStyle=color||'#404040';draw.fillRect(0,0,canvas.width/rasterScale,canvas.height/rasterScale);draw.globalCompositeOperation='source-over';}
+        paintedKey=key;
       };
       canvas.ew4Repaint=redraw;if(typeof WeakRef==='function')paintTargets.add(new WeakRef(canvas));
       const fallback=[...String(text)].filter(char=>!this.glyph(char,font)).join('');

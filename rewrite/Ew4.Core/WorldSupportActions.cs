@@ -71,14 +71,24 @@ public static class WorldSupportActions
 
     public static WorldChange BuildInstallation(WorldState state, long expectedRevision, string unitId, InstallationBuildRules rules)
     {
+        var (faction, unit, cell, cost) = PrepareInstallation(state, expectedRevision, unitId, rules);
+        return Commit(state, faction, unit with { RemainingMovement = 0, Acted = true }, cell with { InstallationKind = rules.Kind },
+            cost, "installation.built");
+    }
+
+    public static Resources InstallationCost(WorldState state, string unitId, InstallationBuildRules rules) =>
+        PrepareInstallation(state, state.Revision, unitId, rules).cost;
+
+    private static (FactionState faction, UnitState unit, CellState cell, Resources cost) PrepareInstallation(
+        WorldState state, long expectedRevision, string unitId, InstallationBuildRules rules)
+    {
         if (string.IsNullOrWhiteSpace(rules.Kind) || rules.Builders.Any(string.IsNullOrWhiteSpace))
             throw new RuleViolation("installation.configuration", "Invalid installation kind or builder categories");
         var (faction, unit, cell) = Ready(state, expectedRevision, unitId, rules.Purchase);
         if (!rules.Builders.Contains(unit.Combatant.Profile.Category) || cell.BuildingKind != null || cell.InstallationKind != null
             || !((unit.RemainingMovement > 0 && unit.Morale.Effective != -3) || unit.Combatant.ConstructionTurns < 1))
             throw new RuleViolation("installation.unavailable", "Unit or site is unavailable for installation construction");
-        return Commit(state, faction, unit with { RemainingMovement = 0, Acted = true }, cell with { InstallationKind = rules.Kind },
-            Price(unit, rules.Purchase), "installation.built");
+        return (faction, unit, cell, Price(unit, rules.Purchase));
     }
 
     public static bool CanBuildInstallation(WorldState state, string unitId, InstallationBuildRules rules)

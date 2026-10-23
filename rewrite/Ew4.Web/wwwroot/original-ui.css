@@ -191,9 +191,12 @@ body:has(#play:not([hidden])>#pause:not([hidden])) :is(#pause,#settings,#detail-
 .unit-card .recruit-frame{position:absolute;inset:0;pointer-events:none}
 .formation-layer{position:absolute;pointer-events:none}
 .formation-count{gap:0}
-#end-turn,#undo-move,#next-unit,#skip-ai{transform:scale(var(--battle-compact-scale))}
-#play .corner-button{width:20px;height:20px;background:none;overflow:visible;isolation:isolate}
-/* The 54px face is the hit target; original 73x74 art includes a directional shadow. */
+#undo-move,#skip-ai{transform:scale(var(--battle-compact-scale))}
+#play{--corner-inset:2px}
+#end-turn,#next-unit{transform:scale(var(--battle-scale));right:calc(env(safe-area-inset-right,0px) + var(--corner-inset))}
+#end-turn{bottom:calc(env(safe-area-inset-bottom,0px) + var(--corner-inset))}
+#play .corner-button{width:20px;height:20px;background:none;overflow:hidden;isolation:isolate}
+/* Crop directional shadows to the original face without changing its colors. */
 .corner-button::before{content:"";position:absolute;width:135.185185%;height:137.037037%;background:var(--corner-art) center/100% 100% no-repeat;pointer-events:none;z-index:-1}
 #menu-button{--corner-art:url("/content/ui/image_recruit_hd/button_pause.png");transform-origin:right top}
 #menu-button::before{left:-35.185185%;top:-1.851852%}
@@ -204,7 +207,7 @@ body:has(#play:not([hidden])>#pause:not([hidden])) :is(#pause,#settings,#detail-
 #undo-move::before{left:-1.851852%;top:-37.037037%}
 #skip-ai{--corner-art:url("/content/ui/image_recruit_hd/button_skip.png")}
 #skip-ai::before{width:137.037037%;left:-1.851852%;top:-35.185185%}
-#next-unit{--corner-art:url("/unit-search.png?v=20261023.3");left:auto;right:0;bottom:calc(25px * var(--battle-compact-scale));transform-origin:right bottom}
+#next-unit{--corner-art:url("/unit-search.png?v=20261023.4");left:auto;bottom:calc(env(safe-area-inset-bottom,0px) + var(--corner-inset) + 24px * var(--battle-scale));transform-origin:right bottom}
 #next-unit-count{position:absolute;display:flex;align-items:center;justify-content:flex-end;right:1px;bottom:0;width:10px;height:9px;line-height:0;pointer-events:none}
 #next-unit-count>.original-text{display:inline-flex;max-width:100%;max-height:100%}
 .corner-button:disabled{opacity:1;filter:brightness(.6);cursor:default}

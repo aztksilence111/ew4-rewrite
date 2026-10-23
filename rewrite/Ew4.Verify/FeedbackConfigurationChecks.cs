@@ -46,6 +46,9 @@ internal static class FeedbackConfigurationChecks
         const string manifest = "{\"schema\":1,\"apiVersion\":2,\"metagame\":\"rewrite/metagame.json\"}";
         Put("rewrite/extension.json", manifest);
         foreach (string invalid in new[] { "{\"schema\":2}", "{\"initialMedals\":-1}", "{\"initialBadges\":\"1\"}", "{\"refresh\":null}",
+            "{\"commanderSectionCapacities\":null}", "{\"commanderSectionCapacities\":{\"3\":20}}",
+            "{\"commanderSectionCapacities\":{\"0\":-1}}", "{\"commanderSectionCapacities\":{\"0\":null}}",
+            "{\"commanderSectionCapacities\":{\"0\":1.5}}", "{\"commanderSectionCapacities\":{\"0\":\"20\"}}",
             "{\"shopSlots\":[null]}", "{\"shopSlots\":[{\"slot\":14}]}", "{\"shopSlots\":[{\"slot\":0},{\"slot\":0}]}",
             "{\"shopSlots\":[{\"slot\":0,\"items\":[]}]}", "{\"refresh\":{\"academy.3\":{\"limit\":1}}}",
             "{\"refresh\":{\"shop\":{\"limit\":-1}}}", "{\"refresh\":{\"shop\":{\"limit\":1,\"initial\":2}}}",

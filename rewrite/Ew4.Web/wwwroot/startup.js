@@ -4,13 +4,14 @@
   var complete = false, failed = false, timer, stage = '启动脚本';
   var match = navigator.userAgent.match(/(?:Chrome|Chromium)\/(\d+)/);
   var version = match ? match[1] : '未知';
+  var minimum = window.Ew4FrontendTarget || 80;
   function fail(message) {
     if (complete || failed) return;
     failed = true;
     clearTimeout(timer);
     document.getElementById('startup-status').hidden = false;
     document.getElementById('startup-message').textContent = message + '\nWebView / Chromium：' + version +
-      (match && Number(version) < 80 ? '\n系统网页组件过旧，请检查系统更新或应用市场，更新系统 WebView 后重开游戏。' : '');
+      (match && Number(version) < minimum ? '\n系统网页组件过旧，请检查系统更新或应用市场，更新系统 WebView 后重开游戏。' : '');
     var retry = document.getElementById('startup-retry');
     retry.hidden = false;
     retry.onclick = function () { location.reload(); };
@@ -32,7 +33,32 @@
   window.addEventListener('unhandledrejection', function (event) {
     fail('启动失败：' + (event.reason && event.reason.message || String(event.reason)));
   });
-  // Chromium 80 understands game syntax but lacks these newer platform methods.
+  if (!window.globalThis) window.globalThis = window;
+  if (match && Number(version) < 80) {
+    var nativeDecode = HTMLImageElement.prototype.decode;
+    HTMLImageElement.prototype.decode = function () {
+      var image = this;
+      if (image.complete && image.naturalWidth) return Promise.resolve();
+      if (nativeDecode) return nativeDecode.call(image).catch(function (error) {
+        if (!image.complete || !image.naturalWidth) throw error;
+      });
+      return new Promise(function (resolve, reject) {
+        function cleanup() { image.removeEventListener('load', loaded); image.removeEventListener('error', broken); }
+        function loaded() { cleanup(); resolve(); }
+        function broken() { cleanup(); reject(new Error('Image load failed: ' + image.src)); }
+        image.addEventListener('load', loaded); image.addEventListener('error', broken);
+        if (image.complete) { if (image.naturalWidth) loaded(); else broken(); }
+      });
+    };
+  }
+  if (!Object.fromEntries) Object.defineProperty(Object, 'fromEntries', { configurable: true, writable: true, value: function (entries) {
+    var result = {};
+    Array.from(entries).forEach(function (entry) {
+      Object.defineProperty(result, entry[0], { value: entry[1], writable: true, enumerable: true, configurable: true });
+    });
+    return result;
+  }});
+  // Syntax is lowered by the shared build; platform methods need separate fallbacks.
   if (!Array.prototype.at) Object.defineProperty(Array.prototype, 'at', { configurable: true, writable: true, value: function (index) {
     var length = this.length, n = Number(index) || 0;
     n = n < 0 ? Math.ceil(n) : Math.floor(n);
@@ -48,5 +74,5 @@
     }});
   });
   pending(stage);
-  if (match && Number(version) < 80) fail('当前系统网页组件不支持游戏启动脚本。');
+  if (match && Number(version) < minimum) fail('当前系统网页组件不支持游戏启动脚本。');
 })();

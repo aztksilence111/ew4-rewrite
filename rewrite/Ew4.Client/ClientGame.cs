@@ -7,7 +7,7 @@ namespace Ew4.Client;
 
 public sealed record ClientCommand(string Op = "", long Revision = -1, string? Scenario = null, string? Country = null,
     string? Unit = null, string? Target = null, int Cell = -1, string? Offer = null, string? Commander = null, string? Item = null, JsonElement? Tutorial = null, int Group = 0, int Slot = 0, int Mode = 0,
-    IReadOnlyList<string>? LocalPlayers = null, string? Tag = null, IReadOnlyList<string>? TaggedCommanders = null);
+    IReadOnlyList<string>? LocalPlayers = null, string? Tag = null, IReadOnlyList<string>? TaggedCommanders = null, bool Delta = false);
 public sealed record ClientSlot(string Scenario, string? Country, byte[] Session, MovementHistoryState? MovementHistory = null, JsonElement? Tutorial = null,
     int Round = 0, DateTimeOffset? SavedAt = null, IReadOnlyList<string>? LocalPlayers = null, string? DisplayCountry = null);
 
@@ -20,6 +20,13 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
     private string? country;
     private JsonElement? tutorialCheckpoint;
     private readonly MovementHistory movementHistory = new();
+    private WorldState? deliveredWorld, deltaBase;
+    private long deliveredRevision = -1;
+    private Dictionary<string, JsonElement> deliveredUnits = new();
+    private Dictionary<string, JsonElement>? pendingUnits;
+    private bool viewBuilt;
+    private WorldState? movementBase;
+    private IReadOnlyList<WorldMovement> executedMovements = [];
     private string Slot => Path.Combine(saveDirectory, "session.json");
     public string Dispatch(string path, string body)
     {
@@ -27,6 +34,13 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         {
             try
             {
+                deltaBase = null; pendingUnits = null; viewBuilt = false;
+                if (path == "/api/action")
+                {
+                    var request = Command(body);
+                    if (request.Delta && request.Op != "state" && request.Revision == deliveredRevision
+                        && game?.Session.World.ScenarioId == deliveredWorld?.ScenarioId) deltaBase = deliveredWorld;
+                }
                 object result = path switch
                 {
                     "/api/catalog" => new { scenarios = content.Scenarios,
@@ -55,7 +69,9 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                     "/api/load" => Load(JsonSerializer.Deserialize<ClientCommand>(body, Json) ?? new()),
                     _ => throw new RuleViolation("client.route", "Unknown command")
                 };
-                return JsonSerializer.Serialize(new { ok = true, data = result }, Json);
+                string response = JsonSerializer.Serialize(new { ok = true, data = result }, Json);
+                if (viewBuilt) { deliveredWorld = Require().Session.World; deliveredRevision = Require().Session.Revision; deliveredUnits = pendingUnits!; }
+                return response;
             }
             catch (Exception error) when (error is RuleViolation or IOException or JsonException or InvalidOperationException or ArgumentException or KeyNotFoundException or OverflowException)
             {
@@ -147,11 +163,11 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             throw new RuleViolation("save.mode", "Save mode does not match the current game");
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         tutorialCheckpoint = command.Tutorial;
-        var bytes = JsonSerializer.SerializeToUtf8Bytes(new ClientSlot(current.Session.World.ScenarioId, country, SessionSave.Encode(current.Session), movementHistory.Save(), tutorialCheckpoint,
+        var slot = new ClientSlot(current.Session.World.ScenarioId, country, SessionSave.Encode(current.Session), movementHistory.Save(), tutorialCheckpoint,
             current.Session.World.Round, DateTimeOffset.Now, current.Session.World.LocalMultiplayer?.HumanFactions,
-            FactionCountries(current.Session.World).GetValueOrDefault(current.Session.PlayerFaction)), Json);
+            FactionCountries(current.Session.World).GetValueOrDefault(current.Session.PlayerFaction));
         string temporary = path + ".tmp";
-        using (var stream = new FileStream(temporary, FileMode.Create, FileAccess.Write, FileShare.None)) { stream.Write(bytes); stream.Flush(true); }
+        using (var stream = new FileStream(temporary, FileMode.Create, FileAccess.Write, FileShare.None)) { JsonSerializer.Serialize(stream, slot, Json); stream.Flush(true); }
         if (File.Exists(path)) File.Replace(temporary, path, path + ".bak"); else File.Move(temporary, path);
         return new { saved = true };
     }
@@ -237,7 +253,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             "recruit" => WorldActions.Recruit(world, world.Revision, command.Cell, "client.unit." + world.Revision, rules.Recruitment[active.Id][command.Offer!]),
             _ => throw new RuleViolation("client.command", "Unknown action")
         };
-        int[]? movedPath = command.Op == "move" ? WorldActions.Reachable(world, command.Unit!, rules.Movement)[command.Cell].Path.ToArray() : null;
+        int[]? movedPath = command.Op == "move" ? action.Movements.Single(m => m.Unit == command.Unit).Path.ToArray() : null;
         Commit(action);
         if (movedPath != null)
             movementHistory.Record(world, game!.Session.World, command.Unit!, movedPath, game.Notices);
@@ -279,6 +295,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
     private void Commit(WorldChange change)
     {
         var current = Require();
+        movementBase = current.Session.World; executedMovements = change.Movements;
         change = PrepareChange(change);
         var session = SessionActions.CommitWorld(current.Session, current.Session.Revision, change);
         InstallSession(current, session.State, change.Notices);
@@ -325,6 +342,11 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         var upgradeQuote = ready ? ActionQuote(() => WorldImprovements.BuildingUpgradeCost(world, cell, current.Rules.Upgrades)) : null;
         var transportQuote = ready && unit?.Owner == world.ActiveFaction
             ? ActionQuote(() => WorldSupportActions.TransportCost(world, unit.Id, current.Rules.Transport)) : null;
+        var installationOffers = ready && unit?.Owner == world.ActiveFaction ? current.Rules.Installations
+            .Select(p => new { id = p.Key, kind = p.Value.Kind,
+                name = content.Catalogs.Cards.Cards.Values.Single(c => c.Id == p.Key).Name,
+                quote = ActionQuote(() => WorldSupportActions.InstallationCost(world, unit.Id, p.Value)) })
+            .Where(p => p.quote != null).ToArray() : [];
         string? disbandWarning = refund != null && unit!.Combatant.Profile.Category == "fort"
             && current.Rules.Recruitment[world.ActiveFaction].Values.Any(o => o.Template?.Profile.Category == "fort"
                 && o.PerTurnLimit.HasValue && world.Factions.Single(f => f.Id == world.ActiveFaction)
@@ -339,8 +361,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             market = ready && world.Cells[cell].Owner == world.ActiveFaction && Service(cell) == "trade",
             upgrade = ready && WorldImprovements.CanUpgradeBuilding(world, cell, current.Rules.Upgrades),
             deploy = ready && unit?.Owner == world.ActiveFaction && unit.CommanderId == null && RosterDeployment.IsDeploymentLocation(world, unit),
-            unit = unit?.Id, installations = ready && unit?.Owner == world.ActiveFaction ? current.Rules.Installations
-                .Where(p => WorldSupportActions.CanBuildInstallation(world, unit.Id, p.Value)).Select(p => p.Key).ToArray() : [],
+            unit = unit?.Id, installationOffers, installations = installationOffers.Where(p => p.quote!.Affordable).Select(p => p.id).ToArray(),
             undo = ready && unit != null && movementHistory.Available(world, unit.Id) != null,
             transport = ready && unit?.Owner == world.ActiveFaction && WorldSupportActions.CanBuyTransport(world, unit.Id, current.Rules.Transport) };
     }
@@ -354,6 +375,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
     private object View(WorldState? previous = null, object? movementOverride = null, object? combat = null, WorldState? cellDeltaFrom = null, string? suppliedUnit = null)
     {
         var current = Require(); var session = current.Session; var world = session.World;
+        cellDeltaFrom ??= deltaBase;
         var battle = content.Battle(world.ScenarioId);
         var factionColors = battle.Factions.Select((source, index) => (source, index))
             .ToDictionary(p => LegacyScenarioInitialization.FactionId(world.ScenarioId, p.index, p.source), p => p.source.Color);
@@ -384,9 +406,11 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         var movements = new List<object>();
         if (previous != null)
         {
+            if (ReferenceEquals(previous, movementBase)) movements.AddRange(executedMovements);
             var before = previous.Units.ToDictionary(u => u.Id);
             foreach (var unit in world.Units)
                 if (before.TryGetValue(unit.Id, out var old) && old.Cell != unit.Cell
+                    && !executedMovements.Any(m => ReferenceEquals(previous, movementBase) && m.Unit == unit.Id)
                     && WorldActions.Reachable(previous, old.Id, current.Rules.Movement).TryGetValue(unit.Cell, out var reachable))
                     movements.Add(new { unit = unit.Id, path = reachable.Path });
         }
@@ -429,6 +453,21 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             tileInfo = TileInfo(i, c),
             facility = sites.TryGetValue(i, out var service) ? service.State6 switch { 1 => "trade", 2 => "shop", 3 => "bar", _ => (string?)null } : null,
             buildingImage = BuildingImage(i, c), buildingStyle = sites.TryGetValue(i, out var site) ? site.State7 : 1 };
+        var unitViews = world.Units.Select(u => JsonSerializer.SerializeToElement(new { u.Id, u.Owner, u.Cell, profile = u.Combatant.Profile.Id, category = u.Combatant.Profile.Category,
+            skills = SkillViews(u.Combatant), statuses = StatusViews(u.Combatant), traits = u.Combatant.Profile.Traits.Where(content.Extensions.Bus.Skills.ContainsKey)
+                .Select(id => SkillView(new SkillSlot(id, "trait." + id))).ToArray(),
+            health = u.Combatant.Health, maxHealth = u.Combatant.Profile.MaxHealth, u.Combatant.ConstructionTurns, u.RemainingMovement, u.Acted, u.CommanderId, u.Transport, u.Burning, u.Objective,
+            objectiveMarker = u.Objective ? 1 : originalUnits.TryGetValue(u.Id, out var markedUnit) && markedUnit.Objective == 2 ? 2 : 0,
+            canMove = u.Combatant.Profile.Category != "fort" && u.RemainingMovement > 0 && u.Morale.Effective != -3 && u.Combatant.ConstructionTurns == 0,
+            canAttack = CanAttack(u), canNavigateMove = navigationMoves.Contains(u.Id), veterancy = u.Veterancy, morale = u.Morale.Effective,
+            facing = originalUnits.TryGetValue(u.Id, out var source) ? source.Facing : 1,
+            commanderDefinitionId = CommanderDefinitionId(u),
+            commanderImage = session.Account.Roster.FirstOrDefault(c => c.Id == u.CommanderId) is OwnedCommander owned
+                ? content.Catalogs.Accounts.Rules().Definitions[owned.DefinitionId].DisplayName
+                : u.CommanderId == u.Id + ".commander" && originalUnits.TryGetValue(u.Id, out var commanded)
+                && content.Catalogs.Runtime.Commanders.TryGetValue(commanded.Commander, out var commander) ? commander.Definition.DisplayName : null }, Json)).ToArray();
+        pendingUnits = unitViews.ToDictionary(u => u.GetProperty("id").GetString()!, StringComparer.Ordinal);
+        viewBuilt = true;
         return new
         {
             session.Revision, scenario = world.ScenarioId, map = content.MapNames[battle.MapId], world.Width, world.Height,
@@ -458,25 +497,15 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                 flag = f.Appearance?.Flag ?? (f.Appearance?.FlagImage == null ? content.Country(countryIds[f.Id])?.Flag ?? factionSources.GetValueOrDefault(f.Id)?.Variant : null),
                 flagImage = f.Appearance?.FlagImage ?? (f.Appearance?.Flag == null ? content.Country(countryIds[f.Id])?.FlagImage : null),
                 color = (f.Appearance?.Color ?? content.Country(countryIds[f.Id])?.Color) is string color ? ScenarioFactions.PackedColor(color) : factionColors.GetValueOrDefault(f.Id) }),
+            baseRevision = deltaBase == null ? (long?)null : deliveredRevision,
             cells = cellDeltaFrom == null ? world.Cells.Select(CellView).ToArray() : null,
             cellUpdates = cellDeltaFrom == null ? null : world.Cells.Select((c, i) => (c, i))
                 .Where(p => p.c != cellDeltaFrom.Cells[p.i] || world.Jurisdictions?.CellCenters[p.i] != cellDeltaFrom.Jurisdictions?.CellCenters[p.i])
                 .Select(p => new { cell = p.i, value = CellView(p.c, p.i) }).ToArray(),
-            units = world.Units.Select(u => new { u.Id, u.Owner, u.Cell, profile = u.Combatant.Profile.Id, category = u.Combatant.Profile.Category,
-                skills = SkillViews(u.Combatant), statuses = StatusViews(u.Combatant), traits = u.Combatant.Profile.Traits.Where(content.Extensions.Bus.Skills.ContainsKey)
-                    .Select(id => SkillView(new SkillSlot(id, "trait." + id))).ToArray(),
-                health = u.Combatant.Health, maxHealth = u.Combatant.Profile.MaxHealth, u.Combatant.ConstructionTurns, u.RemainingMovement, u.Acted, u.CommanderId, u.Transport, u.Burning, u.Objective,
-                objectiveMarker = u.Objective ? 1 : originalUnits.TryGetValue(u.Id, out var markedUnit) && markedUnit.Objective == 2 ? 2 : 0,
-                canMove = u.Combatant.Profile.Category != "fort" && u.RemainingMovement > 0 && u.Morale.Effective != -3 && u.Combatant.ConstructionTurns == 0,
-                canAttack = CanAttack(u),
-                canNavigateMove = navigationMoves.Contains(u.Id),
-                veterancy = u.Veterancy, morale = u.Morale.Effective,
-                facing = originalUnits.TryGetValue(u.Id, out var source) ? source.Facing : 1,
-                commanderDefinitionId = CommanderDefinitionId(u),
-                commanderImage = session.Account.Roster.FirstOrDefault(c => c.Id == u.CommanderId) is OwnedCommander owned
-                    ? content.Catalogs.Accounts.Rules().Definitions[owned.DefinitionId].DisplayName
-                    : u.CommanderId == u.Id + ".commander" && originalUnits.TryGetValue(u.Id, out var commanded)
-                    && content.Catalogs.Runtime.Commanders.TryGetValue(commanded.Commander, out var commander) ? commander.Definition.DisplayName : null }),
+            units = deltaBase == null ? unitViews : null,
+            unitUpdates = deltaBase == null ? null : unitViews.Where(u => !deliveredUnits.TryGetValue(u.GetProperty("id").GetString()!, out var prior) || !JsonElement.DeepEquals(prior, u)).ToArray(),
+            removedUnits = deltaBase == null ? null : deliveredUnits.Keys.Where(id => !pendingUnits.ContainsKey(id)).ToArray(),
+            unitOrder = deltaBase == null ? null : world.Units.Select(u => u.Id).ToArray(),
             notices = current.Notices
         };
     }

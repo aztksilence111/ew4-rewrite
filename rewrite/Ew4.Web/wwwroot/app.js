@@ -1,9 +1,14 @@
 'use strict';
 const $ = id => document.getElementById(id);
-const canvas = $('map'), ctx = canvas.getContext('2d', {alpha: false});
+let canvas = $('map');
+let ctx;
 let catalog, manifest, cityNames={}, state, selected, selection, busy = false, mode = 2;
 let conquestPages, conquestPage=0, conquestEntering=false, conquestRender=0;
 let originalTextRenderer, menuArt, imageRevision=0;
+const resourceHud=['money','industry','food'].map((key,index)=>{
+  const row=document.querySelector('#resources [data-resource="'+key+'"]');
+  return {key,label:['金钱','工业','粮食'][index],row,value:row.querySelector('.resource-value')};
+});
 let startupReady=false,startupRunning=false,startupError='';
 let effects,damageNumbers,music;
 let originalTextQueued=false;
@@ -34,7 +39,7 @@ window.ew4SetAppVisible=visible=>{appVisible=visible;music?.setVisible(visible);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)suspendRendering();else requestRender();});
 new MutationObserver(requestRender).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden']});
 for(const event of ['pointerdown','pointermove','pointerup','wheel','input','change','click'])document.addEventListener(event,requestRender,{passive:true});
-const battlefield = new Ew4Battlefield.Renderer({image,sprite,animation,libraries,get imageRevision(){return imageRevision;},get effects(){return effects;},get manifest(){return manifest;},get geographicLanguage(){return settings.geographicLanguage;},cityLabel:(name,cell,rasterScale=1)=>{
+const battlefield = new Ew4Battlefield.Renderer({image,sprite,animation,libraries,get visible(){return appVisible;},get imageRevision(){return imageRevision;},get effects(){return effects;},get manifest(){return manifest;},get geographicLanguage(){return settings.geographicLanguage;},cityLabel:(name,cell,rasterScale=1)=>{
   const translated=manifest.maps[state.map].cityNames?.[cell];
   const text=translated?.name===name?translated[settings.cityLanguage]:Ew4MenuArt.cityName(name,settings.cityLanguage,cityNames);
   return originalTextRenderer.element(text,'font_city_labels_hd','#ffffff',undefined,'left',{rasterScale});
@@ -60,29 +65,54 @@ const localMultiplayerUi = new Ew4LocalMultiplayer.LocalMultiplayer({rpc,detail:
     && battlefield.state===state&&[...images.values()].every(img=>img.complete),
   restart:next=>start(next.scenario,next.startCountry,next.localMultiplayer.humanFactions)});
 let tutorial, tutorialRect;
-let settings={music:50,sound:50,speed:2,hd:true,screen:100,eventSize:100,cityLanguage:'en',geographicLanguage:'en',localMultiplayer:false,skipTurnFast:false,followAi:false};
+let settings={music:50,sound:50,speed:2,hd:true,screen:100,eventSize:100,cityLanguage:'en',geographicLanguage:'en',localMultiplayer:false,autoTurnFast:true,followAi:false};
 try { settings={...settings,...JSON.parse(localStorage.getItem('ew4.settings')||'{}')}; } catch (_) {}
+// Local Web previews start silent even when a previous test saved audible volumes.
+if(['localhost','127.0.0.1','[::1]'].includes(location.hostname)){
+  settings.music=0;settings.sound=0;
+}
 settings.eventSize=Number.isFinite(settings.eventSize)?Math.max(60,Math.min(180,settings.eventSize)):100;
-for(const key of ['skipTurnFast','followAi'])settings[key]=settings[key]===true;
+// The old switch only configured manual skipping; automatic skipping has its own default.
+delete settings.skipTurnFast;
+settings.autoTurnFast=settings.autoTurnFast!==false;
+settings.followAi=settings.followAi===true;
 try { showGrid = localStorage.getItem('ew4.showGrid') === 'true'; } catch (_) { /* Storage can be unavailable in restricted WebViews. */ }
+let screenLayout;
+function fitDetailWindow(){
+  if(!screenLayout)return;
+  const dialog=$('detail-modal').firstElementChild;
+  const width=parseFloat(dialog.style.width)||250,height=parseFloat(dialog.style.height)||200;
+  dialog.style.setProperty('--detail-fit-scale',Ew4ScreenLayout.fit(width+2,height+2,screenLayout.uiScale,screenLayout.safeWidth,screenLayout.safeHeight));
+  dialog.style.setProperty('--effective-detail-scale',Math.min(screenLayout.uiScale,Number(dialog.style.getPropertyValue('--detail-fit-scale'))));
+}
 function sizeUi() {
   const reserve=startupReady&&!$('startup-status').hidden?Math.ceil($('startup-status').getBoundingClientRect().height)+24:0;
-  document.documentElement.style.setProperty('--startup-reserve',reserve+'px');
-  const scale = Math.min(innerWidth / 568, Math.max(1,innerHeight-reserve) / 320)*settings.screen/100;
-  document.documentElement.style.setProperty('--ui-scale', scale);
-  const battleScale=Math.min(Math.max(scale,48/27,innerHeight/300),innerWidth/420,innerHeight/180);
-  document.documentElement.style.setProperty('--battle-scale', battleScale);
-  document.documentElement.style.setProperty('--battle-compact-scale', battleScale*.75);
+  const root=document.documentElement,style=getComputedStyle(root);
+  const insets=Object.fromEntries(['left','right','top','bottom'].map(side=>[side,parseFloat(style.getPropertyValue('--screen-safe-'+side))||0]));
+  screenLayout=Ew4ScreenLayout.measure({width:innerWidth,height:innerHeight,screen:settings.screen,reserve,insets,
+    touch:matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>0});
+  const {uiScale:scale,width,height,safeWidth,safeHeight}=screenLayout;
+  root.dataset.screenProfile=screenLayout.profile;root.dataset.screenOrientation=screenLayout.orientation;
+  root.style.setProperty('--startup-reserve',reserve+'px');
+  for(const [name,value] of Object.entries({'ui-scale':scale,'battle-scale':screenLayout.battleScale,
+    'battle-compact-scale':screenLayout.compactScale,'battle-hud-scale':screenLayout.hudScale,
+    'pause-scale':screenLayout.pauseScale,'talk-scale':screenLayout.talkScale}))root.style.setProperty('--'+name,value);
+  for(const [name,value] of Object.entries({'screen-width':width,'screen-height':height,'screen-safe-width':safeWidth,'screen-safe-height':safeHeight,
+    'screen-corner-inset':screenLayout.cornerInset,'screen-action-width':screenLayout.actionWidth,
+    'menu-width':screenLayout.menuWidth,'menu-height':screenLayout.menuHeight,
+    'menu-safe-left':screenLayout.menuSafeLeft,'menu-safe-right':screenLayout.menuSafeRight,
+    'menu-safe-top':screenLayout.menuSafeTop,'menu-safe-bottom':screenLayout.menuSafeBottom}))root.style.setProperty('--'+name,value+'px');
+  fitDetailWindow();
   window.dispatchEvent(new Event('ew4uiscale'));
-  const baseEventScale = Math.min(1.5, innerWidth*.84/360, innerHeight*.74/264)*settings.screen/100;
-  const eventHeight=innerHeight>=innerWidth?Math.min(400,innerHeight*.74/baseEventScale):264;
+  const baseEventScale = Math.min(1.5, safeWidth*.84/360, safeHeight*.74/264)*settings.screen/100;
+  const eventHeight=height>=width?Math.min(400,safeHeight*.74/baseEventScale):264;
   // Bound the slider itself so each step still enlarges the popup on small screens.
-  const maxEventSize=Math.min(180,Math.floor(Math.min(innerWidth*.96/360,innerHeight*.92/eventHeight)/baseEventScale*100));
+  const maxEventSize=Math.min(180,Math.floor(Math.min(safeWidth*.96/360,safeHeight*.92/eventHeight)/baseEventScale*100));
   const eventSize=Math.min(settings.eventSize,maxEventSize);
   const eventScale=baseEventScale*eventSize/100;
   document.documentElement.style.setProperty('--event-scale', eventScale);
   document.documentElement.style.setProperty('--event-available-height', eventHeight+'px');
-  document.documentElement.style.setProperty('--settings-scale',Math.min(scale,(innerWidth-16)/362,(innerHeight-16)/340));
+  document.documentElement.style.setProperty('--settings-scale',Math.min(scale,(safeWidth-32)/362,(safeHeight-32)/340));
   $('event-size').max=maxEventSize;$('event-size').value=eventSize;
   $('event-size-value').textContent=eventSize+'%';
   clampView();
@@ -122,11 +152,24 @@ async function showMain() {
 }
 function notice(text) { $('notice').textContent = text; $('notice').hidden = false; clearTimeout(errorTimer); errorTimer = setTimeout(() => $('notice').hidden = true, 5500); }
 async function rpc(route, args = {}) {
+  if(route==='action'&&args.op!=='select')args={...args,delta:true};
   const response = await fetch('/api/' + route + '?q=' + encodeURIComponent(JSON.stringify(args)), {method: 'POST', cache: 'no-store'});
   if (!response.ok) throw Error('连接失败 (' + response.status + ')');
   const result = await response.json();
   if (!result.ok) throw Error(failure(result.code, result.message));
-  return result.data;
+  const data=result.data,next=route==='action'?(args.op==='ai_batch'?data.state:data):null;
+  if(next&&(next.baseRevision!=null||!next.cells&&next.cellUpdates)){
+    if(!state||next.baseRevision!=null&&next.baseRevision!==state.revision){
+      const full=await rpc('action',{op:'state'});
+      if(args.op==='ai_batch'){data.state=full;data.baseRevision=state?.revision;return data;}
+      return full;
+    }
+    next.changedCells=(next.cellUpdates||[]).map(u=>u.cell);
+    if(!next.cells){next.cells=state.cells.slice();for(const update of next.cellUpdates||[])next.cells[update.cell]=update.value;}
+    if(!next.units){const units=new Map(state.units.map(u=>[u.id,u]));for(const id of next.removedUnits||[])units.delete(id);for(const unit of next.unitUpdates||[])units.set(unit.id,unit);next.units=next.unitOrder?next.unitOrder.map(id=>units.get(id)):[...units.values()];}
+    delete next.cellUpdates;delete next.unitUpdates;delete next.removedUnits;delete next.unitOrder;
+  }
+  return data;
 }
 function failure(code, message) {
   const labels = {'client.player_turn':'请等待己方回合','client.stale':'状态已更新，请重新选择','client.ai_turn':'当前并非电脑回合',
@@ -145,7 +188,10 @@ function image(path) {
 async function loadImage(path) {
   const img = image(path);
   if (img.complete && img.naturalWidth) return img;
-  await img.decode(); return img;
+  try{await img.decode();}catch(error){
+    // Early WebViews can reject decode() after the image has successfully loaded.
+    if(!img.complete||!img.naturalWidth)throw Error('图像载入失败：'+path+' ('+error.message+')');
+  }return img;
 }
 function button(text, action, parent) {
   const result = document.createElement('button'); result.textContent = text;
@@ -302,6 +348,12 @@ async function installState(next, center = false) {
   $('menu').hidden = true; $('play').hidden = false;
   if(resetPause)$('pause').hidden = true;
   if (center) centerPlayer(); else clampView();
+  if(center){
+    const map=manifest.maps[state.map],files=[...map.tiles.map(t=>t.file),'images/map_pt@2x.png',manifest.mapDrawing?.borderTexture,'images/tiles.png','images/tiles_hd.png','images/buildings.png','images/buildings_hd.png'].filter(Boolean);
+    await Promise.all(files.map(loadImage));
+    const w=canvas.clientWidth/.48+512,h=canvas.clientHeight/.48+512;
+    await battlefield.prewarm(state,map,{left:view.x-w/2,top:view.y-h/2,width:w,height:h});
+  }
   refreshHud();
   motions.clear(); arrivals.clear();
   const now=performance.now(), stepMs=movementStepMs();
@@ -366,7 +418,7 @@ function presentBattleDialogue(){
     state={...state,dialogue:talk.text,dialoguePresentation:talk,localBattleDialogue:true};
   }
 }
-function fastSkipping(){return aiRunning&&skipAi&&settings.skipTurnFast;}
+function fastSkipping(){return aiRunning&&skipAi;}
 function movementStepMs(){return aiRunning&&skipAi?65:255/Math.sqrt(settings.speed);}
 function clearAiPresentation(){
   motions.clear();arrivals.clear();deaths.clear();combatMotions.clear();battlefield.resetMotions();effects?.clear();damageNumbers?.clear();finishPresentation?.();
@@ -488,17 +540,22 @@ async function presentAiProgress(){
     if(flag.complete)paint();else flag.decode().catch(()=>{}).then(paint);
   });
 }
+function updateHudText(host,value,font,color) {
+  const text=String(value);
+  if(host.ew4HudText===text&&host.ew4HudRenderer===originalTextRenderer)return false;
+  host.replaceChildren(originalTextRenderer.element(text,font,color));
+  host.ew4HudText=text;host.ew4HudRenderer=originalTextRenderer;
+  return true;
+}
 function refreshHud() {
   const active = state.factions.find(f => f.id === state.activeFaction);
   const player = state.factions.find(f => f.id === state.playerFaction);
-  $('turn').replaceChildren(originalTextRenderer.element('回合  ' + state.round,'font_text_2_cn_hd','#404040'));
-  $('player-flag').src = flagSource(player);
-  $('player-flag').alt = $('player-flag').title = player.name;
-  $('resources').replaceChildren();
-  for (const [label, icon, value] of [['金钱','money', player.resources.money], ['工业','industry',player.resources.industry], ['粮食','food',player.resources.food]]) {
-    const span = document.createElement('span'); span.className='resource-item';span.setAttribute('aria-label', label + ' ' + value);
-    const marker = document.createElement('img'); marker.src = '/content/ui/image_ui_hd/marker_' + icon + '.png'; marker.alt = '';
-    span.append(marker, originalTextRenderer.element(value,'font_char_2_hd','#ffffff')); $('resources').append(span);
+  updateHudText($('turn'),'回合  ' + state.round,'font_text_2_cn_hd','#404040');
+  const flag=$('player-flag'),source=flagSource(player);
+  if(flag.getAttribute('src')!==source)flag.src=source;
+  if(flag.alt!==player.name)flag.alt=flag.title=player.name;
+  for (const {key,label,row,value} of resourceHud) {
+    if(updateHudText(value,player.resources[key],'font_char_2_hd','#ffffff'))row.setAttribute('aria-label',label+' '+player.resources[key]);
   }
   $('end-turn').disabled = busy || !active.human || state.phase !== 'Active' || !!state.dialogue;
   $('undo-move').hidden = !active.human;
@@ -512,7 +569,7 @@ function refreshHud() {
     unitCount.replaceChildren(originalTextRenderer.element(remainingUnits,'font_char_2_hd','#ffffff',14,'right',{size:remainingUnits<100?8:remainingUnits<1000?6:4.5,singleLine:true}));
     $('next-unit').title=$('next-unit').ariaLabel='寻找可行动部队（剩余 '+remainingUnits+'）';
   }
-  $('skip-ai').hidden = active.human || state.phase === 'Finished' || !!state.dialogue;
+  $('skip-ai').hidden = active.human || state.phase === 'Finished' || !!state.dialogue || !!state.scenarioPopup || settings.autoTurnFast;
   $('skip-ai').disabled = skipAi;
   refreshAiProgress();
   $('dialogue').hidden = !state.dialogue || !!state.scenarioPopup || stageIntroOpen;
@@ -590,7 +647,8 @@ async function stopAi(){
 async function runAiLoop() {
   if (aiRunning) return;
   aiStopRequested=false;
-  aiRunning = true; skipAi = false;
+  aiRunning = true; skipAi = settings.autoTurnFast;
+  if(skipAi){clearAiPresentation();aiFocus=null;}
   try {
     busy=true;refreshHud();
     while (aiCanContinue(state)&&$('pause').hidden&&!aiStopRequested) {
@@ -647,7 +705,7 @@ async function selectCell(cell,restore=false,selectOnly=false) {
   }
   if(selection.deploy) toolButton('general','任命将领',()=>menus.deployGeneral(target.id,state.revision));
   if(selection.actionQuotes?.upgrade) singleActionButton('buildupgrade','升级建筑','upgrade',selection.actionQuotes.upgrade,{cell});
-  if(selection.installations.length) toolButton('builddefense','防御',()=>openDefense(cell));
+  if(selection.installationOffers?.length) toolButton('builddefense','防御',()=>openDefense(cell));
   if(selection.actionQuotes?.train) singleActionButton('training','培训','train',selection.actionQuotes.train);
   if(selection.items) toolButton('items','使用物品',()=>menus.useItems(target.id));
   if(selection.offers.length) toolButton(({city:'city',industry:'factory',stable:'stable',port:'dock'})[site.buildingKind]||'buildfortress',site.buildingKind?'雇佣':'建造要塞',()=>openRecruitment(cell));
@@ -710,6 +768,7 @@ function detailWindow(title,width,height,confirm,onClose){
   $('detail-title').replaceChildren(labelImage(title,titleText,$('detail-title')));$('detail-content').replaceChildren();$('detail-content').nativeLayout=null;$('detail-content').className='';$('detail-modal').hidden=false;
   $('detail-confirm').dataset.tutorialId='winbtn_ok';$('detail-confirm').hidden=!confirm;$('detail-confirm').onclick=async()=>{try{await confirm();if(generation===detailRevision)$('detail-modal').hidden=true;await tutorialUi($('detail-confirm').dataset.tutorialId);}catch(e){notice(e.message);}};
   $('detail-confirm').disabled=false;
+  fitDetailWindow();
   popupOpen(dialog);return $('detail-content');
 }
 const formationColors=['#646464','#326478','#40803b'];
@@ -880,8 +939,34 @@ function openRecruitment(cell){
   choose(chosen,row.firstElementChild);
 }
 function openDefense(){
-  let chosen=selection.installations[0];const body=detailWindow('defense_label',300,185,()=>act('installation',{offer:chosen}));const row=document.createElement('div');row.className='defense-cards';body.append(row);
-  for(const [index,id] of selection.installations.entries()){const b=button('',()=>{chosen=id;for(const c of row.children)c.setAttribute('aria-pressed',String(c===b));},row);b.dataset.tutorialId='lbox_defense';b.dataset.tutorialRow=index;b.setAttribute('aria-label',id);b.append(uiImage('build_'+({trench:'moat',fence:'fences',bunker:'bunker'})[id]+'.png',94,64));}
+  const offers=selection.installationOffers;if(!offers?.length)return;
+  let chosen=offers[0];const unit=selected.id,revision=state.revision,cell=selection.cell;
+  const body=detailWindow('defense_label',300,185,async()=>{
+    if(!chosen.quote.affordable||busy)return;
+    if(revision!==state.revision||cell!==selection?.cell||unit!==selected?.id)throw new Error('状态已更新，请重新选择');
+    await act('installation',{offer:chosen.id,unit,revision});
+  });
+  const row=document.createElement('div');row.className='defense-cards';body.append(row);
+  function choose(offer,b){
+    chosen=offer;for(const c of row.children)c.setAttribute('aria-pressed',String(c===b));
+    body.querySelector('.unit-description')?.remove();
+    descriptionBox(body,manifest.strings['name_'+offer.name]||offer.name,manifest.strings['desc_'+offer.name]||'');
+    $('detail-confirm').disabled=!offer.quote.affordable;
+  }
+  const funds=state.factions.find(f=>f.id===state.playerFaction).resources;
+  for(const [index,offer] of offers.entries()){
+    const b=button('',()=>choose(offer,b),row);b.dataset.tutorialId='lbox_defense';b.dataset.tutorialRow=index;b.setAttribute('aria-label',manifest.strings['name_'+offer.name]||offer.name);
+    b.append(uiImage('build_'+({trench:'moat',fence:'fences',bunker:'bunker'})[offer.kind]+'.png',94,64));
+    const strip=document.createElement('span');strip.className='cost-strip';
+    for(const key of ['money','industry','food']){
+      const value=offer.quote.cost[key]||0;if(key==='food'&&!value)continue;
+      const amount=document.createElement('span');amount.textContent=value;amount.dataset.resource=key;
+      if(value>funds[key])amount.style.color='#ff3200';
+      strip.append(uiImage('marker_'+key+'.png',10),amount);
+    }
+    b.append(strip);
+  }
+  choose(chosen,row.firstElementChild);
 }
 function centerPlayer() {
   const unit = state.units.find(u => u.owner === state.playerFaction);
@@ -939,24 +1024,25 @@ function animation(lib, item, tick, depth=0, draw=ctx, frameFor=null) {
 function drawStrategicMap(time=performance.now()) {
   const surface=$('strategic-map'), draw=surface.getContext('2d'), lib=libraries.get('strategicmap');
   if(!lib || !chosenScenario)return;
-  const definition=manifest.strategic[chosenScenario]||{}, scale=Number(definition.scale||1)*.92;
+  const definition=manifest.strategic[chosenScenario]||{};
   const textureScale=manifest.uiOverrides?.strategic?1:.8;
-  const mapLeft=205-Number(definition.centerx||410)*scale;
-  const mapRight=mapLeft+menuArt.strategic.image.naturalWidth/menuArt.strategic.ratio*textureScale*scale;
-  const centerX=205+(manifest.uiOverrides?.strategic?0:mapLeft>0?-mapLeft:Math.max(0,410-mapRight));
+  const logicalWidth=surface.clientWidth,logicalHeight=surface.clientHeight;
+  const mapWidth=logicalWidth-158,texture=menuArt.strategic;
+  const scale=Math.max(Number(definition.scale||1)*.92,
+    manifest.uiOverrides?.strategic?0:Math.max(mapWidth/(texture.image.naturalWidth/texture.ratio*textureScale),logicalHeight/((texture.height||texture.image.naturalHeight/texture.ratio)*textureScale)));
+  const camera=menuArt.strategicCamera(definition,scale,textureScale,mapWidth,logicalHeight);
   const rect=surface.getBoundingClientRect(),ratio=settings.hd?Math.min(devicePixelRatio||1,3):1;
   const width=Math.max(1,Math.round(rect.width*ratio)),height=Math.max(1,Math.round(rect.height*ratio));
   if(surface.width!==width||surface.height!==height){surface.width=width;surface.height=height;}
-  draw.setTransform(surface.width/568,0,0,surface.height/320,0,0);draw.clearRect(0,0,568,320);draw.save();
+  draw.setTransform(surface.width/logicalWidth,0,0,surface.height/logicalHeight,0,0);draw.clearRect(0,0,logicalWidth,logicalHeight);draw.save();
   // Conquest overlays use an 80% backdrop; scenario centers remain in overlay coordinates.
-  menuArt.drawStrategic(draw,definition,scale,centerX,160,textureScale);
-  draw.translate(centerX,160);draw.scale(scale,scale);
+  menuArt.drawStrategic(draw,definition,scale,camera.x,camera.y,textureScale);
+  draw.translate(camera.x,camera.y);draw.scale(scale,scale);
   const strategic=lib.byName.get(definition.name||('conquest '+chosenScenario.slice(8)));if(strategic)animation(lib,strategic,time/180,0,draw);draw.restore();
 }
 function render(time) {
   renderRequest=0;
   if(document.hidden||!appVisible)return;
-  if(!renderDirty&&time-lastRenderTime<1000/30-.5){renderRequest=requestAnimationFrame(render);return;}
   renderDirty=false;lastRenderTime=time;
   const playVisible=state&&!$('play').hidden;
   const menuVisible=!$('menu').hidden;
@@ -975,14 +1061,16 @@ function render(time) {
   // Covered battlefields still need a fresh frame when their backing surface changes size.
   const resized=canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)||viewport.w!==w||viewport.h!==h||viewport.dpr!==dpr;
   if(covered&&!stageIntroOpen&&!resized)return;
-  if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);}
+  if(!ctx){try{ctx=Ew4Pixi.createContext(canvas,()=>{battlefield.invalidateGround();requestRender();});if(canvas!==ctx.canvas){canvas=ctx.canvas;bindMapInput();}}catch(error){notice('绘图初始化失败：'+error.message);suspendRendering();return;}}
+  if(!ctx.begin(Math.round(w*dpr),Math.round(h*dpr)))return;
   viewport={w,h,dpr};updateAiCamera(time);clampView();ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#688e91';ctx.fillRect(0,0,w,h);
   ctx.translate(w/2,h/2);ctx.scale(view.zoom,view.zoom);ctx.translate(-view.x,-view.y);
   const min=screenToWorld(0,0),max=screenToWorld(w,h);
   battlefield.frame({draw:ctx,state,map:manifest.maps[state.map],visibleRect:{left:min.x,top:min.y,width:max.x-min.x,height:max.y-min.y},
-    zoom:view.zoom,showGrid,selection,selected,selectedAt,motions,facings,arrivals,arrivalSpeed:Math.sqrt(settings.speed),deaths,combatMotions},time);
+    zoom:view.zoom,detailScale:Math.max(1,Math.min(w/568,h/320,3)),showGrid,selection,selected,selectedAt,motions,facings,arrivals,arrivalSpeed:Math.sqrt(settings.speed),deaths,combatMotions},time);
   effects?.frame(ctx,time,'foreground',battlefield.visibleRect);
   damageNumbers?.frame(ctx,time,battlefield.visibleRect);
+  ctx.end();
   if(!animated&&battlefield.animated)requestRender();
 }
 async function tutorialUi(id,row=-1){if(id)await tutorial?.notify({type:'ui',id,row});}
@@ -1030,6 +1118,7 @@ document.addEventListener('pointerup',event=>{
 },true);
 document.addEventListener('click',event=>{if(performance.now()-tutorialTouchTime<350){event.preventDefault();event.stopPropagation();}},true);
 let pointers=new Map(),dragged=false,lastDistance=0;
+function bindMapInput(){
 canvas.addEventListener('pointerdown',e=>{if(followingAi())return;canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY});if(pointers.size===1)dragged=false;else{dragged=true;lastDistance=0;}});
 canvas.addEventListener('pointermove',e=>{
   if(followingAi()){pointers.clear();return;}
@@ -1040,8 +1129,10 @@ canvas.addEventListener('pointermove',e=>{
 });
 canvas.addEventListener('pointerup',e=>{pointers.delete(e.pointerId);if(!dragged&&pointers.size===0)selectCell(cellAt(e.clientX,e.clientY)).catch(error=>notice(error.message));});
 canvas.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);dragged=true;});
-function zoom(factor,x=viewport.w/2,y=viewport.h/2){const before=screenToWorld(x,y);view.zoom*=factor;clampView();const after=screenToWorld(x,y);view.x+=before.x-after.x;view.y+=before.y-after.y;clampView();}
 canvas.addEventListener('wheel',e=>{e.preventDefault();if(!followingAi())zoom(Math.exp(-e.deltaY*.001),e.clientX,e.clientY);},{passive:false});
+}
+bindMapInput();
+function zoom(factor,x=viewport.w/2,y=viewport.h/2){const before=screenToWorld(x,y);view.zoom*=factor;clampView();const after=screenToWorld(x,y);view.x+=before.x-after.x;view.y+=before.y-after.y;clampView();}
 document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=async()=>{if(!startupReady)return;mode=Number(b.dataset.mode);if(mode===4){menus.tutorialMenu();return;}$('main-menu').hidden=true;$('scenario-menu').hidden=false;$('countries').hidden=true;$('conquest-pagination').hidden=mode!==2;$('scenario-menu').classList.toggle('campaign-mode',mode===1);menuArt.apply(mode);$('mode-title').replaceChildren(labelImage(b.dataset.label,b.getAttribute('aria-label')));if(!await menus.open(mode))scenarioList();});
 $('conquest-prev').onclick=()=>turnConquestPage(-1);
 $('conquest-next').onclick=()=>turnConquestPage(1);
@@ -1063,7 +1154,7 @@ function syncLanguages(){for(const [id,key,title] of languageControls){const cho
   else choice.textContent=text;
 }}
 function openSettings(){for(const [id,key] of [['music-volume','music'],['sound-volume','sound'],['game-speed','speed'],['screen-size','screen']])$(id).value=settings[key];syncLanguages();$('hd-mode').checked=settings.hd;$('show-grid').checked=showGrid;
-  $('skip-turn-fast').checked=settings.skipTurnFast;$('follow-ai').checked=settings.followAi;
+  $('skip-turn-fast').checked=settings.autoTurnFast;$('follow-ai').checked=settings.followAi;
   const local=$('local-multiplayer-mode'),inGame=!$('play').hidden;
   local.disabled=inGame;local.checked=inGame?!!state?.localMultiplayer:!!settings.localMultiplayer;
   $('settings').hidden=false;}
@@ -1072,10 +1163,12 @@ $('close-settings').onclick=()=>$('settings').hidden=true;
 $('confirm-settings').onclick=()=>$('settings').hidden=true;
 for(const [id,key] of [['music-volume','music'],['sound-volume','sound'],['game-speed','speed'],['screen-size','screen'],['event-size','eventSize']])$(id).oninput=e=>{settings[key]=Number(e.target.value);if(key==='music')music?.resume();persistSettings();sizeUi();};
 $('hd-mode').onchange=e=>{settings.hd=e.target.checked;persistSettings();};
-for(const [id,key] of [['skip-turn-fast','skipTurnFast'],['follow-ai','followAi']])$(id).onchange=e=>{
+for(const [id,key] of [['skip-turn-fast','autoTurnFast'],['follow-ai','followAi']])$(id).onchange=e=>{
   settings[key]=e.target.checked;persistSettings();
+  if(key==='autoTurnFast'&&aiRunning)skipAi=settings.autoTurnFast;
   if(fastSkipping()){clearAiPresentation();aiFocus=null;}
   if(key==='followAi'){aiFocus=null;pointers.clear();}
+  if(state)refreshHud();
   requestRender();
 };
 $('local-multiplayer-mode').onchange=e=>{if(!$('play').hidden){e.target.checked=!!state?.localMultiplayer;return;}settings.localMultiplayer=e.target.checked;persistSettings();};
@@ -1087,7 +1180,10 @@ $('resume').onclick=()=>{$('pause').hidden=true;if(!busy)runAi().catch(e=>notice
 $('end-turn').onclick=()=>act('end').catch(e=>notice(e.message));
 $('undo-move').onclick=()=>{if(!selected||!selection?.undo||$('undo-move').disabled)return;return act('undo',{unit:selected.id}).then(()=>tutorialUi('btn_undo')).catch(e=>notice(e.message));};
 $('next-unit').onclick=()=>findNextUnit().catch(e=>notice(e.message));
-$('skip-ai').onclick=()=>{skipAi=true;clearAiPresentation();if(fastSkipping())aiFocus=null;refreshHud();requestRender();};
+$('skip-ai').onclick=()=>{
+  if(!aiRunning||!aiCanContinue(state)||skipAi)return;
+  skipAi=true;clearAiPresentation();aiFocus=null;refreshHud();requestRender();
+};
 $('dialogue').onclick=()=>{
   if($('dialogue').hidden||!$('pause').hidden||!$('settings').hidden||state?.scenarioPopup)return;
   act('dialogue').catch(e=>notice(e.message));
@@ -1157,10 +1253,13 @@ async function initializeClient(){
     effects=new Ew4Effects.Effects({image,sprite,animation,libraries,get manifest(){return manifest;},volume:()=>settings.sound},fx,visuals);
     effects.preloadSounds(presentation.sounds);
     Ew4Startup.pending('战斗图像与界面');
-    await Promise.all([Ew4OriginalUI.prepareText('-0123456789'),Ew4OriginalUI.prepareCombatText('-0123456789'),loadImage('images/eff.png')]);
+    const fightFont='font_fight_num_hd';
+    const [fightFonts,fightSheet]=await Promise.all([startupJson('/content/fight-font.json'),loadImage('images/'+fightFont+'.png'),
+      Ew4OriginalUI.prepareText('-0123456789'),loadImage('images/eff.png'),
+      ...resourceHud.map(({row})=>row.querySelector('img').decode())]);
     // Publish only after awaits so the mutation painter cannot consume initial label text.
     originalTextRenderer=text;
-    damageNumbers=new Ew4Effects.DamageNumbers();originalLabels();showMain();
+    damageNumbers=new Ew4Effects.DamageNumbers(manifest.fonts[fightFont]||fightFonts[fightFont],fightSheet);originalLabels();showMain();
     startupReady=true;
     Ew4Startup.ready();
     document.querySelectorAll('.main-entry').forEach(button=>button.disabled=false);$('continue').disabled=false;

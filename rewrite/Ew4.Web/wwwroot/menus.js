@@ -165,9 +165,11 @@
       const surface=document.getElementById('campaign-map'),draw=surface.getContext('2d'),lib=this.api.libraries.get('strategicmap');if(!lib)return;
       const rect=surface.getBoundingClientRect(),ratio=Math.min(devicePixelRatio||1,3),w=Math.round(rect.width*ratio),h=Math.round(rect.height*ratio);
       if(surface.width!==w||surface.height!==h){surface.width=w;surface.height=h;}
-      draw.setTransform(w/568,0,0,h/320,0,0);draw.clearRect(0,0,568,320);
-      const definition=this.manifest.strategic[this.battle.id]||{},scale=Number(definition.scale||1),textureScale=this.manifest.uiOverrides?.strategic?1:.8;
-      const camera=this.api.menuArt.strategicCamera(definition,scale,textureScale);
+      const logicalWidth=surface.clientWidth,logicalHeight=surface.clientHeight;
+      draw.setTransform(w/logicalWidth,0,0,h/logicalHeight,0,0);draw.clearRect(0,0,logicalWidth,logicalHeight);
+      const definition=this.manifest.strategic[this.battle.id]||{},textureScale=this.manifest.uiOverrides?.strategic?1:.8,texture=this.api.menuArt.strategic;
+      const scale=Math.max(Number(definition.scale||1),this.manifest.uiOverrides?.strategic?0:Math.max((logicalWidth-130)/(texture.image.naturalWidth/texture.ratio*textureScale),logicalHeight/((texture.height||texture.image.naturalHeight/texture.ratio)*textureScale)));
+      const camera=this.api.menuArt.strategicCamera(definition,scale,textureScale,logicalWidth-130,logicalHeight);
       draw.save();this.api.menuArt.drawStrategic(draw,definition,scale,camera.x,camera.y,textureScale);
       draw.translate(camera.x,camera.y);draw.scale(scale,scale);if(lib.byName.has(definition.name))this.api.animation(lib,lib.byName.get(definition.name),time/180,0,draw);draw.restore();
     }
@@ -254,7 +256,8 @@
         if(!this.recruiting&&!this.deployment)this.promotionShortcut(b,held,()=>this.drawRoster());
         b.setAttribute('aria-pressed',String(definition.id===(this.recruiting?this.offer?.id:this.rosterSelected)));
       }
-      const capacity=data.sectionCapacity??20,slots=this.recruiting?[6,4,2][this.rating]:this.deployment?Math.max(12,entries.length):Math.max(this.rosterRating===null?capacity*3:capacity,entries.length);
+      const capacities=data.sectionCapacities??Array(3).fill(data.sectionCapacity??20),capacity=this.rosterRating===null?capacities.reduce((sum,value)=>sum+value,0):capacities[this.rosterRating];
+      const slots=this.recruiting?[6,4,2][this.rating]:this.deployment?Math.max(12,entries.length):Math.max(capacity,entries.length);
       for(let i=entries.length;i<slots;i++){const b=this.api.button('',()=>{if(!this.deployment){this.recruiting=true;this.rating=this.rosterRating??0;this.drawRoster();}},roster);b.className='commander-card empty-commander';b.setAttribute('aria-label','空将领位');b.append(this.api.uiImage('button_add_generals.png',78,78));const name=document.createElement('span');name.className='commander-name';b.append(name);b.disabled=this.recruiting||!!this.deployment||!!this.tagDraft;}
       if(!this.recruiting)for(const [i,card] of [...roster.children].entries()){card.style.gridRow=i%2+1;card.style.gridColumn=Math.floor(i/2)+1;}
       for(const id of ['hq-recruit-band','hq-refresh','hq-buy-buttons'])document.getElementById(id)?.remove();
@@ -263,15 +266,21 @@
         const remaining=data.refresh?.[this.rating]?.remaining;if(remaining!=null){refresh.append(this.lettering(remaining,'font_char_2_hd','#ebe6e1'));refresh.title='剩余 '+remaining+' 次';}this.drawPurchases();}
       roster.scrollLeft=scroll;this.headquartersControls();
       const count=document.getElementById('hq-count');
-      count.hidden=this.recruiting;count.replaceChildren(this.lettering(entries.length+' / '+slots,'font_char_2_hd','#404040'));
+      count.hidden=this.recruiting;count.replaceChildren(this.lettering(entries.length+' / '+(this.deployment?slots:capacity),'font_char_2_hd','#404040'));
       document.getElementById('hq-deployment-quota')?.remove();
       if(this.deployment){const quota=document.createElement('div');quota.id='hq-deployment-quota';quota.append(this.api.uiImage('generalnumber.png',26,19),this.lettering((this.deploymentQuota?.used??0)+' / '+(this.deploymentQuota?.limit??'∞'),'font_char_4_hd','#404040'));screen.append(quota);}
     }
     drawPurchases(){
       document.getElementById('hq-buy-buttons')?.remove();if(!this.offer)return;
+      const definition=this.offer,group=this.rating;
       const row=document.createElement('div');row.id='hq-buy-buttons';document.getElementById('hq-screen').append(row);
-      for(const [currency,op,price,balance] of [['medals','recruit',this.offer.price,this.data.medals],['badges','recruit_badge',this.offer.badgePrice,this.data.badges]]){
-        if(price<=0)continue;const b=this.api.button('',async()=>{const definition=this.offer;this.offer=null;await this.transact({op,commander:definition.id,group:this.rating});},row);b.className='native-command'+(currency==='badges'?' red':'');b.setAttribute('aria-label',(currency==='badges'?'徽章':'勋章')+'招募 '+price);b.disabled=balance<price;b.append(this.api.uiImage(currency+'.png',13,17),this.lettering(price,'font_text_3_cn_hd','#ebe6e1'));
+      for(const [currency,op,price,balance] of [['medals','recruit',definition.price,this.data.medals],['badges','recruit_badge',definition.badgePrice,this.data.badges]]){
+        if(price<=0)continue;const b=this.api.button('',async()=>{
+          if(this.recruitPending)return;
+          this.recruitPending=true;for(const button of row.querySelectorAll('button'))button.disabled=true;
+          try{await this.transact({op,commander:definition.id,group});if(this.offer===definition)this.offer=null;}
+          finally{this.recruitPending=false;this.drawPurchases();}
+        },row);b.className='native-command'+(currency==='badges'?' red':'');b.setAttribute('aria-label',(currency==='badges'?'徽章':'勋章')+'招募 '+price);b.disabled=!!this.recruitPending||balance<price;b.append(this.api.uiImage(currency+'.png',13,17),this.lettering(price,'font_text_3_cn_hd','#ebe6e1'));
       }
       this.api.popup(row);
     }

@@ -11,6 +11,7 @@ public static partial class WorldAi
 {
     public static AiUnitPlan PlanUnit(WorldState state, string unitId, WorldAiRules rules)
     {
+        using var planning = PlanningScope.Begin(rules);
         var faction = WorldActions.Ready(state, state.Revision);
         rules.Validate();
         var unit = state.Units.SingleOrDefault(u => u.Id == unitId);
@@ -53,10 +54,15 @@ public static partial class WorldAi
 
     public static AiUnitPlan? PlanNextUnit(WorldState state, WorldAiRules rules)
     {
+        using var planning = PlanningScope.Begin(rules);
         var faction = WorldActions.Ready(state, state.Revision);
         rules.Validate();
+        if (WorldDiplomacy.Dormant(state, faction.Id, rules.NeutralCamps)) return null;
         foreach (var unit in state.Units.Where(u => u.Owner == faction.Id).OrderBy(u => u.Cell).ThenBy(u => u.Id, StringComparer.Ordinal))
         {
+            // Empty request sets cannot consume random draws or produce a candidate.
+            if (rules.Behaviors.TryGetValue(unit.Behavior, out var behavior)
+                && !AiPlanning.Requests(behavior, new(unit.RemainingMovement, unit.Morale.Effective, unit.Combatant.ConstructionTurns, unit.Acted)).Eligible) continue;
             var plan = PlanUnit(state, unit.Id, rules);
             if (plan.Candidates.Count > 0) return plan;
         }

@@ -72,12 +72,12 @@ public sealed partial class ClientGame
         var command = plan.Unit.Candidates[best].Action;
         string? target = command switch { AiStrikeCommand strike => strike.TargetId, AiMoveCommand move => move.TargetId, _ => null };
         if (target == null) return null;
-        var projected = command is AiMoveCommand movement
-            ? WorldActions.Move(world, world.Revision, command.UnitId, movement.Destination, Require().Rules.Movement).State : world;
+        var movedChange = command is AiMoveCommand movement
+            ? WorldActions.Move(world, world.Revision, command.UnitId, movement.Destination, Require().Rules.Movement) : null;
+        var projected = movedChange?.State ?? world;
         if (projected.Phase == TurnPhase.Finished || projected.PendingDialogue != null) return null;
         var preview = WorldBattle.Preview(projected, projected.Revision, command.UnitId, target, Require().Rules.Battle);
-        var movements = command is AiMoveCommand moved
-            ? new[] { new { unit = moved.UnitId, path = WorldActions.Reachable(world, moved.UnitId, Require().Rules.Movement)[moved.Destination].Path } } : [];
+        var movements = movedChange?.Movements ?? [];
         return new { attacker = preview.Attacker, defender = preview.Defender, counterattack = preview.Main.Counterattack, movements,
             damage = preview.Main.DefenderDamage, counterDamage = preview.Main.AttackerDamage,
             critical = preview.Main.OffensiveProc && !preview.Main.DefensiveProc, counterCritical = false,

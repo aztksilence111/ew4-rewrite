@@ -37,7 +37,9 @@ app.Use(async (context, next) =>
         catch (Exception e) when (e is IOException or ArgumentException) { context.Response.StatusCode = 404; return; }
     }
     string sourcePath = path == "/" ? "index.html" : path.TrimStart('/');
-    if (!sourcePath.Contains('/') && Path.GetExtension(sourcePath) is ".html" or ".css" or ".js")
+    bool compatibleAsset = sourcePath.StartsWith("compat/", StringComparison.Ordinal)
+        && !sourcePath.Contains("..", StringComparison.Ordinal) && !sourcePath.Contains('\\');
+    if ((!sourcePath.Contains('/') || compatibleAsset) && Path.GetExtension(sourcePath) is ".html" or ".css" or ".js")
     {
         string sourceFile = Path.Combine(frontend, sourcePath);
         if (File.Exists(sourceFile))

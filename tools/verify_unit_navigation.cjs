@@ -4,7 +4,7 @@ const {chromium}=createRequire('C:/Users/WIN11/.cache/codex-runtimes/codex-prima
 const base=process.argv[2]||'http://127.0.0.1:5426',folder=path.resolve(process.argv[3]||'build/unit-navigation-fix-20261023/browser');
 (async()=>{
   await fs.mkdir(folder,{recursive:true});
-  const report={checks:0,errors:[],missing:[],screenshots:[],scope:'Pure unit-state cases and real shared Web UI; Android safe viewport sizes simulated, no device execution'};
+  const report={checks:0,errors:[],missing:[],screenshots:[],layouts:[],scope:'Pure unit-state cases and real shared Web UI; Android safe viewport sizes and rounded corners simulated, no device execution'};
   const check=(value,label)=>{assert.ok(value,label);report.checks++;};
   const sandbox={};vm.runInNewContext(await fs.readFile('rewrite/Ew4.Web/wwwroot/unit-navigation.js','utf8'),sandbox);
   const api=sandbox.Ew4UnitNavigation;
@@ -32,6 +32,20 @@ const base=process.argv[2]||'http://127.0.0.1:5426',folder=path.resolve(process.
   page.on('pageerror',e=>report.errors.push(e.message));page.on('response',r=>{if(r.status()>=400)report.missing.push(r.url());});
   try{
     await page.goto(base);await page.waitForFunction(()=>startupReady,null,{timeout:60000});
+    report.asset=await page.evaluate(async()=>{
+      const img=new Image();img.src='/unit-search.png?v=20261023.4';await img.decode();
+      const canvas=document.createElement('canvas');canvas.width=img.width;canvas.height=img.height;
+      const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);const pixels=ctx.getImageData(0,0,img.width,img.height).data;
+      let top=0,lateral=0,white=0;
+      for(let y=0;y<img.height;y++)for(let x=0;x<img.width;x++){
+        const i=(y*img.width+x)*4,a=pixels[i+3];
+        if(y<20&&a)top++;
+        if(x<19&&a)lateral++;
+        if(a>200&&pixels[i]>220&&pixels[i+1]>220&&pixels[i+2]>220)white++;
+      }
+      return {width:img.width,height:img.height,top,lateral,white};
+    });
+    check(report.asset.top===0&&report.asset.lateral>0&&report.asset.white>300,'honeycomb retains white tiles and lateral shadow without the upward corner wedge');
     await page.evaluate(()=>start('conquest1','fra'));
     await page.waitForFunction(()=>!busy&&!$('next-unit').disabled);
     const initial=await page.evaluate(()=>({revision:state.revision,units:JSON.stringify(state.units),ids:Ew4UnitNavigation.groups(state)[0].map(u=>u.id),zoom:view.zoom}));
@@ -70,16 +84,26 @@ const base=process.argv[2]||'http://127.0.0.1:5426',folder=path.resolve(process.
     await page.evaluate(()=>{$('pause').hidden=false;});
     const paused=await page.evaluate(()=>selected.id);await page.evaluate(()=>findNextUnit());
     check(await page.evaluate(id=>selected.id===id,paused),'paused battle blocks unit search');await page.evaluate(()=>{$('pause').hidden=true;});
-    // Native Android pads the parent and gives the WebView exactly these safe dimensions.
-    const cases=[['desktop',1280,720],['phone-landscape',820,336],['phone-reverse-landscape',820,336],['wide-phone',956,360],['small-landscape',544,248],['portrait',336,700]];
-    for(const [name,width,height] of cases){
+    // Fullscreen Android uses the full viewport; cutouts do not add rectangular gutters.
+    const cases=[['desktop',1280,720],['device-screenshot',1215,582],['device-large-ui',1215,582,150],['phone-landscape',820,336],['phone-reverse-landscape',820,336],['wide-phone',956,360],['small-landscape',544,248],['portrait',336,700]];
+    for(const [name,width,height,screen=100] of cases){
       await page.setViewportSize({width,height});await page.waitForTimeout(120);
+      await page.evaluate(screen=>{settings.screen=screen;sizeUi();},screen);
       const bounds=await page.evaluate(()=>{
         const ids=['undo-move','next-unit','end-turn','menu-button'],rects=ids.map(id=>{const r=$(id).getBoundingClientRect();return {id,x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height};});
         return {rects,w:innerWidth,h:innerHeight,canvas:[canvas.clientWidth,canvas.clientHeight],scale:+getComputedStyle(document.documentElement).getPropertyValue('--battle-scale')};
       });
       for(const r of bounds.rects)check(r.x>=-.1&&r.y>=-.1&&r.right<=width+.1&&r.bottom<=height+.1,name+' '+r.id+' fully inside safe viewport');
       check(Math.abs(bounds.rects[1].right-bounds.rects[2].right)<.1&&bounds.rects[1].bottom<bounds.rects[2].y,name+' honeycomb is aligned above the hourglass');
+      for(const r of bounds.rects.slice(1,3)){
+        check(Math.abs(r.width-bounds.rects[3].width)<.1&&Math.abs(r.height-bounds.rects[3].height)<.1,name+' '+r.id+' matches pause face and hit size');
+        check(Math.abs(width-r.right-2)<.1&&height-r.bottom>=1.9,name+' '+r.id+' stays close to the screen edge');
+      }
+      const end=bounds.rects[2];
+      check(Math.abs(height-end.bottom-2)<.1,name+' lower button has only two pixels of bottom clearance');
+      report.layouts.push({name,screen,...bounds});
+      check(Math.abs(bounds.rects[2].y-bounds.rects[1].bottom-.2*end.height)<.1,name+' compact right stack keeps a fifth-button gap');
+      for(const id of ['undo-move','next-unit','end-turn','menu-button'])check(await page.locator('#'+id).evaluate(el=>getComputedStyle(el).overflow==='hidden'),name+' '+id+' crops external shadow');
       check(bounds.canvas[0]===width&&bounds.canvas[1]===height,name+' canvas uses the same safe viewport');
       for(const id of ['undo-move','next-unit','menu-button'])check(await page.locator('#'+id).evaluate(el=>{const r=el.getBoundingClientRect();return document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('button')===el;}),name+' '+id+' touch target is not covered');
       check(await page.locator('#next-unit').evaluate(el=>{const r=el.getBoundingClientRect();return document.elementFromPoint(r.left-2,r.top-2)?.closest('button')!==el;}),name+' shadow does not intercept map input');
@@ -97,10 +121,25 @@ const base=process.argv[2]||'http://127.0.0.1:5426',folder=path.resolve(process.
       });
       for(const b of badgeCases)check(b.matches&&b.inside&&b.ink&&b.disabled===(b.count===0),name+' count '+b.count+' is correct, legible and inside the button');
       await page.screenshot({path:path.join(folder,name+'.png')});report.screenshots.push(name+'.png');
+      await page.evaluate(()=>{settings.screen=100;sizeUi();});
       await page.locator('#menu-button').click();await page.locator('#pause-settings').click();
       check(await page.locator('#confirm-settings').evaluate(el=>{const r=el.getBoundingClientRect();return r.x>=0&&r.y>=0&&r.right<=innerWidth&&r.bottom<=innerHeight;}),name+' settings confirm fits');
       await page.locator('#close-settings').click();await page.locator('#resume').click();
     }
+    await page.setViewportSize({width:844,height:390});
+    await page.route('**/screen-layout.css?*',async route=>{
+      const response=await route.fetch(),css=await response.text();
+      await route.fulfill({response,body:css.replaceAll('env(safe-area-inset-right,0px)','24px').replaceAll('env(safe-area-inset-bottom,0px)','16px')});
+    });
+    await page.reload();await page.waitForFunction(()=>startupReady,null,{timeout:60000});
+    await page.evaluate(()=>start('conquest1','fra'));await page.waitForFunction(()=>!busy&&!$('next-unit').disabled);
+    const safe=await page.evaluate(()=>{
+      const r=$('end-turn').getBoundingClientRect(),n=$('next-unit').getBoundingClientRect();
+      return {right:innerWidth-r.right,bottom:innerHeight-r.bottom,aligned:Math.abs(r.right-n.right)<.1};
+    });
+    check(Math.abs(safe.right-2)<.1&&Math.abs(safe.bottom-2)<.1&&safe.aligned,'browser cutout insets do not move the edge HUD');
+    report.safeInsets=safe;
+    await page.screenshot({path:path.join(folder,'safe-area.png')});report.screenshots.push('safe-area.png');
     await page.evaluate(()=>{state={...state,units:state.units.map(u=>u.owner===state.playerFaction?{...u,acted:true,canMove:false,canNavigateMove:false,canAttack:false,remainingMovement:0}:u)};refreshHud();});
     check(await page.locator('#next-unit').isDisabled(),'no remaining units disables search');
     check(await page.locator('#next-unit-count').getAttribute('data-count')==='0','zero remaining units displays zero');

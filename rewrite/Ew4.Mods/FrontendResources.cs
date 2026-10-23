@@ -16,7 +16,7 @@ public sealed partial class ModStore
             string text = Encoding.UTF8.GetString(bytes).Replace("content/", "content/r-" + revision + "/", StringComparison.Ordinal);
             if (extension == ".html")
                 text = Regex.Replace(text, "((?:src|href)=\")([^\"]+\\.(?:js|css)(?:\\?[^\"]*)?)(\")",
-                    m => m.Groups[1].Value + m.Groups[2].Value + (m.Groups[2].Value.Contains('?') ? "&" : "?") + "content=" + revision + m.Groups[3].Value);
+                    m => m.Groups[1].Value + "compat/" + m.Groups[2].Value + (m.Groups[2].Value.Contains('?') ? "&" : "?") + "content=" + revision + m.Groups[3].Value);
             return Encoding.UTF8.GetBytes(text);
         }
     }

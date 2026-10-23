@@ -87,7 +87,7 @@ public sealed record Combatant
         && (Skills.Contains(skill) || Profile.SkillSlots.Any(s => s.Id == skill));
     public void Validate()
     {
-        Profile.Validate();
+        PlanningScope.Validate(Profile, Profile.Validate);
         SkillSlot.Validate(Profile.SkillSlots.Concat(SkillSlots));
         if (Statuses == null || Statuses.Count > 64 || Statuses.Any(s => s == null || string.IsNullOrWhiteSpace(s.Id)
             || s.Id.Length > 128 || s.RemainingTurns is < 1 or > 1000 || s.Level < 1 || s.Stacks is < 1 or > 32)

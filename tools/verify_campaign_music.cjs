@@ -5,13 +5,15 @@ const root='E:/Workplace/game/o4mod',folder=root+'/build/campaign-music-20261023
 (async()=>{
   await fs.mkdir(folder,{recursive:true});
   const report={checks:0,errors:[],missing:[],screenshots:[]},check=(value,label)=>{assert(value,label);report.checks++;};
-  const browser=await chromium.launch({headless:true,executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'});
+  const browser=await chromium.launch({headless:true,args:['--mute-audio'],executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'});
   const page=await browser.newPage({viewport:{width:1280,height:720}});
   page.on('pageerror',error=>report.errors.push(error.message));page.on('response',r=>{if(r.status()>=400)report.missing.push([r.status(),r.url()]);});
   try{
     await page.goto(url);await page.waitForFunction(()=>startupReady,null,{timeout:90000});
     check(await page.evaluate(()=>music.audio.paused&&!music.unlocked),'music waits for initial gesture');
     await page.locator('#main-settings').click();
+    check(await page.evaluate(()=>settings.music===0&&settings.sound===0&&music.audio.paused),'local Web preview starts silent after a gesture');
+    await page.locator('#music-volume').fill('50');
     await page.waitForFunction(()=>!music.audio.paused&&music.audio.currentTime>0,null,{timeout:20000});
     check(await page.evaluate(()=>music.audio.src.endsWith('/music/battle1.mp3')&&music.audio.loop),'original main menu loop plays');
     await page.locator('#music-volume').fill('0');check(await page.evaluate(()=>music.audio.paused&&music.audio.volume===0),'music zero pauses');

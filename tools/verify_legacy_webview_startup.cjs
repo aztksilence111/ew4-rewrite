@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs/promises'),path=require('node:path'),{createRequire}=require('node:module');
 const {chromium}=createRequire('C:/Users/WIN11/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/_probe.cjs')('playwright');
-const base=process.env.EW4_TEST_URL||'http://127.0.0.1:5227',folder=path.resolve('build/android10-startup-20261021');
+const base=process.env.EW4_TEST_URL||'http://127.0.0.1:5227',baseline=path.resolve('build/android10-startup-20261021/baseline'),folder=path.resolve(process.env.EW4_STARTUP_REPORT||'build/android10-startup-20261021');
 (async()=>{
   await fs.mkdir(folder,{recursive:true});
   const browser=await chromium.launch({headless:true,executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'});
@@ -20,12 +20,12 @@ const base=process.env.EW4_TEST_URL||'http://127.0.0.1:5227',folder=path.resolve
   };
   const ready=page=>page.waitForFunction(()=>typeof startupReady!=='undefined'&&startupReady);
   try{
-    await scenario('exact 0.2.6 frontend without modern APIs',async(page,errors)=>{
+    if(!process.argv.includes('--skip-baseline'))await scenario('exact 0.2.6 frontend without modern APIs',async(page,errors)=>{
       await page.addInitScript(oldApis);
       await page.route('**/*',async route=>{
         const name=new URL(route.request().url()).pathname.slice(1);
         if(/^[^/]+\.(js|html)$/.test(name)){
-          try{return await route.fulfill({body:await fs.readFile(folder+'/baseline/'+name),contentType:name.endsWith('.js')?'text/javascript':'text/html'});}
+          try{return await route.fulfill({body:await fs.readFile(baseline+'/'+name),contentType:name.endsWith('.js')?'text/javascript':'text/html'});}
           catch(error){if(error.code!=='ENOENT')throw error;}
         }
         await route.continue();
@@ -78,9 +78,9 @@ const base=process.env.EW4_TEST_URL||'http://127.0.0.1:5227',folder=path.resolve
       check((await page.locator('#startup-message').innerText()).includes('original-ui.js'),'missing script reports original resource before secondary errors');
     });
     await scenario('outdated renderer diagnostic',async(page)=>{
-      await page.addInitScript(()=>Object.defineProperty(navigator,'userAgent',{get:()=> 'Mozilla/5.0 (Linux; Android 10; wv) Chrome/74.0.3729.136 Mobile Safari/537.36'}));
+      await page.addInitScript(()=>Object.defineProperty(navigator,'userAgent',{get:()=> 'Mozilla/5.0 (Linux; Android 10; wv) Chrome/69.0.3497.100 Mobile Safari/537.36'}));
       await page.route('**/app.js?*',route=>route.fulfill({contentType:'text/javascript',body:'const broken = ;'}));
-      await page.goto(base);await page.waitForFunction(()=>document.querySelector('#startup-message').textContent.includes('74'));
+      await page.goto(base);await page.waitForFunction(()=>document.querySelector('#startup-message').textContent.includes('69'));
       check((await page.locator('#startup-message').innerText()).includes('更新系统 WebView'),'obsolete renderer gets actionable component update message');
       await page.screenshot({path:folder+'/outdated-webview.png'});
     });

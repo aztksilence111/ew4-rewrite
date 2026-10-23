@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
     <ApplicationId>org.ew4.reconstruction</ApplicationId>
     <ApplicationTitle>欧陆战争4 重构</ApplicationTitle>
-    <ApplicationVersion>19</ApplicationVersion>
-    <ApplicationDisplayVersion>0.2.16</ApplicationDisplayVersion>
+    <ApplicationVersion>20</ApplicationVersion>
+    <ApplicationDisplayVersion>0.2.17</ApplicationDisplayVersion>
     <SupportedOSPlatformVersion>26</SupportedOSPlatformVersion>
     <RuntimeIdentifiers>android-arm64;android-x64</RuntimeIdentifiers>
     <AndroidPackageFormats>apk</AndroidPackageFormats>
@@ -29,5 +29,7 @@
     <AndroidAsset Include="../data/legacy/metagame_rule_tables.json" Link="data/metagame_rule_tables.json" />
     <AndroidAsset Include="../mod-kit/THIRD_PARTY_NOTICES.md" Link="licenses/THIRD_PARTY_NOTICES.md" />
     <AndroidAsset Include="../mod-kit/licenses/MoonSharp-LICENSE.txt" Link="licenses/MoonSharp-LICENSE.txt" />
+    <AndroidAsset Include="../mod-kit/licenses/PixiJS-LICENSE.txt" Link="licenses/PixiJS-LICENSE.txt" />
   </ItemGroup>
+  <Import Project="../Frontend.Build.targets" />
 </Project>

@@ -131,6 +131,15 @@ public static class WorldActions
     }
 
     public static WorldChange Move(WorldState state, long expectedRevision, string unitId, int destination, WorldMoveRules? configuration = null)
+        => MoveCore(state, expectedRevision, unitId, destination, configuration);
+
+    internal static WorldChange ProjectMove(WorldState state, string unitId, int destination, WorldMoveRules rules,
+        IReadOnlyDictionary<int, ReachableCell> range)
+        => PlanningScope.CanTrust(rules) ? MoveCore(state, state.Revision, unitId, destination, rules, range, true)
+            : Move(state, state.Revision, unitId, destination, rules);
+
+    private static WorldChange MoveCore(WorldState state, long expectedRevision, string unitId, int destination,
+        WorldMoveRules? configuration, IReadOnlyDictionary<int, ReachableCell>? range = null, bool projection = false)
     {
         var faction = Ready(state, expectedRevision);
         var unit = state.Units.SingleOrDefault(u => u.Id == unitId);
@@ -145,7 +154,7 @@ public static class WorldActions
         map.Check(destination);
         if (destination == unit.Cell || state.Units.Count(u => u.Cell == destination) >= state.Limits.UnitsPerCell)
             throw new RuleViolation("move.destination", "Destination is occupied or unchanged");
-        if (!MovementRange(state, unit, rules).TryGetValue(destination, out var reachable))
+        if (!(range ?? MovementRange(state, unit, rules)).TryGetValue(destination, out var reachable))
             throw new RuleViolation("move.unreachable", "No affordable legal route to destination");
         var otherUnits = state.Units.Where(u => u.Id != unitId).ToArray();
         var claimed = JurisdictionClaims.Move(state,
@@ -158,8 +167,9 @@ public static class WorldActions
         var notices = new List<WorldNotice> { new("unit.moved", unitId, destination) };
         for (int i = 0; i < claimed.Count; i++)
             if (claimed[i].Owner != state.Cells[i].Owner) notices.Add(new("cell.owner_changed", i.ToString()));
-        var next = (state with { Cells = claimed, Units = state.Units.Select(u => u.Id == unitId ? moved : u).ToArray(),
-            Revision = checked(state.Revision + 1) }).Copy();
+        var next = state with { Cells = claimed, Units = state.Units.Select(u => u.Id == unitId ? moved : u).ToArray(),
+            Revision = checked(state.Revision + 1) };
+        if (!projection) next = next.Copy();
         next.Validate();
         var previousOwners = Enumerable.Range(0, claimed.Count).Where(i => claimed[i].Owner != state.Cells[i].Owner)
             .Select(i => state.Cells[i].Owner).Where(id => id != null && id != faction.Id).Distinct().ToArray();
@@ -200,7 +210,7 @@ public static class WorldActions
         }
         next = next with { Revision = checked(state.Revision + 1) };
         next.Validate();
-        return new(next, notices);
+        return new(next, notices) { Movements = new[] { new WorldMovement(unitId, reachable.Path) } };
     }
 
     public static WorldChange RelocateAndRecruit(WorldState state, long expectedRevision, string unitId, int destination,
@@ -214,7 +224,7 @@ public static class WorldActions
         var recruited = Recruit(moved.State, moved.State.Revision, origin, recruitedUnitId, offer);
         var next = recruited.State with { Revision = checked(state.Revision + 1) };
         next.Validate();
-        return new(next, moved.Notices.Concat(recruited.Notices).ToArray());
+        return new(next, moved.Notices.Concat(recruited.Notices).ToArray()) { Movements = moved.Movements };
     }
 
     public static IReadOnlyDictionary<int, ReachableCell> Reachable(WorldState state, string unitId, WorldMoveRules? configuration = null)

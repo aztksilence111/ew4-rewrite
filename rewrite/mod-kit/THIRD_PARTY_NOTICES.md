@@ -1,5 +1,7 @@
 # Third-party components
 
+- PixiJS 7.4.3: MIT, https://github.com/pixijs/pixijs . Offline WebGL battlefield renderer; see `licenses/PixiJS-LICENSE.txt` and `wwwroot/vendor/PixiJS-LICENSE.txt`.
+
 - AssetRipper.TextureDecoder 2.6.3: MIT, https://github.com/AssetRipper/TextureDecoder . Used only for ETC1 resource decoding.
 - StbImageSharp 2.30.15: public domain / MIT dual license, https://github.com/StbSharp/StbImageSharp . Managed image decoding.
 - StbImageWriteSharp 1.16.7: public domain, https://github.com/StbSharp/StbImageWriteSharp . Managed PNG encoding.

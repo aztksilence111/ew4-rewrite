@@ -37,6 +37,8 @@
         this.backgrounds[id]=canvas.toDataURL();
       }
       this.strategic=await this.texture('tex_campaign_back.pkm');
+      // The legacy power-of-two texture has white padding below its 1024 x 720 map.
+      this.strategic.height=Math.min(720,this.strategic.image.naturalHeight/this.strategic.ratio);
       if(this.api.manifest.uiOverrides?.strategic){const image=this.api.image(this.api.manifest.uiOverrides.strategic);await image.decode();this.strategic={image,ratio:2};}
       this.apply(2);
     }
@@ -47,15 +49,16 @@
     }
     drawStrategic(draw,definition,scale,centerX=205,centerY=128,textureScale=1){
       const {image,ratio}=this.strategic,cx=Number(definition.centerx||410),cy=Number(definition.centery||288);
-      const width=image.naturalWidth/ratio*textureScale,height=image.naturalHeight/ratio*textureScale;
-      draw.drawImage(image,centerX-cx*scale,centerY-cy*scale,width*scale,height*scale);
+      const sourceHeight=this.strategic.height||image.naturalHeight/ratio;
+      const width=image.naturalWidth/ratio*textureScale,height=sourceHeight*textureScale;
+      draw.drawImage(image,0,0,image.naturalWidth,sourceHeight*ratio,centerX-cx*scale,centerY-cy*scale,width*scale,height*scale);
     }
-    strategicCamera(definition,scale,textureScale){
+    strategicCamera(definition,scale,textureScale,viewportWidth=438,viewportHeight=320){
       const {image,ratio}=this.strategic,cx=Number(definition.centerx||410),cy=Number(definition.centery||288);
-      const width=image.naturalWidth/ratio*textureScale*scale,height=image.naturalHeight/ratio*textureScale*scale;
+      const width=image.naturalWidth/ratio*textureScale*scale,height=(this.strategic.height||image.naturalHeight/ratio)*textureScale*scale;
       // Native 8e4c0: reserve the 130px sidebar, center on the full-height map, clamp its edges.
       const clamp=(offset,total,viewport)=>total<=viewport?(total-viewport)/2:Math.max(0,Math.min(total-viewport,offset));
-      return {x:cx*scale-clamp(cx*scale-219,width,438),y:cy*scale-clamp(cy*scale-160,height,320)};
+      return {x:cx*scale-clamp(cx*scale-viewportWidth/2,width,viewportWidth),y:cy*scale-clamp(cy*scale-viewportHeight/2,height,viewportHeight)};
     }
   }
   function cityName(name,language,names){

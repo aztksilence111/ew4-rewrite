@@ -1,6 +1,11 @@
 using System.Text.Json;
 using Ew4.Core;
 
+if (args.ElementAtOrDefault(1) == "--performance-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { performanceContracts = PerformanceContractChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
 if (args.ElementAtOrDefault(1) == "--campaign-only")
 {
     string campaignRoot = Path.GetFullPath(args[0]);

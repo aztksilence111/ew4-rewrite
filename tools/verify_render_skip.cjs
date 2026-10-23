@@ -46,7 +46,9 @@ const folder=process.env.EW4_RENDER_REPORT||'E:/Workplace/game/o4mod/rewrite/rep
       check(await page.evaluate(async()=>{const latest=await rpc('action',{op:'state'});return JSON.stringify(latest.cells)===JSON.stringify(state.cells)&&latest.revision===state.revision;}),'final delta reconstruction equals full backend state');
       check(report.render.covered.frames<=1,'covered battlefield stops repainting');
       check(report.turn.skippedFrames===0,'skipped intermediate actions do not repaint battlefield');
-      check(report.render.idle.frames<=52,'animated idle scene limited to 30 FPS');
+      const gpu=await page.evaluate(()=>!!ctx.gpu);
+      check(report.render.idle.frames<=(gpu?115:52),'animated idle scene respects renderer frame schedule');
+      if(gpu)check(report.render.idle.frames>52,'Pixi animated scene exceeds old 30 FPS cap');
       report.cache=await page.evaluate(()=>{
         const scene={draw:ctx,state,map:manifest.maps[state.map],visibleRect:battlefield.visibleRect,zoom:view.zoom,showGrid:false,selection:null,selected:null,selectedAt:0,motions:new Map(),facings,arrivals:new Map(),combatMotions:new Map()};
         battlefield.frame(scene,500);const canvas=battlefield.staticCanvas,key=battlefield.groundSignature;
@@ -75,7 +77,7 @@ const folder=process.env.EW4_RENDER_REPORT||'E:/Workplace/game/o4mod/rewrite/rep
       check(report.staticFrames===0,'scene without visible animation becomes idle');
       for(const size of [{width:1280,height:720},{width:844,height:390},{width:390,height:844}]){
         await page.setViewportSize(size);await page.waitForTimeout(200);
-        check(await page.locator('#map').evaluate(c=>{const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;const colors=new Set();for(let i=0;i<d.length;i+=4*397)colors.add(d[i]+','+d[i+1]+','+d[i+2]);return colors.size>20;}),'nonblank '+size.width);
+        check(await page.evaluate(()=>{const d=ctx.gpu?ctx.renderer.extract.pixels(ctx.stage):ctx.getImageData(0,0,canvas.width,canvas.height).data;const colors=new Set();for(let i=0;i<d.length;i+=4*397)colors.add(d[i]+','+d[i+1]+','+d[i+2]);return colors.size>20;}),'nonblank '+size.width);
         await page.screenshot({path:folder+'/'+phase+'-'+size.width+'.png'});
       }
       await page.mouse.move(200,200);await page.mouse.wheel(0,150);await page.waitForTimeout(150);

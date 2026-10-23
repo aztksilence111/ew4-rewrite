@@ -8,7 +8,11 @@ public sealed record WorldNotice(string Kind, string Subject, long Value = 0)
 {
     public string? Target { get; init; }
 }
-public sealed record WorldChange(WorldState State, IReadOnlyList<WorldNotice> Notices);
+public sealed record WorldMovement(string Unit, IReadOnlyList<int> Path);
+public sealed record WorldChange(WorldState State, IReadOnlyList<WorldNotice> Notices)
+{
+    public IReadOnlyList<WorldMovement> Movements { get; init; } = Array.Empty<WorldMovement>();
+}
 public sealed record EventContext(TriggerKind Trigger, string? UnitId = null, int? Cell = null,
     string? PreviousOwner = null, string? NewOwner = null, bool HasCommander = false);
 

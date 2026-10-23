@@ -11,6 +11,18 @@
 | `initialMedals` / `initialBadges` | 各20000000，非负整数，仅创建此Mod新账户时应用，不重置旧余额 |
 | `shopSlots` | 省略/null保持五个消耗品位、两个装备位；数组完整替换商品位；空数组为空商店 |
 | `refresh` | 空字典；未配置目标或limit:null为无限次免费刷新 |
+| `commanderSectionCapacities` | 星级区将领槽位上限字典，键为`"0"`（一星区）、`"1"`（二星区）、`"2"`（三星区）；省略的区默认20，值为非负整数，0禁止新增 |
+
+例如在 `rewrite/extension.json` 中注册 `{"schema":1,"apiVersion":2,"metagame":"rewrite/metagame.json"}`，然后在 `rewrite/metagame.json` 配置：
+
+```json
+{
+  "schema": 1,
+  "commanderSectionCapacities": { "0": 30, "1": 25, "2": 40 }
+}
+```
+
+三个区独立计数，沿用当前将领总星级分区（1～3、4～6、7及以上），不是单项兵种能力星数。军事学院勋章/徽章购买和公主领取共用此限制；满额提示为“该星级区将领已达上限，无法购买”，失败不扣货币、不移除候选。指挥部空槽和数量显示同步采用配置。已有超过上限的将领保留，仅阻止继续新增；配置参与逻辑指纹，更新已导入Mod需遵循现有版本隔离规则。此字段不改变学院候选数、刷新次数或战场派遣名额。`/api/headquarters` 的 `sectionCapacities` 按一星到三星返回三项生效上限。
 
 商品位字段：`slot` 为0～13唯一格号；`pool` 为consumable（默认）/equipment/any；`items` 可省略或为有效物品ID的非空候选集；`refresh` 默认true；`quantity` 默认1，非负整数或null（不限库存）。显式候选须符合pool类型。永久装备排除已拥有及当轮重复物品，唯一性购买规则继续生效。默认原版装备位仍为不限库存。
 

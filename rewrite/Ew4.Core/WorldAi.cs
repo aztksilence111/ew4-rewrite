@@ -27,7 +27,8 @@ public sealed record WorldAiRules
         ["2"] = new(true, true, true), ["3"] = new(true, false, false)
     };
     public bool UseOriginForMoveAttackScore { get; init; }
-    public void Validate()
+    public void Validate() => PlanningScope.Validate(this, ValidateCore);
+    private void ValidateCore()
     {
         Tactics.Validate(); MoveScoring.Validate(); Strategy.Validate();
         if (ExperienceLevels.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Value < 0)
@@ -106,6 +107,7 @@ public static partial class WorldAi
 
     public static IReadOnlyList<AiCandidate<AiMoveCommand>> TacticalMoveCandidates(WorldState state, string unitId, WorldAiRules rules)
     {
+        using var planning = PlanningScope.Begin(rules);
         var faction = WorldActions.Ready(state, state.Revision);
         rules.Validate();
         var unit = state.Units.SingleOrDefault(u => u.Id == unitId);
@@ -115,7 +117,8 @@ public static partial class WorldAi
         var originalFacts = Facts(state, unit, rules);
         long sourceValue = AiTactics.Location(Site(state, unit.Cell, rules), originalFacts, rules.Tactics);
         AiCandidate<AiMoveCommand>? move = null, combo = null;
-        foreach (int cellId in WorldActions.MovementRange(state, unit, rules.Movement).Keys.OrderBy(i => i))
+        var range = WorldActions.MovementRange(state, unit, rules.Movement);
+        foreach (int cellId in range.Keys.OrderBy(i => i))
         {
             if (cellId == unit.Cell || state.Units.Any(u => u.Cell == cellId)) continue;
             var site = state.Cells[cellId];
@@ -124,7 +127,7 @@ public static partial class WorldAi
                 : owner == null || !WorldDiplomacy.Hostile(state, faction.Id, owner.Id, rules.NeutralCamps) ? AiTerritoryRelation.NonAllied : AiTerritoryRelation.Hostile;
             var facts = new AiMoveFacts(sourceValue, AiTactics.Location(Site(state, cellId, rules), null, rules.Tactics), relation,
                 site.Environment, site.BuildingKind == null ? 0 : site.BuildingLevel, unit.Combatant.Health < unit.Combatant.Profile.MaxHealth, owner?.Human == true);
-            var projected = WorldActions.Move(state, state.Revision, unit.Id, cellId, rules.Movement).State;
+            var projected = WorldActions.ProjectMove(state, unit.Id, cellId, rules.Movement, range).State;
             long score = AiMovement.MoveScore(facts, rules.MoveScoring);
             if (score > 0 && (move == null || score > move.Score)) move = new(new(state.Revision, unit.Id, cellId), score);
             if (projected.Phase == TurnPhase.Finished || projected.PendingDialogue != null) continue;
@@ -153,6 +156,6 @@ public static partial class WorldAi
         var attacked = WorldBattle.Attack(moved.State, moved.State.Revision, command.UnitId, command.TargetId, battleRules);
         var next = attacked.State with { Revision = checked(state.Revision + 1) };
         next.Validate();
-        return new(next, moved.Notices.Concat(attacked.Notices).ToArray());
+        return new(next, moved.Notices.Concat(attacked.Notices).ToArray()) { Movements = moved.Movements };
     }
 }

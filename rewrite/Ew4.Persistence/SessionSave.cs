@@ -18,17 +18,29 @@ public static class SessionSave
     public static byte[] Encode(GameSession state)
     {
         state.Validate();
-        using var world = JsonDocument.Parse(WorldSave.Encode(state.World));
-        byte[] payload = JsonSerializer.SerializeToUtf8Bytes(new Payload(state.ContentRevision, state.Revision, state.PlayerFaction,
-            world.RootElement, state.Account, state.Markets, state.TavernCandidates, state.RosterDeployments,
-            state.BattleId, state.BattleResult, state.CollectedMedals), WorldSave.Options);
+        // Write the authenticated nested world directly, avoiding a complete DOM parse
+        // and re-encoding of every cell and unit on each autosave.
+        using var payloadStream = new MemoryStream();
+        using (var data = new Utf8JsonWriter(payloadStream, new JsonWriterOptions { Encoder = WorldSave.Options.Encoder }))
+        {
+            data.WriteStartObject();
+            data.WriteString("contentRevision", state.ContentRevision); data.WriteNumber("revision", state.Revision);
+            data.WriteString("playerFaction", state.PlayerFaction);
+            data.WritePropertyName("world"); data.WriteRawValue(WorldSave.EncodeValidated(state.World), skipInputValidation: true);
+            void Property<T>(string name, T value) { data.WritePropertyName(name); JsonSerializer.Serialize(data, value, WorldSave.Options); }
+            Property("account", state.Account); Property("markets", state.Markets); Property("tavernCandidates", state.TavernCandidates);
+            Property("rosterDeployments", state.RosterDeployments); data.WriteString("battleId", state.BattleId);
+            Property("battleResult", state.BattleResult); data.WriteNumber("collectedMedals", state.CollectedMedals);
+            data.WriteEndObject();
+        }
+        var payload = payloadStream.GetBuffer().AsSpan(0, checked((int)payloadStream.Length));
         using var stream = new MemoryStream();
         using (var writer = new Utf8JsonWriter(stream))
         {
             writer.WriteStartObject();
             writer.WriteString("format", Format); writer.WriteNumber("version", Version);
             writer.WriteString("sha256", Convert.ToHexStringLower(SHA256.HashData(payload)));
-            writer.WritePropertyName("payload"); writer.WriteRawValue(payload); writer.WriteEndObject();
+            writer.WritePropertyName("payload"); writer.WriteRawValue(payload, skipInputValidation: true); writer.WriteEndObject();
         }
         return stream.ToArray();
     }

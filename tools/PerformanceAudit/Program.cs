@@ -25,6 +25,8 @@ JsonElement Call(ClientGame host, string route, object command, List<double>? du
     return doc.RootElement.GetProperty("data").Clone();
 }
 var reports = new List<object>();
+bool delta = Environment.GetEnvironmentVariable("EW4_AUDIT_DELTA") == "1";
+bool trace = Environment.GetEnvironmentVariable("EW4_AUDIT_TRACE") == "1";
 foreach (string scenario in (Environment.GetEnvironmentVariable("EW4_AUDIT_SCENARIOS") ?? "conquest1,conquest4").Split(','))
 {
     var started = content.Start(scenario, "fra");
@@ -44,13 +46,22 @@ foreach (string scenario in (Environment.GetEnvironmentVariable("EW4_AUDIT_SCENA
         long allocated = GC.GetAllocatedBytesForCurrentThread();
         int gc0 = GC.CollectionCount(0), gc1 = GC.CollectionCount(1), gc2 = GC.CollectionCount(2);
         var clock = Stopwatch.StartNew();
-        var state = Call(host, "action", new { op = "end", revision = Session(host).Revision }, calls, sizes);
+        using var sequence = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        void Trace()
+        {
+            if (!trace) return;
+            sequence.AppendData(WorldSave.Encode(Session(host).World));
+            sequence.AppendData(JsonSerializer.SerializeToUtf8Bytes(((LegacyScenarioStart)gameField.GetValue(host)!).Notices, ClientGame.Json));
+        }
+        var state = Call(host, "action", new { op = "end", revision = Session(host).Revision, delta }, calls, sizes);
+        Trace();
         int steps = 0;
         while (true)
         {
             var world = Session(host).World;
             if (world.Factions.Single(f => f.Id == world.ActiveFaction).Human || world.PendingDialogue != null || world.Phase == TurnPhase.Finished) break;
-            var next = Call(host, "action", new { op = mode == "batch" ? "ai_batch" : "ai", revision = Session(host).Revision }, calls, sizes);
+            var next = Call(host, "action", new { op = mode == "batch" ? "ai_batch" : "ai", revision = Session(host).Revision, delta }, calls, sizes);
+            Trace();
             if (mode == "batch")
             {
                 if (next.GetProperty("error").ValueKind != JsonValueKind.Null) throw new Exception(next.GetRawText());
@@ -69,7 +80,7 @@ foreach (string scenario in (Environment.GetEnvironmentVariable("EW4_AUDIT_SCENA
         expectedHash ??= hash;
         if (hash != expectedHash) throw new Exception("Final session differs between modes/repetitions");
         var report = new { scenario, mode, sample, warmup = sample == 0, cells = initial.World.Cells.Count,
-            units = initial.World.Units.Count, steps, requests = calls.Count, elapsedMs, dispatchMs = calls.Sum(),
+            units = initial.World.Units.Count, steps, delta, sequenceSha256 = trace ? Convert.ToHexStringLower(sequence.GetHashAndReset()) : null, requests = calls.Count, elapsedMs, dispatchMs = calls.Sum(),
             responseBytes = sizes.Sum(x => (long)x), allocatedBytes = bytes, gc = new[] { GC.CollectionCount(0)-gc0, GC.CollectionCount(1)-gc1, GC.CollectionCount(2)-gc2 },
             requestP95Ms = calls.Order().ElementAt((int)((calls.Count-1)*.95)), requestMaxMs = calls.Max(),
             final.World.Round, final.World.RandomState, final.World.AiRandomState, finalSha256 = hash,

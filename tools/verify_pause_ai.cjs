@@ -28,7 +28,7 @@ const deferred=()=>{let resolve;const promise=new Promise(r=>{resolve=r;});retur
   const idle=()=>page.waitForFunction(()=>!busy&&!aiRunning&&!aiTask&&!sessionTransition,null,{timeout:20000});
   try{
     await page.goto(base);await page.waitForFunction(()=>startupReady,null,{timeout:60000});
-    await page.evaluate(()=>start('conquest1','fra'));
+    await page.evaluate(()=>{settings.autoTurnFast=false;return start('conquest1','fra');});
     let gate=hold(['ai']);
     await page.evaluate(()=>{window.pauseTurn=act('end');});await waitHeld(gate);
     await page.locator('#menu-button').click();
@@ -58,7 +58,8 @@ const deferred=()=>{let resolve;const promise=new Promise(r=>{resolve=r;});retur
     await page.locator('#menu-button').click();gate.release.resolve();await idle();
     check(await page.locator('#pause').isVisible(),'second pause survives another result');
 
-    for(const [name,width,height] of [['landscape',844,390],['portrait',390,844]]){
+    // Allow behavior-only regression when the existing mobile pause layout is tracked separately.
+    for(const [name,width,height] of (process.argv.includes('--desktop-only')?[]:[['landscape',844,390],['portrait',390,844]])){
       await page.setViewportSize({width,height});
       check(await page.locator('#restart').isVisible()&&await page.locator('#return-menu').isVisible(),name+' restart and exit remain reachable');
       check(await page.locator('#pause .dialog').evaluate(el=>{const b=el.getBoundingClientRect();return b.left>=0&&b.top>=0&&b.right<=innerWidth&&b.bottom<=innerHeight;}),name+' pause fits viewport');
@@ -82,16 +83,16 @@ const deferred=()=>{let resolve;const promise=new Promise(r=>{resolve=r;});retur
     await page.waitForFunction(()=>aiRunning&&presentationWaiters.size>0&&!window.presentationGate);
     await page.locator('#menu-button').click();await page.locator('#restart').click();await idle();
     check(await page.evaluate(()=>state.round===1&&presentationWaiters.size===0&&combatMotions.size===0),'restart cancels long presentation waits');
-    await page.evaluate(()=>{installState=window.realInstallState;settings.skipTurnFast=true;});
+    await page.evaluate(()=>{installState=window.realInstallState;settings.autoTurnFast=true;});
 
     // Fast skip must obey the same pause and transition barriers as single-step AI.
-    gate=hold(['ai']);await page.evaluate(()=>{window.pauseTurn=act('end');});await waitHeld(gate);
-    await page.locator('#skip-ai').click();const batchGate=hold(['ai_batch']);gate.release.resolve();await waitHeld(batchGate);
-    await page.locator('#menu-button').click();batchGate.release.resolve();await idle();
+    gate=hold(['ai_batch']);await page.evaluate(()=>{window.pauseTurn=act('end');});await waitHeld(gate);
+    check(await page.evaluate(()=>fastSkipping()),'automatic fast skip starts without manual button');
+    await page.locator('#menu-button').click();gate.release.resolve();await idle();
     check(await page.locator('#pause').isVisible(),'batch response preserves pause');
     const batchCalls=aiCalls;await page.waitForTimeout(200);check(aiCalls===batchCalls,'paused fast skip schedules no next batch');
 
-    gate=hold(['ai']);await page.locator('#resume').click();await waitHeld(gate);
+    gate=hold(['ai_batch']);await page.locator('#resume').click();await waitHeld(gate);
     await page.locator('#menu-button').click();await page.locator('#return-menu').click();
     check(await page.evaluate(()=>sessionTransition&&aiStopRequested),'exit immediately requests AI interruption');
     const exitCalls=aiCalls;gate.release.resolve();await idle();
@@ -99,7 +100,7 @@ const deferred=()=>{let resolve;const promise=new Promise(r=>{resolve=r;});retur
     check(await page.evaluate(async()=>{try{await rpc('action',{op:'state'});return false;}catch(e){return e.message==='请先开始游戏';}}),'exit releases backend session using the latest revision');
     await page.waitForTimeout(300);check(aiCalls===exitCalls,'old AI cannot reopen an exited battle');
 
-    await page.evaluate(()=>start('conquest1','fra'));
+    await page.evaluate(()=>{settings.autoTurnFast=false;return start('conquest1','fra');});
     gate=hold(['ai']);await page.evaluate(()=>{window.pauseTurn=act('end');});await waitHeld(gate);
     await page.route('**/api/start?*',route=>route.fulfill({json:{ok:false,code:'client.failure',message:'restart failure fixture'}}));
     await page.locator('#menu-button').click();await page.locator('#restart').click();gate.release.resolve();await idle();

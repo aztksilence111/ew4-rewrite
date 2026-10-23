@@ -88,7 +88,8 @@
     return points.length?{left:Math.min(...points.map(p=>p[0])),top:Math.min(...points.map(p=>p[1])),right:Math.max(...points.map(p=>p[0])),bottom:Math.max(...points.map(p=>p[1]))}:null;
   }
   class Renderer {
-    constructor(api) {this.api=api;this.surface=new Ew4MapSurface.Surface();this.cityLabels=new Map();this.mapLabels=new Map();this.unitFrames=new Map();this.unitFramePixels=0;this.unitLibraryIds=new WeakMap();this.nextLibraryId=1;this.resetMotions();}
+    constructor(api) {this.api=api;this.surface=new Ew4MapSurface.Surface();this.chunks=new Map();this.chunkPixels=0;this.cityLabels=new Map();this.mapLabels=new Map();this.healthArcs=new Map();this.unitFrames=new Map();this.unitFramePixels=0;this.unitLibraryIds=new WeakMap();this.nextLibraryId=1;this.resetMotions();}
+    invalidateGround(){for(const c of this.chunks.values())this.gpuDraw?.release?.(c.canvas);this.chunks.clear();this.chunkPixels=0;this.staticKey=null;this.groundSignature=(this.groundSignature||0)+1;}
     resetMotions(){this.unitMotions=new Map();this.motionSelection=null;}
     syncMotions(){
       for(const [id,combat] of this.combatMotions||[])if(!this.stationedHasUnit(id)||this.time>=combat.started+(combat.delay||0)+(combat.segments.at(-1)?.end||0))this.combatMotions.delete(id);
@@ -117,7 +118,8 @@
     frame(scene,time) {
       Object.assign(this,scene);this.time=time;
       if(this.preparedState!==this.state){
-        if(this.preparedMap!==this.map){this.cityLabels.clear();this.mapLabels.clear();this.unitFrames.clear();this.unitFramePixels=0;}
+        if(this.preparedMap!==this.map||this.preparedWidth!==this.state.width||this.preparedHeight!==this.state.height){this.invalidateGround();if(this.surfaceMap!==this.map)this.surface=new Ew4MapSurface.Surface();this.cityLabels.clear();this.mapLabels.clear();this.unitFrames.clear();this.unitFramePixels=0;}
+        this.preparedWidth=this.state.width;this.preparedHeight=this.state.height;
         this.preparedMap=this.map;this.preparedState=this.state;
         this.factions=new Map(this.state.factions.map(f=>[f.id,f]));
         this.stationed=new Map(this.state.units.map(u=>[u.cell,u]));
@@ -125,19 +127,45 @@
         this.orderedUnits=[...this.state.units].sort((a,b)=>a.cell-b.cell);
         this.objectiveCells=[];
         this.state.cells.forEach((site,cell)=>{if(site.active&&objectiveMarker(site,this.stationed.get(cell)))this.objectiveCells.push(cell);});
-        this.groundSignature=JSON.stringify([this.state.width,this.state.cells,this.state.factions.map(f=>[f.id,f.color])]);
+        const prior=this.groundState;
+        if(prior&&prior.cells!==this.state.cells){
+          const fields=['owner','active','sea','buildingKind','buildingLevel','buildingImage','buildingStyle','installationKind','facility','jurisdictionCenter'];
+          const candidates=this.state.baseRevision===prior.revision&&this.state.changedCells?this.state.changedCells:this.state.cells.map((_,i)=>i);
+          const changed=candidates.filter(i=>fields.some(key=>this.state.cells[i]?.[key]!==prior.cells[i]?.[key]));
+          if(changed.length){this.staticKey=null;this.groundSignature=(this.groundSignature||0)+1;}
+          for(const cell of changed){const p=point(cell,this.state.width);for(const [key,c] of this.chunks)if(p.x>=c.x-160&&p.x<=c.x+672&&p.y>=c.y-160&&p.y<=c.y+672){this.draw.release?.(c.canvas);this.chunkPixels-=c.pixels;this.chunks.delete(key);}}
+        }
+        if(prior&&this.state.factions.some(f=>prior.factions.find(p=>p.id===f.id)?.color!==f.color))this.invalidateGround();
+        this.groundState=this.state;
         this.visibleKey=null;
       }
-      this.syncMotions();
+      this.detailScale=this.detailScale||1;
+      this.badgeOnly=this.badgeOnly?this.zoom<this.detailScale*.62:this.zoom<this.detailScale*.52;
+      this.markerScale=this.detailScale/this.zoom;
+      if(!this.badgeOnly)this.syncMotions();
       const r=this.visibleRect,visibleKey=[r.left,r.top,r.width,r.height].join(',');
       if(this.visibleKey!==visibleKey){
         this.visibleKey=visibleKey;this.visibleCells=this.cellsInRect(r);
         this.visibleUnits=this.orderedUnits.filter(unit=>this.visible(point(unit.cell,this.state.width)));
       }
-      this.animated=!!this.selection||this.visibleUnits.some(u=>this.unitMotions.get(u.id)?.playing||u.burning>0||u.category==='fort'&&u.health>0&&u.maxHealth-u.health>=80||badgeAlpha(u,this.state,300)!==1||flagAnimated(u,this.state)&&this.factions.get(u.owner)?.flag&&!this.factions.get(u.owner)?.flagImage)||
-        this.visibleCells.some(({site,cell})=>site.active&&(objectiveMarker(site,this.stationed.get(cell))||site.buildingKind==='port'&&site.owner&&!this.stationed.has(cell)));
+      this.animated=!!this.selection||this.visibleUnits.some(u=>badgeAlpha(u,this.state,300)!==1||!this.badgeOnly&&(this.unitMotions.get(u.id)?.playing||u.burning>0||u.category==='fort'&&u.health>0&&u.maxHealth-u.health>=80||flagAnimated(u,this.state)&&this.factions.get(u.owner)?.flag&&!this.factions.get(u.owner)?.flagImage))||
+        this.visibleCells.some(({site,cell})=>site.active&&(objectiveMarker(site,this.stationed.get(cell))||!this.badgeOnly&&site.buildingKind==='port'&&site.owner&&!this.stationed.has(cell)));
       // Keep flags above all unit bodies, including ships on adjacent cells.
       this.staticGround();this.objectives();this.units();this.flags();this.unitMarkers();this.labels();this.highlights();
+    }
+    async prewarm(state,map,rect){
+      const surface=new Ew4MapSurface.Surface(),factions=new Map(state.factions.map(f=>[f.id,f]));
+      const rules=this.api.manifest.mapDrawing,texture=rules&&this.api.image(rules.borderTexture);
+      let started=performance.now();
+      const first=Math.max(0,Math.floor((rect.top-120+18)/54)),last=Math.min(state.height-1,Math.ceil((rect.top+rect.height+120+18)/54));
+      for(let row=first;row<=last;row++)for(let col=0;col<state.width;col++){
+        const i=row*state.width+col,p=point(i,state.width);if(p.x<rect.left-120||p.x>rect.left+rect.width+120)continue;
+        const site=state.cells[i],neighbors=Array.from({length:6},(_,d)=>{const c=state.cells[neighbor(i,d,state.width,state.height)];return c?{...c,color:factions.get(c.owner)?.color||0}:null;});
+        if(!site.owner||site.sea){if(neighbors.some(n=>n?.active&&!n.sea&&n.color))surface.coast(neighbors);}
+        if(rules&&site.active&&!site.sea&&site.owner){const mask=Ew4MapSurface.borderMask(site,neighbors);if(mask)surface.border(mask,rules,texture);}
+        if(performance.now()-started>=4){await new Promise(resolve=>setTimeout(resolve,0));started=performance.now();}
+      }
+      this.surface=surface;this.surfaceMap=map;
     }
     cellsInRect(r){
       const cells=[],width=this.state.width,height=this.state.height;
@@ -149,6 +177,7 @@
       return cells;
     }
     staticGround(){
+      if(this.draw.gpu){this.chunkGround();return;}
       const target=this.draw,matrix=target.getTransform(),size=target.canvas;
       const key=[matrix.a,matrix.b,matrix.c,matrix.d,size.width,size.height,this.api.imageRevision||0,this.api.geographicLanguage||'en',Ew4OriginalUI.revision].join(',');
       const dx=matrix.e-this.staticX,dy=matrix.f-this.staticY;
@@ -174,6 +203,63 @@
       this.staticState=this.state;
       target.save();target.resetTransform();
       target.drawImage(this.staticCanvas,this.staticX-matrix.e,this.staticY-matrix.f,size.width,size.height,0,0,size.width,size.height);target.restore();
+    }
+    chunkGround(warmRect=null,warmDensity=null){
+      const target=this.draw,originalRect=this.visibleRect,rect=warmRect||originalRect,cells=this.visibleCells;
+      this.gpuDraw=target;
+      const density=warmDensity||(Math.abs(target.getTransform().a)>1.4?2:1);
+      const revision=[this.api.geographicLanguage||'en',this.api.geographicLanguage==='zh'?Ew4OriginalUI.revision:0].join(':');
+      if(this.chunkRevision!==revision){this.invalidateGround();this.chunkRevision=revision;}
+      const dependencies=new Set();
+      this.collectImages=dependencies;
+      const sourceImage=this.api.image;
+      const sourceSprite=this.api.sprite;
+      // Only image dependencies actually used by a chunk may invalidate it.
+      const trackedImage=file=>{const img=sourceImage(file);dependencies.add(img);return img;};
+      this.api.image=trackedImage;
+      this.api.sprite=(atlas,name,...args)=>{trackedImage('images/'+(this.api.manifest.atlases[atlas+'_hd']?.[name]?atlas+'_hd':atlas)+'.png');return sourceSprite(atlas,name,...args);};
+      try{
+        for(let y=Math.floor(rect.top/512)*512;y<rect.top+rect.height;y+=512)for(let x=Math.floor(rect.left/512)*512;x<rect.left+rect.width;x+=512){
+          const key=[x,y,density].join(':');let chunk=this.chunks.get(key);
+          if(chunk&&chunk.pending.some(img=>img.complete&&img.naturalWidth)){target.release(chunk.canvas);this.chunkPixels-=chunk.pixels;this.chunks.delete(key);chunk=null;}
+          if(!chunk){
+            dependencies.clear();
+            const canvas=document.createElement('canvas');canvas.width=canvas.height=512*density;
+            this.visibleRect={left:x,top:y,width:512,height:512};this.visibleCells=this.cellsInRect(this.visibleRect);
+            this.draw=canvas.getContext('2d');this.draw.setTransform(density,0,0,density,-x*density,-y*density);
+            this.draw.fillStyle='#688e91';this.draw.fillRect(x,y,512,512);
+            this.ground();this.facilities(true);this.terrain(false);this.ownership();this.mapTiles();this.mapText();this.borders();this.terrain(true);this.facilities(false);
+            chunk={canvas,x,y,density,pixels:canvas.width*canvas.height,pending:[...dependencies].filter(img=>!img.complete)};
+            this.chunks.set(key,chunk);this.chunkPixels+=chunk.pixels;this.staticBuilds=(this.staticBuilds||0)+1;
+            this.draw=target;
+          }
+          this.chunks.delete(key);this.chunks.set(key,chunk);
+          if(!warmRect)target.drawImage(chunk.canvas,x,y,512,512);
+        }
+      }finally{this.api.image=sourceImage;this.api.sprite=sourceSprite;this.draw=target;this.visibleRect=originalRect;this.visibleCells=cells;this.collectImages=null;}
+      if(warmRect)return;
+      // Keep the visible frame alive even if a very large Mod viewport exceeds the budget.
+      const visible=new Set([...this.chunks].filter(([,c])=>c.density===density&&c.x<rect.left+rect.width&&c.x+512>rect.left&&c.y<rect.top+rect.height&&c.y+512>rect.top).map(([key])=>key));
+      for(const [key,c] of this.chunks){if(this.chunkPixels<=12*1024*1024)break;if(visible.has(key))continue;target.release(c.canvas);this.chunkPixels-=c.pixels;this.chunks.delete(key);}
+      this.warmTarget={rect:{...rect},density,state:this.state,map:this.map};
+      this.scheduleChunkWarm();
+    }
+    scheduleChunkWarm(){
+      if(this.warmTimer)return;
+      const run=()=>{
+        this.warmTimer=0;
+        const target=this.warmTarget;if(!target||this.state!==target.state||this.map!==target.map||document.hidden||this.api.visible===false||this.chunkPixels+512*512*target.density**2>12*1024*1024)return;
+        const {rect,density}=target,candidates=[];
+        for(let y=Math.floor(rect.top/512)*512-512;y<rect.top+rect.height+512;y+=512)for(let x=Math.floor(rect.left/512)*512-512;x<rect.left+rect.width+512;x+=512){
+          if(this.chunks.has([x,y,density].join(':'))||x+512<0||y+512< -72||x>this.state.width*64||y>this.state.height*54)continue;
+          candidates.push({x,y,distance:(x+256-rect.left-rect.width/2)**2+(y+256-rect.top-rect.height/2)**2});
+        }
+        candidates.sort((a,b)=>a.distance-b.distance);
+        if(!candidates.length)return;
+        const {x,y}=candidates[0];this.chunkGround({left:x,top:y,width:512,height:512},density);
+        this.scheduleChunkWarm();
+      };
+      this.warmTimer=typeof requestIdleCallback==='function'?requestIdleCallback(run,{timeout:500}):setTimeout(run,32);
     }
     ground() {
       const {draw,visibleRect:r}=this, pattern=this.api.image('images/map_pt@2x.png');
@@ -292,6 +378,7 @@
       this.api.sprite('buildings',flag+(animated?flagFrame(this.time):1)+'.png',anchor.x,anchor.y,1,this.draw);
     }
     flags(){
+      if(this.badgeOnly)return;
       for(const {site,cell,p} of this.visibleCells){
         if(!site.active||!site.owner||!site.buildingKind||site.buildingKind==='farmland'||this.stationed.has(cell))continue;
         const faction=this.factions.get(site.owner);this.flag(faction?.flag,p,site.buildingKind==='port',faction?.flagImage);
@@ -302,25 +389,35 @@
       this.visibleUnitMarkers=[];
       // Native movement emitters render behind the unit bodies, using HD-to-map scale.
       const activeTrails=new Set();
-      for(const [id,motion] of this.motions){const unit=state.units.find(u=>u.id===id);if(!unit)continue;
+      if(!this.badgeOnly)for(const [id,motion] of this.motions){const unit=state.units.find(u=>u.id===id);if(!unit)continue;
         const p=pose(motion,state.width,time),profile=this.api.effects?.profile(unit.profile,this.factions.get(unit.owner))||this.api.manifest.profiles[unit.profile];
         if(p.moving){activeTrails.add(id);this.api.effects?.trail(unit.id,p.x,p.y,Number(profile?.grade||0),state.cells[p.cell??unit.cell]?.sea,time,this.visible(p),this.arrivalSpeed||1);}
       }
-      this.api.effects?.finishTrails?.(activeTrails,time);
+      this.api.effects?.finishTrails?.(activeTrails,time,this.badgeOnly);
       this.api.effects?.frame(draw,time,'ground',this.visibleRect);
       const units=this.motions.size?this.orderedUnits.filter(u=>this.motions.has(u.id)||this.visible(point(u.cell,state.width))):this.visibleUnits;
       for(const unit of units){
         const motion=this.motions.get(unit.id),p=motion?pose(motion,state.width,time):point(unit.cell,state.width);
         if(!this.visible(p))continue;
-        const profile=this.api.effects?.profile(unit.profile,this.factions.get(unit.owner))||this.api.manifest.profiles[unit.profile],lib=this.api.libraries.get(profile?.library);if(!profile)continue;
+        const profile=(!this.badgeOnly&&this.api.effects?.profile(unit.profile,this.factions.get(unit.owner)))||this.api.manifest.profiles[unit.profile];if(!profile)continue;
         draw.save();
         const death=this.deaths?.get(unit.id),deathProgress=death?Math.max(0,Math.min(1,(time-death.started)/death.duration)):0;
         if(deathProgress>=1){draw.restore();continue;}
+        // Far view exits before body libraries, poses, flames, damage effects or flags are evaluated.
+        if(this.badgeOnly){
+          draw.translate(p.x,p.y);draw.scale(this.markerScale,this.markerScale);
+          this.unitBadge(unit,{x:0,y:0},profile,!!death);
+          if(unit.transport&&unit.category!=='naval'&&unit.category!=='fort')this.api.sprite('buildings','ship_mark.png',12,7);
+          if(Number(unit.veterancy)>0)this.api.sprite('buildings','rank_'+unit.veterancy+'.png',0,21);
+          if(!death)this.visibleUnitMarkers.push({unit,p});
+          draw.restore();continue;
+        }
+        const lib=this.api.libraries.get(profile.library);
         const facing=motion?p.facing:this.facings.get(unit.id)??(unit.facing===0?-1:1),sea=state.cells[p.cell??unit.cell]?.sea;
         draw.save();if(death)draw.globalAlpha*=1-deathProgress;
         const arrival=this.arrivals.get(unit.id);if(arrival!=null)draw.translate(0,recruitOffset(time-arrival,this.arrivalSpeed||1));
-        if(sea&&unit.category!=='naval')this.api.sprite('buildings',facing>0?'transportship1.png':'transportship2.png',p.x,p.y);
-        else if(lib){
+        if(!this.badgeOnly&&sea&&unit.category!=='naval')this.api.sprite('buildings',facing>0?'transportship1.png':'transportship2.png',p.x,p.y);
+        else if(!this.badgeOnly&&lib){
           const combat=this.combatMotions?.get(unit.id),elapsed=combat?time-combat.started-(combat.delay||0):0;
           const segment=elapsed>=0?(combat?.segments.find(s=>elapsed<s.end)||combat?.segments.at(-1)):null;
           if(combat)this.unitMotions.set(unit.id,{action:'ready',playing:false});
@@ -331,12 +428,7 @@
           this.unitAnimation(lib,item,tick);draw.restore();
         }
         draw.restore();
-        const color=badgeColor(state,unit.owner);
-        draw.save();draw.globalAlpha*=death?1:badgeAlpha(unit,state,time);
-        this.api.sprite('buildings','hpbar_'+color+'.png',p.x-13,p.y+15);
-        draw.beginPath();draw.arc(p.x-13,p.y+15,9,Math.PI,Math.PI+Math.PI*Math.max(0,death?0:unit.maxHealth>0?Math.min(1,unit.health/unit.maxHealth):0));draw.strokeStyle=healthColor(death?0:unit.health,unit.maxHealth);draw.lineWidth=2.5;draw.stroke();
-        this.api.sprite('buildings','mark_unit_'+profile.unitIndex+'.png',p.x-13,p.y+15);
-        draw.restore();
+        this.unitBadge(unit,{x:p.x-13,y:p.y+15},profile,!!death);
         if(unit.transport&&unit.category!=='naval'&&unit.category!=='fort')this.api.sprite('buildings','ship_mark.png',p.x+19,p.y+17);
         if(unit.burning>0){const fire=this.api.libraries.get('anim_fire'),item=fire?.byName.get(['1','3','2'][unit.burning-1]);if(item){draw.save();draw.globalAlpha=.5;draw.translate(p.x,p.y);this.api.animation(fire,item,time/1000*fire.fps);draw.restore();}}
         if(!death&&unit.category==='fort'&&unit.health>0){const damaged=Math.max(0,Math.min(3,Math.floor((unit.maxHealth-unit.health)/80)));if(damaged)this.api.effects?.element?.('damaged '+damaged,p.x,p.y,time,draw);}
@@ -345,9 +437,43 @@
         draw.restore();
       }
     }
+    unitBadge(unit,p,profile,death){
+      const {draw,state,time}=this,color=badgeColor(state,unit.owner);
+      draw.save();draw.globalAlpha*=death?1:badgeAlpha(unit,state,time);
+      this.api.sprite('buildings','hpbar_'+color+'.png',p.x,p.y);
+      const arc=!death&&this.healthArc(unit.health,unit.maxHealth);
+      if(arc)draw.drawImage(arc,p.x-12,p.y-12,24,24);
+      this.api.sprite('buildings','mark_unit_'+profile.unitIndex+'.png',p.x,p.y);
+      draw.restore();
+    }
+    healthArc(health,maximum){
+      if(!(health>0&&maximum>0))return null;
+      const hp=Math.min(health,maximum),key=hp+':'+maximum;
+      if(!this.healthArcs.has(key)){
+        // Supersampled transparent edges keep GPU line aliasing out of the small health ring.
+        const canvas=document.createElement('canvas');canvas.width=canvas.height=96;
+        const draw=canvas.getContext('2d');draw.scale(4,4);draw.beginPath();
+        draw.arc(12,12,9,Math.PI,Math.PI+Math.PI*hp/maximum);draw.strokeStyle=healthColor(hp,maximum);draw.lineWidth=2.5;draw.stroke();
+        if(this.healthArcs.size>=256){const oldest=this.healthArcs.keys().next().value;this.draw.release?.(this.healthArcs.get(oldest));this.healthArcs.delete(oldest);}
+        this.healthArcs.set(key,canvas);
+      }
+      return this.healthArcs.get(key);
+    }
     unitMarkers(){
       // Draw every flag after all bodies so nearby ships cannot cover them.
       const {state}=this;
+      if(this.badgeOnly){
+        for(const {unit,p} of this.visibleUnitMarkers||[]){
+          this.draw.save();this.draw.translate(p.x,p.y);this.draw.scale(this.markerScale,this.markerScale);
+          const morale=moraleSprite(unit.morale);if(morale)this.api.sprite('buildings',morale,15,-12);
+          if(unit.commanderImage){
+            this.api.sprite('commandermark','board_smallgenerals.png',0,-14);
+            this.api.sprite('commandermark',unit.commanderImage+'.png',0,-38);
+          }
+          this.draw.restore();
+        }
+        return;
+      }
       for(const {unit,p} of this.visibleUnitMarkers||[]){
         // Native 5335c -> 60b50 draws the effective state, including after reload.
         const morale=moraleSprite(unit.morale);
@@ -370,6 +496,10 @@
       if(!this.unitLibraryIds.has(lib))this.unitLibraryIds.set(lib,this.nextLibraryId++);
       const frame=Math.floor(tick)%item.duration,key=this.unitLibraryIds.get(lib)+':'+item.name+':'+frame;
       let cached=this.unitFrames.get(key);
+      if(this.draw.gpu){
+        if(!cached?.pose){const pose=new Ew4Pixi.Pose();this.api.animation(lib,item,tick,0,pose);cached={lib,pose,pixels:0};this.unitFrames.set(key,cached);while(this.unitFrames.size>1024)this.unitFrames.delete(this.unitFrames.keys().next().value);}
+        cached.pose.replay(this.draw);return;
+      }
       if(cached?.lib!==lib){
         const bounds=animationBounds(lib,item,tick);if(!bounds)return;
         const ratio=lib.pixelRatio||1,density=2,left=Math.floor(bounds.left/ratio)-1,top=Math.floor(bounds.top/ratio)-1;
@@ -384,17 +514,16 @@
       this.draw.drawImage(cached.canvas,cached.left,cached.top,cached.width,cached.height);
     }
     labels() {
-      if(this.zoom<=.5)return;
       const {draw,state}=this;
-      const density=Math.max(1,Math.min(4,Math.ceil(draw.getTransform().a/2)));
+      const scale=Math.max(1,this.markerScale),density=Math.max(1,Math.min(4,Math.ceil(draw.getTransform().a*scale/2)));
       for(const {site:c,cell:i,p} of this.visibleCells){if(!c.active||!c.name)continue;
         const key=i+':'+c.name+':'+density;
         if(!this.cityLabels.has(key)){
           if(this.cityLabels.size>=1024)this.cityLabels.delete(this.cityLabels.keys().next().value);
           this.cityLabels.set(key,this.api.cityLabel(c.name,i,density).firstElementChild);
         }
-        const label=this.cityLabels.get(key),width=label.width/density/2,height=label.height/density/2;
-        draw.drawImage(label,p.x-width/2,p.y+29,width,height);}
+        const label=this.cityLabels.get(key),width=label.width/density/2*scale,height=label.height/density/2*scale;
+        draw.drawImage(label,p.x-width/2,p.y+29*scale,width,height);}
     }
     highlights() {
       const range=new Set(this.selection?.range),targets=new Set(this.selection?.targets);

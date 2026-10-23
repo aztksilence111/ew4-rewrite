@@ -1,12 +1,21 @@
 # APK 点击闪烁修复短断点
 
-更新：2026-10-23。状态：仅调查与交接，未修复。用户要求本轮只写报告断点，禁止本轮修改本体代码；本文件供另一个修复会话接续，不代表该会话已经启动。
+更新：2026-10-23。状态：用户已在后续会话授权修复，顶部资源栏重复创建已修复并通过浏览器回归；Android ARM64 Compile 通过，未打新 APK、未发布、未真机验证。前一轮“只写报告”的限制是历史任务边界，不适用于此次修复请求。
 
 ## 先读与下一步
 
-工作目录：`E:\Workplace\game\o4mod`。先读本文件，再读 [完整报告与验收清单](../reverse/APK_CLICK_FLICKER_HANDOFF_20261023.md)，不必通读历史状态和日志。先 `git status --short`，保留其他任务的代码/性能方案/工具改动。
+工作目录：`E:\Workplace\game\o4mod`。先读本文件，再按需读 [实施与验证记录](../reverse/APK_CLICK_FLICKER_FIX_20261023.md) 和 [原调查及验收清单](../reverse/APK_CLICK_FLICKER_HANDOFF_20261023.md)，不必通读历史日志。先 `git status --short`，保留其他任务的代码/性能方案/工具改动。
 
-下一步：在获得修复任务后，为顶部资源栏建立持久节点，将资源图标与数字更新分离，以后端已提交状态的实际字段变化驱动数字更新，然后验证 Mod 覆盖和真机闪烁。
+下一步：需要 APK 交付时从当前授权范围构建并核验前端资源，再在反馈设备做同局前后录屏；分别核对资源图标、数字、地图和全屏。当前没有连接 adb 设备，整屏闪动根因尚未闭环。
+
+## 已完成与证据
+
+- 四个前端文件：index.html 固定三组图标/数字骨架；app.js 逐字段对比当前权威资源，只更新变化数字，同时去除回合和国旗的重复更新；original-ui.js 按实际字体依赖/倍率避免相同文字重绘；style.css 稳定战场 HUD 层级和安全区。
+- Mod 仍经原版本资源 URL 与 ReadContent 覆盖通道，切换 Mod 页面重载；初始化等待图标解码。未修改缓存头、战斗规则或动画。
+- `tools/verify_click_flicker.cjs` 完整专项31项，最终UI与重开回归21项，现有字体回归42项通过；异常/缺失资源均0。含DOM/节点/画布计数、真实升级、Mod单/多资源事件、势力切换、读档、同名图片更新和原版恢复。
+- 证据：`rewrite/reports/click-flicker-20261023/{browser.json,ui-final.json,fonts/results.json}`。Web隔离构建与Android ARM64 Release Compile为0警告/错误。
+- 预览 <http://127.0.0.1:5417>；测试档案 `build/click-flicker-profile`，后端隔离输出 `build/click-flicker-web`。前端随当前工作树，后端是本轮构建快照。
+- 没有本项提交、新APK或发布，不宣称整屏闪动和卡顿已全部解决；未穷举完整回合、快进和本地多人流程。
 
 ## 必须保留的用户要求
 
@@ -18,8 +27,8 @@
 
 ## 已有依据与定位
 
-- `Ew4.Web/wwwroot/app.js`：`selectCell()` 最后调用 `refreshHud()`；后者清空 `#resources`，重建 img、span 和数字。`act()` / `installState()` 也反复触发 HUD 刷新。
-- `Ew4.Web/wwwroot/original-ui.js`：`TextRenderer.element()` 每次创建文字 canvas 并绘制。
+- 修复前 `selectCell()` / `act()` / `installState()` 反复触发 `refreshHud()`，其清空 `#resources` 并重建图标/数字。现保留调用以更新按钮，但资源部分无变化零变更。
+- `TextRenderer.element()` 仍用于新文字创建；相同HUD数值不再调用它，既有画布也不会因无关字体分片或相同倍率通知重绘。
 - `Ew4.Android/MainActivity.cs`：WebView 静态图片返回 no-store；这是候选放大因素，不是已证实的整屏闪烁根因。
 - `Ew4.Mods/FrontendResources.cs`：`ReadContent()` 是现有 Mod 内容读取入口；不要绕开。
 - 当前已关闭触摸高亮；主画布只在目标尺寸改变时重设，不能把这两项直接认定为每次点击闪烁的原因。
@@ -29,8 +38,8 @@
 
 先通过节点引用/DOM 变更/文字生成计数检查：无变化零重建、有变化只更新相应数字；覆盖后端非白名单资源变更、失败请求、读档、势力切换及 Mod 图标覆盖/恢复。再做相关前端检查、必要构建与目标手机前后录屏。桌面通过或 Android 编译成功不能代替真机验收；若整屏仍闪，保持该项未解决。
 
-每阶段先保存成果和证据，再更新本短断点，最后写简短工作日志。当前没有本项修复提交、APK 或性能成绩。
+每阶段先保存成果和证据，再更新本短断点，最后写简短工作日志。不得用桌面及编译结果代替真机验收。
 
 ## 可复制给修复会话的提示词
 
-> 修复 APK 点击部队时的资源栏闪烁与重复创建。工作目录 E:\Workplace\game\o4mod，先读 rewrite/HANDOFF_APK_CLICK_FLICKER.md 和 reverse/APK_CLICK_FLICKER_HANDOFF_20261023.md，按其中用户要求实施并验证。固定金币/工业/粮食图标作为支持 Mod 覆盖的顶部状态栏；数字未变不重建，只有后端权威值确实改变才局部更新，不写死动作名单。保留他人改动，区分局部图标问题与未定位的整屏闪烁，更新断点并如实保留真机待验项。
+> 接续 R 版点击闪动修复。先读 rewrite/HANDOFF_APK_CLICK_FLICKER.md 和 reverse/APK_CLICK_FLICKER_FIX_20261023.md。资源栏节点复用与Mod验证已通过，保留实现及其他会话改动；按新的用户授权处理APK构建/核验和目标手机复测。固定图标、相同数字零重建、不写动作白名单的约束继续有效。分别核对局部资源栏与整屏闪动，如实记录尚未通过的真机项。

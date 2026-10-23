@@ -27,11 +27,12 @@
 #scenario-menu{background-image:url("content/ui/conquest_background.png");background-size:cover;background-repeat:no-repeat}
 #undo-move,#next-unit,#skip-ai{left:0;bottom:0;transform-origin:left bottom;width:37px;height:37px}
 #undo-move{background-image:url("content/ui/image_recruit_hd/button_return.png")}
-#next-unit{left:calc(41px * var(--battle-scale));background-image:url("unit-search.png")}
 #skip-ai{background-image:url("content/ui/image_recruit_hd/button_skip.png")}
+#next-unit{left:calc(41px * var(--battle-scale));background-image:url("unit-search.png")}
 #ai-action{position:absolute;bottom:0;right:0;width:137px;height:22px;background:url("content/ui/image_ui_hd/board_aiaction.png") center/100% 100% no-repeat;transform:scale(var(--battle-scale));transform-origin:right bottom;color:#eee;font:13px var(--ew4-font-family);pointer-events:none}
 #ai-action img{position:absolute;left:13px;top:5px;width:25.5px;height:15px}#ai-action span{position:absolute;left:44px;top:5px}
 .unit-card{background:#646464}.unit-card>.card-marker{position:absolute;left:1px;top:34px;object-fit:contain}.cost-strip{background:#414141}
+.defense-cards button{position:relative;flex:none;height:64px;overflow:hidden}.defense-cards button>img{display:block}.defense-cards .cost-strip{position:absolute;left:0;right:0;bottom:0;height:12px}.defense-cards+.unit-description{top:76px}
 .recruit-cards{left:2px;right:0;top:10px;padding:0;gap:1px;height:65px}.recruit-cards>button{outline:1px solid #888;outline-offset:-1px}
 .recruit-cards>button[aria-pressed=true]{outline:2px solid #ff6b00;outline-offset:-2px}.empty-recruit-card{flex:none;width:72px;height:65px;background:#686868;border:1px solid #aaa}
 .recruit-description .ability-grid{left:2px;top:82px;width:152px;grid-template-columns:24px 52px 24px 52px;grid-auto-rows:24px}
@@ -42,7 +43,13 @@
 #terrain-info .terrain-row{display:flex;align-items:center;gap:3px;white-space:nowrap}
 #terrain-info .original-text{position:static;display:inline-flex;height:auto;gap:0;align-items:center}
 #terrain-info img{width:18px;height:18px;flex:none}
+#play{isolation:isolate}
+.battle-resources{z-index:1;pointer-events:none;top:env(safe-area-inset-top,0px);left:env(safe-area-inset-left,0px)}
+#pause{z-index:7}
+#terrain-info{left:env(safe-area-inset-left,0px);top:calc(env(safe-area-inset-top,0px) + 31px * var(--battle-scale))}
 #resources>.resource-item{display:flex;align-items:center;gap:3px;white-space:nowrap}
+#resources .resource-value{display:inline-flex;align-items:center}
+#resources img{flex:none}
 #resources .original-text{position:static;display:inline-flex;min-width:0;gap:0}
 .chapter-list{position:absolute;inset:0;pointer-events:none}.chapter-entry{position:absolute;pointer-events:auto}.chapter-entry>img{display:block}.chapter-entry>span{position:absolute;left:-35px;right:-35px;top:65px;color:#333;font-size:12px;text-align:center;text-shadow:0 1px #eee}.campaign-mode{background-image:url("content/ui/campaign_background.png")!important}.chapter-list+.menu-bar{position:relative}
 #tutorial-talk{position:absolute;left:30px;bottom:0;width:325px;height:83px;transform:scale(var(--battle-scale));transform-origin:left bottom;pointer-events:none;background:url("content/ui/image_ui_hd/board_dialog_ex.png") right center/265px 83px no-repeat;color:#404040}#tutorial-portrait{position:absolute;left:10px;top:7px;width:70px;height:70px}#tutorial-text{position:absolute;left:87px;top:8px;width:230px;max-height:69px;overflow:auto;font-size:11px;line-height:1.45}#tutorial-focus{position:fixed;pointer-events:none;border:3px solid #ed911a;z-index:6;animation:tutorial-focus-pulse 1.2s linear infinite}#tutorial-focus:after{content:"";position:absolute;left:50%;top:-26px;width:22px;height:24px;background:url("content/ui/image_ui_hd/tutorials_point.png") center/contain no-repeat;transform:translateX(-50%);animation:tutorial-arrow 1s ease-in-out infinite}@keyframes tutorial-focus-pulse{50%{opacity:.3}}@keyframes tutorial-arrow{50%{transform:translate(-50%,-8px)}}.action-confirmation{text-align:center;padding:12px;font-size:14px;color:#404040}.action-confirmation .unit-card{margin:7px auto}.card-change{animation:recruit-card-select .18s ease-out}@keyframes recruit-card-select{from{transform:scale(.9)}to{transform:scale(1)}}

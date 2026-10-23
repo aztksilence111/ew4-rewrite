@@ -14,6 +14,7 @@ API 2 可打包覆盖包，字段见[指南](../../docs/porting/METAGAME_AND_BRI
   "schema": 1,
   "initialMedals": 20000000,
   "initialBadges": 20000000,
+  "commanderSectionCapacities": { "0": 30, "1": 25, "2": 40 },
   "refresh": {
     "shop": { "limit": 3, "recovery": { "intervalSeconds": 600, "amount": 1 } },
     "academy.0": { "limit": 2, "recovery": { "victories": 2, "amount": 1 } }

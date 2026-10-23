@@ -8,6 +8,7 @@ public static partial class WorldAi
 {
     public static AiStepPlan PlanStep(WorldState state, WorldAiRules ai, WorldProductionRules production, WorldTurnRules turns)
     {
+        using var planning = PlanningScope.Begin(ai);
         WorldActions.Ready(state, state.Revision);
         ai.Validate();
         if (WorldDiplomacy.Dormant(state, state.ActiveFaction, ai.NeutralCamps))

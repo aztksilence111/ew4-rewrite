@@ -31,7 +31,8 @@ public sealed record WorldProductionRules
     public string FortressCategory { get; init; } = "fort";
     public IReadOnlyCollection<string> HoldBehaviors { get; init; } = new[] { "3" };
 
-    public void Validate()
+    public void Validate() => PlanningScope.Validate(this, ValidateCore);
+    private void ValidateCore()
     {
         Recruit.Validate(); Pool.Validate(); Upgrade.Validate();
         InstallationScoring?.Validate(); FortressScoring?.Validate(); BuildingUpgrades?.Validate(); Transport?.Purchase.Validate();

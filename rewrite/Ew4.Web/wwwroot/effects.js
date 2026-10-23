@@ -90,18 +90,23 @@
     }
   }
   class DamageNumbers {
-    constructor(){this.instances=[];this.cache=new Map();this.revision=-1;}
+    constructor(font,sheet){this.font=font;this.sheet=sheet;this.instances=[];this.cache=new Map();}
     clear(){this.instances=[];}
     add(amount,critical,x,y,speed=1){
       if(!Number.isFinite(amount)||amount<=0)return;
-      if(this.revision!==Ew4OriginalUI.revision){this.cache.clear();this.revision=Ew4OriginalUI.revision;}
       const key=amount+':'+!!critical;
       if(!this.cache.has(key)){
-        const canvas=document.createElement('canvas'),draw=canvas.getContext('2d'),text='-'+amount;
-        draw.font='72px '+Ew4OriginalUI.combatFontFamily;
-        canvas.width=Math.ceil(draw.measureText(text).width)+12;canvas.height=96;
-        draw.font='72px '+Ew4OriginalUI.combatFontFamily;draw.textBaseline='middle';draw.lineWidth=6;draw.lineJoin='round';
-        draw.strokeStyle='#000000';draw.strokeText(text,6,48);draw.fillStyle=critical?'#ff3030':'#ffffff';draw.fillText(text,6,48);
+        const glyphs=[...('-'+amount)].map(c=>this.font.glyphs[c.codePointAt(0)]);
+        let cursor=0,width=0;
+        for(const [,,w,,dx,,advance] of glyphs){width=Math.max(width,cursor-dx+w);cursor+=advance;}
+        const canvas=document.createElement('canvas');canvas.width=Math.ceil(width);canvas.height=this.font.height;const draw=canvas.getContext('2d');
+        cursor=0;
+        for(const [x,y,w,h,dx,dy,advance] of glyphs){draw.drawImage(this.sheet,x,y,w,h,cursor-dx,-dy,w,h);cursor+=advance;}
+        if(critical){
+          const pixels=draw.getImageData(0,0,canvas.width,canvas.height);
+          for(let i=0;i<pixels.data.length;i+=4){pixels.data[i+1]*=48/255;pixels.data[i+2]*=48/255;}
+          draw.putImageData(pixels,0,0);
+        }
         this.cache.set(key,canvas);if(this.cache.size>128)this.cache.delete(this.cache.keys().next().value);
       }
       this.instances.push({amount,critical:!!critical,x,y,speed,started:performance.now(),duration:1600/speed,canvas:this.cache.get(key)});
@@ -110,7 +115,7 @@
       this.instances=this.instances.filter(hit=>{
         const progress=Math.max(0,(time-hit.started)/hit.duration);if(progress>=1)return false;
         const y=hit.y-30-64*progress;if(!inView(rect,hit.x,y,96))return true;
-        const scale=1/3,width=hit.canvas.width*scale,height=hit.canvas.height*scale;
+        const scale=24/this.font.height,width=hit.canvas.width*scale,height=hit.canvas.height*scale;
         draw.drawImage(hit.canvas,hit.x-width/2,y,width,height);return true;
       });
     }
@@ -156,7 +161,11 @@
       instance.enabled=visible;instance.trailPosition={x:(x-instance.x)/instance.scale,y:(y-instance.y)/instance.scale,time:elapsed};
     }
     stopTrail(trail,time){const i=trail.instance,elapsed=(time-i.started)/1000*i.speed;i.continuous=false;i.emissionLife=elapsed;for(const e of i.emitters)e.stop(elapsed);}
-    finishTrails(active,time){for(const [id,trail] of this.trails)if(!active.has(id)){this.stopTrail(trail,time);this.trails.delete(id);}}
+    finishTrails(active,time,discard=false){
+      const removed=new Set();
+      for(const [id,trail] of this.trails)if(!active.has(id)){this.stopTrail(trail,time);this.trails.delete(id);if(discard)removed.add(trail.instance);}
+      if(removed.size)this.instances=this.instances.filter(instance=>!removed.has(instance));
+    }
     get particles(){return this.instances.flatMap(i=>i.emitters.flatMap(e=>e.particles));}
     element(name,x,y,time,draw){
       for(const element of this.data.elements?.[name]||[]){const lib=this.api.libraries.get(element.res),item=lib?.byName.get(element.name);if(!item)continue;
@@ -179,6 +188,18 @@
         this.tints.set(key,canvas);
       }
       return this.tints.get(key);
+    }
+    particleAtlas(){
+      const image=this.api.image('images/eff.png');if(!image.complete||!image.naturalWidth)return null;
+      if(this.gpuAtlas?.source!==image){
+        const canvas=document.createElement('canvas');canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;
+        const draw=canvas.getContext('2d');draw.fillStyle='#ffffff';draw.fillRect(0,0,canvas.width,canvas.height);draw.drawImage(image,0,0);
+        // Preserve the existing multiply -> destination-in edge colors; tinting the
+        // original translucent atlas directly would darken its antialiased edges.
+        draw.globalCompositeOperation='destination-in';draw.drawImage(image,0,0);
+        this.gpuAtlas={source:image,canvas};
+      }
+      return this.gpuAtlas.canvas;
     }
     frame(draw,time,layer='foreground',visibleRect=null){
       this.instances=this.instances.filter(instance=>{
@@ -216,8 +237,11 @@
           const anchorX=sprite?Number(sprite.refx||0)/sprite.w:.5,anchorY=sprite?Number(sprite.refy||0)/sprite.h:.5;
           const radius=Math.hypot(width,height)*Math.max(anchorX,1-anchorX,anchorY,1-anchorY);
           if(!inView(visibleRect,x,y,radius))continue;
-          const color=p.color.map((v,i)=>v*track(p.tracks,life,['r','g','b','a'][i])),texture=this.texture(p.image?.file,color);if(!texture)continue;
-          draw.save();draw.translate(x,y);draw.rotate(p.rotation);draw.globalAlpha=alpha;draw.globalCompositeOperation=p.image.blend==='add'?'lighter':'source-over';draw.drawImage(texture,-width*anchorX,-height*anchorY,width,height);draw.restore();
+          const color=p.color.map((v,i)=>v*track(p.tracks,life,['r','g','b','a'][i])),texture=draw.gpu?this.particleAtlas():this.texture(p.image?.file,color);if(!texture||!sprite)continue;
+          draw.save();draw.translate(x,y);draw.rotate(p.rotation);draw.globalAlpha=alpha;draw.globalCompositeOperation=p.image.blend==='add'?'lighter':'source-over';
+          if(draw.gpu){const rgb=color.slice(0,3).map(v=>Math.max(0,Math.min(255,Math.round(v/16)*16)));draw.tint=(rgb[0]<<16)|(rgb[1]<<8)|rgb[2];draw.drawImage(texture,sprite.x,sprite.y,sprite.w,sprite.h,-width*anchorX,-height*anchorY,width,height);}
+          else draw.drawImage(texture,-width*anchorX,-height*anchorY,width,height);
+          draw.restore();
         }
         return visualAlive||instance.done.size<instance.events.length||instance.emitters.some(e=>e.alive);
       });

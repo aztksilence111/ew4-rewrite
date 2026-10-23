@@ -63,7 +63,7 @@ public sealed class MainActivity : Activity
         surface = new FrameLayout(this);
         surface.SetBackgroundColor(global::Android.Graphics.Color.Black);
         surface.AddView(web, new FrameLayout.LayoutParams(-1, -1));
-        safeInsets = new SafeInsets();
+        safeInsets = new SafeInsets(this);
         surface.SetOnApplyWindowInsetsListener(safeInsets);
         SetContentView(surface);
         if (OperatingSystem.IsAndroidVersionAtLeast(33))
@@ -163,11 +163,11 @@ public sealed class MainActivity : Activity
             if (value?.ToString() == "\"exit\"") activity.ConfirmExit();
         }
     }
-    private sealed class SafeInsets : Java.Lang.Object, View.IOnApplyWindowInsetsListener
+    private sealed class SafeInsets(MainActivity activity) : Java.Lang.Object, View.IOnApplyWindowInsetsListener
     {
         public WindowInsets OnApplyWindowInsets(View? view, WindowInsets? insets)
         {
-            // Size the entire WebView, keeping canvas coordinates and all menu/HUD controls aligned.
+            // Only visible system bars reduce the viewport; a cutout is not a full-height gutter.
             if (view != null && insets != null)
             {
                 int left = 0, top = 0, right = 0, bottom = 0;
@@ -179,25 +179,33 @@ public sealed class MainActivity : Activity
                 if (OperatingSystem.IsAndroidVersionAtLeast(30))
                 {
                     // Hidden bars and gesture hit regions do not obscure the fullscreen surface.
-                    var bars = insets.GetInsets(WindowInsets.Type.SystemBars() | WindowInsets.Type.DisplayCutout());
+                    var bars = insets.GetInsets(WindowInsets.Type.SystemBars());
                     Include(bars.Left, bars.Top, bars.Right, bars.Bottom);
-                    var waterfall = insets.DisplayCutout?.WaterfallInsets;
-                    if (waterfall != null) Include(waterfall.Left, waterfall.Top, waterfall.Right, waterfall.Bottom);
                 }
                 else
                 {
 #pragma warning disable CS0618
-                    Include(insets.SystemWindowInsetLeft, insets.SystemWindowInsetTop, insets.SystemWindowInsetRight, insets.SystemWindowInsetBottom);
+                    var flags = (SystemUiFlags)(int)(activity.Window?.DecorView.SystemUiVisibility ?? StatusBarVisibility.Visible);
+                    bool navigationHidden = (flags & SystemUiFlags.HideNavigation) != 0;
+                    bool statusHidden = (flags & SystemUiFlags.Fullscreen) != 0;
+                    Include(navigationHidden ? 0 : insets.SystemWindowInsetLeft, statusHidden ? 0 : insets.SystemWindowInsetTop,
+                        navigationHidden ? 0 : insets.SystemWindowInsetRight, navigationHidden ? 0 : insets.SystemWindowInsetBottom);
 #pragma warning restore CS0618
-                }
-                if (OperatingSystem.IsAndroidVersionAtLeast(28))
-                {
-                    var cutout = insets.DisplayCutout;
-                    Include(cutout?.SafeInsetLeft ?? 0, cutout?.SafeInsetTop ?? 0,
-                        cutout?.SafeInsetRight ?? 0, cutout?.SafeInsetBottom ?? 0);
                 }
                 if (view.PaddingLeft != left || view.PaddingTop != top || view.PaddingRight != right || view.PaddingBottom != bottom)
                     view.SetPadding(left, top, right, bottom);
+                // Preserve cutout information for floating content, consuming only handled system bars.
+                if (OperatingSystem.IsAndroidVersionAtLeast(30))
+                {
+                    using var remaining = new WindowInsets.Builder(insets);
+                    var zero = global::Android.Graphics.Insets.Of(0, 0, 0, 0);
+                    remaining.SetInsets(WindowInsets.Type.SystemBars(), zero);
+                    remaining.SetInsetsIgnoringVisibility(WindowInsets.Type.SystemBars(), zero);
+                    return remaining.Build()!;
+                }
+#pragma warning disable CS0618
+                return insets.ConsumeSystemWindowInsets()!;
+#pragma warning restore CS0618
             }
             return insets!;
         }

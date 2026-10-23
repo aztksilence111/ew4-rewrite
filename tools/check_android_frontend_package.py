@@ -16,7 +16,16 @@ APK = ROOT / args.apk
 files = {}
 with zipfile.ZipFile(APK) as archive:
     assert archive.testzip() is None, "APK CRC failure"
-    for name in ("victory-ui.js", "victory-ui.css", "local-multiplayer.js", "local-multiplayer.css"):
+    frontend = ROOT / "rewrite/Ew4.Web/wwwroot"
+    compatibility = json.loads((frontend / "compat/manifest.json").read_text(encoding="utf-8"))
+    assert compatibility["target"] == "chrome70", "Unexpected frontend target"
+    for name, entry in compatibility["files"].items():
+        assert hashlib.sha256((frontend / name).read_bytes()).hexdigest() == entry["sourceSha256"], name + " source changed after transpilation"
+        relative = "assets/www/compat/" + name
+        assert hashlib.sha256(archive.read(relative)).hexdigest() == entry["sha256"], relative + " is stale"
+        files[relative] = entry["sha256"]
+    assert archive.read("assets/www/compat/manifest.json") == (frontend / "compat/manifest.json").read_bytes(), "Compatibility manifest is stale"
+    for name in ("victory-ui.js", "victory-ui.css", "local-multiplayer.js", "local-multiplayer.css", "screen-layout.js", "screen-layout.css"):
         relative = "assets/www/" + name
         source = ROOT / "rewrite/Ew4.Web/wwwroot" / name
         assert archive.read(relative) == source.read_bytes(), relative + " is stale"

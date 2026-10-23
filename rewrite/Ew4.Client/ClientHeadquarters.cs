@@ -7,7 +7,6 @@ namespace Ew4.Client;
 
 public sealed partial class ClientGame
 {
-    private const int CommanderSectionCapacity = 20;
     private PlayerAccount? localAccount;
     private string Profile => Path.Combine(saveDirectory, "account.json");
     private PlayerAccount Account()
@@ -59,7 +58,8 @@ public sealed partial class ClientGame
     {
         var account = Account(); var locked = LockedCommanders();
         var sources = content.Catalogs.Runtime.SourceTrees.GetProperty("def_commander.xml").GetProperty("children");
-        return new { account.Revision, account.Medals, account.Badges, sectionCapacity = CommanderSectionCapacity,
+        return new { account.Revision, account.Medals, account.Badges, sectionCapacity = MetagameRules.DefaultCommanderSectionCapacity,
+            sectionCapacities = Enumerable.Range(0, 3).Select(content.Extensions.Metagame.CommanderSectionCapacity).ToArray(),
             refresh = Enumerable.Range(0, 3).ToDictionary(i => i, i => RefreshView(account, "academy." + i)),
             skillLayout = content.Extensions.Layouts.GetValueOrDefault("commander"), offers = account.CommanderOffers, roster = account.Roster.Select(c => new { c.Id, c.DefinitionId, c.Learning, c.Training, c.Items, c.Tag,
             locked = locked.Contains(c.Id), rankPrice = PromotionPrice(c, false), titlePrice = PromotionPrice(c, true), fullPrice = FullPromotionPrice(c),
@@ -100,8 +100,8 @@ public sealed partial class ClientGame
     private void RequireCommanderSlot(PlayerAccount account, string definitionId)
     {
         int section = CommanderSection(definitionId);
-        if (account.Roster.Count(c => CommanderSection(c.DefinitionId) == section) >= CommanderSectionCapacity)
-            throw new RuleViolation("account.capacity", "该星区已满（20位将领）");
+        if (account.Roster.Count(c => CommanderSection(c.DefinitionId) == section) >= content.Extensions.Metagame.CommanderSectionCapacity(section))
+            throw new RuleViolation("account.capacity", "该星级区将领已达上限，无法购买");
     }
     private PlayerAccount DrawCommanders(PlayerAccount account, int group)
     {

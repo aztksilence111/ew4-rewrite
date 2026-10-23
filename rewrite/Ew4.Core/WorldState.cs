@@ -184,7 +184,8 @@ public sealed record WorldState
     public TurnPhase Phase { get; init; } = TurnPhase.Active;
     public BattleOutcome Outcome { get; init; } = BattleOutcome.Continue;
 
-    public void Validate()
+    public void Validate() => PlanningScope.Validate(this, ValidateCore);
+    private void ValidateCore()
     {
         Limits.Validate();
         if (ExtensionState.Count > 100_000 || ExtensionState.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Key.Length > 512))
