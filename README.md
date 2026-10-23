@@ -1,6 +1,6 @@
 # EW4 rewrite
 
-2026-10-23：[战役同盟胜负、非接壤占领及失败界面修复](reverse/CAMPAIGN_ALLIANCE_CAPTURE_20261023.md)已完成源码验证，[0.2.16双端打包发布进行中](rewrite/RELEASE_PROGRESS_0.2.16_20261023.md)。
+2026-10-23：[0.2.16双端正式下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.16-20261023)，包含[战役同盟胜负、非接壤占领及失败界面修复](reverse/CAMPAIGN_ALLIANCE_CAPTURE_20261023.md)；Web与ARM64 APK code19远端校验完成，真机待验。[发布记录](rewrite/RELEASE_PROGRESS_0.2.16_20261023.md)。
 
 本仓库保存 rewrite 游戏源码、运行资源、地图制作配置和 Mod 制作指南。
 名称约定：**r版**就是 **rewrite版**的简称，后续不再另行注明。

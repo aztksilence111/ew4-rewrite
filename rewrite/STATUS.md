@@ -1,6 +1,6 @@
 # 重构短锚点
 
-- **战役同盟胜负、占领及失败显示已修，0.2.16双端发行进行中：[报告](../reverse/CAMPAIGN_ALLIANCE_CAPTURE_20261023.md)、[进度](RELEASE_PROGRESS_0.2.16_20261023.md)。** 战役同盟合计红点共享胜负、征服保持单国；非接壤实际占领换主。失败先对白后原结算，数字及横竖屏背景修复。多人245/辖区228/客户端2763+24/结算459+32/浏览器42通过，0异常缺图；隔离机制356，正式入口历史指纹问题见报告。5439隔离预览，真机未运行，发行以远端审计为准。
+- **0.2.16已正式发布：[下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.16-20261023)、[报告](../reverse/CAMPAIGN_ALLIANCE_CAPTURE_20261023.md)、[进度](RELEASE_PROGRESS_0.2.16_20261023.md)。** 战役同盟胜负、非接壤占领、失败原对白/结算、数字及旋屏背景修复已入包。源码ca82e6c，Web/ARM64 APK code19及两校验附件远端审计errors=0；核心310933/Mod106/独立运行11249/发行浏览器42+42通过，同证书v2/v3/16KiB通过。正式机制专项历史指纹问题见报告，5439隔离预览，真机未运行；下文是历史阶段记录。
 
 - **战役可见性、原版选国及音乐已接：[记录](../reverse/CAMPAIGN_MUSIC_RESTORATION_20261023.md)。** 11个原隐藏入口初始开放，84主入口/两个附加国家分支；API2 campaignVisibility支持original/visible/hidden，Mod默认遵守XML。原form_selcountry布局及5首MP3播放规则恢复，音乐JSON与旧包导入覆盖已验。专项20/客户端2490/Mod17/浏览器59通过，Web及Android Compile零警告错误，5431独立预览；真机待验。并行0.2.15发行状态见下条。
 
