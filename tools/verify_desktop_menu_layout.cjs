@@ -14,9 +14,9 @@ const base=process.argv[2]||'http://127.0.0.1:5493',folder=path.resolve(process.
   for(const [width,height] of [[390,844],[844,390],[768,1024],[1280,800],[2550,1275]])for(const screen of [80,100,150]){
     for(const touch of [false,true])for(const insets of [{},{left:32,right:24,top:12,bottom:24}]){
       const input={width,height,screen,touch,insets,reserve:28},before=baseline.Ew4ScreenLayout.measure(input);
-      const native=current.Ew4ScreenLayout.measure({...input,webMenu:false}),web=current.Ew4ScreenLayout.measure({...input,webMenu:true});
-      check(Object.keys(before).every(key=>before[key]===native[key]),'Android layout values match baseline '+[width,height,screen,touch]);
-      check(Object.keys(before).filter(key=>!key.startsWith('menu')).every(key=>before[key]===web[key]),'Web battlefield values match baseline');
+      const layout=current.Ew4ScreenLayout.measure(input);
+      check(Object.keys(before).filter(key=>!key.startsWith('menu')).every(key=>before[key]===layout[key]),'battlefield values match baseline '+[width,height,screen,touch]);
+      check(layout.menuWidth===568&&layout.menuHeight===320,'all platforms use original menu canvas');
     }
   }
   const browser=await chromium.launch({headless:true,executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',args:['--mute-audio']});
@@ -26,6 +26,7 @@ const base=process.argv[2]||'http://127.0.0.1:5493',folder=path.resolve(process.
   const fits=async selector=>page.locator(selector).evaluateAll(nodes=>nodes.every(el=>{const r=el.getBoundingClientRect();return r.left>=-.1&&r.top>=-.1&&r.right<=innerWidth+.1&&r.bottom<=innerHeight+.1;}));
   try{
     await page.goto(base);await page.waitForFunction(()=>startupReady,null,{timeout:60000});
+    check(await page.locator('#menu').evaluate(el=>getComputedStyle(el).backgroundColor==='rgb(119, 119, 119)'),'unused menu area stays gray');
     for(const [width,height] of [[2550,1275],[3440,1440],[1920,1080],[1366,768],[844,390],[390,844]]){
       await page.setViewportSize({width,height});await page.evaluate(()=>showMain());
       for(const screen of [80,100,150]){
@@ -80,6 +81,8 @@ const base=process.argv[2]||'http://127.0.0.1:5493',folder=path.resolve(process.
     check(await fits('#menu-stage, .tutorial-menu'),'tutorial menu fits');
     const nativePage=await browser.newPage({hasTouch:true});
     nativePage.on('pageerror',e=>report.errors.push('native: '+e.message));
+    nativePage.on('response',r=>{if(r.status()>=400)report.missing.push(r.url());});
+    await nativePage.addInitScript(()=>localStorage.setItem('ew4.settings',JSON.stringify({music:0,sound:0})));
     await nativePage.route('https://ew4.local/**',async route=>{
       const url=new URL(route.request().url());
       const headers={...route.request().headers()};
@@ -90,10 +93,41 @@ const base=process.argv[2]||'http://127.0.0.1:5493',folder=path.resolve(process.
     await nativePage.goto('https://ew4.local/index.html');
     try{await nativePage.waitForFunction(()=>startupReady,null,{timeout:60000});}
     catch(error){report.nativeStartup=await nativePage.locator('#startup-message').textContent();throw error;}
-    for(const [width,height] of [[390,844],[844,390],[768,1024]]){
-      await nativePage.setViewportSize({width,height});await nativePage.evaluate(()=>sizeUi());
-      check(await nativePage.evaluate(()=>screenLayout.menuProfile!=='web'&&screenLayout.menuScale===screenLayout.uiScale&&Math.abs(screenLayout.menuWidth*screenLayout.uiScale-innerWidth)<.1),'Android origin keeps viewport menu '+[width,height]);
-      await nativePage.screenshot({path:path.join(folder,`native-${width}x${height}.png`)});
+    for(const [width,height] of [[2376,1080],[1080,491],[844,390],[390,844],[768,1024],[1280,800]]){
+      await nativePage.setViewportSize({width,height});
+      for(const screen of [80,100,150]){
+        await nativePage.evaluate(screen=>{showMain();settings.screen=screen;sizeUi();},screen);
+        check(await nativePage.evaluate(()=>{
+          const r=$('menu-stage').getBoundingClientRect();
+          return Math.abs(r.width/r.height-568/320)<.001&&r.x>=-.1&&r.y>=-.1&&r.right<=innerWidth+.1&&r.bottom<=innerHeight+.1
+            &&Math.abs(r.x*2+r.width-innerWidth)<.1&&Math.abs(r.y*2+r.height-innerHeight)<.1;
+        }),'Android menu keeps centered original composition '+[width,height,screen]);
+        check(await nativePage.locator('#main-menu .game-title, #main-menu .main-entry').evaluateAll(nodes=>nodes.every(el=>{
+          const r=el.getBoundingClientRect();return r.x>=-.1&&r.y>=-.1&&r.right<=innerWidth+.1&&r.bottom<=innerHeight+.1;
+        })),'Android title and menu buttons fit');
+        if(screen===100)await nativePage.screenshot({path:path.join(folder,`native-main-${width}x${height}.png`)});
+        await nativePage.locator('[data-mode="2"]').click();await nativePage.waitForFunction(()=>!conquestEntering);
+        check(await nativePage.locator('#scenarios').evaluate(el=>{
+          const cards=[...el.children].map(c=>c.getBoundingClientRect()),scale=screenLayout.menuScale;
+          return cards.length===6&&Math.abs((cards[1].left-cards[0].right)/scale-18)<.1
+            &&Math.abs(cards[0].width/scale-222)<.1&&Math.abs(cards[0].height/scale-83)<.1;
+        }),'Android conquest retains original card sizes and column gap');
+        check(await nativePage.locator('#scenarios .scenario-entry, #conquest-pagination').evaluateAll(nodes=>nodes.every(el=>{
+          const r=el.getBoundingClientRect();return r.x>=-.1&&r.y>=-.1&&r.right<=innerWidth+.1&&r.bottom<=innerHeight+.1;
+        })),'Android conquest cards and pager fit');
+        if(screen===100){
+          await nativePage.screenshot({path:path.join(folder,`native-conquest-${width}x${height}.png`)});
+          await nativePage.locator('#conquest-next').click();await nativePage.waitForFunction(()=>!conquestEntering);
+          check(await nativePage.locator('#scenarios .scenario-placeholder').count()===6,'Android next conquest page accessible');
+          await nativePage.locator('#conquest-prev').click();await nativePage.waitForFunction(()=>!conquestEntering);
+          await nativePage.locator('#scenarios button').first().click();await nativePage.locator('#countries').waitFor();
+          await nativePage.waitForFunction(()=>!busy);await nativePage.waitForTimeout(500);
+          check(await nativePage.locator('#country-list, #confirm-country').evaluateAll(nodes=>nodes.every(el=>{
+            const r=el.getBoundingClientRect();return r.x>=-.1&&r.y>=-.1&&r.right<=innerWidth+.1&&r.bottom<=innerHeight+.1;
+          })),'Android country controls fit');
+        }
+        report.layouts.push({platform:'Android origin',width,height,screen});
+      }
     }
     await nativePage.close();
     check(!report.errors.length&&!report.missing.length,'no browser errors or missing resources');

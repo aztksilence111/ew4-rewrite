@@ -102,7 +102,10 @@ const base=process.argv[2]||'http://127.0.0.1:5478',folder=path.resolve(process.
       await page.setViewportSize({width,height});await page.waitForTimeout(150);
       check(await fits('#menu-stage'),name+' menu stage fits');
       check(await fits('#main-menu .game-title'),name+' full game title is visible');
-      for(const el of await page.locator('#main-menu .main-entry').all())check(await el.evaluate(el=>{const r=el.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth+.1&&r.bottom<=innerHeight+.1&&r.height>=43.9;}),name+' commands fit with readable touch size');
+      for(const el of await page.locator('#main-menu .main-entry').all())check(await el.evaluate(el=>{
+        const r=el.getBoundingClientRect();return r.left>=0&&r.top>=0&&r.right<=innerWidth+.1&&r.bottom<=innerHeight+.1
+          &&Math.abs(r.height/ screenLayout.menuScale-parseFloat(getComputedStyle(el).height))<.1;
+      }),name+' commands fit with original proportions');
       await shot(name);
     }
     stage='safe-area reload';await page.route('**/screen-layout.css?*',async route=>{
