@@ -2,7 +2,7 @@
 (function(root){
   const families=['EW4 Kai','EW4 Serif','EW4 Han','EW4 Han Plane 2','EW4 Han Plane 3','EW4 Unicode','EW4 Unicode Supplement'];
   const fontFamily=families.map(name=>'"'+name+'"').join(',');
-  const numberFamilies=families.filter(name=>name!=='EW4 Kai');
+  const numberFamilies=families;
   const numberFamily=numberFamilies.map(name=>'"'+name+'"').join(',');
   let fontPreparation,glyphRanges,coverage,revision=0,loadQueue=Promise.resolve();
   const faceStates=new Map(),requestedPoints=new Set(),paintTargets=new Set(),candidateLists=new Map();
@@ -110,17 +110,12 @@
     async prepare(){
       await prepareFonts();
       this.measure=document.createElement('canvas').getContext('2d');
-      await Promise.all(Object.keys(this.fonts).filter(name=>this.fonts[name].glyphs).map(name=>this.sheet(name).decode()));
     }
     sheet(name){
       if(!this.sheets.has(name)){const image=new Image();image.src='/content/images/'+encodeURIComponent(name)+'.png';this.sheets.set(name,image);}
       return this.sheets.get(name);
     }
     glyph(char,font){
-      const names=[font];
-      if(!font.startsWith('font_city'))names.push('font_text_1_cn_hd','font_text_2_cn_hd','font_text_3_cn_hd','font_text_4_cn_hd');
-      for(const name of names){const definition=this.fonts[name],record=definition?.glyphs?.[char.codePointAt(0)],sheet=this.sheets.get(name);
-        if(record&&sheet?.naturalWidth)return {record,sheet,height:definition.height};}
       return null;
     }
     layout(text,font,width=Infinity,options={}){
@@ -151,14 +146,17 @@
     element(text,font='font_text_2_cn_hd',color='#404040',width,align='left',options={}){
       const span=document.createElement('span');span.className='original-text';span.setAttribute('aria-label',String(text));
       const canvas=document.createElement('canvas');canvas.setAttribute('aria-hidden','true');span.append(canvas);
-      const padding=4,outlined=font.startsWith('font_city'),rasterScale=options.rasterScale||1;
+      const padding=4,outlined=font.startsWith('font_city');
       const typeface=options.numeric?numberFamily:fontFamily;
       span.dataset.font=font;span.dataset.typeface=font;
       span.dataset.color=outlined?'#ffffff':color;
       const redraw=()=>{
         const layout=this.layout(text,font,width,options);span.dataset.size=String(layout.height/2);
+        const uiScale=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale'))||1;
+        const requested=options.rasterScale||Math.max(1,Math.min(6,Math.ceil(uiScale*(root.devicePixelRatio||1))));
+        const rasterScale=Math.min(requested,Math.sqrt(4*1024*1024/((layout.width+padding*2)*(layout.lines.length*(layout.height+2)+padding*2))));
         canvas.width=Math.ceil((layout.width+padding*2)*rasterScale);canvas.height=Math.ceil((layout.lines.length*(layout.height+2)+padding*2)*rasterScale);
-        canvas.style.width=canvas.width/rasterScale/2+'px';canvas.style.height=canvas.height/rasterScale/2+'px';
+        canvas.style.width=(layout.width+padding*2)/2+'px';canvas.style.height=(layout.lines.length*(layout.height+2)+padding*2)/2+'px';
         const draw=canvas.getContext('2d');draw.clearRect(0,0,canvas.width,canvas.height);
         draw.scale(rasterScale,rasterScale);
         for(const [row,line] of layout.lines.entries()){
@@ -218,5 +216,6 @@
     }
   }
   root.Ew4OriginalUI={TextRenderer,fontFamily,hasGlyph,displayText,availableText,prepareText,retryFonts,fontStatus,get revision(){return revision;}};
+  root.addEventListener?.('ew4uiscale',repaintFonts);
   if(typeof module!=='undefined')module.exports=root.Ew4OriginalUI;
 })(globalThis);

@@ -4,6 +4,8 @@
 
 上将名额可通过 API 2 的 `deploymentLimits` 引用 JSON，支持全局默认与指定剧本覆盖；不配置保持当前限制，示例及存档规则见[上将名额模板](../../examples/deployment-limits/README.md)。
 
+API 2 的 `formationCounts` 引用编制数量 JSON（`schema:1`、`profiles` 按完整兵种档位 ID 设置 1–99 的整数），服务端校验后在 catalog 返回，超过三编显示士兵图标 × 数字。空配置保持原版数量，实际战斗属性仍由兵种数据定义；[模板和边界](../../examples/formation-counts/README.md)。
+
 物品与装备现在可通过 API 2 的 `itemBindings` 复用本指南的技能、事件和 Lua，支持保留/替换原效果、装备主动/被动技能及消耗品使用效果，见[物品接口](ITEM_EFFECTS.md)及[模板](../../examples/item-effects/README.md)。
 
 将领专属台词可用 `apiVersion:2` 的 `commanderDialogues` 引用 JSON，见[字段、条件规则及可打包模板](../../examples/commander-dialogues/README.md)。killRules支持目标将领、兵种、剧本、回合、血量条件、概率和固定/随机选句；未配置时保持原喊话行为。占领、退场数组仅预留。

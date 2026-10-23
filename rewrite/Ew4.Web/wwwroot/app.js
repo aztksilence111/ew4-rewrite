@@ -67,6 +67,8 @@ function sizeUi() {
   document.documentElement.style.setProperty('--ui-scale', scale);
   const battleScale=Math.min(Math.max(scale,48/27,innerHeight/300),innerWidth/420,innerHeight/180);
   document.documentElement.style.setProperty('--battle-scale', battleScale);
+  document.documentElement.style.setProperty('--battle-compact-scale', battleScale*.75);
+  window.dispatchEvent(new Event('ew4uiscale'));
   const baseEventScale = Math.min(1.5, innerWidth*.84/360, innerHeight*.74/264)*settings.screen/100;
   const eventHeight=innerHeight>=innerWidth?Math.min(400,innerHeight*.74/baseEventScale):264;
   // Bound the slider itself so each step still enlarges the popup on small screens.
@@ -714,9 +716,13 @@ function unitCard(profile,cost){
 function abilityGrid(profile,unit){
   const p=manifest.profiles[profile],s=p.stats,grid=document.createElement('div');grid.className='ability-grid';
   const health=Number(s.strength)===-999?'一次性':unit?.health??s.strength;
-  for(const [icon,value] of [['attack',s.minatk+'-'+s.maxatk],['soldiernumber',p.grade+1],['hp',health],['food',s.consumption],['range',s.maxatkrange],['move',unit?.remainingMovement??s.movement]]){
+  for(const [icon,value] of [['attack',s.minatk+'-'+s.maxatk],['soldiernumber',catalog.formationCounts?.[profile]??Number(p.grade)+1],['hp',health],['food',s.consumption],['range',s.maxatkrange],['move',unit?.remainingMovement??s.movement]]){
     const marker=document.createElement('span');marker.className='ability-icon';marker.append(uiImage('infomarker_'+icon+'.png',21));const number=document.createElement('span');number.textContent=value;grid.append(marker,number);
-    if(icon==='soldiernumber'){number.replaceChildren();number.className='formation-count';for(let i=0;i<3;i++)number.append(tintedUi('infomarker_soldiernumber'+(i<value?'':'_empty')+'.png','#404040',14,18));}
+    if(icon==='soldiernumber'){
+      number.replaceChildren();number.className='formation-count';number.dataset.count=String(value);number.setAttribute('aria-label',value+'编');
+      if(value>3){number.append(tintedUi('infomarker_soldiernumber.png','#404040',14,18),originalTextRenderer.element('\u00d7'+value,'font_char_2_hd','#404040',32,'center',{size:13,singleLine:true,maxHeight:22}));}
+      else for(let i=0;i<3;i++){const marker=tintedUi('infomarker_soldiernumber.png','#404040',14,18);marker.dataset.filled=String(i<value);marker.style.opacity=i<value?'1':'.2';number.append(marker);}
+    }
   }return grid;
 }
 function descriptionBox(parent,name,text){const desc=document.createElement('section');desc.className='unit-description';const h=document.createElement('h3');h.textContent=name;const p=document.createElement('p');p.textContent=text;desc.append(h,p);parent.append(desc);}
@@ -1134,11 +1140,8 @@ async function initializeClient(){
     effects.preloadSounds(presentation.sounds);
     originalTextRenderer=text;
     Ew4Startup.pending('战斗图像与界面');
-    const fightFonts=await startupJson('/content/fight-font.json');
-    const fightFont='font_fight_num_hd';
-    const [fightSheet]=await Promise.all([loadImage('images/'+fightFont+'.png'),loadImage('images/eff.png')]);
-    const fightMetrics=manifest.fonts[fightFont]||fightFonts[fightFont];
-    damageNumbers=new Ew4Effects.DamageNumbers(fightMetrics,fightSheet);originalLabels();showMain();
+    await Promise.all([Ew4OriginalUI.prepareText('-0123456789'),loadImage('images/eff.png')]);
+    damageNumbers=new Ew4Effects.DamageNumbers();originalLabels();showMain();
     startupReady=true;
     Ew4Startup.ready();
     document.querySelectorAll('.main-entry').forEach(button=>button.disabled=false);$('continue').disabled=false;

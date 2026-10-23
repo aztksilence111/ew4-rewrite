@@ -5,6 +5,11 @@ using System.Text.Json.Nodes;
 using System.Xml.Linq;
 using Ew4.Mods;
 
+if (args.ElementAtOrDefault(1) == "--formation-counts-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { formationCountChecks = FormationCountChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
 if (args.ElementAtOrDefault(1) == "--deployment-limits-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { deploymentLimitModChecks = DeploymentLimitModChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;

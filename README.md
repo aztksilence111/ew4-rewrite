@@ -10,7 +10,7 @@ Mod 制作资料见 [rewrite/mod-kit/README.md](rewrite/mod-kit/README.md)。
 
 ## 当前快照
 
-本轮发行 0.2.13（APK code16）：整合 0.2.12 后移动端显示、AI 暂停、旗帜/撤回、动作表现、士气、随机勋章及计算优化。[发行说明](rewrite/RELEASE_0.2.13_20261022.md)与[发布进度](rewrite/RELEASE_PROGRESS_0.2.13_20261022.md)分别记录内容和验证步骤，下载见[GitHub Releases](https://github.com/aztksilence111/ew4-rewrite/releases/latest)。实际远端完成依据为本次构建目录的 `remote-audit.json`；以下未打包记录为开发历史，真机验收仍待。
+本轮发行 0.2.14（APK code17）：落实 FB-14–17 的全内置字体、晋升数字、战场控件尺寸及编制数量接口。[发行说明](rewrite/RELEASE_0.2.14_20261023.md)与[发布进度](rewrite/RELEASE_PROGRESS_0.2.14_20261023.md)记录内容和验证步骤，下载见[GitHub Releases](https://github.com/aztksilence111/ew4-rewrite/releases/latest)。实际远端完成依据为本次构建目录的 `remote-audit.json`；以下未打包记录为开发历史，真机验收仍待。
 
 2026-10-22：[四项反馈修复](reverse/FEEDBACK_UNDO_FIX_20261022.md)已修存档国旗、空地撤回入口、保存拆行和说明将领块，新增占城事件/红黄圈不能撤回条件；93新增专项、108配置、20+172浏览器及Web/Android Compile通过。[5395独立预览](http://127.0.0.1:5395)，未打新APK或发布。[当前待办](rewrite/GOALS.md)同步，士气演出、随机掉落、OTF及长期目标另列，真机验收保留。
 

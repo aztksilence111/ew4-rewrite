@@ -39,11 +39,11 @@ const base=process.env.EW4_TEST_URL||'http://127.0.0.1:5185';
       let white=0,black=0;for(let i=0;i<p.length;i+=4)if(p[i+3]>160){if(p[i]>240&&p[i+1]>240&&p[i+2]>240)white++;if(p[i]<30&&p[i+1]<30&&p[i+2]<30)black++;}
       const long=renderer.element('奥斯曼土耳其帝国','font_text_2_cn_hd','#373737',84,'left',{size:11.5,singleLine:true});
       const multi=renderer.layout('第一行\n第二行文字换行测试','font_text_2_cn_hd',50);
-      return {white,black,equal:canvas.toDataURL()===b.firstChild.toDataURL(),long:{size:Number(long.dataset.size),width:long.firstChild.width/2,height:long.firstChild.height/2},multi:multi.lines.length};
+      return {white,black,equal:canvas.toDataURL()===b.firstChild.toDataURL(),long:{size:Number(long.dataset.size),width:parseFloat(long.firstChild.style.width),height:parseFloat(long.firstChild.style.height)},multi:multi.lines.length};
     });
     check(report.renderer.white>50&&report.renderer.black>30,'Chinese/English city names retain separate white fill and black outline');
-    check(!report.renderer.equal,'original city atlas and metrics are used ahead of bundled fallback');
-    check(report.renderer.long.width===84&&report.renderer.long.size<11.5&&report.renderer.long.height<18,'long names fit one line without stretching or exceeding the requested width');
+    check(report.renderer.equal,'city names use bundled fonts independently of the original atlas');
+    check(report.renderer.long.width===84&&report.renderer.long.size<=11.5&&report.renderer.long.height<18,'long names fit one line without stretching or exceeding the requested width');
     check(report.renderer.multi>2,'descriptions retain explicit and automatic line breaks');
     await page.locator('#main-settings').click();await page.waitForTimeout(260);await shot('after-settings');
     check(await page.locator('.settings-dialog [data-label="name_music"] .original-text').evaluate(e=>e.dataset.color==='rgb(69, 69, 67)'&&Number(e.dataset.size)===12),'settings labels inherit dark foreground and compact CSS size');
@@ -51,6 +51,7 @@ const base=process.env.EW4_TEST_URL||'http://127.0.0.1:5185';
     for(const viewport of [{width:1136,height:640},{width:1280,height:720},{width:844,height:390},{width:390,height:844}]){
       await page.setViewportSize(viewport);await page.evaluate(()=>showMain());
       await page.locator('[data-mode="2"]').click();await page.locator('.scenario-entry[data-scenario]').first().click();await page.waitForTimeout(750);
+      await page.waitForFunction(()=>document.querySelectorAll('#country-list .country-entry').length>=6);
       const rows=await page.locator('#country-list .country-entry').evaluateAll(rows=>rows.map(row=>{
         const c=row.querySelector('canvas'),r=c.getBoundingClientRect(),b=row.getBoundingClientRect(),pixels=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
         let dark=0,white=0;for(let i=0;i<pixels.length;i+=4)if(pixels[i+3]>160){if(pixels[i]<90&&pixels[i+1]<90&&pixels[i+2]<90)dark++;if(pixels[i]>230&&pixels[i+1]>230&&pixels[i+2]>230)white++;}

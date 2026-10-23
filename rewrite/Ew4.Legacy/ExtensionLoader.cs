@@ -26,6 +26,7 @@ public sealed partial class ExtensionLoader
     public int ApiVersion { get; private set; } = 1;
     public LegacySkillParameters? LegacySkills { get; private init; }
     public IReadOnlyDictionary<string, int?> DeploymentLimits { get; private init; } = new Dictionary<string, int?>();
+    public IReadOnlyDictionary<string, int> FormationCounts { get; private init; } = new Dictionary<string, int>();
     public MetagameRules Metagame { get; private init; } = new();
     public IReadOnlyDictionary<string, StageIntroPresentation> StageIntroPresentations { get; private init; } = new Dictionary<string, StageIntroPresentation>();
     public IReadOnlyDictionary<string, CommanderDialogueLines> CommanderDialogues { get; private init; } = new Dictionary<string, CommanderDialogueLines>();
@@ -37,10 +38,12 @@ public sealed partial class ExtensionLoader
         string? UnitBindings = null, string? CommanderBindings = null, string? VictoryRules = null, string? Presentation = null, string[]? Scripts = null,
         string? ScenarioEvents = null, string[]? Statuses = null, string? VictoryPresentation = null, string? LegacySkillParameters = null,
         string? CommanderDialogues = null, string? ItemBindings = null, string? DeploymentLimits = null, string? Metagame = null,
-        string? StageIntroPresentation = null);
+        string? StageIntroPresentation = null, string? FormationCounts = null);
     private sealed record LegacySkillFile(int Schema, Dictionary<string, Dictionary<string, double>> Skills);
     private sealed record DeploymentLimitFile([property: JsonNumberHandling(JsonNumberHandling.Strict)] int Schema,
         [property: JsonNumberHandling(JsonNumberHandling.Strict)] Dictionary<string, int?>? Limits);
+    private sealed record FormationCountFile([property: JsonNumberHandling(JsonNumberHandling.Strict)] int Schema,
+        [property: JsonNumberHandling(JsonNumberHandling.Strict)] Dictionary<string, int>? Profiles);
 
     public static bool PathValid(string? p) => p != null && p.StartsWith("rewrite/", StringComparison.Ordinal) && p.Length < 240
         && !p.Contains('\\') && !p.Contains(':') && p.Split('/').All(s => s.Length > 0 && s != "." && s != "..")
@@ -73,6 +76,15 @@ public sealed partial class ExtensionLoader
         if (m.Schema != 1 || m.ApiVersion is not (1 or 2)) throw new RuleViolation("extension.version", "Unsupported extension schema/API version");
         if (m.ApiVersion == 1 && m.Statuses != null) throw new RuleViolation("extension.version", "Statuses require API 2");
         var deploymentLimits = new Dictionary<string, int?>();
+        var formationCounts = new Dictionary<string, int>();
+        if (m.FormationCounts != null)
+        {
+            if (m.ApiVersion < 2) throw new RuleViolation("extension.version", "Formation counts require API 2");
+            var formations = Read<FormationCountFile>(m.FormationCounts);
+            if (formations.Schema != 1 || formations.Profiles == null || formations.Profiles.Any(p => !Id(p.Key) || p.Value is < 1 or > 99))
+                throw new RuleViolation("extension.formation_count", "Formation counts require known profiles and integer counts from 1 to 99");
+            formationCounts = formations.Profiles;
+        }
         var metagame = new MetagameRules();
         if (m.Metagame != null)
         {
@@ -215,7 +227,7 @@ public sealed partial class ExtensionLoader
         string revision = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(string.Join('\n', loaded.Select(p => p.Key + ":" + Convert.ToHexStringLower(SHA256.HashData(p.Value)))))));
         return new(new(skills, runtime, statuses), revision, units, commanders, victories, layouts, scenarioEvents)
             { ApiVersion = m.ApiVersion, VictoryPresentations = victoryScreens, LegacySkills = legacySkills, CommanderDialogues = commanderDialogues,
-                ItemBindings = items, DeploymentLimits = deploymentLimits, Metagame = metagame, StageIntroPresentations = introScreens };
+                ItemBindings = items, DeploymentLimits = deploymentLimits, FormationCounts = formationCounts, Metagame = metagame, StageIntroPresentations = introScreens };
         bool Known(string id) => skills.ContainsKey(id) || id.StartsWith("ew4.skill.", StringComparison.Ordinal)
             && int.TryParse(id[10..], out int value) && value is >= 0 and < 40 || BuiltinTraits.Contains(id);
     }
@@ -261,6 +273,8 @@ public sealed partial class ExtensionLoader
 
     public void ConfigureRuntime(LegacyRuntimeCatalog runtime)
     {
+        if (FormationCounts.Keys.Any(id => !runtime.Profiles.ContainsKey(id)))
+            throw new RuleViolation("extension.formation_count", "Unknown formation profile");
         foreach (var binding in ItemBindings)
         {
             var item = runtime.Items.Values.SingleOrDefault(i => i.Id == binding.Target)

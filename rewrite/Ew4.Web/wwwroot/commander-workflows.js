@@ -124,6 +124,12 @@
   proto.promotion=function(id,onClose){
     const held=this.held(id),definition=this.definition(held),l=this.native('form_generalupgrade',onClose||(()=>this.reopenCommander(id)));
     l.fill('tcmder',this.card(definition,held,()=>{}));
+    for(const [path,el] of l.nodes){
+      if(!/text_life(?:from|to)$|text_medal$/.test(path))continue;
+      const cost=path.endsWith('text_medal');
+      el.style.height='20px';el.style.top=cost?'5px':'22px';
+      el.nativeAttributes={...el.nativeAttributes,size:15,align:'center'};
+    }
     for(const [kind,track,price,effects] of [['military','rank',held.rankPrice,this.data.rankHealth],['nobility','title',held.titlePrice,this.data.titleHealing]]){
       const level=held.learning[track].level,next=price===null?level:level+1,path='group_'+kind+'/';
       l.fill(path+'rank_from',this.progressionBadge(track,held.learning[track]));l.fill(path+'rank_to',this.progressionBadge(track,{level:next,experience:price===null?held.learning[track].experience:0}));

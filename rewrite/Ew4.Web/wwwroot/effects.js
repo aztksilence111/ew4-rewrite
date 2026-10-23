@@ -90,23 +90,18 @@
     }
   }
   class DamageNumbers {
-    constructor(font,sheet){this.font=font;this.sheet=sheet;this.instances=[];this.cache=new Map();}
+    constructor(){this.instances=[];this.cache=new Map();this.revision=-1;}
     clear(){this.instances=[];}
     add(amount,critical,x,y,speed=1){
       if(!Number.isFinite(amount)||amount<=0)return;
+      if(this.revision!==Ew4OriginalUI.revision){this.cache.clear();this.revision=Ew4OriginalUI.revision;}
       const key=amount+':'+!!critical;
       if(!this.cache.has(key)){
-        const glyphs=[...('-'+amount)].map(c=>this.font.glyphs[c.codePointAt(0)]);
-        let cursor=0,width=0;
-        for(const [,,w,,dx,,advance] of glyphs){width=Math.max(width,cursor-dx+w);cursor+=advance;}
-        const canvas=document.createElement('canvas');canvas.width=Math.ceil(width);canvas.height=this.font.height;const draw=canvas.getContext('2d');
-        cursor=0;
-        for(const [x,y,w,h,dx,dy,advance] of glyphs){draw.drawImage(this.sheet,x,y,w,h,cursor-dx,-dy,w,h);cursor+=advance;}
-        if(critical){
-          const pixels=draw.getImageData(0,0,canvas.width,canvas.height);
-          for(let i=0;i<pixels.data.length;i+=4){pixels.data[i+1]*=48/255;pixels.data[i+2]*=48/255;}
-          draw.putImageData(pixels,0,0);
-        }
+        const canvas=document.createElement('canvas'),draw=canvas.getContext('2d'),text='-'+amount;
+        draw.font='72px '+Ew4OriginalUI.fontFamily;
+        canvas.width=Math.ceil(draw.measureText(text).width)+12;canvas.height=96;
+        draw.font='72px '+Ew4OriginalUI.fontFamily;draw.textBaseline='middle';draw.lineWidth=6;draw.lineJoin='round';
+        draw.strokeStyle='#000000';draw.strokeText(text,6,48);draw.fillStyle=critical?'#ff3030':'#ffffff';draw.fillText(text,6,48);
         this.cache.set(key,canvas);if(this.cache.size>128)this.cache.delete(this.cache.keys().next().value);
       }
       this.instances.push({amount,critical:!!critical,x,y,speed,started:performance.now(),duration:1600/speed,canvas:this.cache.get(key)});
@@ -115,7 +110,7 @@
       this.instances=this.instances.filter(hit=>{
         const progress=Math.max(0,(time-hit.started)/hit.duration);if(progress>=1)return false;
         const y=hit.y-30-64*progress;if(!inView(rect,hit.x,y,96))return true;
-        const scale=24/this.font.height,width=hit.canvas.width*scale,height=hit.canvas.height*scale;
+        const scale=1/3,width=hit.canvas.width*scale,height=hit.canvas.height*scale;
         draw.drawImage(hit.canvas,hit.x-width/2,y,width,height);return true;
       });
     }

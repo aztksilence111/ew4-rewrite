@@ -191,6 +191,11 @@ body:has(#play:not([hidden])>#pause:not([hidden])) :is(#pause,#settings,#detail-
 .unit-card .recruit-frame{position:absolute;inset:0;pointer-events:none}
 .formation-layer{position:absolute;pointer-events:none}
 .formation-count{gap:0}
+#end-turn,#undo-move,#next-unit,#skip-ai{transform:scale(var(--battle-compact-scale))}
+#next-unit{left:calc(41px * var(--battle-compact-scale))}
+#actions{transform:translateX(-50%) scale(var(--battle-compact-scale))}
+.battle-resources,#terrain-info{transform:scale(var(--battle-compact-scale))}
+#terrain-info{top:calc(31px * var(--battle-compact-scale))}
 .recruit-cards .formation-outgoing{position:absolute;left:0;top:0;height:54px;z-index:3;pointer-events:none}
 .native-layout{color:#404040;overflow:visible}
 .dialog.native-dialog{border-width:0;outline:1px solid #9e9c98}

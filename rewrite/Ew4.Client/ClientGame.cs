@@ -36,7 +36,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                         unlockedCampaigns = Account().UnlockedCampaigns, campaignStars = Account().CampaignStars,
                         hasSave = File.Exists(Slot), extensionLayouts = content.Extensions.Layouts,
                         commanderDialogues = content.Extensions.CommanderDialogues, countries = content.Countries.Countries,
-                        countryAliases = content.Countries.Aliases },
+                        countryAliases = content.Countries.Aliases, formationCounts = content.Extensions.FormationCounts },
                     "/api/country-registry" => new { schema = 1, countries = content.Countries.Countries, aliases = content.Countries.Aliases },
                     "/api/countries" => Countries(Command(body)),
                     "/api/local-players" => LocalPlayers(Command(body)),

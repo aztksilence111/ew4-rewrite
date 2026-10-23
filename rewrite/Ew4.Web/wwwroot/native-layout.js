@@ -62,7 +62,7 @@
       const color=`rgba(${rgba[0]},${rgba[1]},${rgba[2]},${rgba[3]/255})`;
       const width=parseFloat(el.style.width),height=parseFloat(el.style.height),singleLine=a.breakwords!=='true';
       const align=['left','center','right'].includes(a.align)?a.align:a.type?.includes('button')||a.type==='tmp_intitle'?'center':'left';
-      el.replaceChildren(this.api.text(value,font,color,Number.isFinite(width)?width:undefined,align,{singleLine,maxHeight:singleLine?height:undefined}));
+      el.replaceChildren(this.api.text(value,font,color,Number.isFinite(width)?width:undefined,align,{size:a.size?Number(a.size):undefined,singleLine,maxHeight:singleLine?height:undefined}));
     }
     text(id,value,attributes){const el=this.get(id);if(attributes)el.nativeAttributes={...el.nativeAttributes,...attributes};this.write(el,value);return el;}
     fill(id,...nodes){const el=this.get(id);
