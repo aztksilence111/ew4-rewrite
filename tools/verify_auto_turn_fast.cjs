@@ -39,7 +39,7 @@ const deferred=()=>{let resolve;const promise=new Promise(r=>{resolve=r;});retur
     for(const legacy of [false,true]){
       await page.evaluate(legacy=>localStorage.setItem('ew4.settings',JSON.stringify({skipTurnFast:legacy,sound:23})),legacy);
       await page.reload();await ready();
-      check(await page.evaluate(()=>settings.autoTurnFast===true&&settings.sound===23&&!('skipTurnFast' in settings)),'legacy switch adopts new default '+legacy);
+      check(await page.evaluate(()=>settings.autoTurnFast===true&&settings.sound===0&&settings.music===0&&!('skipTurnFast' in settings)),'legacy switch adopts new default and localhost stays muted '+legacy);
     }
     await page.locator('#main-settings').click();
     check(await page.locator('#skip-turn-fast').isChecked(),'settings checkbox starts checked');
