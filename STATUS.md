@@ -2,7 +2,7 @@
 
 - **战役/选国/音乐恢复完成：[核查及接口记录](reverse/CAMPAIGN_MUSIC_RESTORATION_20261023.md)。** 95份BTL无缺失，11关原为隐藏；内置初始显示84主入口，API2 campaignVisibility可恢复隐藏，导入Mod默认保留XML设置。两处分支使用原form_selcountry；5首原MP3及菜单/战斗/失败规则已接。专项20/客户端2490/Mod17/浏览器59及Web、Android Compile通过，0异常缺图；5431独立干净预览。真机待验；已纳入并行0.2.15发行任务，状态见下条。
 
-- **0.2.15 发行进行中：[进度](rewrite/RELEASE_PROGRESS_0.2.15_20261023.md)、[说明](rewrite/RELEASE_0.2.15_20261023.md)。** 用户已授权同步当前Git、打包Web/ARM64 APK并上传Release；版本0.2.15/code18。包含蜂窝定位与角标、侧边阴影、字体修正、战役可见性和背景音乐；性能/闪烁未实现项继续保留。证据build/release-0.2.15-20261023，完成以remote-audit.json errors=0为准，真机待验。
+- **0.2.15 已正式发布：[下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.15-20261023)、[验证记录](rewrite/RELEASE_PROGRESS_0.2.15_20261023.md)。** 包源码a294c29，Web ZIP/ARM64 APK/code18和两校验附件已同步；包含蜂窝定位与角标、侧边阴影、字体修正、11个原隐藏关及5首背景音乐。发布版浏览器185/42/73/59项通过，APK资源/程序集/旧证书签名核验通过，远端四附件大小及SHA-256审计errors=0。证据build/release-0.2.15-20261023；性能/闪烁未实施项保留，真机待验。下方“未发布”是此前阶段记录。
 
 - **Pixi选型范围纠正：仅纸面评估，不做双路线实现对比。** 用户明确两套优化后端实机比较太耗资源，已从[报告](reverse/PIXI_RENDERER_ASSESSMENT_20261023.md)撤销。Canvas 2D与Pixi层级不同；游戏GPU批绘有架构优势，若重构战场纸面倾向Pixi/WebGL，全部既定优化仍必做。当前未决定或启动迁移；保持仅文档、实施暂停。
 
