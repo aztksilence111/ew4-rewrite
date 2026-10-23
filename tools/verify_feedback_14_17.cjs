@@ -32,15 +32,17 @@ const base=process.argv[2]||'http://127.0.0.1:5420',folder=process.argv[3]||'bui
       check(await page.evaluate(()=>battlefield.mapLabels.size>0&&[...battlefield.mapLabels.values()].every(l=>l.canvas.width>0&&l.canvas.height>0)),'legacy geographic labels retain nonblank dimensions '+width);
       const sizes=await page.evaluate(()=>{
         const rect=id=>{const r=$(id).getBoundingClientRect();return {id,x:r.x,y:r.y,right:r.right,bottom:r.bottom,w:r.width,h:r.height};};
-        return {scale:parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--battle-scale')),controls:['menu-button','end-turn','undo-move','next-unit','actions'].map(rect),resources:document.querySelector('.battle-resources').getBoundingClientRect().height};
+        const pauseArt=getComputedStyle($('menu-button'),'::before');
+        return {scale:parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--battle-scale')),controls:['menu-button','end-turn','undo-move','next-unit','actions'].map(rect),resources:document.querySelector('.battle-resources').getBoundingClientRect().height,
+          pauseArtWidth:parseFloat(pauseArt.width),shadowPointerEvents:pauseArt.pointerEvents};
       });
       const [pause,end,undo,next,actions]=sizes.controls;
-      check(Math.abs(pause.w-27*sizes.scale)<.1,'pause size preserved '+width);
+      check(Math.abs(pause.w-20*sizes.scale)<.1&&Math.abs(sizes.pauseArtWidth-20*73/54)<.05&&sizes.shadowPointerEvents==='none','pause face and original shadow size preserved '+width);
       check(Math.abs(end.w/pause.w-.75)<.01,'end turn reduced 25 percent '+width);
-      check(Math.abs(undo.w-37*sizes.scale*.75)<.1&&Math.abs(next.w-undo.w)<.1,'undo and locate reduced '+width);
+      check(Math.abs(undo.w-27*sizes.scale*.75)<.1&&Math.abs(next.w-20*sizes.scale*.75)<.1,'compact undo and honeycomb face sizes '+width);
       check(Math.abs(sizes.resources-23*sizes.scale*.75)<.1,'resource bar reduced '+width);
       for(const r of sizes.controls)check(r.x>=-.1&&r.y>=-.1&&r.right<=width+.1&&r.bottom<=height+.1,'control inside viewport '+width+' '+r.id);
-      check(next.right<=actions.x+1&&actions.right<=end.x+1,'toolbar groups do not overlap '+width);
+      check(undo.right<=actions.x+1&&actions.right<=end.x+1&&Math.abs(next.right-end.right)<.1&&next.bottom<end.y,'toolbar groups and raised honeycomb do not overlap '+width);
       await shot('battle-'+width);
     }
     await page.setViewportSize({width:844,height:390});
