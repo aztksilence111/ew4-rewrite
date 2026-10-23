@@ -2,7 +2,7 @@
 
 此接口适用于包含本增补的宿主，旧0.2.6发行包不含结算界面绑定。电脑和Android共用规则与前端。完整可打包源码见[三阶段示例](../../examples/victory-stages/README.md)。
 
-本地多人模式保留动态 `victory_rules`，但按单个国家完成 `win` 确定唯一胜者，其余势力自动失败；单人失败条件不结束整局。多人使用单独的各国结果窗口，不套用本页的单人 `victoryPresentation`。事件与当前席位语义见 [SCENARIO_CONTROL](SCENARIO_CONTROL.md)。
+本地多人保留动态 `victory_rules`。战役由实际外交同盟合计目标、共享胜负，征服按单国完成 `win` 确定胜者；单人失败条件不结束整局。多人使用独立各国结果窗口，不套用本页单人 `victoryPresentation`。事件和当前席位语义见 [SCENARIO_CONTROL](SCENARIO_CONTROL.md)。
 
 ## 分阶段更新条件
 

@@ -48,11 +48,16 @@ const victoryUi = new Ew4VictoryUI.Results({
   get manifest(){return manifest;},detail:detailWindow,button,uiImage,notice,
   text:(...args)=>originalTextRenderer.element(...args),portrait:name=>menus.portrait(name),close:closeDetail,
   title:key=>$('detail-title').replaceChildren(labelImage(key,manifest.strings[key]||key,$('detail-title'))),
+  failureDialogue:result=>{
+    battleDialogues.push({...result.failureSpeaker,text:result.failureDescription,left:true});
+    presentBattleDialogue();refreshHud();requestRender();
+  },
   restart:()=>start(state.scenario,catalog.scenarios.find(s=>s.id===state.scenario)?.mode===2?(state.startCountry??state.factions.find(f=>f.id===state.playerFaction).country):null,null),
   continue:async result=>{if(result.nextScenario)await start(result.nextScenario,null,null);else await showMain();},exit:showMain
 });
 const localMultiplayerUi = new Ew4LocalMultiplayer.LocalMultiplayer({rpc,detail:detailWindow,button,close:closeDetail,main:showMain,
-  text:(...args)=>originalTextRenderer.element(...args),ready:()=>!busy&&!aiRunning&&!skipAi&&!sessionTransition&&$('pause').hidden&&$('loading-screen').hidden,
+  text:(...args)=>originalTextRenderer.element(...args),ready:()=>!busy&&!aiRunning&&!skipAi&&!sessionTransition&&$('pause').hidden&&$('loading-screen').hidden
+    && battlefield.state===state&&[...images.values()].every(img=>img.complete),
   restart:next=>start(next.scenario,next.startCountry,next.localMultiplayer.humanFactions)});
 let tutorial, tutorialRect;
 let settings={music:50,sound:50,speed:2,hd:true,screen:100,eventSize:100,cityLanguage:'en',geographicLanguage:'en',localMultiplayer:false,skipTurnFast:false,followAi:false};
@@ -964,9 +969,12 @@ function render(time) {
   if(tutorial&&!$('play').hidden)positionTutorial();
   if(tutorial?.wait?.name==='wait action'&&!busy&&!aiRunning)tutorial.notify({type:'action'}).catch(e=>notice(e.message));
   if(!$('countries').hidden&&!$('menu').hidden)drawStrategicMap(time);
-  if(!playVisible||covered&&!stageIntroOpen||fastSkipping())return;
+  if(!playVisible||fastSkipping())return;
   const w=canvas.clientWidth,h=canvas.clientHeight;
   const dpr=settings.hd?Math.max(1,Math.min(window.devicePixelRatio||1,3,Math.sqrt(6*1024*1024/Math.max(1,w*h)))):1;
+  // Covered battlefields still need a fresh frame when their backing surface changes size.
+  const resized=canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)||viewport.w!==w||viewport.h!==h||viewport.dpr!==dpr;
+  if(covered&&!stageIntroOpen&&!resized)return;
   if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);}
   viewport={w,h,dpr};updateAiCamera(time);clampView();ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#688e91';ctx.fillRect(0,0,w,h);
   ctx.translate(w/2,h/2);ctx.scale(view.zoom,view.zoom);ctx.translate(-view.x,-view.y);

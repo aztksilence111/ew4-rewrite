@@ -156,13 +156,18 @@
       span.dataset.color=outlined?'#ffffff':color;
       const redraw=()=>{
         const layout=this.layout(text,font,width,options);span.dataset.size=String(layout.height/2);
+        const inkCenter=options.singleLine&&options.inkCenter&&options.maxHeight;
+        const canvasHeight=inkCenter?options.maxHeight*2:layout.lines.length*(layout.height+2)+padding*2;
         const uiScale=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale'))||1;
         const requested=options.rasterScale||Math.max(1,Math.min(6,Math.ceil(uiScale*(root.devicePixelRatio||1))));
         const rasterScale=Math.min(requested,Math.sqrt(4*1024*1024/((layout.width+padding*2)*(layout.lines.length*(layout.height+2)+padding*2))));
-        canvas.width=Math.ceil((layout.width+padding*2)*rasterScale);canvas.height=Math.ceil((layout.lines.length*(layout.height+2)+padding*2)*rasterScale);
-        canvas.style.width=(layout.width+padding*2)/2+'px';canvas.style.height=(layout.lines.length*(layout.height+2)+padding*2)/2+'px';
+        canvas.width=Math.ceil((layout.width+padding*2)*rasterScale);canvas.height=Math.ceil(canvasHeight*rasterScale);
+        canvas.style.width=(layout.width+padding*2)/2+'px';canvas.style.height=canvasHeight/2+'px';
         const draw=canvas.getContext('2d');draw.clearRect(0,0,canvas.width,canvas.height);
         draw.scale(rasterScale,rasterScale);
+        draw.font=layout.height+'px '+typeface;draw.fontKerning='none';
+        const metrics=inkCenter?layout.lines[0].glyphs.map(({char})=>draw.measureText(availableText(char))):[];
+        const ascent=Math.max(0,...metrics.map(m=>m.actualBoundingBoxAscent)),descent=Math.max(0,...metrics.map(m=>m.actualBoundingBoxDescent));
         for(const [row,line] of layout.lines.entries()){
           const offset=align==='center'?(layout.width-line.width)/2:align==='right'?layout.width-line.width:0;
           for(const {char,x,glyph} of line.glyphs){
@@ -171,10 +176,11 @@
               const [sx,sy,w,h,dx,dy]=glyph.record,scale=layout.height/glyph.height;
               draw.drawImage(glyph.sheet,sx,sy,w,h,padding+offset+x-dx*scale,y-dy*scale,w*scale,h*scale);continue;
             }
-            draw.font=layout.height+'px '+typeface;draw.fontKerning='none';draw.textBaseline='top';
+            draw.font=layout.height+'px '+typeface;draw.fontKerning='none';draw.textBaseline=inkCenter?'alphabetic':'top';
+            const baseline=inkCenter?(canvasHeight-ascent-descent)/2+ascent:y;
             const fallback=availableText(char);
-            if(outlined){draw.strokeStyle='#000000';draw.lineWidth=2;draw.lineJoin='round';draw.strokeText(fallback,padding+offset+x,y);}
-            draw.fillStyle=outlined?'#ffffff':color||'#404040';draw.fillText(fallback,padding+offset+x,y);
+            if(outlined){draw.strokeStyle='#000000';draw.lineWidth=2;draw.lineJoin='round';draw.strokeText(fallback,padding+offset+x,baseline);}
+            draw.fillStyle=outlined?'#ffffff':color||'#404040';draw.fillText(fallback,padding+offset+x,baseline);
           }
         }
         if(!outlined){draw.globalCompositeOperation='source-in';draw.fillStyle=color||'#404040';draw.fillRect(0,0,canvas.width/rasterScale,canvas.height/rasterScale);draw.globalCompositeOperation='source-over';}

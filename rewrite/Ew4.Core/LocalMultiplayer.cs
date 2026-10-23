@@ -5,11 +5,19 @@ using System.Linq;
 namespace Ew4.Core;
 
 public sealed record LocalMultiplayerState(string MainFaction, IReadOnlyList<string> HumanFactions, string? WinnerFaction = null,
-    string? InitialObjectiveOwner = null, bool HadObjectives = false);
+    string? InitialObjectiveOwner = null, bool HadObjectives = false, bool ShareAlliedVictory = false);
 
-// Control and victory are independent: allies keep their diplomacy, but never share a win.
+// Campaign allies share victory; conquest countries retain independent results.
 public static class LocalMultiplayerGame
 {
+    private static bool SharesVictory(WorldState world, string first, string second) => first == second
+        || world.LocalMultiplayer?.ShareAlliedVictory == true && WorldDiplomacy.Allied(world, first, second);
+
+    public static bool Won(WorldState world, string faction, string winner) => SharesVictory(world, faction, winner);
+
+    private static BattleOutcome Outcome(WorldState world, string winner) => world.LocalMultiplayer!.HumanFactions
+        .Any(id => Won(world, id, winner)) ? BattleOutcome.Victory : BattleOutcome.Defeat;
+
     public static void Validate(WorldState world)
     {
         var local = world.LocalMultiplayer;
@@ -23,7 +31,7 @@ public static class LocalMultiplayerGame
             || !local.HumanFactions.SequenceEqual(world.Factions.Where(f => f.Human).Select(f => f.Id))
             || local.WinnerFaction != null && (!world.Factions.Any(f => f.Id == local.WinnerFaction && !f.Defeated)
                 || world.Phase != TurnPhase.Finished
-                || world.Outcome != (local.HumanFactions.Contains(local.WinnerFaction) ? BattleOutcome.Victory : BattleOutcome.Defeat)))
+                || world.Outcome != Outcome(world, local.WinnerFaction)))
             throw new RuleViolation("local.state", "Invalid local multiplayer selection or winner");
     }
 
@@ -39,24 +47,26 @@ public static class LocalMultiplayerGame
         {
             if (custom != null)
             {
-                // Rebind player-relative conditions to one country. Unique camps make ownership
-                // exact without changing diplomacy in the actual battle.
+                // Project the candidate's winning side without changing battle diplomacy.
                 var projected = world with { LocalMultiplayer = null, ScenarioPlayerFaction = candidate.Id,
                     DiplomaticRelations = Array.Empty<DiplomaticRelation>(), NeutralHostilities = Array.Empty<NeutralHostility>(),
-                    Factions = world.Factions.Select(f => f with { Camp = f.Id, Human = f.Id == candidate.Id }).ToArray() };
+                    Factions = world.Factions.Select(f => f with {
+                        Camp = SharesVictory(world, candidate.Id, f.Id) ? candidate.Id : f.Id,
+                        Human = f.Id == candidate.Id }).ToArray() };
                 if (ExtensionVictory.Evaluate(projected, candidate.Id, Array.Empty<string>(),
                     custom with { Lose = null }, rules.Scripts) == BattleOutcome.Victory) return candidate.Id;
             }
             else
             {
-                bool soleSurvivor = world.Factions.All(f => f.Id == candidate.Id || f.Defeated);
+                bool soleSurvivor = world.Factions.All(f => SharesVictory(world, candidate.Id, f.Id) || f.Defeated);
                 // A defending country can start with every marked objective in a campaign.
                 // Initial ownership is not a completed conquest. Resolve removes this guard
                 // once an objective changes hands, allowing the defender to reclaim them.
-                if (soleSurvivor || objectiveOwners.Length == 1 && objectiveOwners[0] == candidate.Id
-                    && candidate.Id != local.InitialObjectiveOwner
+                bool initialOwner = local.InitialObjectiveOwner is string initial && SharesVictory(world, candidate.Id, initial);
+                if (soleSurvivor || objectiveOwners.Length > 0 && objectiveOwners.All(owner => owner != null && SharesVictory(world, candidate.Id, owner))
+                    && !initialOwner
                     || local.HadObjectives && objectiveOwners.Length == 0 && candidate.Id == world.ActiveFaction
-                        && candidate.Id != local.InitialObjectiveOwner)
+                        && !initialOwner)
                     return candidate.Id;
             }
         }
@@ -73,7 +83,8 @@ public static class LocalMultiplayerGame
     public static string? InitialObjectiveOwner(WorldState world, ObjectiveUnitOwnership ownership = ObjectiveUnitOwnership.UnitOwner)
     {
         var owners = ObjectiveOwners(world, ownership);
-        return owners.Length == 1 ? owners[0] : null;
+        return owners.Length > 0 && owners[0] is string first
+            && owners.All(owner => owner != null && SharesVictory(world, first, owner)) ? first : null;
     }
 
     public static WorldState Finish(WorldState world, string winner)
@@ -81,14 +92,14 @@ public static class LocalMultiplayerGame
         var local = world.LocalMultiplayer!;
         if (local.WinnerFaction != null || !world.Factions.Any(f => f.Id == winner && !f.Defeated)) return world;
         return world with { LocalMultiplayer = local with { WinnerFaction = winner }, Phase = TurnPhase.Finished,
-            Outcome = local.HumanFactions.Contains(winner) ? BattleOutcome.Victory : BattleOutcome.Defeat };
+            Outcome = Outcome(world, winner) };
     }
 
     public static WorldState Resolve(WorldState world, VictoryRules rules)
     {
         if (world.LocalMultiplayer == null || world.PendingDialogue != null) return world;
         if (world.LocalMultiplayer.InitialObjectiveOwner is string initial
-            && ObjectiveOwners(world, rules.UnitObjectiveOwnership).Any(owner => owner != initial))
+            && ObjectiveOwners(world, rules.UnitObjectiveOwnership).Any(owner => owner == null || !SharesVictory(world, initial, owner)))
             world = world with { LocalMultiplayer = world.LocalMultiplayer with { InitialObjectiveOwner = null } };
         string? winner = Winner(world, rules);
         return winner == null ? world : Finish(world, winner);

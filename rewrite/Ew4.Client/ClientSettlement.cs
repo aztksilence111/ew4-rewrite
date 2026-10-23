@@ -56,9 +56,17 @@ public sealed partial class ClientGame
                 rank = runtime?.Rank.Level ?? c.Learning.Rank.Level, title = runtime?.Title.Level ?? c.Learning.Title.Level,
                 withdrawn = runtime?.Withdrawn ?? false };
         }).ToArray();
+        var victory = Require().Rules.Turns.Victory;
+        var custom = session.World.ScenarioVictory ?? victory.Custom;
+        int? roundLimit = custom == null ? victory.RoundLimit : custom.RoundLimit;
+        string? failureDescriptionKey = session.World.LocalMultiplayer == null && result.Outcome == "Defeat"
+            ? roundLimit.HasValue && session.World.Round > roundLimit.Value ? "desc_failure 2" : "desc_failure 1" : null;
         return new { result.Id, result.Scenario, result.Outcome, result.Round, result.Stars,
             result.MinimumRatingRound, result.HighestRatingRound, result.AwardMedals, result.CollectedMedals,
             name = content.Scenarios.Single(s => s.Id == scenario).Name, nextScenario = next?.Id, generals,
+            failureDescriptionKey, failureDescription = failureDescriptionKey == null ? null : content.Label(failureDescriptionKey),
+            failureSpeaker = failureDescriptionKey == null || entry?.Commander == null ? null
+                : new { portrait = entry.Commander + ".png", name = content.Label("name_" + entry.Commander) },
             localMultiplayer = LocalMultiplayerView(session),
             presentation = content.Extensions.VictoryPresentations.TryGetValue(scenario, out var screen) ? screen
                 : content.Extensions.VictoryPresentations.GetValueOrDefault("*") };

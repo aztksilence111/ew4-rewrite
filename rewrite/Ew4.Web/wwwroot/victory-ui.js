@@ -3,7 +3,7 @@
   class Results {
     constructor(api){
       this.api=api;this.id=null;this.dismissed=null;this.layout=null;this.pending=0;
-      addEventListener('resize',()=>this.fit());
+      addEventListener('ew4uiscale',()=>this.fit());
     }
     fit(){
       if(!this.layout?.current())return;
@@ -14,7 +14,7 @@
     reset(){
       cancelAnimationFrame(this.pending);this.pending=0;
       if(this.layout?.current())this.api.close();
-      this.id=null;this.dismissed=null;this.layout=null;
+      this.id=null;this.dismissed=null;this.layout=null;this.failureTalk=null;
     }
     sync(state){
       this.state=state;
@@ -35,6 +35,9 @@
     }
     open(result){
       const api=this.api,won=result.outcome==='Victory';
+      if(!won&&!result.presentation?.layout&&!result.presentation?.defeatLayout&&result.failureDescription&&this.failureTalk!==result.id){
+        this.failureTalk=result.id;api.failureDialogue(result);return;
+      }
       const screen=result.presentation||{},bindings=screen.bindings||{
         name:'text_battle',round:'text_roundval',awardMedals:'text_award_val',collectedMedals:'text_gain_val',
         minimumRatingRound:'text_star',highestRatingRound:'text_star2',thresholds:'group_starlevel',
@@ -49,6 +52,18 @@
       layout.body.dataset.result=result.id;
       api.title(won?(screen.victoryTitle||'title_victory'):(screen.defeatTitle||'title_failure'));
       if(bindings.name)layout.text(bindings.name,result.name);
+      if(!definition){
+        if(!won){
+          const width=layout.width-parseFloat(layout.get('scale_line_ver').style.left);
+          for(const id of ['text_round','text_roundval'])layout.get(id).style.width=width+'px';
+        }
+        for(const [label,value] of [['text_award','text_award_val'],['text_gain','text_gain_val']]){
+          const el=layout.get(label),a=el.nativeAttributes;
+          el.replaceChildren(api.text(api.manifest.strings[a.text]||a.text,'font_text_2_cn_hd','#404040',parseFloat(el.style.width),a.align,
+            {singleLine:true,maxHeight:parseFloat(el.style.height),inkCenter:true}));
+          layout.get(value).style.top=el.style.top;
+        }
+      }
       for(const key of ['round','awardMedals','collectedMedals','minimumRatingRound','highestRatingRound'])if(bindings[key]){
         const el=layout.get(bindings[key]),a=el.nativeAttributes,threshold=key==='minimumRatingRound'||key==='highestRatingRound';
         const parentWidth=parseFloat(el.parentElement.style.width)||layout.width;
@@ -58,7 +73,7 @@
         const rgba=(a.color||a.textcolor||'64,64,64,255').split(',').map(Number);
         const color=threshold&&!a.color&&!a.textcolor?'#ffffff':`rgba(${rgba[0]},${rgba[1]},${rgba[2]},${rgba[3]/255})`;
         el.replaceChildren(api.text(result[key],font,color,width,a.align||'left',{
-          singleLine:true,maxHeight:parseFloat(el.style.height),numeric:true
+          singleLine:true,maxHeight:parseFloat(el.style.height),numeric:true,inkCenter:!definition
         }));
       }
       if(bindings.thresholds)layout.hide(bindings.thresholds,!won||result.stars===0);

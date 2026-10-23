@@ -116,6 +116,14 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                 state = state with { World = state.World with { Jurisdictions = start.Session.World.Jurisdictions.Copy() with { CenterCaptureVersion = 0 } } };
             state = state with { World = JurisdictionClaims.UpgradeCapturedDistricts(state.World, start.Session.World) };
         }
+        if (state.World.LocalMultiplayer is { WinnerFaction: null, ShareAlliedVictory: false } local
+            && start.Session.World.LocalMultiplayer?.ShareAlliedVictory == true)
+        {
+            state = state with { World = state.World with { LocalMultiplayer = local with {
+                ShareAlliedVictory = true,
+                InitialObjectiveOwner = local.InitialObjectiveOwner == null ? null : start.Session.World.LocalMultiplayer.InitialObjectiveOwner } } };
+            state = state with { World = LocalMultiplayerGame.Resolve(state.World, start.Rules.Turns.Victory) };
+        }
         var profile = Account();
         var unlocks = profile.UnlockedCampaigns.Union(state.Account.UnlockedCampaigns, StringComparer.Ordinal).ToArray();
         if (profile.Revision > state.Account.Revision) state = state with { Account = profile };

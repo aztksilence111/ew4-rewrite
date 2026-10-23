@@ -46,7 +46,7 @@ public static class WorldVictory
         if (state.LocalMultiplayer != null)
         {
             string? winner = LocalMultiplayerGame.Winner(state, rules);
-            return winner == null ? BattleOutcome.Continue : state.LocalMultiplayer.HumanFactions.Contains(winner)
+            return winner == null ? BattleOutcome.Continue : state.LocalMultiplayer.HumanFactions.Any(id => LocalMultiplayerGame.Won(state, id, winner))
                 ? BattleOutcome.Victory : BattleOutcome.Defeat;
         }
         if (state.ScenarioPlayerFaction != null)

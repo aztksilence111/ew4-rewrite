@@ -145,19 +145,23 @@ public static class LegacyScenarioHost
         foreach (var policy in production.Values) policy.Validate();
         var initial = new WorldState { ScenarioId = request.Id, ContentRevision = "initializing", Width = map.Width, Height = map.Height,
             LocalMultiplayer = request.LocalPlayers == null ? null : new(player,
-                initialized.TurnOrder.Select(i => ids[i]).Where(request.LocalPlayers.Contains).ToArray()),
+                initialized.TurnOrder.Select(i => ids[i]).Where(request.LocalPlayers.Contains).ToArray(), ShareAlliedVictory: request.Mode == 1),
             Factions = initialized.TurnOrder.Select(i => bySource[i]).ToArray(), ActiveFaction = player, Cells = importedMap.Cells,
             Units = bindings.Select(b => b.Unit).ToArray(), Commanders = bindings.Where(b => b.Commander != null).Select(b => b.Commander!).ToArray(),
             Events = events.Events, TriggeredEvents = events.TriggeredEvents, Limits = request.Limits with { },
             RandomState = request.CombatSeed, AiRandomState = request.AiSeed, Phase = TurnPhase.RoundEvents };
         if (initial.LocalMultiplayer != null)
             initial = initial with { LocalMultiplayer = initial.LocalMultiplayer with {
-                InitialObjectiveOwner = LocalMultiplayerGame.InitialObjectiveOwner(initial, turns.Victory.UnitObjectiveOwnership),
+                InitialObjectiveOwner = LocalMultiplayerGame.InitialObjectiveOwner(initial with {
+                    LocalMultiplayer = initial.LocalMultiplayer with { ShareAlliedVictory = false } }, turns.Victory.UnitObjectiveOwnership),
                 HadObjectives = initial.Cells.Any(c => c.Objective) || initial.Units.Any(u => u.Objective) } };
         string worldRevision = Fingerprint(new { schema = 1, initialized.SourceRevision, map = importedMap.SourceRevision,
             events = events.SourceRevision, commerce = commerce.SourceRevision, rules,
             sourceHashes = catalogs.Runtime.SourceHashes, initial = initial with { RandomState = 0, AiRandomState = 0 } });
         initial = initial with { ContentRevision = worldRevision };
+        if (initial.LocalMultiplayer?.ShareAlliedVictory == true)
+            initial = initial with { LocalMultiplayer = initial.LocalMultiplayer with {
+                InitialObjectiveOwner = LocalMultiplayerGame.InitialObjectiveOwner(initial, turns.Victory.UnitObjectiveOwnership) } };
         initial.Validate();
         var entered = WorldTurns.Resume(initial, 0, turns);
         if (request.LocalPlayers != null) entered = entered with { State = LocalMultiplayerGame.Resolve(entered.State, turns.Victory) };
@@ -187,6 +191,7 @@ public static class LegacyScenarioHost
                 foreach (var property in element.EnumerateObject().OrderBy(p => p.Name, StringComparer.Ordinal))
                 {
                     // Optional runtime districts must not change the pre-existing source-content binding.
+                    if (property.Name == nameof(LocalMultiplayerState.ShareAlliedVictory)) continue;
                     if (property.Name == nameof(WorldState.Jurisdictions) && property.Value.ValueKind == JsonValueKind.Null) continue;
                     if (property.Name == nameof(FactionState.Appearance) && property.Value.ValueKind == JsonValueKind.Null) continue;
                     if (property.Name is nameof(WorldState.LocalMultiplayer) or nameof(WorldState.ScenarioVictory) or nameof(WorldState.ScenarioEnding)

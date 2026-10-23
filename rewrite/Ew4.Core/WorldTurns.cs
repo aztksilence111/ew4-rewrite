@@ -297,7 +297,12 @@ public static class WorldTurns
         // Income uses pre-expansion territory, matching the native start-turn ordering.
         var expansion = Enumerable.Range(0, state.Cells.Count).Where(i => state.Cells[i].Owner == faction.Id && rules.Building(state.Cells[i])?.ClaimsNeighbors == true).ToArray();
         var cells = JurisdictionClaims.Filter(state,
-            TerritoryClaims.Expand(map, state.Cells, expansion, state.Units.Select(u => u.Cell).ToArray(), faction.Id), faction.Id);
+            TerritoryClaims.Expand(map, state.Cells, expansion.Where(i=>state.Cells[i].BuildingKind!="farmland").ToArray(),
+                state.Units.Select(u => u.Cell).ToArray(), faction.Id), faction.Id);
+        var farms = expansion.Where(i=>state.Cells[i].BuildingKind=="farmland").ToArray();
+        if (farms.Length > 0)
+            cells = JurisdictionClaims.Filter(state with { Cells=cells },
+                TerritoryClaims.Expand(map, cells, farms, state.Units.Select(u=>u.Cell).ToArray(), faction.Id), faction.Id, requireFrontier: true);
         cells = cells.Select(c => c.Owner == faction.Id ? c with { BuildingUpgradesThisTurn = 0 } : c).ToArray();
         var expanded = state with { Cells = cells };
         var occupied = new HashSet<int>(expanded.Units.Select(u => u.Cell));

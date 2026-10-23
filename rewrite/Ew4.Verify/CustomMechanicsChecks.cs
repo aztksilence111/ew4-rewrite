@@ -93,7 +93,9 @@ internal static class CustomMechanicsChecks
         land = land with { Jurisdictions = TerritorialJurisdictions.Create(land) }; land.Validate();
         var proposed = land.Cells.Select(c => c with { Owner = "winner" }).ToArray();
         var claims = JurisdictionClaims.Filter(land, proposed, "winner");
-        Check(claims[23].Owner == "winner" && claims[24].Owner == "loser" && claims[22].Owner == "loser", "only neighboring ordinary ground can be claimed without occupying a center");
+        Check(claims[23].Owner == "winner" && claims[24].Owner == "winner" && claims[22].Owner == "loser", "ordinary claims do not require a frontier but facilities still require actual occupation");
+        Check(JurisdictionClaims.Filter(land,proposed,"winner",requireFrontier:true)[24].Owner=="loser",
+            "farm-style expansion explicitly retains the nonadjacent district restriction");
         Check(land.Jurisdictions!.Borders.Count > 1, "multiple border districts represented without a single nearest-city shortcut");
         var allied = land with { Factions = land.Factions.Select(f => f with { Camp = "allied" }).ToArray() };
         Check(JurisdictionClaims.Filter(allied, proposed, "winner").SequenceEqual(allied.Cells), "allied countries keep territory during expansion");
@@ -134,7 +136,7 @@ internal static class CustomMechanicsChecks
         var island = stranded with { Cells = stranded.Cells.Select((c, i) => i is 22 or 25 ? c with { BuildingKind = null, BuildingLevel = 0 } : c).ToArray(), Jurisdictions = null };
         island = island with { Jurisdictions = TerritorialJurisdictions.Create(island) }; island.Validate();
         Check(island.Jurisdictions!.CellCenters[22] >= 0 && island.Jurisdictions.DetachedCells.Contains(22), "centerless island has an administrative label without a land connection");
-        Check(JurisdictionClaims.Filter(island, proposed, "winner")[22].Owner == "loser" && island.Jurisdictions.Borders.Count == 0, "island label does not permit painting across the sea");
+        Check(JurisdictionClaims.Filter(island, proposed, "winner",requireFrontier:true)[22].Owner == "loser" && island.Jurisdictions.Borders.Count == 0, "island label does not permit farm-style painting across the sea");
         var islandSaved = WorldSave.Decode(WorldSave.Encode(island), island.ContentRevision);
         Check(islandSaved.Jurisdictions!.DetachedCells.SequenceEqual(island.Jurisdictions.DetachedCells), "disconnected land restrictions survive save/load");
         foreach (string kind in new[] { "city", "industry", "stable" })
@@ -153,7 +155,8 @@ internal static class CustomMechanicsChecks
         Check(ring.Where(i => land.Jurisdictions.CellCenters[i] is 19 or 22 && (i == farm || farmland.Cells[i].BuildingKind == null)).All(i => occupiedFarm[i].Owner == "winner"), "occupying eligible farm releases ordinary ring cells and its own tile");
         Check(occupiedFarm[22].Owner == "loser", "farm ring never captures its neighboring city");
         var deepFarm = land with { Cells = land.Cells.Select((c, i) => i == 34 ? c with { BuildingKind = "farmland", BuildingLevel = 1 } : c).ToArray() };
-        Check(JurisdictionClaims.Move(deepFarm, proposed, [33, 34], "winner")[34].Owner == "loser", "farm capture cannot bypass the deeper-city rule");
+        var deepFarmCapture = JurisdictionClaims.Move(deepFarm, deepFarm.Cells.Select((c,i)=>i==34?c with { Owner="winner" }:c).ToArray(), [33, 34], "winner");
+        Check(deepFarmCapture[34].Owner == "winner" && deepFarmCapture[35].Owner == "loser", "direct deep farm occupation transfers its tile but cannot expand its ring beyond the frontier");
         var boundaryFarm = land with { Cells = land.Cells.Select((c, i) => i == 23 ? c with { BuildingKind = "farmland", BuildingLevel = 1 } : c).ToArray() };
         var boundaryCapture = WorldActions.Move(boundaryFarm with { Units = [own with { Cell = 22, RemainingMovement = 6 }] }, 0, own.Id, 23).State;
         Check(boundaryCapture.Cells[23].Owner == "winner" && boundaryCapture.Cells[24].Owner == "loser", "actual farm occupation transfers eligible ring but preserves the deeper district");
@@ -212,7 +215,16 @@ internal static class CustomMechanicsChecks
         var mover = own with { Cell = 24, RemainingMovement = 6 };
         var marching = land with { Units = [mover] };
         var marched = WorldActions.Move(marching, marching.Revision, mover.Id, 25).State;
-        Check(marched.Units.Single().Cell == 25 && marched.Cells[25].Owner == "loser", "real movement enters deep district without repainting it");
+        Check(marched.Units.Single().Cell == 25 && marched.Cells[25].Owner == "winner", "real movement captures a nonadjacent enemy center");
+        var departed = WorldActions.Move(marched with { Units = marched.Units.Select(u=>u with { RemainingMovement=6 }).ToArray() }, marched.Revision, mover.Id, 24).State;
+        Check(departed.Cells[25].Owner == "winner", "captured deep city retains its owner after troops leave");
+        foreach (string kind in new[] { "city", "industry", "stable" })
+        {
+            var overseas = stranded with { Cells = stranded.Cells.Select((c,i)=>i==25?c with { BuildingKind=kind }:c).ToArray(), Units=[mover] };
+            var landed = WorldActions.Move(overseas, overseas.Revision, mover.Id, 25).State;
+            Check(landed.Cells[25].Owner == "winner" && landed.Cells[24].Owner == "winner", "overseas occupation transfers " + kind + " and its district without a land frontier");
+            Check(WorldSave.Decode(WorldSave.Encode(landed), landed.ContentRevision).Cells[25].Owner == "winner", "overseas " + kind + " occupation survives save/load");
+        }
         var invader = own with { Cell = 30, Combatant = own.Combatant with { Profile = own.Combatant.Profile with {
             DamageMultipliers = new Dictionary<string, float> { ["infantry"] = 1, ["fort"] = 1 } } } };
         var battleRules = new WorldBattleRules { CheckFactionSurvival = false, ResolveIgnition = false, RecalculateLocalMorale = false,

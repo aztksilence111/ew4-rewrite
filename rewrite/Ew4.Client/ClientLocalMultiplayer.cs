@@ -36,8 +36,8 @@ public sealed partial class ClientGame
     {
         var local = session.World.LocalMultiplayer;
         if (local == null) return null;
-        return new { local.MainFaction, local.HumanFactions, local.WinnerFaction,
+        return new { local.MainFaction, local.HumanFactions, local.WinnerFaction, local.ShareAlliedVictory,
             results = local.WinnerFaction == null ? null : session.World.Factions.Select(f => new {
-                f.Id, f.Name, outcome = f.Id == local.WinnerFaction ? "Victory" : "Defeat" }).ToArray() };
+                f.Id, f.Name, outcome = LocalMultiplayerGame.Won(session.World, f.Id, local.WinnerFaction) ? "Victory" : "Defeat" }).ToArray() };
     }
 }

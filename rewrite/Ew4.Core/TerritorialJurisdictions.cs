@@ -195,16 +195,15 @@ public static class JurisdictionClaims
             for (int d = 0; d < 6; d++) { int n = map.Neighbor(center, d); if (n >= 0) yield return n; }
         }
         internal void OccupiedCenter(int center) => allowed.Add(center);
-        internal bool CanClaim(int cell, bool occupyFarm = false, bool occupiedSite = false)
+        internal bool CanClaim(int cell, bool occupyFarm = false, bool occupiedSite = false, bool requireFrontier = false)
         {
             var site = state.Cells[cell];
             if ((!transferAllies && AlliedTerritory(state, cell, owner)) || !site.Terrain.Active) return false;
             // Facilities only change hands through an actual occupation, never a neighboring ring.
             if (site.BuildingKind != null && !occupiedSite) return false;
-            if (site.BuildingKind == "port") return true;
+            if (occupiedSite && (TerritorialJurisdictions.IsCenter(site) || site.BuildingKind == "port")) return true;
             if (site.Terrain.Sea
-                || detached.Contains(cell) || !allowed.Contains(state.Jurisdictions!.CellCenters[cell])) return false;
-            if (occupiedSite && TerritorialJurisdictions.IsCenter(site)) return true;
+                || requireFrontier && (detached.Contains(cell) || !allowed.Contains(state.Jurisdictions!.CellCenters[cell]))) return false;
             foreach (int guard in Ring(cell))
             {
                 if (Released.Contains(guard)) continue;
@@ -215,12 +214,13 @@ public static class JurisdictionClaims
         }
     }
 
-    public static IReadOnlyList<CellState> Filter(WorldState state, IReadOnlyList<CellState> proposed, string owner)
+    public static IReadOnlyList<CellState> Filter(WorldState state, IReadOnlyList<CellState> proposed, string owner, bool requireFrontier = false)
     {
         proposed = PreserveAllies(state, proposed, owner);
         if (state.Jurisdictions == null) return proposed;
         var policy = new Policy(state, owner);
-        return proposed.Select((c, i) => c.Owner == state.Cells[i].Owner || c.Owner == null && c.Terrain.Sea && state.Cells[i].BuildingKind == null || policy.CanClaim(i) ? c : state.Cells[i]).ToArray();
+        return proposed.Select((c, i) => c.Owner == state.Cells[i].Owner || c.Owner == null && c.Terrain.Sea && state.Cells[i].BuildingKind == null
+            || policy.CanClaim(i, requireFrontier: requireFrontier) ? c : state.Cells[i]).ToArray();
     }
 
     public static IReadOnlyList<CellState> Move(WorldState state, IReadOnlyList<CellState> proposed, IReadOnlyList<int> path, string owner)
@@ -234,14 +234,14 @@ public static class JurisdictionClaims
         {
             if (state.Cells[cell].BuildingKind != "farmland" || state.Cells[cell].Owner == owner || proposed[cell].Owner != owner) continue;
             policy.Released.Add(cell);
-            if (policy.CanClaim(cell, true, true)) capturedFarms.Add(cell); else policy.Released.Remove(cell);
+            if (policy.CanClaim(cell, true, true, requireFrontier: false)) capturedFarms.Add(cell); else policy.Released.Remove(cell);
         }
         var result = proposed.Select((c, i) => c.Owner == state.Cells[i].Owner || c.Owner == null && c.Terrain.Sea && state.Cells[i].BuildingKind == null
             || occupied.Contains(i) && (TerritorialJurisdictions.IsCenter(c) || c.BuildingKind == "port") && AlliedTerritory(state, i, owner)
             || policy.CanClaim(i, capturedFarms.Contains(i), occupied.Contains(i)) ? c : state.Cells[i]).ToArray();
         foreach (int farm in capturedFarms)
             foreach (int cell in policy.Ring(farm))
-                if (cell == farm || policy.CanClaim(cell)) result[cell] = result[cell] with { Owner = owner };
+                if (cell == farm || policy.CanClaim(cell, requireFrontier: true)) result[cell] = result[cell] with { Owner = owner };
         foreach (int center in path.Skip(1).Distinct().Where(i => TerritorialJurisdictions.IsCenter(state.Cells[i])
             && state.Cells[i].Owner != owner && result[i].Owner == owner))
             TransferDistrict(state, result, center, owner, new Policy(state, owner, true));
@@ -277,10 +277,10 @@ public static class JurisdictionClaims
         if (before.Jurisdictions == null) return before.Cells;
         var policy = new Policy(before, owner); policy.Released.Add(cell);
         // Destroying a deep or overseas fort cannot bypass the city frontier.
-        if (!policy.CanClaim(cell, true)) return before.Cells;
+        if (!policy.CanClaim(cell, true, requireFrontier: true)) return before.Cells;
         var result = before.Cells.ToArray();
         foreach (int target in policy.Ring(cell))
-            if (SameDistrict(before, cell, target) && policy.CanClaim(target, true)) result[target] = result[target] with { Owner = owner };
+            if (SameDistrict(before, cell, target) && policy.CanClaim(target, true, requireFrontier: true)) result[target] = result[target] with { Owner = owner };
         return result;
     }
 }
