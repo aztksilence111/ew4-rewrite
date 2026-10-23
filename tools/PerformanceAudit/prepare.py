@@ -29,7 +29,7 @@ selected = {
     "WorldAiCommanders": {"PlanCommander"},
     "HexMap": {"Reachable", "DistancesTo"},
     "WorldBattle": {"Preview", "Attack"}, "WorldTurns": {"EndTurn", "StartFaction"},
-    "SessionSave": {"Encode"}, "WorldSave": {"Encode"},
+    "SessionSave": {"Encode"}, "WorldSave": {"Encode", "EncodeValidated"},
 }
 pattern = re.compile(r"(?m)^    (?:public|private|internal|protected) [^\n;{}]*?\b(?P<name>\w+)\s*\([^;{}]*?\)\s*\{")
 manifest = []
@@ -52,22 +52,30 @@ for project in projects:
                 if end < 0:
                     raise RuntimeError("WorldState.Copy end changed")
                 text = text[:end] + text[end:].replace('\n    };', '\n    });', 1)
+                probes.append("WorldState.Copy")
             def insert(match):
                 name = match.group("name")
-                if name not in selected.get(source.stem, set()) and not (project == "Ew4.Core" and name == "Validate"):
+                if name not in selected.get(source.stem, set()) and not (project == "Ew4.Core" and name in {"Validate", "ValidateCore"}):
                     return match.group(0)
                 owners = re.findall(r"\b(?:class|record|struct)\s+(\w+)", text[:match.start()])
                 owner = owners[-1] if owners else source.stem
-                label = source.stem + "." + (owner + "." if name == "Validate" else "") + name
+                label = source.stem + "." + (owner + "." if name in {"Validate", "ValidateCore"} else "") + name
                 probes.append(label)
-                observed = '\n        Ew4.Core.PerfProbe.ObserveWorld(this);' if owner == "WorldState" and name == "Validate" else ''
+                observed = '\n        Ew4.Core.PerfProbe.ObserveWorld(this);' if owner == "WorldState" and name in {"Validate", "ValidateCore"} else ''
                 return match.group(0) + '\n        using var __auditScope = Ew4.Core.PerfProbe.Enter("' + label + '");' + observed
             text = pattern.sub(insert, text)
             if source.name == "ClientGame.cs":
                 old = 'return JsonSerializer.Serialize(new { ok = true, data = result }, Json);'
-                if text.count(old) != 1:
+                current = 'string response = JsonSerializer.Serialize(new { ok = true, data = result }, Json);'
+                if text.count(old) + text.count(current) != 1:
                     raise RuntimeError("Dispatch serialization anchor changed")
                 text = text.replace(old, 'return Ew4.Core.PerfProbe.Measure("JSON.response", () => JsonSerializer.Serialize(new { ok = true, data = result }, Json));')
+                text = text.replace(current, 'string response = Ew4.Core.PerfProbe.Measure("JSON.response", () => JsonSerializer.Serialize(new { ok = true, data = result }, Json));')
+                probes.append("JSON.response")
+                stream_save = '{ JsonSerializer.Serialize(stream, slot, Json); stream.Flush(true); }'
+                if stream_save in text:
+                    text = text.replace(stream_save, '{ { using var __auditEnvelope = Ew4.Core.PerfProbe.Enter("Save.serializeWrite"); JsonSerializer.Serialize(stream, slot, Json); } { using var __auditFlush = Ew4.Core.PerfProbe.Enter("Save.flush"); stream.Flush(true); } }')
+                    probes.extend(["Save.serializeWrite", "Save.flush"])
                 text = text.replace('{ stream.Write(bytes); stream.Flush(true); }', '{ using var __auditIo = Ew4.Core.PerfProbe.Enter("Save.writeFlush"); stream.Write(bytes); stream.Flush(true); }')
                 text = text.replace('var bytes = JsonSerializer.SerializeToUtf8Bytes(new ClientSlot', 'var bytes = Ew4.Core.PerfProbe.Measure("JSON.saveEnvelope", () => JsonSerializer.SerializeToUtf8Bytes(new ClientSlot')
                 text = text.replace('FactionCountries(current.Session.World).GetValueOrDefault(current.Session.PlayerFaction)), Json);', 'FactionCountries(current.Session.World).GetValueOrDefault(current.Session.PlayerFaction)), Json));')
