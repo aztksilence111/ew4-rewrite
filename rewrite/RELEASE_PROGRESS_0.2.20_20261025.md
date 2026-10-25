@@ -1,5 +1,7 @@
 # 0.2.20 发布进度
 
+发布后用户追加要求全面清理测试包及配套文件：已关闭17旧测试预览，追加删除195184文件/44968573501字节，错误0；保留正式三版assets/web、发布/校验凭据、玩家资料、原始字体输入及Mod接口演示源码。9310保留文件哈希无变化。以下测试数量为实际执行结果，临时日志、截图、提取程序集、冻结对照和测试脚本副本现已清理；现行规则及简短清理记录见LOCAL_RESOURCE_MAINTENANCE.md和build/maintenance-20261025/test-artifact-cleanup.json。
+
 2026-10-25。用户授权提交推送当前源码，打包 Windows x64 Web 与 Android ARM64 并上传 GitHub Release。
 
 版本 0.2.20/code23，规则 API 3。证据目录 `build/release-0.2.20-20261025`。双端正式发布完成：[Release v0.2.20-20261025](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.20-20261025)。包源码及标签为 `e0239fc01b29904dc01a823d331e2ed8c33b9947`，已同步远端 main；后续完成记录提交只补文档。
