@@ -567,7 +567,6 @@ async function start(scenario, country, localPlayers) {
         tutorial=null;stageIntroOpen=false;
         const next=await performanceLog.stage('backend',()=>rpc('start', {scenario, country,localPlayers}));
         await installState(next, true);
-        await performanceLog.stage('firstFrame',async()=>{requestRender();await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});
         showStageIntro();await beginTutorial();
       });
       performanceLog.endEntry('ready');
@@ -581,7 +580,12 @@ async function withLoading(action){
   $('loading-tip').replaceChildren(originalTextRenderer.element(tip,'font_text_2_cn_hd','#ebe6e1',527));
   $('loading-word').replaceChildren(originalTextRenderer.element('LOADING...','font_char_3_hd','#ebe6e1'));
   $('loading-screen').hidden=false;
-  try{await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));await action();await new Promise(resolve=>setTimeout(resolve,Math.max(0,700-(performance.now()-started))));}
+  try{
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));await action();
+    await new Promise(resolve=>setTimeout(resolve,Math.max(0,700-(performance.now()-started))));
+    // Finish the loaded battlefield before an immediately opened modal can freeze it.
+    if(state&&!$('play').hidden)await performanceLog.stage('firstFrame',async()=>{suspendRendering();render(performance.now(),true);});
+  }
   finally{$('loading-screen').hidden=true;}
 }
 function flagSource(faction){
@@ -1124,7 +1128,7 @@ function drawStrategicMap(time=performance.now()) {
   draw.translate(camera.x,camera.y);draw.scale(scale,scale);
   const strategic=lib.byName.get(definition.name||('conquest '+chosenScenario.slice(8)));if(strategic)animation(lib,strategic,time/180,0,draw);draw.restore();
 }
-function render(time) {
+function render(time,forceBattlefield=false) {
   renderRequest=0;
   if(document.hidden||!appVisible)return;
   renderDirty=false;lastRenderTime=time;
@@ -1144,7 +1148,7 @@ function render(time) {
   const dpr=settings.hd?Math.max(1,Math.min(window.devicePixelRatio||1,3,Math.sqrt(6*1024*1024/Math.max(1,w*h)))):1;
   // Covered battlefields still need a fresh frame when their backing surface changes size.
   const resized=canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)||viewport.w!==w||viewport.h!==h||viewport.dpr!==dpr;
-  if(covered&&!stageIntroOpen&&!resized)return;
+  if(covered&&!stageIntroOpen&&!resized&&!forceBattlefield)return;
   if(!ctx){try{ctx=Ew4Pixi.createContext(canvas,()=>{battlefield.invalidateGround();requestRender();});if(canvas!==ctx.canvas){canvas=ctx.canvas;bindMapInput();}}catch(error){notice('绘图初始化失败：'+error.message);suspendRendering();return;}}
   if(!ctx.begin(Math.round(w*dpr),Math.round(h*dpr)))return;
   viewport={w,h,dpr};updateAiCamera(time);clampView();ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#688e91';ctx.fillRect(0,0,w,h);
