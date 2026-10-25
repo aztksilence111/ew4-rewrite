@@ -38,6 +38,21 @@
       }finally{this.working=false;}
     }
   }
-  root.Ew4Tutorial={Runner,supported};
+  function frame(rect,command,scale){
+    const padding=5*scale;
+    return {left:Math.max(0,rect.left-padding),top:Math.max(0,rect.top-padding),
+      width:Math.max(1,rect.width+padding*2+Number(command.w||0)*scale),
+      height:Math.max(1,rect.height+padding*2+Number(command.h||0)*scale)};
+  }
+  function pointer(rect,scale,width,height){
+    const w=35*scale,h=47*scale,gap=2.5*scale,travel=7.5*scale,margin=2;
+    const below=rect.top-h-travel+gap<margin;
+    const top=below?rect.top+rect.height-gap:rect.top-h+gap;
+    return {left:clamp(rect.left+rect.width/2-22.5*scale,margin,Math.max(margin,width-w-margin)),
+      top:clamp(top,margin+(below?0:travel),Math.max(margin,height-h-margin-(below?travel:0))),
+      width:w,height:h,flip:below?-1:1,travel:below?travel:-travel};
+  }
+  function clamp(value,min,max){return Math.max(min,Math.min(max,value));}
+  root.Ew4Tutorial={Runner,supported,frame,pointer};
   if(typeof module!=='undefined')module.exports=root.Ew4Tutorial;
 })(globalThis);

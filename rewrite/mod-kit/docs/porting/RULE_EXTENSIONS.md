@@ -136,7 +136,7 @@ commander-bindings示例：
 ]
 ```
 
-目标ID从当前Mod转换得到的 `legacy/catalog.json` 的profiles/commanders读取，不能以显示名称替代。原格式将领编号、国家兵种编号不等于本接口完整ID。
+目标 ID 从当前 Mod 的 `legacy/units.json.units`、`legacy/commanders.json.commanders` 读取，不能以显示名称替代。旧完整目录仍使用 profiles/commanders；原格式将领编号、国家兵种编号不等于本接口完整 ID。
 
 - append追加，replace替换该目标技能列表，remove按instanceId移除。traits按ID操作；将领没有traits绑定字段的行为。
 - 将领技能数量不固定；未配扩展时沿用原四格。level为正整数、order控制显示排序，缺省分别1和0；排序不改变后端效果执行顺序。

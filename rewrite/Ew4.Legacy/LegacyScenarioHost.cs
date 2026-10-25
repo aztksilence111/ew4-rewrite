@@ -60,7 +60,7 @@ public static class LegacyScenarioHost
         return Start(battle, maps.Resolve(id), catalogs, request, account);
     }
 
-    private static LegacyScenarioStart Start(LegacyBattle battle, WorldMapDefinition map,
+    public static LegacyScenarioStart Start(LegacyBattle battle, WorldMapDefinition map,
         LegacyScenarioCatalogs catalogs, LegacyScenarioRequest request, PlayerAccount account)
     {
         account.Validate(); request.Limits.Validate();
@@ -159,6 +159,8 @@ public static class LegacyScenarioHost
             events = events.SourceRevision, commerce = commerce.SourceRevision, rules,
             sourceHashes = catalogs.Runtime.SourceHashes, initial = initial with { RandomState = 0, AiRandomState = 0 } });
         initial = initial with { ContentRevision = worldRevision };
+        initial = initial with { DiplomacyNeutralCamps = neutral,
+            Provocations = request.Mode is 1 or 2 ? new(Camp(4), new[] { Camp(1), Camp(2), Camp(3) }) : null };
         if (initial.LocalMultiplayer?.ShareAlliedVictory == true)
             initial = initial with { LocalMultiplayer = initial.LocalMultiplayer with {
                 InitialObjectiveOwner = LocalMultiplayerGame.InitialObjectiveOwner(initial, turns.Victory.UnitObjectiveOwnership) } };
@@ -194,6 +196,8 @@ public static class LegacyScenarioHost
                     if (property.Name == nameof(LocalMultiplayerState.ShareAlliedVictory)) continue;
                     if (property.Name == nameof(WorldState.Jurisdictions) && property.Value.ValueKind == JsonValueKind.Null) continue;
                     if (property.Name == nameof(FactionState.Appearance) && property.Value.ValueKind == JsonValueKind.Null) continue;
+                    if (property.Name == nameof(FactionState.DiplomacyWarned) && property.Value.ValueKind == JsonValueKind.False) continue;
+                    if (property.Name == nameof(WorldState.Provocations) && property.Value.ValueKind == JsonValueKind.Null) continue;
                     if (property.Name is nameof(WorldState.LocalMultiplayer) or nameof(WorldState.ScenarioVictory) or nameof(WorldState.ScenarioEnding)
                         && property.Value.ValueKind == JsonValueKind.Null) continue;
                     if (property.Name == nameof(WorldState.NeutralHostilities) && property.Value.ValueKind == JsonValueKind.Array && property.Value.GetArrayLength() == 0) continue;

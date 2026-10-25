@@ -7,7 +7,8 @@ namespace Ew4.Client;
 
 public sealed record ClientCommand(string Op = "", long Revision = -1, string? Scenario = null, string? Country = null,
     string? Unit = null, string? Target = null, int Cell = -1, string? Offer = null, string? Commander = null, string? Item = null, JsonElement? Tutorial = null, int Group = 0, int Slot = 0, int Mode = 0,
-    IReadOnlyList<string>? LocalPlayers = null, string? Tag = null, IReadOnlyList<string>? TaggedCommanders = null, bool Delta = false);
+    IReadOnlyList<string>? LocalPlayers = null, string? Tag = null, IReadOnlyList<string>? TaggedCommanders = null, bool Delta = false,
+    string? KnownVersion = null);
 public sealed record ClientSlot(string Scenario, string? Country, byte[] Session, MovementHistoryState? MovementHistory = null, JsonElement? Tutorial = null,
     int Round = 0, DateTimeOffset? SavedAt = null, IReadOnlyList<string>? LocalPlayers = null, string? DisplayCountry = null);
 
@@ -27,6 +28,13 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
     private bool viewBuilt;
     private WorldState? movementBase;
     private IReadOnlyList<WorldMovement> executedMovements = [];
+    private readonly Dictionary<string, LegacyBattle> requestBattles = new(StringComparer.Ordinal);
+    private LegacyBattle RequestBattle(string scenario)
+    {
+        if (!requestBattles.TryGetValue(scenario, out var battle))
+            requestBattles.Add(scenario, battle = content.Battle(scenario));
+        return battle;
+    }
     private string Slot => Path.Combine(saveDirectory, "session.json");
     public string Dispatch(string path, string body)
     {
@@ -43,7 +51,12 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                 }
                 object result = path switch
                 {
-                    "/api/catalog" => new { scenarios = content.Scenarios,
+                    "/api/catalog" => new { build = typeof(ClientGame).Assembly.ManifestModule.ModuleVersionId.ToString("N"),
+                        buildVariant = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "Ew4.Android")
+                            ?.GetCustomAttributesData().FirstOrDefault(a => a.AttributeType.FullName == "System.Reflection.AssemblyMetadataAttribute"
+                                && a.ConstructorArguments[0].Value as string == "Ew4RuntimeAot")?.ConstructorArguments[1].Value as string is { } aot
+                                ? aot == "true" ? "android-aot" : "android-jit" : "web-jit",
+                        scenarios = content.Scenarios,
                         chapters = content.Chapters.Select(c => c with { Countries = c.Countries.Select(content.Countries.Canonical).ToArray() }),
                         presentations = content.Presentations.ToDictionary(p => p.Key, p => p.Value with {
                             Countries = p.Value.Countries.Select(content.Countries.Canonical).ToArray() }),
@@ -55,6 +68,8 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                     "/api/countries" => Countries(Command(body)),
                     "/api/local-players" => LocalPlayers(Command(body)),
                     "/api/headquarters" => Headquarters(),
+                    "/api/objectives" => Objectives(Command(body)),
+                    "/api/pause-objectives" => PauseObjectives(Command(body)),
                     "/api/deployment" => Deployment(Command(body)),
                     "/api/unit-info" => UnitInfo(Command(body)),
                     "/api/commander" => CommanderAction(Command(body)),
@@ -77,6 +92,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             {
                 return JsonSerializer.Serialize(new { ok = false, code = error is RuleViolation rule ? rule.Code : "client.failure", message = error.Message }, Json);
             }
+            finally { requestBattles.Clear(); }
         }
     }
     private static ClientCommand Command(string body) => JsonSerializer.Deserialize<ClientCommand>(body, Json)
@@ -132,6 +148,9 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                 state = state with { World = state.World with { Jurisdictions = start.Session.World.Jurisdictions.Copy() with { CenterCaptureVersion = 0 } } };
             state = state with { World = JurisdictionClaims.UpgradeCapturedDistricts(state.World, start.Session.World) };
         }
+        if (state.World.Provocations == null && state.World.Outcome == BattleOutcome.Continue)
+            state = state with { World = state.World with { Provocations = start.Session.World.Provocations,
+                DiplomacyNeutralCamps = start.Rules.Turns.NeutralCamps.ToArray() } };
         if (state.World.LocalMultiplayer is { WinnerFaction: null, ShareAlliedVictory: false } local
             && start.Session.World.LocalMultiplayer?.ShareAlliedVictory == true)
         {
@@ -270,15 +289,19 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         var current = Require();
         var scenarioChange = ScenarioRules.Evaluate(change.State, content.Extensions.Bus.Scripts);
         change = new(scenarioChange.State, change.Notices.Concat(scenarioChange.Notices).ToArray());
-        if (content.Extensions.Enabled || current.Rules.Turns.Victory.Custom != null)
+        bool dispatchEvents = content.Extensions.Bus.Skills.Count > 0 || content.Extensions.Bus.Statuses.Count > 0;
+        if (dispatchEvents || current.Rules.Turns.Victory.Custom != null || change.State.ScenarioEvents.Count > 0)
         {
             var world = change.State;
-            foreach (string id in world.Units.Where(u => !current.Session.World.Units.Any(old => old.Id == u.Id)).Select(u => u.Id).ToArray())
-                world = content.Extensions.Bus.Dispatch(world, "unit.recruited", id, new Ew4Random(world.RandomState));
-            foreach (var notice in change.Notices.Where(n => n.Kind is "unit.destroyed" or "battle.damage"))
-                if (current.Session.World.Units.FirstOrDefault(u => u.Id == notice.Subject) is UnitState before)
-                    world = content.Extensions.Bus.Dispatch(world, notice.Kind == "unit.destroyed" ? "unit.destroyed" : "unit.damaged",
-                        before.Id, new Ew4Random(world.RandomState), eventSource: before);
+            if (dispatchEvents)
+            {
+                foreach (string id in world.Units.Where(u => !current.Session.World.Units.Any(old => old.Id == u.Id)).Select(u => u.Id).ToArray())
+                    world = content.Extensions.Bus.Dispatch(world, "unit.recruited", id, new Ew4Random(world.RandomState));
+                foreach (var notice in change.Notices.Where(n => n.Kind is "unit.destroyed" or "battle.damage"))
+                    if (current.Session.World.Units.FirstOrDefault(u => u.Id == notice.Subject) is UnitState before)
+                        world = content.Extensions.Bus.Dispatch(world, notice.Kind == "unit.destroyed" ? "unit.destroyed" : "unit.damaged",
+                            before.Id, new Ew4Random(world.RandomState), eventSource: before);
+            }
             var scenarioEvents = ScenarioRules.Evaluate(world, content.Extensions.Bus.Scripts);
             world = scenarioEvents.State;
             change = change with { Notices = change.Notices.Concat(scenarioEvents.Notices).ToArray() };
@@ -310,7 +333,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
     }
     private void InstallSession(LegacyScenarioStart current, GameSession next, IReadOnlyList<WorldNotice> notices)
     {
-        var settled = SettleBattle(next);
+        var settled = SettleBattle(next, current.Session.World);
         StoreAccount(settled.Account);
         game = current with { Session = settled, Notices = notices };
         movementHistory.Observe(next.World);
@@ -376,7 +399,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
     {
         var current = Require(); var session = current.Session; var world = session.World;
         cellDeltaFrom ??= deltaBase;
-        var battle = content.Battle(world.ScenarioId);
+        var battle = RequestBattle(world.ScenarioId);
         var factionColors = battle.Factions.Select((source, index) => (source, index))
             .ToDictionary(p => LegacyScenarioInitialization.FactionId(world.ScenarioId, p.index, p.source), p => p.source.Color);
         var factionSources = battle.Factions.Select((source, index) => (source, index))
@@ -441,6 +464,17 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             && world.PendingDialogue == null && AttackTargets(world, unit).Any();
         object? DialoguePresentation()
         {
+            if (world.PendingDialogue != null && WorldProvocations.Dialogue(world, world.PendingDialogue) is { } diplomatic)
+            {
+                var diplomaticSpeaker = world.Commanders.Where(c => c.Owner == diplomatic.Faction && !c.Withdrawn
+                    && world.Units.Any(u => u.CommanderId == c.Id)).OrderByDescending(c => c.Title.Level)
+                    .ThenByDescending(c => c.Rank.Level).FirstOrDefault();
+                string? diplomaticPortrait = diplomaticSpeaker != null && current.Rules.Commanders.Definitions.TryGetValue(diplomaticSpeaker.Id, out var diplomaticDefinition)
+                    ? diplomaticDefinition.DisplayName : null;
+                return new { id = world.PendingDialogue, text = content.Label($"desc_{diplomatic.Kind} {diplomatic.Variant}"), left = true,
+                    portrait = diplomaticPortrait == null ? null : diplomaticPortrait + ".png", name = diplomaticPortrait == null
+                        ? world.Factions.Single(f => f.Id == diplomatic.Faction).Name : content.Label("name_" + diplomaticPortrait) };
+            }
             if (world.PendingDialogue == null || !current.Rules.Dialogues.TryGetValue(world.PendingDialogue, out var entry)) return null;
             string? portrait = content.Catalogs.Runtime.Commanders.TryGetValue(entry.Commander, out var speaker)
                 ? speaker.Definition.DisplayName : null;
@@ -448,6 +482,13 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                 name = portrait == null ? "" : content.Label(portrait) };
         }
         object CellView(CellState c, int i) => new { c.Owner, c.Name, c.BuildingKind, c.BuildingLevel, c.Terrain.Active, c.Terrain.Sea, c.Objective, c.InstallationKind, c.Environment,
+            geographyType = GeographyCatalog.Type(c.Terrain),
+            geographyName = GeographyCatalog.Type(c.Terrain) == "none" ? null : content.Extensions.Geography.Visual(GeographyCatalog.Type(c.Terrain)).Name,
+            geographySprite = GeographyCatalog.Type(c.Terrain) == "none" ? null : content.Extensions.Geography.Visual(GeographyCatalog.Type(c.Terrain)).Sprites[i % content.Extensions.Geography.Visual(GeographyCatalog.Type(c.Terrain)).Sprites.Length],
+            bridgeEdges = c.Terrain.BridgeEdges,
+            bridgeStyle0 = sites.TryGetValue(i, out var bridge) ? bridge.BridgeStyle0 : 0,
+            bridgeStyle1 = bridge?.BridgeStyle1 ?? 0,
+            bridgeStyle2 = bridge?.BridgeStyle2 ?? 0,
             objectiveMarker = c.Objective ? 1 : sites.TryGetValue(i, out var markedSite) && markedSite.Marker == 2 ? 2 : 0,
             jurisdictionCenter = world.Jurisdictions?.CellCenters[i] is int center && center >= 0 ? center : (int?)null,
             tileInfo = TileInfo(i, c),
@@ -471,7 +512,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         return new
         {
             session.Revision, scenario = world.ScenarioId, map = content.MapNames[battle.MapId], world.Width, world.Height,
-            stageIntro = StageIntro(world.ScenarioId),
+            stageIntro = StageIntro(world.ScenarioId), session.BattleId,
             battleResult = BattleResultView(session),
             tutorialCheckpoint,
             cameraBounds = new { left = battle.Left * 64 - 52, top = (battle.Top - 1) * 54 - 20,
@@ -484,9 +525,12 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             world.Round, phase = world.Phase.ToString(), outcome = world.Outcome.ToString(), world.ActiveFaction, session.PlayerFaction,
             startCountry = country, ending = world.ScenarioEnding, victoryRules = world.ScenarioVictory ?? current.Rules.Turns.Victory.Custom,
             localMultiplayer = LocalMultiplayerView(session),
-            dialogue = world.PendingDialogue == null ? null : current.Rules.Dialogues.TryGetValue(world.PendingDialogue, out var dialogue) ? dialogue.Text : world.PendingDialogue,
+            dialogue = world.PendingDialogue == null ? null : WorldProvocations.Dialogue(world, world.PendingDialogue) is { } diplomatic
+                ? content.Label($"desc_{diplomatic.Kind} {diplomatic.Variant}")
+                : current.Rules.Dialogues.TryGetValue(world.PendingDialogue, out var dialogue) ? dialogue.Text : world.PendingDialogue,
             dialoguePresentation = DialoguePresentation(),
             scenarioPopup = ScenarioPopupView(world),
+            mapColors = MapColorsPresentation.Resolve(content.Extensions.MapColors, world.ScenarioId),
             medals = session.Account.Medals,
             factions = world.Factions.Select(f => new { f.Id, f.Name, f.Camp, f.Human, f.Defeated, f.Resources,
                 relation = WorldDiplomacy.Relation(world, session.PlayerFaction, f.Id, current.Rules.Turns.NeutralCamps),

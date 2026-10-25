@@ -48,7 +48,9 @@ public sealed class MainActivity : Activity
             : path.StartsWith("legacy/", StringComparison.Ordinal) ? "data/" + path[7..]
             : path.StartsWith("frontend/", StringComparison.Ordinal) ? "www/" + path[9..] : path);
         store = new Lazy<ModStore>(() => new ModStore(new ModBase(ContentRead, Walk("original").Concat(Walk("www/content").Select(p => "client/" + p[12..]))
-            .Concat(["legacy/catalog.json", "legacy/runtime_rule_tables.json", "legacy/metagame_rule_tables.json", "frontend/conquest-pages.json", "frontend/city-names.json"])),
+            .Concat(Walk("data").Select(p => "legacy/" + p[5..]))
+            .Concat(Walk("rewrite"))
+            .Concat(["frontend/conquest-pages.json", "frontend/city-names.json"])),
             Path.Combine(FilesDir!.AbsolutePath, "content-mods"), Path.Combine(FilesDir.AbsolutePath, "saves")));
         web = new WebView(this);
         web.Settings.JavaScriptEnabled = true;

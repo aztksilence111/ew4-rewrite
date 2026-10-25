@@ -16,7 +16,7 @@ public sealed partial class ClientGame
         if (primary < 0 || battle.Factions[primary].Camp == 4)
             throw new RuleViolation("local.selection", "Choose a playable initial country first");
         var order = new[] { primary }.Concat(Enumerable.Range(0, battle.Factions.Count).Where(i => i != primary));
-        return order.Where(i => battle.Factions[i].Camp != 4)
+        return order.Where(i => scenario.Mode == 1 || battle.Factions[i].Camp != 4)
             .Select(i => new { id = LegacyScenarioInitialization.FactionId(scenario.Id, i, battle.Factions[i]),
             name = content.CountryName(battle.Factions[i].CountryId), country = content.Countries.Canonical(battle.Factions[i].CountryId),
             flag = content.Country(battle.Factions[i].CountryId)?.Flag ?? battle.Factions[i].Variant,
@@ -25,7 +25,7 @@ public sealed partial class ClientGame
 
     private void ValidateLocalSelection(ClientCommand command)
     {
-        if (command.LocalPlayers == null || content.Scenarios.Single(s => s.Id == command.Scenario).Mode is not (1 or 2)) return;
+        if (command.LocalPlayers == null || content.Scenarios.Single(s => s.Id == command.Scenario).Mode != 2) return;
         var battle = content.Battle(command.Scenario!);
         if (battle.Factions.Select((f, i) => (f, i)).Any(p => p.f.Camp == 4
             && command.LocalPlayers.Contains(LegacyScenarioInitialization.FactionId(command.Scenario!, p.i, p.f))))

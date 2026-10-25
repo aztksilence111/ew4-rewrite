@@ -1,5 +1,12 @@
 # 源码文件与函数索引
 
+曲线地理文字：`Web/wwwroot/battlefield.js` 的 `textPath/pathLettering/mapText` 共用中英路径；`tools/eastasia_lettering.py` 生成地形贴合路径及逐字动画，`Mods/ResourceValidation.CheckMapLabelPaths` 校验导入字段，见[作者接口](porting/MAP_TEXT_PATHS.md)。
+
+通用禁行地形：`Core/Geography.cs`校验，`Core/HexMap.cs`统一通行，`Legacy/GeographyCatalog.cs`配置应用，`ClientContent.Start`真实加载；字段与模板命令见[API 3地理接口](porting/GEOGRAPHY.md)。
+
+独立规则文件由 `Ew4.Legacy/LegacyCatalogFiles.cs` 加载和合成；`ClientContent` 将同一配置交给
+战斗、总部、商业、招募及显示模块。文件与字段见[独立配置指南](porting/SPLIT_CATALOG.md)。
+
 路径相对源码仓库根目录；工具发行包不含这些源码。函数名比行号更适合后续版本搜索。仓库中可用`rg -n "函数名" rewrite/对应目录`定位；下表不是让普通作者修改所有代码。
 
 需要从旧文件或原生函数反查时，先读[原包入库/运行入口对照](porting/ENTRYPOINTS.md)，包括原SO基线、Ghidra标识和证据文件，避免混用不同库版本的地址。

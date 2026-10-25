@@ -28,14 +28,61 @@ public static class PerfProbe
     private static int depth;
     private static ConditionalWeakTable<WorldState, object> worlds = new();
     public static long WorldValidationCalls, WorldSnapshots, CellValidationVisits, UnitValidationVisits;
+    private static readonly Dictionary<string, long> counters = new();
+    private static readonly Dictionary<string, HashSet<string>> distinct = new();
+    public static void Distinct(string name, string value)
+    {
+        if (!Active) return;
+        if (!distinct.TryGetValue(name, out var values)) distinct.Add(name, values = new());
+        if (values.Add(value)) Count(name);
+    }
+    private static ConditionalWeakTable<WorldState, Dictionary<string, int>> distanceWorlds = new();
+    private static readonly List<object> distanceSamples = new();
+    private static int distanceSequence;
+    public static void DistanceKey(WorldState world, string unit, bool purchase, string key, bool hit,
+        Dictionary<string, int> localHistory, int position)
+    {
+        if (!Active) return;
+        string outcome = localHistory.TryGetValue(key, out int previous) ? hit ? "hit" : "clearedReuse" : "firstInScope";
+        Count("distance." + outcome);
+        if (outcome != "firstInScope") Count("distance.reuseGap." + (position - previous));
+        localHistory[key] = position;
+        var history = distanceWorlds.GetOrCreateValue(world);
+        string context = unit + ":" + purchase + ":" + key;
+        if (history.TryGetValue(context, out int last)) Count("distance.sameWorldContextReuse");
+        else Count("distance.firstWorldContext");
+        if (distanceSamples.Count < 24) distanceSamples.Add(new { unit, purchase, key, outcome, position,
+            sameWorldGap = history.ContainsKey(context) ? distanceSequence - last : (int?)null });
+        history[context] = distanceSequence++;
+    }
+    public static object[] DistanceSamples() => distanceSamples.ToArray();
+    public static void Count(string name, long value = 1)
+    {
+        if (Active) counters[name] = counters.GetValueOrDefault(name) + value;
+    }
+    public static IReadOnlyDictionary<string, long> Counters() => new Dictionary<string, long>(counters);
+    public static void Validation(string result)
+    {
+        if (!Active) return;
+        string source = "planning";
+        for (int i = 0; i < depth; i++)
+        {
+            string name = Frames[i].Metric.Name;
+            if (name.Contains("Save") || name.Contains("Encode")) { source = "save"; break; }
+            if (name.Contains("ProjectMove")) source = "candidate";
+            else if (source != "candidate" && (name.Contains("Execute") || name == "WorldActions.Move")) source = "execution";
+            else if (source == "planning" && name.Contains("Commit")) source = "commit";
+        }
+        Count("validation." + source + "." + result);
+    }
     public static void ObserveWorld(WorldState world)
     {
         if (!Active) return;
-        WorldValidationCalls++; CellValidationVisits += world.Cells.Count; UnitValidationVisits += world.Units.Count;
+        WorldValidationCalls++; Validation("full");
         if (!worlds.TryGetValue(world, out _)) { worlds.Add(world, new object()); WorldSnapshots++; }
     }
     public static bool Active;
-    public static void Reset() { if (depth != 0) throw new InvalidOperationException("Probe scope open"); Metrics.Clear(); worlds = new(); WorldValidationCalls = WorldSnapshots = CellValidationVisits = UnitValidationVisits = 0; }
+    public static void Reset() { if (depth != 0) throw new InvalidOperationException("Probe scope open"); Metrics.Clear(); counters.Clear(); distinct.Clear(); worlds = new(); distanceWorlds = new(); distanceSamples.Clear(); distanceSequence = 0; WorldValidationCalls = WorldSnapshots = CellValidationVisits = UnitValidationVisits = 0; }
     public static Metric[] Snapshot() => Metrics.Values.OrderByDescending(m => m.ExclusiveMs).ToArray();
     public static Scope Enter(string name)
     {

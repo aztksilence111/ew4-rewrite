@@ -24,12 +24,15 @@ public sealed partial class ExtensionLoader
     public IReadOnlyDictionary<string, ScriptedScenarioEvent[]> ScenarioEvents { get; }
     public bool Enabled => Revision.Length > 0;
     public int ApiVersion { get; private set; } = 1;
+    public GeographyCatalog Geography { get; private init; } = GeographyCatalog.Empty;
+    public IReadOnlyDictionary<string, MapColorsPresentation> MapColors { get; private init; } = new Dictionary<string, MapColorsPresentation>();
     public LegacySkillParameters? LegacySkills { get; private init; }
     public IReadOnlyDictionary<string, int?> DeploymentLimits { get; private init; } = new Dictionary<string, int?>();
     public IReadOnlyDictionary<string, int> FormationCounts { get; private init; } = new Dictionary<string, int>();
     public IReadOnlyDictionary<string, string> CampaignVisibility { get; private init; } = new Dictionary<string, string>();
     public MetagameRules Metagame { get; private init; } = new();
     public IReadOnlyDictionary<string, StageIntroPresentation> StageIntroPresentations { get; private init; } = new Dictionary<string, StageIntroPresentation>();
+    public IReadOnlyDictionary<string, PauseObjectivesPresentation> PauseObjectivesPresentations { get; private init; } = new Dictionary<string, PauseObjectivesPresentation>();
     public IReadOnlyDictionary<string, CommanderDialogueLines> CommanderDialogues { get; private init; } = new Dictionary<string, CommanderDialogueLines>();
     private ExtensionLoader(RuleEventBus bus, string revision, ExtensionBinding[] units, ExtensionBinding[] commanders,
         Dictionary<string, ExtensionVictoryRules> victories, Dictionary<string, ExtensionLayout> layouts,
@@ -39,7 +42,8 @@ public sealed partial class ExtensionLoader
         string? UnitBindings = null, string? CommanderBindings = null, string? VictoryRules = null, string? Presentation = null, string[]? Scripts = null,
         string? ScenarioEvents = null, string[]? Statuses = null, string? VictoryPresentation = null, string? LegacySkillParameters = null,
         string? CommanderDialogues = null, string? ItemBindings = null, string? DeploymentLimits = null, string? Metagame = null,
-        string? StageIntroPresentation = null, string? FormationCounts = null, string? CampaignVisibility = null);
+        string? StageIntroPresentation = null, string? FormationCounts = null, string? CampaignVisibility = null,
+        string? Geography = null, string? PauseObjectivesPresentation = null, string? MapColors = null);
     private sealed record CampaignVisibilityFile(int Schema, Dictionary<string, string>? Visibility);
     private sealed record LegacySkillFile(int Schema, Dictionary<string, Dictionary<string, double>> Skills);
     private sealed record DeploymentLimitFile([property: JsonNumberHandling(JsonNumberHandling.Strict)] int Schema,
@@ -75,7 +79,12 @@ public sealed partial class ExtensionLoader
             return ParseJson<T>(data);
         }
         var m = Read<Manifest>("rewrite/extension.json");
-        if (m.Schema != 1 || m.ApiVersion is not (1 or 2)) throw new RuleViolation("extension.version", "Unsupported extension schema/API version");
+        if (m.Schema != 1 || m.ApiVersion is not (1 or 2 or 3)) throw new RuleViolation("extension.version", "Unsupported extension schema/API version");
+        if (m.Geography != null && m.ApiVersion < 3) throw new RuleViolation("extension.version", "Geography requires API 3");
+        var geography = m.Geography == null ? GeographyCatalog.Empty : Read<GeographyCatalog>(m.Geography);
+        if (m.MapColors != null && m.ApiVersion < 3) throw new RuleViolation("extension.version", "Map colors require API 3");
+        var mapColors = m.MapColors == null ? new Dictionary<string, MapColorsPresentation>() : Read<Dictionary<string, MapColorsPresentation>>(m.MapColors);
+        MapColorsPresentation.Validate(mapColors);
         if (m.ApiVersion == 1 && m.Statuses != null) throw new RuleViolation("extension.version", "Statuses require API 2");
         var deploymentLimits = new Dictionary<string, int?>();
         var formationCounts = new Dictionary<string, int>();
@@ -211,8 +220,12 @@ public sealed partial class ExtensionLoader
         if (m.StageIntroPresentation != null && m.ApiVersion < 2) throw new RuleViolation("extension.version", "Stage intro presentation requires API 2");
         var introScreens = m.StageIntroPresentation == null ? new Dictionary<string, StageIntroPresentation>() : Read<Dictionary<string, StageIntroPresentation>>(m.StageIntroPresentation);
         if (introScreens.Count > 0) StageIntroPresentation.Validate(introScreens, read("client/manifest.json"), read);
+        if (m.PauseObjectivesPresentation != null && m.ApiVersion < 2) throw new RuleViolation("extension.version", "Pause objectives presentation requires API 2");
+        var pauseScreens = m.PauseObjectivesPresentation == null ? new Dictionary<string, PauseObjectivesPresentation>()
+            : Read<Dictionary<string, PauseObjectivesPresentation>>(m.PauseObjectivesPresentation);
+        if (pauseScreens.Count > 0) PauseObjectivesPresentation.Validate(pauseScreens, read("client/manifest.json"), read);
         foreach (var layout in layouts)
-            if (layout.Value == null || layout.Key is not ("commander" or "unit") || layout.Value.Mode is not ("list" or "grid" or "positioned")
+            if (layout.Value == null || layout.Key is not ("commander" or "unit" or "headquarters" or "tasks" or "achievements") || layout.Value.Mode is not ("list" or "grid" or "positioned")
                 || layout.Value.Columns is < 1 or > 16 || layout.Value.Gap is < 0 or > 32 || layout.Value.IconSize is < 12 or > 64
                 || layout.Value.MaxHeight is < 40 or > 400 || layout.Value.Left is < 0 or > 560 || layout.Value.Top is < 0 or > 300
                 || layout.Value.Width is < 40 or > 560 || layout.Value.Height is < 20 or > 300) throw new RuleViolation("extension.layout", layout.Key);
@@ -226,11 +239,11 @@ public sealed partial class ExtensionLoader
             if (data.Length > 256 * 1024) throw new RuleViolation("extension.size", path);
             loaded[path] = data; scripts[path] = Encoding.UTF8.GetString(data);
         }
-        var runtime = new ExtensionScriptRuntime(scripts);
-        foreach (var handler in scenarioHandlers) runtime.ValidateHandler(handler.Script, handler.Function);
-        foreach (var effect in effects.Where(e => e.Script != null)) runtime.ValidateHandler(effect.Script!, effect.Function!);
+        var runtime = scripts.Count == 0 ? null : new ExtensionScriptRuntime(scripts);
+        foreach (var handler in scenarioHandlers) runtime!.ValidateHandler(handler.Script, handler.Function);
+        foreach (var effect in effects.Where(e => e.Script != null)) runtime!.ValidateHandler(effect.Script!, effect.Function!);
         foreach (var condition in victories.Values.SelectMany(v => Conditions(v.Win).Concat(v.Lose == null ? [] : Conditions(v.Lose))).Where(c => c.Type == "script"))
-            runtime.ValidateHandler(condition.Script!, condition.Function!);
+            runtime!.ValidateHandler(condition.Script!, condition.Function!);
         foreach (var icon in skills.Values.Select(s => s.Icon).Concat(statuses.Values.Select(s => s.Icon)).OfType<string>().Distinct())
         {
             var data = read(icon);
@@ -240,7 +253,8 @@ public sealed partial class ExtensionLoader
         return new(new(skills, runtime, statuses), revision, units, commanders, victories, layouts, scenarioEvents)
             { ApiVersion = m.ApiVersion, VictoryPresentations = victoryScreens, LegacySkills = legacySkills, CommanderDialogues = commanderDialogues,
                 ItemBindings = items, DeploymentLimits = deploymentLimits, FormationCounts = formationCounts, CampaignVisibility = campaignVisibility,
-                Metagame = metagame, StageIntroPresentations = introScreens };
+                Metagame = metagame, StageIntroPresentations = introScreens, PauseObjectivesPresentations = pauseScreens, Geography = geography,
+                MapColors = mapColors };
         bool Known(string id) => skills.ContainsKey(id) || id.StartsWith("ew4.skill.", StringComparison.Ordinal)
             && int.TryParse(id[10..], out int value) && value is >= 0 and < 40 || BuiltinTraits.Contains(id);
     }
@@ -320,7 +334,7 @@ public sealed partial class ExtensionLoader
 
     public string PatchCatalog(string json)
     {
-        if (!Enabled) return json;
+        if (!Enabled || Geography.Maps.Length > 0 && Bus.Skills.Count == 0 && UnitBindings.Count == 0 && CommanderBindings.Count == 0) return json;
         var catalog = JsonNode.Parse(json)!.AsObject();
         catalog["overridden_skills"] = JsonSerializer.SerializeToNode(Bus.Skills.Keys.Where(s => s.StartsWith("ew4.skill.", StringComparison.Ordinal)).ToArray());
         foreach (var definition in Bus.Skills.Values)

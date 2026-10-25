@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "description": "Generalized Himalayan crest and historical pass corridors for the existing 42 km hex map; not surveyed elevation or modern border policy.",
+  "ridge": [[75.0,35.0],[76.3,34.6],[77.5,33.4],[78.5,32.1],[79.5,31.4],[80.5,30.7],[81.0,30.3],[82.2,29.9],[83.5,29.2],[84.5,28.7],[85.4,28.3],[86.4,28.0],[87.4,27.9],[88.3,27.8],[88.8,27.6],[89.4,27.9],[90.4,28.1],[91.5,28.0],[92.5,28.1],[93.4,28.7],[94.8,29.5]],
+  "crestHalfWidthKm": 42,
+  "passes": [
+    {"id":"lipulekh","name":"普兰—里普列克","location":[81.03,30.24],"route":[[81.20,30.70],[81.18,30.30],[81.03,30.24],[80.85,29.90],[80.60,29.65]],"basis":"Historic pilgrimage and trans-Himalayan trade route; generalized pack route, not a claim of heavy-equipment access.","reference":"https://en.wikipedia.org/wiki/Lipulekh_Pass"},
+    {"id":"gyirong-kuti","name":"吉隆／聂拉木古道（粗格合并）","location":[85.30,28.35],"route":[[85.25,29.10],[85.30,28.70],[85.30,28.35],[85.30,28.05],[85.30,27.75]],"basis":"Nepal-Tibet historical Gyirong and Kuti trade routes; nearby routes represented as one corridor at this map scale, not two independent wide openings.","reference":"https://en.wikipedia.org/wiki/Gyirong_Town"},
+    {"id":"nathu-jelep","name":"亚东—乃堆拉／则里拉（粗格合并）","location":[88.83,27.39],"route":[[89.10,28.45],[89.00,28.00],[88.95,27.65],[88.83,27.39],[88.65,27.20],[88.50,27.00]],"basis":"Historical Sikkim-Tibet trade route via Chumbi Valley; Nathu and Jelep represented together at coarse scale, independent of present opening status.","reference":"https://en.wikipedia.org/wiki/Nathu_La"}
+  ]
+}

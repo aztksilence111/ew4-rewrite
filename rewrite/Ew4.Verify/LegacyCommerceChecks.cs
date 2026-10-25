@@ -67,7 +67,7 @@ internal static class LegacyCommerceChecks
         }
         string assets = Path.Combine(root, "apk_work/original/assets");
         var catalog = LegacyItemTradingCatalog.Read(File.ReadAllText(Path.Combine(assets, "def_item.xml")));
-        var runtime = LegacyRuntimeCatalog.FromJson(File.ReadAllText(Path.Combine(root, "rewrite/data/legacy/catalog.json")));
+        var runtime = LegacyRuntimeCatalog.FromJson(Ew4.Legacy.LegacyCatalogFiles.ReadCatalogFile(Path.Combine(root, "rewrite/data/legacy/catalog.json")));
         var trade = catalog.Rules();
         Check(catalog.Items.Count == 228 && catalog.Items.All(p => p.Value.Equipment == runtime.Items[p.Key]), "item pricing catalog matches combat equipment");
         int markets = 0, taverns = 0, candidates = 0, offers = 0;

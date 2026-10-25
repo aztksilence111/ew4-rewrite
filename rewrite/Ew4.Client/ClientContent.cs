@@ -29,7 +29,13 @@ public sealed class ClientContent
 
     public ClientContent(Func<string, byte[]> read, IEnumerable<string> battleFiles, bool correctOriginalEquipment = true, bool showHiddenCampaigns = true)
     {
-        this.read = read;
+        var definitionsBundle = LegacyCatalogFiles.Load(read);
+        var originalRead = read;
+        bool correctItems = correctOriginalEquipment && definitionsBundle.ItemsMatchSource(read);
+        if (definitionsBundle.IsSplit)
+            read = path => path.StartsWith("original/", StringComparison.Ordinal) && definitionsBundle.Xml.TryGetValue(path[9..], out string? value)
+                ? System.Text.Encoding.UTF8.GetBytes(value) : originalRead(path);
+        this.read = originalRead;
         string Text(string name)
         {
             using var reader = new StreamReader(new MemoryStream(read("original/" + name)), System.Text.Encoding.UTF8, true);
@@ -37,23 +43,25 @@ public sealed class ClientContent
         }
         Countries = CountryCatalog.Load(read);
         Extensions = ExtensionLoader.Load(read, Countries);
-        var runtime = LegacyRuntimeCatalog.FromJson(Extensions.PatchCatalog(System.Text.Encoding.UTF8.GetString(read("data/catalog.json"))),
-            correctOriginalEquipment, Extensions.LegacySkills, Extensions.ConfigureItem);
-        CorrectOriginalEquipment = correctOriginalEquipment && LegacyEquipmentCorrections.IsOriginal(runtime.SourceHashes["def_item.xml"]);
+        var runtime = LegacyRuntimeCatalog.FromJson(Extensions.PatchCatalog(definitionsBundle.Catalog.ToJsonString()),
+            correctItems, Extensions.LegacySkills, Extensions.ConfigureItem);
+        CorrectOriginalEquipment = correctItems && LegacyEquipmentCorrections.IsOriginal(runtime.SourceHashes["def_item.xml"]);
         Extensions.ConfigureRuntime(runtime);
-        runtime.VerifySources(name => read("original/" + name));
+        runtime.VerifySources(name => originalRead("original/" + name));
         Countries.ValidateRuntime(runtime);
         var buildings = LegacyBuildingCatalog.Read(Text("def_construction.xml"), Text("def_capital.xml"));
-        var combat = LegacyCombatCatalog.Read(System.Text.Encoding.UTF8.GetString(read("data/runtime_rule_tables.json")),
+        var combat = LegacyCombatCatalog.Read(definitionsBundle.RuntimeRules.ToJsonString(),
             Text("def_terraintype.xml"), Text("def_installation.xml"), buildings, Extensions.LegacySkills);
         var accounts = LegacyCommanderAccounts.Read(runtime, combat,
-            System.Text.Encoding.UTF8.GetString(read("data/metagame_rule_tables.json")));
+            definitionsBundle.MetagameRules.ToJsonString());
         Catalogs = new(runtime, LegacyTerrainRules.FromXml(Text("def_mapterrain.xml"), Text("def_terraintype.xml")), buildings,
-            LegacyRecruitmentCatalog.Read(Text("def_card.xml")), combat, accounts, LegacyItemTradingCatalog.Read(Text("def_item.xml"), correctOriginalEquipment, runtime.Items),
+            LegacyRecruitmentCatalog.Read(Text("def_card.xml")), combat, accounts, LegacyItemTradingCatalog.Read(Text("def_item.xml"), correctItems, runtime.Items),
             LegacyWarzoneTechnology.Read(Text("def_warzonetech.xml")), LegacyDialogueCatalog.Read(Text("def_dialogues.xml"), Text("stringtable_cn.ini")));
         var definitions = XDocument.Parse(Text("def_map.xml")).Root!.Elements("map").ToArray();
         Maps = definitions.ToDictionary(e => (int)e.Attribute("id")!, e => LegacyTerrainMap.Read(read("original/" + (string)e.Attribute("file")!)));
         MapNames = definitions.ToDictionary(e => (int)e.Attribute("id")!, e => (string)e.Attribute("name")!);
+        Extensions.Geography.Validate(Maps, MapNames, id => read("original/" +
+            (string)definitions.Single(e => (int)e.Attribute("id")! == id).Attribute("file")!));
         Cities = XDocument.Parse(Text("def_areaname.xml")).Root!.Elements("areaname")
             .ToDictionary(e => (int)e.Attribute("id")!, e => (string)e.Attribute("name")!);
         var strings = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -62,6 +70,14 @@ public sealed class ClientContent
             int separator = line.IndexOf('=');
             if (separator > 0 && !line.TrimStart().StartsWith(';')) strings[line[..separator].Trim()] = line[(separator + 1)..].Trim();
         }
+        if (definitionsBundle.IsSplit)
+            foreach (var skill in definitionsBundle.Catalog["skills"]!.AsArray())
+            {
+                if (skill!["legacy_id"] is not { } legacyId) continue;
+                string suffix = ((int)legacyId + 1).ToString("00");
+                strings["name_skill_" + suffix] = (string)skill["names"]!["zh_CN"]!;
+                strings["desc_skill_" + suffix] = (string)skill["legacy_description"]!;
+            }
         Strings = strings;
         ItemDefinitions = XDocument.Parse(Text("def_item.xml")).Root!.Elements("item").ToArray();
         PrincessDefinitions = XDocument.Parse(Text("def_princess.xml")).Root!.Elements("Princess").ToArray();
@@ -118,10 +134,32 @@ public sealed class ClientContent
             throw new RuleViolation("extension.deployment_limit", "Deployment limits reference an unknown scenario");
         if (Extensions.StageIntroPresentations.Keys.Any(id => id != "*" && !Scenarios.Any(s => s.Id == id)))
             throw new RuleViolation("extension.stage_intro", "Stage intro references an unknown scenario");
+        if (Extensions.PauseObjectivesPresentations.Keys.Any(id => id != "*" && !Scenarios.Any(s => s.Id == id)))
+            throw new RuleViolation("extension.pause_objectives", "Pause objectives references an unknown scenario");
+        if (Extensions.MapColors.Keys.Any(id => id != "*" && !Scenarios.Any(s => s.Id == id)))
+            throw new RuleViolation("extension.map_colors", "Map colors reference an unknown scenario");
         if (Extensions.Metagame.ShopSlots?.Any(s => s.Items?.Any(id => !Catalogs.Items.Rules().Definitions.ContainsKey(id)
                 || s.Pool == "consumable" && !Catalogs.Items.Rules().Definitions[id].Equipment.Consumable
                 || s.Pool == "equipment" && Catalogs.Items.Rules().Definitions[id].Equipment.Consumable) == true) == true)
             throw new RuleViolation("metagame.item", "Shop slot references an unknown item or mismatched pool");
+        foreach (var objective in Extensions.Metagame.Objectives)
+        {
+            if (objective.Reward.Items.Keys.Any(id => !Catalogs.Items.Rules().Definitions.ContainsKey(id))
+                || objective.Reward.Commanders.Any(id => !Catalogs.Accounts.Rules().Definitions.ContainsKey(id)))
+                throw new RuleViolation("objectives.reference", "Unknown reward definition: " + objective.Id);
+            var scenario = objective.Scenario == null ? null : Scenarios.SingleOrDefault(s => s.Id == objective.Scenario);
+            if (objective.Scenario != null && (scenario == null || scenario.Mode is not (1 or 2) || objective.Mode.HasValue && scenario.Mode != objective.Mode)
+                || objective.Country != null && (Countries.Get(objective.Country) == null || Countries.Canonical(objective.Country) != objective.Country))
+                throw new RuleViolation("objectives.reference", "Unknown scenario or country: " + objective.Id);
+            foreach (var condition in objective.Conditions)
+            {
+                if (condition.Type == "commanderOwned" && condition.Id != null && !Catalogs.Accounts.Rules().Definitions.ContainsKey(condition.Id)
+                    || condition.Type == "itemOwned" && condition.Id != null && !Catalogs.Items.Rules().Definitions.ContainsKey(condition.Id)
+                    || condition.Type is "campaignUnlocked" or "campaignStars" && condition.Id != null && !Presentations.ContainsKey(condition.Id)
+                    || condition.Type == "cellControlled" && condition.Cell >= Maps[Battle(objective.Scenario!).MapId].Cells.Count)
+                    throw new RuleViolation("objectives.reference", "Unknown condition reference: " + objective.Id);
+            }
+        }
     }
 
     public string Label(string key) => Strings.TryGetValue(key, out string? label) ? label : Strings.TryGetValue("name_" + key, out label) ? label : key;
@@ -148,7 +186,10 @@ public sealed class ClientContent
             : battle.Factions.FirstOrDefault(f => Countries.Canonical(f.CountryId) == country)?.CountryId ?? country;
         if (battle.Jurisdictions != null && choice.Mode is not (1 or 2))
             throw new RuleViolation("client.jurisdiction_mode", "手工辖区仅支持战役与征服剧本");
-        var started = LegacyScenarioHost.Start(battle, Maps, Catalogs, new LegacyScenarioRequest
+        var baseMap = LegacyMapDefinitions.Import(Maps[battle.MapId], Catalogs.Terrain,
+            "legacy.map." + battle.MapId, "Legacy map " + battle.MapId);
+        baseMap = Extensions.Geography.Apply(MapNames[battle.MapId], baseMap, Catalogs.Terrain.MovementCosts["mountain"]);
+        var started = LegacyScenarioHost.Start(battle, baseMap, Catalogs, new LegacyScenarioRequest
         {
             Id = id, Mode = choice.Mode, SelectedCountry = selectedCountry, LocalPlayers = localPlayers,
             CityNames = scenarioCityNames.TryGetValue(id, out var names) ? names : Cities,

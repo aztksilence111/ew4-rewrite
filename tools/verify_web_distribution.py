@@ -13,7 +13,8 @@ package = ROOT / args.directory
 checks = 0
 for source_root, destination in ((ROOT / "rewrite/Ew4.Web/wwwroot", package / "wwwroot"),
                                  (ROOT / "rewrite/data/client", package / "data/client"),
-                                 (ROOT / "rewrite/data/original", package / "data/original")):
+                                 (ROOT / "rewrite/data/original", package / "data/original"),
+                                 (ROOT / "rewrite/data/rewrite", package / "data/rewrite")):
     for source in source_root.rglob("*"):
         if not source.is_file() or source.name == "README.md":
             continue
@@ -21,8 +22,6 @@ for source_root, destination in ((ROOT / "rewrite/Ew4.Web/wwwroot", package / "w
         assert target.read_bytes() == source.read_bytes(), str(target) + " differs from source"
         checks += 1
 for source in (ROOT / "rewrite/data/legacy").glob("*.json"):
-    if source.name not in ("catalog.json", "runtime_rule_tables.json", "metagame_rule_tables.json"):
-        continue
     assert (package / "data/legacy" / source.name).read_bytes() == source.read_bytes()
     checks += 1
 for entry in json.loads((ROOT / "rewrite/data/runtime-content.json").read_text())["files"]:

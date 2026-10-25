@@ -1,0 +1,1865 @@
+{
+  "schema": 1,
+  "items": [
+    {
+      "name": "War Horse",
+      "id": 0,
+      "function": 0,
+      "value": 0,
+      "target": "all",
+      "price": 815
+    },
+    {
+      "name": "War Horse",
+      "id": 10001,
+      "function": 0,
+      "value": 0,
+      "target": "all",
+      "price": 815
+    },
+    {
+      "name": "War Horse",
+      "id": 10002,
+      "function": 0,
+      "value": 0,
+      "target": "all",
+      "price": 815
+    },
+    {
+      "name": "War Horse",
+      "id": 10003,
+      "function": 0,
+      "value": 0,
+      "target": "all",
+      "price": 815
+    },
+    {
+      "name": "Golden Staff",
+      "id": 1,
+      "function": 1,
+      "value": 200,
+      "target": "all",
+      "price": 635
+    },
+    {
+      "name": "Golden Staff",
+      "id": 10101,
+      "function": 1,
+      "value": 200,
+      "target": "all",
+      "price": 635
+    },
+    {
+      "name": "Golden Staff",
+      "id": 10102,
+      "function": 1,
+      "value": 200,
+      "target": "all",
+      "price": 635
+    },
+    {
+      "name": "Golden Staff",
+      "id": 10103,
+      "function": 1,
+      "value": 200,
+      "target": "all",
+      "price": 635
+    },
+    {
+      "name": "Crown",
+      "id": 2,
+      "function": 1,
+      "value": 400,
+      "target": "all",
+      "price": 925
+    },
+    {
+      "name": "Crown",
+      "id": 10201,
+      "function": 1,
+      "value": 400,
+      "target": "all",
+      "price": 925
+    },
+    {
+      "name": "Crown",
+      "id": 10202,
+      "function": 1,
+      "value": 400,
+      "target": "all",
+      "price": 925
+    },
+    {
+      "name": "Crown",
+      "id": 10203,
+      "function": 1,
+      "value": 400,
+      "target": "all",
+      "price": 925
+    },
+    {
+      "name": "Art Of War",
+      "id": 3,
+      "function": 2,
+      "value": 200,
+      "target": "all",
+      "price": 745
+    },
+    {
+      "name": "Art Of War",
+      "id": 10301,
+      "function": 2,
+      "value": 200,
+      "target": "all",
+      "price": 745
+    },
+    {
+      "name": "Art Of War",
+      "id": 10302,
+      "function": 2,
+      "value": 200,
+      "target": "all",
+      "price": 745
+    },
+    {
+      "name": "Art Of War",
+      "id": 10303,
+      "function": 2,
+      "value": 200,
+      "target": "all",
+      "price": 745
+    },
+    {
+      "name": "On War",
+      "id": 4,
+      "function": 2,
+      "value": 300,
+      "target": "all",
+      "price": 990
+    },
+    {
+      "name": "On War",
+      "id": 10401,
+      "function": 2,
+      "value": 300,
+      "target": "all",
+      "price": 990
+    },
+    {
+      "name": "On War",
+      "id": 10402,
+      "function": 2,
+      "value": 300,
+      "target": "all",
+      "price": 990
+    },
+    {
+      "name": "On War",
+      "id": 10403,
+      "function": 2,
+      "value": 300,
+      "target": "all",
+      "price": 990
+    },
+    {
+      "name": "Encyclopedia",
+      "id": 5,
+      "function": 3,
+      "value": 150,
+      "target": "all",
+      "price": 385
+    },
+    {
+      "name": "Encyclopedia",
+      "id": 10501,
+      "function": 3,
+      "value": 150,
+      "target": "all",
+      "price": 385
+    },
+    {
+      "name": "Encyclopedia",
+      "id": 10502,
+      "function": 3,
+      "value": 150,
+      "target": "all",
+      "price": 385
+    },
+    {
+      "name": "Encyclopedia",
+      "id": 10503,
+      "function": 3,
+      "value": 150,
+      "target": "all",
+      "price": 385
+    },
+    {
+      "name": "Napoleonic Code",
+      "id": 6,
+      "function": 3,
+      "value": 200,
+      "target": "all",
+      "price": 635
+    },
+    {
+      "name": "Napoleonic Code",
+      "id": 10601,
+      "function": 3,
+      "value": 200,
+      "target": "all",
+      "price": 635
+    },
+    {
+      "name": "Napoleonic Code",
+      "id": 10602,
+      "function": 3,
+      "value": 200,
+      "target": "all",
+      "price": 635
+    },
+    {
+      "name": "Napoleonic Code",
+      "id": 10603,
+      "function": 3,
+      "value": 200,
+      "target": "all",
+      "price": 635
+    },
+    {
+      "name": "Snare Drum",
+      "id": 7,
+      "function": 4,
+      "value": 0,
+      "target": "all",
+      "price": 630
+    },
+    {
+      "name": "Snare Drum",
+      "id": 10701,
+      "function": 4,
+      "value": 0,
+      "target": "all",
+      "price": 630
+    },
+    {
+      "name": "Snare Drum",
+      "id": 10702,
+      "function": 4,
+      "value": 0,
+      "target": "all",
+      "price": 630
+    },
+    {
+      "name": "Snare Drum",
+      "id": 10703,
+      "function": 4,
+      "value": 0,
+      "target": "all",
+      "price": 630
+    },
+    {
+      "name": "Tent Tentage",
+      "id": 8,
+      "function": 5,
+      "value": 2,
+      "target": "all",
+      "price": 135
+    },
+    {
+      "name": "Tent Tentage",
+      "id": 10801,
+      "function": 5,
+      "value": 2,
+      "target": "all",
+      "price": 135
+    },
+    {
+      "name": "Tent Tentage",
+      "id": 10802,
+      "function": 5,
+      "value": 2,
+      "target": "all",
+      "price": 135
+    },
+    {
+      "name": "Tent Tentage",
+      "id": 10803,
+      "function": 5,
+      "value": 2,
+      "target": "all",
+      "price": 135
+    },
+    {
+      "name": "Tent Tentage",
+      "id": 10804,
+      "function": 5,
+      "value": 2,
+      "target": "all",
+      "price": 135
+    },
+    {
+      "name": "Army Tentage",
+      "id": 9,
+      "function": 5,
+      "value": 4,
+      "target": "all",
+      "price": 300
+    },
+    {
+      "name": "Army Tentage",
+      "id": 10901,
+      "function": 5,
+      "value": 4,
+      "target": "all",
+      "price": 300
+    },
+    {
+      "name": "Army Tentage",
+      "id": 10902,
+      "function": 5,
+      "value": 4,
+      "target": "all",
+      "price": 300
+    },
+    {
+      "name": "Army Tentage",
+      "id": 10903,
+      "function": 5,
+      "value": 4,
+      "target": "all",
+      "price": 300
+    },
+    {
+      "name": "Army Tentage",
+      "id": 10904,
+      "function": 5,
+      "value": 4,
+      "target": "all",
+      "price": 300
+    },
+    {
+      "name": "Military Camp",
+      "id": 10,
+      "function": 5,
+      "value": 6,
+      "target": "all",
+      "price": 625
+    },
+    {
+      "name": "Military Camp",
+      "id": 11001,
+      "function": 5,
+      "value": 6,
+      "target": "all",
+      "price": 625
+    },
+    {
+      "name": "Military Camp",
+      "id": 11002,
+      "function": 5,
+      "value": 6,
+      "target": "all",
+      "price": 625
+    },
+    {
+      "name": "Military Camp",
+      "id": 11003,
+      "function": 5,
+      "value": 6,
+      "target": "all",
+      "price": 625
+    },
+    {
+      "name": "Military Camp",
+      "id": 11004,
+      "function": 5,
+      "value": 6,
+      "target": "all",
+      "price": 625
+    },
+    {
+      "name": "Wine",
+      "id": 11,
+      "function": 7,
+      "value": 0,
+      "target": "all",
+      "price": 5,
+      "consumable": 1
+    },
+    {
+      "name": "Spirit",
+      "id": 12,
+      "function": 6,
+      "value": 0,
+      "target": "all",
+      "price": 10,
+      "consumable": 1
+    },
+    {
+      "name": "Medikit",
+      "id": 13,
+      "function": 8,
+      "value": 65,
+      "target": "all",
+      "price": 15,
+      "consumable": 1
+    },
+    {
+      "name": "Medikit L",
+      "id": 14,
+      "function": 8,
+      "value": 130,
+      "target": "all",
+      "price": 30,
+      "consumable": 1
+    },
+    {
+      "name": "First Aid Box",
+      "id": 15,
+      "function": 8,
+      "value": 200,
+      "target": "all",
+      "price": 45,
+      "consumable": 1
+    },
+    {
+      "name": "Tall Boots",
+      "id": 16,
+      "function": 9,
+      "value": 2,
+      "target": "infantry",
+      "price": 370
+    },
+    {
+      "name": "Tall Boots",
+      "id": 11601,
+      "function": 9,
+      "value": 2,
+      "target": "infantry",
+      "price": 370
+    },
+    {
+      "name": "Tall Boots",
+      "id": 11602,
+      "function": 9,
+      "value": 2,
+      "target": "infantry",
+      "price": 370
+    },
+    {
+      "name": "Tall Boots",
+      "id": 11603,
+      "function": 9,
+      "value": 2,
+      "target": "infantry",
+      "price": 370
+    },
+    {
+      "name": "Tall Boots",
+      "id": 11604,
+      "function": 9,
+      "value": 2,
+      "target": "infantry",
+      "price": 370
+    },
+    {
+      "name": "Gaiters",
+      "id": 17,
+      "function": 9,
+      "value": 1,
+      "target": "infantry",
+      "price": 230
+    },
+    {
+      "name": "Gaiters",
+      "id": 11701,
+      "function": 9,
+      "value": 1,
+      "target": "infantry",
+      "price": 230
+    },
+    {
+      "name": "Gaiters",
+      "id": 11702,
+      "function": 9,
+      "value": 1,
+      "target": "infantry",
+      "price": 230
+    },
+    {
+      "name": "Gaiters",
+      "id": 11703,
+      "function": 9,
+      "value": 1,
+      "target": "infantry",
+      "price": 230
+    },
+    {
+      "name": "Gaiters",
+      "id": 11704,
+      "function": 9,
+      "value": 1,
+      "target": "infantry",
+      "price": 230
+    },
+    {
+      "name": "Combat Uniform",
+      "id": 18,
+      "function": 10,
+      "value": 4,
+      "target": "infantry",
+      "price": 400
+    },
+    {
+      "name": "Combat Uniform",
+      "id": 11801,
+      "function": 10,
+      "value": 4,
+      "target": "infantry",
+      "price": 400
+    },
+    {
+      "name": "Combat Uniform",
+      "id": 11802,
+      "function": 10,
+      "value": 4,
+      "target": "infantry",
+      "price": 400
+    },
+    {
+      "name": "Combat Uniform",
+      "id": 11803,
+      "function": 10,
+      "value": 4,
+      "target": "infantry",
+      "price": 400
+    },
+    {
+      "name": "Combat Uniform",
+      "id": 11804,
+      "function": 10,
+      "value": 4,
+      "target": "infantry",
+      "price": 400
+    },
+    {
+      "name": "Bearskin Cap",
+      "id": 19,
+      "function": 10,
+      "value": 2,
+      "target": "infantry",
+      "price": 205
+    },
+    {
+      "name": "Bearskin Cap",
+      "id": 11901,
+      "function": 10,
+      "value": 2,
+      "target": "infantry",
+      "price": 205
+    },
+    {
+      "name": "Bearskin Cap",
+      "id": 11902,
+      "function": 10,
+      "value": 2,
+      "target": "infantry",
+      "price": 205
+    },
+    {
+      "name": "Bearskin Cap",
+      "id": 11903,
+      "function": 10,
+      "value": 2,
+      "target": "infantry",
+      "price": 205
+    },
+    {
+      "name": "Ferguson Rifle",
+      "id": 20,
+      "function": 11,
+      "value": 6,
+      "target": "infantry",
+      "price": 565
+    },
+    {
+      "name": "Ferguson Rifle",
+      "id": 12001,
+      "function": 11,
+      "value": 6,
+      "target": "infantry",
+      "price": 565
+    },
+    {
+      "name": "Ferguson Rifle",
+      "id": 12002,
+      "function": 11,
+      "value": 6,
+      "target": "infantry",
+      "price": 565
+    },
+    {
+      "name": "Ferguson Rifle",
+      "id": 12003,
+      "function": 11,
+      "value": 6,
+      "target": "infantry",
+      "price": 565
+    },
+    {
+      "name": "Baker Rifle",
+      "id": 21,
+      "function": 11,
+      "value": 4,
+      "target": "infantry",
+      "price": 370
+    },
+    {
+      "name": "Baker Rifle",
+      "id": 12101,
+      "function": 11,
+      "value": 4,
+      "target": "infantry",
+      "price": 370
+    },
+    {
+      "name": "Baker Rifle",
+      "id": 12102,
+      "function": 11,
+      "value": 4,
+      "target": "infantry",
+      "price": 370
+    },
+    {
+      "name": "Baker Rifle",
+      "id": 12103,
+      "function": 11,
+      "value": 4,
+      "target": "infantry",
+      "price": 370
+    },
+    {
+      "name": "Baker Rifle",
+      "id": 12104,
+      "function": 11,
+      "value": 4,
+      "target": "infantry",
+      "price": 370
+    },
+    {
+      "name": "Brown Bess",
+      "id": 22,
+      "function": 11,
+      "value": 2,
+      "target": "infantry",
+      "price": 160
+    },
+    {
+      "name": "Brown Bess",
+      "id": 12201,
+      "function": 11,
+      "value": 2,
+      "target": "infantry",
+      "price": 160
+    },
+    {
+      "name": "Brown Bess",
+      "id": 12202,
+      "function": 11,
+      "value": 2,
+      "target": "infantry",
+      "price": 160
+    },
+    {
+      "name": "Brown Bess",
+      "id": 12203,
+      "function": 11,
+      "value": 2,
+      "target": "infantry",
+      "price": 160
+    },
+    {
+      "name": "Brown Bess",
+      "id": 12204,
+      "function": 11,
+      "value": 2,
+      "target": "infantry",
+      "price": 160
+    },
+    {
+      "name": "Bayonet",
+      "id": 23,
+      "function": 11,
+      "value": 1,
+      "target": "infantry",
+      "price": 70
+    },
+    {
+      "name": "Bayonet",
+      "id": 12301,
+      "function": 11,
+      "value": 1,
+      "target": "infantry",
+      "price": 70
+    },
+    {
+      "name": "Bayonet",
+      "id": 12302,
+      "function": 11,
+      "value": 1,
+      "target": "infantry",
+      "price": 70
+    },
+    {
+      "name": "Bayonet",
+      "id": 12303,
+      "function": 11,
+      "value": 1,
+      "target": "infantry",
+      "price": 70
+    },
+    {
+      "name": "Quality Saddle",
+      "id": 24,
+      "function": 9,
+      "value": 2,
+      "target": "cavalry",
+      "price": 505
+    },
+    {
+      "name": "Quality Saddle",
+      "id": 12401,
+      "function": 9,
+      "value": 2,
+      "target": "cavalry",
+      "price": 505
+    },
+    {
+      "name": "Quality Saddle",
+      "id": 12402,
+      "function": 9,
+      "value": 2,
+      "target": "cavalry",
+      "price": 505
+    },
+    {
+      "name": "Quality Saddle",
+      "id": 12403,
+      "function": 9,
+      "value": 2,
+      "target": "cavalry",
+      "price": 505
+    },
+    {
+      "name": "Quality Saddle",
+      "id": 12404,
+      "function": 9,
+      "value": 2,
+      "target": "cavalry",
+      "price": 505
+    },
+    {
+      "name": "Brass Horseshoe",
+      "id": 25,
+      "function": 9,
+      "value": 1,
+      "target": "cavalry",
+      "price": 335
+    },
+    {
+      "name": "Brass Horseshoe",
+      "id": 12501,
+      "function": 9,
+      "value": 1,
+      "target": "cavalry",
+      "price": 335
+    },
+    {
+      "name": "Brass Horseshoe",
+      "id": 12502,
+      "function": 9,
+      "value": 1,
+      "target": "cavalry",
+      "price": 335
+    },
+    {
+      "name": "Brass Horseshoe",
+      "id": 12503,
+      "function": 9,
+      "value": 1,
+      "target": "cavalry",
+      "price": 335
+    },
+    {
+      "name": "Brass Horseshoe",
+      "id": 12504,
+      "function": 9,
+      "value": 1,
+      "target": "cavalry",
+      "price": 335
+    },
+    {
+      "name": "Gilding Cuirass",
+      "id": 26,
+      "function": 10,
+      "value": 4,
+      "target": "cavalry",
+      "price": 465
+    },
+    {
+      "name": "Gilding Cuirass",
+      "id": 12601,
+      "function": 10,
+      "value": 4,
+      "target": "cavalry",
+      "price": 465
+    },
+    {
+      "name": "Gilding Cuirass",
+      "id": 12602,
+      "function": 10,
+      "value": 4,
+      "target": "cavalry",
+      "price": 465
+    },
+    {
+      "name": "Gilding Cuirass",
+      "id": 12603,
+      "function": 10,
+      "value": 4,
+      "target": "cavalry",
+      "price": 465
+    },
+    {
+      "name": "Gilding Cuirass",
+      "id": 12604,
+      "function": 10,
+      "value": 4,
+      "target": "cavalry",
+      "price": 465
+    },
+    {
+      "name": "Cuirass",
+      "id": 27,
+      "function": 10,
+      "value": 2,
+      "target": "cavalry",
+      "price": 225
+    },
+    {
+      "name": "Cuirass",
+      "id": 12701,
+      "function": 10,
+      "value": 2,
+      "target": "cavalry",
+      "price": 225
+    },
+    {
+      "name": "Cuirass",
+      "id": 12702,
+      "function": 10,
+      "value": 2,
+      "target": "cavalry",
+      "price": 225
+    },
+    {
+      "name": "Cuirass",
+      "id": 12703,
+      "function": 10,
+      "value": 2,
+      "target": "cavalry",
+      "price": 225
+    },
+    {
+      "name": "Cuirass",
+      "id": 12704,
+      "function": 10,
+      "value": 2,
+      "target": "cavalry",
+      "price": 225
+    },
+    {
+      "name": "Cavalry Pistol",
+      "id": 28,
+      "function": 11,
+      "value": 6,
+      "target": "cavalry",
+      "price": 670
+    },
+    {
+      "name": "Cavalry Pistol",
+      "id": 12801,
+      "function": 11,
+      "value": 6,
+      "target": "cavalry",
+      "price": 670
+    },
+    {
+      "name": "Cavalry Pistol",
+      "id": 12802,
+      "function": 11,
+      "value": 6,
+      "target": "cavalry",
+      "price": 670
+    },
+    {
+      "name": "Cavalry Pistol",
+      "id": 12803,
+      "function": 11,
+      "value": 6,
+      "target": "cavalry",
+      "price": 670
+    },
+    {
+      "name": "Cavalry Sword",
+      "id": 29,
+      "function": 11,
+      "value": 4,
+      "target": "cavalry",
+      "price": 455
+    },
+    {
+      "name": "Cavalry Sword",
+      "id": 12901,
+      "function": 11,
+      "value": 4,
+      "target": "cavalry",
+      "price": 455
+    },
+    {
+      "name": "Cavalry Sword",
+      "id": 12902,
+      "function": 11,
+      "value": 4,
+      "target": "cavalry",
+      "price": 455
+    },
+    {
+      "name": "Cavalry Sword",
+      "id": 12903,
+      "function": 11,
+      "value": 4,
+      "target": "cavalry",
+      "price": 455
+    },
+    {
+      "name": "Cavalry Sword",
+      "id": 12904,
+      "function": 11,
+      "value": 4,
+      "target": "cavalry",
+      "price": 455
+    },
+    {
+      "name": "Blucher Sabre",
+      "id": 30,
+      "function": 11,
+      "value": 2,
+      "target": "cavalry",
+      "price": 180
+    },
+    {
+      "name": "Blucher Sabre",
+      "id": 13001,
+      "function": 11,
+      "value": 2,
+      "target": "cavalry",
+      "price": 180
+    },
+    {
+      "name": "Blucher Sabre",
+      "id": 13002,
+      "function": 11,
+      "value": 2,
+      "target": "cavalry",
+      "price": 180
+    },
+    {
+      "name": "Blucher Sabre",
+      "id": 13003,
+      "function": 11,
+      "value": 2,
+      "target": "cavalry",
+      "price": 180
+    },
+    {
+      "name": "Trooper Sabre",
+      "id": 31,
+      "function": 11,
+      "value": 1,
+      "target": "cavalry",
+      "price": 80
+    },
+    {
+      "name": "Trooper Sabre",
+      "id": 13101,
+      "function": 11,
+      "value": 1,
+      "target": "cavalry",
+      "price": 80
+    },
+    {
+      "name": "Trooper Sabre",
+      "id": 13102,
+      "function": 11,
+      "value": 1,
+      "target": "cavalry",
+      "price": 80
+    },
+    {
+      "name": "Trooper Sabre",
+      "id": 13103,
+      "function": 11,
+      "value": 1,
+      "target": "cavalry",
+      "price": 80
+    },
+    {
+      "name": "Horse Artillery",
+      "id": 32,
+      "function": 9,
+      "value": 2,
+      "target": "artillery",
+      "price": 705
+    },
+    {
+      "name": "Horse Artillery",
+      "id": 13201,
+      "function": 9,
+      "value": 2,
+      "target": "artillery",
+      "price": 705
+    },
+    {
+      "name": "Horse Artillery",
+      "id": 13202,
+      "function": 9,
+      "value": 2,
+      "target": "artillery",
+      "price": 705
+    },
+    {
+      "name": "Horse Artillery",
+      "id": 13203,
+      "function": 9,
+      "value": 2,
+      "target": "artillery",
+      "price": 705
+    },
+    {
+      "name": "Horse Artillery",
+      "id": 13204,
+      "function": 9,
+      "value": 2,
+      "target": "artillery",
+      "price": 705
+    },
+    {
+      "name": "Oak Wheel",
+      "id": 33,
+      "function": 9,
+      "value": 1,
+      "target": "artillery",
+      "price": 230
+    },
+    {
+      "name": "Oak Wheel",
+      "id": 13301,
+      "function": 9,
+      "value": 1,
+      "target": "artillery",
+      "price": 230
+    },
+    {
+      "name": "Oak Wheel",
+      "id": 13302,
+      "function": 9,
+      "value": 1,
+      "target": "artillery",
+      "price": 230
+    },
+    {
+      "name": "Oak Wheel",
+      "id": 13303,
+      "function": 9,
+      "value": 1,
+      "target": "artillery",
+      "price": 230
+    },
+    {
+      "name": "Helmet",
+      "id": 34,
+      "function": 10,
+      "value": 4,
+      "target": "artillery",
+      "price": 445
+    },
+    {
+      "name": "Helmet",
+      "id": 13401,
+      "function": 10,
+      "value": 4,
+      "target": "artillery",
+      "price": 445
+    },
+    {
+      "name": "Helmet",
+      "id": 13402,
+      "function": 10,
+      "value": 4,
+      "target": "artillery",
+      "price": 445
+    },
+    {
+      "name": "Helmet",
+      "id": 13403,
+      "function": 10,
+      "value": 4,
+      "target": "artillery",
+      "price": 445
+    },
+    {
+      "name": "Helmet",
+      "id": 13404,
+      "function": 10,
+      "value": 4,
+      "target": "artillery",
+      "price": 445
+    },
+    {
+      "name": "Canvas Coat",
+      "id": 35,
+      "function": 10,
+      "value": 2,
+      "target": "artillery",
+      "price": 190
+    },
+    {
+      "name": "Canvas Coat",
+      "id": 13501,
+      "function": 10,
+      "value": 2,
+      "target": "artillery",
+      "price": 190
+    },
+    {
+      "name": "Canvas Coat",
+      "id": 13502,
+      "function": 10,
+      "value": 2,
+      "target": "artillery",
+      "price": 190
+    },
+    {
+      "name": "Canvas Coat",
+      "id": 13503,
+      "function": 10,
+      "value": 2,
+      "target": "artillery",
+      "price": 190
+    },
+    {
+      "name": "Potent Gunpowder",
+      "id": 36,
+      "function": 11,
+      "value": 6,
+      "target": "artillery",
+      "price": 695
+    },
+    {
+      "name": "Potent Gunpowder",
+      "id": 13601,
+      "function": 11,
+      "value": 6,
+      "target": "artillery",
+      "price": 695
+    },
+    {
+      "name": "Potent Gunpowder",
+      "id": 13602,
+      "function": 11,
+      "value": 6,
+      "target": "artillery",
+      "price": 695
+    },
+    {
+      "name": "Potent Gunpowder",
+      "id": 13603,
+      "function": 11,
+      "value": 6,
+      "target": "artillery",
+      "price": 695
+    },
+    {
+      "name": "Powder Mixture",
+      "id": 37,
+      "function": 11,
+      "value": 4,
+      "target": "artillery",
+      "price": 455
+    },
+    {
+      "name": "Powder Mixture",
+      "id": 13701,
+      "function": 11,
+      "value": 4,
+      "target": "artillery",
+      "price": 455
+    },
+    {
+      "name": "Powder Mixture",
+      "id": 13702,
+      "function": 11,
+      "value": 4,
+      "target": "artillery",
+      "price": 455
+    },
+    {
+      "name": "Powder Mixture",
+      "id": 13703,
+      "function": 11,
+      "value": 4,
+      "target": "artillery",
+      "price": 455
+    },
+    {
+      "name": "Powder Mixture",
+      "id": 13704,
+      "function": 11,
+      "value": 4,
+      "target": "artillery",
+      "price": 455
+    },
+    {
+      "name": "Pressed Powder",
+      "id": 38,
+      "function": 11,
+      "value": 2,
+      "target": "artillery",
+      "price": 190
+    },
+    {
+      "name": "Pressed Powder",
+      "id": 13801,
+      "function": 11,
+      "value": 2,
+      "target": "artillery",
+      "price": 190
+    },
+    {
+      "name": "Pressed Powder",
+      "id": 13802,
+      "function": 11,
+      "value": 2,
+      "target": "artillery",
+      "price": 190
+    },
+    {
+      "name": "Pressed Powder",
+      "id": 13803,
+      "function": 11,
+      "value": 2,
+      "target": "artillery",
+      "price": 190
+    },
+    {
+      "name": "Pressed Powder",
+      "id": 13804,
+      "function": 11,
+      "value": 2,
+      "target": "artillery",
+      "price": 190
+    },
+    {
+      "name": "Brown Gunpowder",
+      "id": 39,
+      "function": 11,
+      "value": 1,
+      "target": "artillery",
+      "price": 80
+    },
+    {
+      "name": "Brown Gunpowder",
+      "id": 13901,
+      "function": 11,
+      "value": 1,
+      "target": "artillery",
+      "price": 80
+    },
+    {
+      "name": "Brown Gunpowder",
+      "id": 13902,
+      "function": 11,
+      "value": 1,
+      "target": "artillery",
+      "price": 80
+    },
+    {
+      "name": "Brown Gunpowder",
+      "id": 13903,
+      "function": 11,
+      "value": 1,
+      "target": "artillery",
+      "price": 80
+    },
+    {
+      "name": "Armored Carrier",
+      "id": 40,
+      "function": 12,
+      "value": 0,
+      "target": "all",
+      "price": 305
+    },
+    {
+      "name": "Armored Carrier",
+      "id": 14001,
+      "function": 12,
+      "value": 0,
+      "target": "all",
+      "price": 305
+    },
+    {
+      "name": "Armored Carrier",
+      "id": 14002,
+      "function": 12,
+      "value": 0,
+      "target": "all",
+      "price": 305
+    },
+    {
+      "name": "Armored Carrier",
+      "id": 14003,
+      "function": 12,
+      "value": 0,
+      "target": "all",
+      "price": 305
+    },
+    {
+      "name": "Armored Carrier",
+      "id": 14004,
+      "function": 12,
+      "value": 0,
+      "target": "all",
+      "price": 305
+    },
+    {
+      "name": "Figurehead",
+      "id": 41,
+      "function": 10,
+      "value": 2,
+      "target": "navy",
+      "price": 220
+    },
+    {
+      "name": "Figurehead",
+      "id": 14101,
+      "function": 10,
+      "value": 2,
+      "target": "navy",
+      "price": 220
+    },
+    {
+      "name": "Figurehead",
+      "id": 14102,
+      "function": 10,
+      "value": 2,
+      "target": "navy",
+      "price": 220
+    },
+    {
+      "name": "Figurehead",
+      "id": 14103,
+      "function": 10,
+      "value": 2,
+      "target": "navy",
+      "price": 220
+    },
+    {
+      "name": "Figurehead",
+      "id": 14104,
+      "function": 10,
+      "value": 2,
+      "target": "navy",
+      "price": 220
+    },
+    {
+      "name": "Propeller",
+      "id": 42,
+      "function": 9,
+      "value": 1,
+      "target": "navy",
+      "price": 250
+    },
+    {
+      "name": "Propeller",
+      "id": 14201,
+      "function": 9,
+      "value": 1,
+      "target": "navy",
+      "price": 250
+    },
+    {
+      "name": "Propeller",
+      "id": 14202,
+      "function": 9,
+      "value": 1,
+      "target": "navy",
+      "price": 250
+    },
+    {
+      "name": "Propeller",
+      "id": 14203,
+      "function": 9,
+      "value": 1,
+      "target": "navy",
+      "price": 250
+    },
+    {
+      "name": "Propeller",
+      "id": 14204,
+      "function": 9,
+      "value": 1,
+      "target": "navy",
+      "price": 250
+    },
+    {
+      "name": "Bow Chaser",
+      "id": 43,
+      "function": 11,
+      "value": 4,
+      "target": "navy",
+      "price": 335
+    },
+    {
+      "name": "Bow Chaser",
+      "id": 14301,
+      "function": 11,
+      "value": 4,
+      "target": "navy",
+      "price": 335
+    },
+    {
+      "name": "Bow Chaser",
+      "id": 14302,
+      "function": 11,
+      "value": 4,
+      "target": "navy",
+      "price": 335
+    },
+    {
+      "name": "Bow Chaser",
+      "id": 14303,
+      "function": 11,
+      "value": 4,
+      "target": "navy",
+      "price": 335
+    },
+    {
+      "name": "Bow Chaser",
+      "id": 14304,
+      "function": 11,
+      "value": 4,
+      "target": "navy",
+      "price": 335
+    },
+    {
+      "name": "Ram Stem",
+      "id": 44,
+      "function": 11,
+      "value": 2,
+      "target": "navy",
+      "price": 150
+    },
+    {
+      "name": "Ram Stem",
+      "id": 14401,
+      "function": 11,
+      "value": 2,
+      "target": "navy",
+      "price": 150
+    },
+    {
+      "name": "Ram Stem",
+      "id": 14402,
+      "function": 11,
+      "value": 2,
+      "target": "navy",
+      "price": 150
+    },
+    {
+      "name": "Ram Stem",
+      "id": 14403,
+      "function": 11,
+      "value": 2,
+      "target": "navy",
+      "price": 150
+    },
+    {
+      "name": "Ram Stem",
+      "id": 14404,
+      "function": 11,
+      "value": 2,
+      "target": "navy",
+      "price": 150
+    },
+    {
+      "name": "Concrete",
+      "id": 45,
+      "function": 10,
+      "value": 2,
+      "target": "fort",
+      "price": 125
+    },
+    {
+      "name": "Concrete",
+      "id": 14501,
+      "function": 10,
+      "value": 2,
+      "target": "fort",
+      "price": 125
+    },
+    {
+      "name": "Concrete",
+      "id": 14502,
+      "function": 10,
+      "value": 2,
+      "target": "fort",
+      "price": 125
+    },
+    {
+      "name": "Concrete",
+      "id": 14503,
+      "function": 10,
+      "value": 2,
+      "target": "fort",
+      "price": 125
+    },
+    {
+      "name": "Concrete",
+      "id": 14504,
+      "function": 10,
+      "value": 2,
+      "target": "fort",
+      "price": 125
+    },
+    {
+      "name": "Eagle Flag",
+      "id": 46,
+      "function": 13,
+      "value": 2,
+      "target": "all",
+      "price": 910,
+      "flag": 1
+    },
+    {
+      "name": "Eagle Flag",
+      "id": 14601,
+      "function": 13,
+      "value": 2,
+      "target": "all",
+      "price": 910,
+      "flag": 1
+    },
+    {
+      "name": "Eagle Flag",
+      "id": 14602,
+      "function": 13,
+      "value": 2,
+      "target": "all",
+      "price": 910,
+      "flag": 1
+    },
+    {
+      "name": "Eagle Flag",
+      "id": 14603,
+      "function": 13,
+      "value": 2,
+      "target": "all",
+      "price": 910,
+      "flag": 1
+    },
+    {
+      "name": "Eagle Flag",
+      "id": 14604,
+      "function": 13,
+      "value": 2,
+      "target": "all",
+      "price": 910,
+      "flag": 1
+    },
+    {
+      "name": "Bear Flag",
+      "id": 47,
+      "function": 13,
+      "value": 1,
+      "target": "all",
+      "price": 335,
+      "flag": 1
+    },
+    {
+      "name": "Bear Flag",
+      "id": 14701,
+      "function": 13,
+      "value": 1,
+      "target": "all",
+      "price": 335,
+      "flag": 1
+    },
+    {
+      "name": "Bear Flag",
+      "id": 14702,
+      "function": 13,
+      "value": 1,
+      "target": "all",
+      "price": 335,
+      "flag": 1
+    },
+    {
+      "name": "Bear Flag",
+      "id": 14703,
+      "function": 13,
+      "value": 1,
+      "target": "all",
+      "price": 335,
+      "flag": 1
+    },
+    {
+      "name": "Bear Flag",
+      "id": 14704,
+      "function": 13,
+      "value": 1,
+      "target": "all",
+      "price": 335,
+      "flag": 1
+    },
+    {
+      "name": "Dragon Flag",
+      "id": 48,
+      "function": 14,
+      "value": 2,
+      "target": "all",
+      "price": 745,
+      "flag": 1
+    },
+    {
+      "name": "Dragon Flag",
+      "id": 14801,
+      "function": 14,
+      "value": 2,
+      "target": "all",
+      "price": 745,
+      "flag": 1
+    },
+    {
+      "name": "Dragon Flag",
+      "id": 14802,
+      "function": 14,
+      "value": 2,
+      "target": "all",
+      "price": 745,
+      "flag": 1
+    },
+    {
+      "name": "Dragon Flag",
+      "id": 14803,
+      "function": 14,
+      "value": 2,
+      "target": "all",
+      "price": 745,
+      "flag": 1
+    },
+    {
+      "name": "Dragon Flag",
+      "id": 14804,
+      "function": 14,
+      "value": 2,
+      "target": "all",
+      "price": 745,
+      "flag": 1
+    },
+    {
+      "name": "Lions Flag",
+      "id": 49,
+      "function": 15,
+      "value": 2,
+      "target": "all",
+      "price": 790,
+      "flag": 1
+    },
+    {
+      "name": "Lions Flag",
+      "id": 14901,
+      "function": 15,
+      "value": 2,
+      "target": "all",
+      "price": 790,
+      "flag": 1
+    },
+    {
+      "name": "Lions Flag",
+      "id": 14902,
+      "function": 15,
+      "value": 2,
+      "target": "all",
+      "price": 790,
+      "flag": 1
+    },
+    {
+      "name": "Lions Flag",
+      "id": 14903,
+      "function": 15,
+      "value": 2,
+      "target": "all",
+      "price": 790,
+      "flag": 1
+    },
+    {
+      "name": "Lions Flag",
+      "id": 14904,
+      "function": 15,
+      "value": 2,
+      "target": "all",
+      "price": 790,
+      "flag": 1
+    },
+    {
+      "name": "Tiger Flag",
+      "id": 50,
+      "function": 15,
+      "value": 1,
+      "target": "all",
+      "price": 465,
+      "flag": 1
+    },
+    {
+      "name": "Tiger Flag",
+      "id": 15001,
+      "function": 15,
+      "value": 1,
+      "target": "all",
+      "price": 465,
+      "flag": 1
+    },
+    {
+      "name": "Tiger Flag",
+      "id": 15002,
+      "function": 15,
+      "value": 1,
+      "target": "all",
+      "price": 465,
+      "flag": 1
+    },
+    {
+      "name": "Tiger Flag",
+      "id": 15003,
+      "function": 15,
+      "value": 1,
+      "target": "all",
+      "price": 465,
+      "flag": 1
+    },
+    {
+      "name": "Tiger Flag",
+      "id": 15004,
+      "function": 15,
+      "value": 1,
+      "target": "all",
+      "price": 465,
+      "flag": 1
+    },
+    {
+      "name": "Wolf Flag",
+      "id": 51,
+      "function": 14,
+      "value": 1,
+      "target": "all",
+      "price": 500,
+      "flag": 1
+    },
+    {
+      "name": "Wolf Flag",
+      "id": 15101,
+      "function": 14,
+      "value": 1,
+      "target": "all",
+      "price": 500,
+      "flag": 1
+    },
+    {
+      "name": "Wolf Flag",
+      "id": 15102,
+      "function": 14,
+      "value": 1,
+      "target": "all",
+      "price": 500,
+      "flag": 1
+    },
+    {
+      "name": "Wolf Flag",
+      "id": 15103,
+      "function": 14,
+      "value": 1,
+      "target": "all",
+      "price": 500,
+      "flag": 1
+    },
+    {
+      "name": "Wolf Flag",
+      "id": 15104,
+      "function": 14,
+      "value": 1,
+      "target": "all",
+      "price": 500,
+      "flag": 1
+    },
+    {
+      "name": "Pumper",
+      "id": 52,
+      "function": 16,
+      "value": 0,
+      "target": "all",
+      "price": 505
+    },
+    {
+      "name": "Pumper",
+      "id": 15201,
+      "function": 16,
+      "value": 0,
+      "target": "all",
+      "price": 505
+    },
+    {
+      "name": "Pumper",
+      "id": 15202,
+      "function": 16,
+      "value": 0,
+      "target": "all",
+      "price": 505
+    },
+    {
+      "name": "Pumper",
+      "id": 15203,
+      "function": 16,
+      "value": 0,
+      "target": "all",
+      "price": 505
+    },
+    {
+      "name": "Pumper",
+      "id": 15204,
+      "function": 16,
+      "value": 0,
+      "target": "all",
+      "price": 505
+    },
+    {
+      "name": "Star",
+      "id": 53,
+      "function": 17,
+      "value": 0,
+      "target": "all",
+      "price": 5,
+      "consumable": 1
+    }
+  ]
+}

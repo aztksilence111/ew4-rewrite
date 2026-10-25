@@ -40,7 +40,10 @@ public static class WorldEvents
             || new[] { context.PreviousOwner, context.NewOwner }.Any(id => id != null && !state.Factions.Any(f => f.Id == id)))
             throw new RuleViolation("event.trigger", "Invalid event trigger");
         if (state.PendingDialogue != null && !queueDialogues) throw new RuleViolation("event.dialogue_pending", "Acknowledge dialogue before continuing");
-        var next = state.Copy();
+        // A controlled candidate can borrow its inputs until an event actually
+        // writes. Public actions still return independently owned snapshots.
+        bool deferredCopy = queueDialogues && PlanningScope.IsMovementProjection(state);
+        var next = deferredCopy ? state : state.Copy();
         var fired = new HashSet<string>(state.TriggeredEvents, StringComparer.Ordinal);
         var notices = new List<WorldNotice>();
         bool differentCamps = context.PreviousOwner != null && context.NewOwner != null
@@ -53,6 +56,7 @@ public static class WorldEvents
                 && (context.Trigger == TriggerKind.Round ? r.Round == state.Round
                     : context.Trigger == TriggerKind.UnitDestroyed ? r.UnitId == context.UnitId : r.TriggerCell == context.Cell));
             if (rule == null) continue;
+            if (deferredCopy) { next = state.Copy(); deferredCopy = false; }
             string? faction = rule.Target == EventFactionTarget.PreviousOwner ? context.PreviousOwner
                 : rule.Target == EventFactionTarget.NewOwner ? context.NewOwner : rule.FactionId;
             if (rule.Effect == EventEffectKind.SetMorale && faction != null)
@@ -74,7 +78,10 @@ public static class WorldEvents
                 if (!queueDialogues) break;
             }
         }
-        next = next with { TriggeredEvents = state.Events.Where(e => fired.Contains(e.Id)).Select(e => e.Id).ToArray(),
+        var triggered = state.Events.Where(e => fired.Contains(e.Id)).Select(e => e.Id).ToArray();
+        if (deferredCopy && triggered.SequenceEqual(state.TriggeredEvents)) return new(state, notices);
+        if (deferredCopy) next = state.Copy();
+        next = next with { TriggeredEvents = triggered,
             Revision = notices.Count == 0 ? state.Revision : checked(state.Revision + 1) };
         next.Validate();
         return new WorldChange(next, notices);

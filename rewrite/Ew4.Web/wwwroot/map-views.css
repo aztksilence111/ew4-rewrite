@@ -1,0 +1,19 @@
+#map-view-controls{position:absolute;right:calc(var(--corner-inset) + 20px * var(--battle-scale) + 6px);top:var(--corner-inset);width:20px;height:20px;transform:scale(var(--battle-scale));transform-origin:right top;z-index:3}
+#play .map-mode-button{position:relative;display:block;width:20px;height:20px;min-width:0;min-height:0;aspect-ratio:1;border:0;padding:0;background:none;cursor:pointer;touch-action:manipulation}
+.map-mode-button img{display:block;width:100%;height:100%;pointer-events:none}
+.map-mode-button:active img{filter:brightness(.8)}.map-mode-button:focus-visible{outline:1px solid #ddd;outline-offset:1px}
+#map-mode{z-index:2}.map-mode-arrow{position:absolute;left:39%;bottom:6%;width:22%;height:12%;background:#d3d3d3;clip-path:polygon(0 0,100% 0,50% 100%);pointer-events:none;transition:transform 240ms cubic-bezier(.2,.7,.25,1)}
+#map-mode[aria-expanded=true] .map-mode-arrow{transform:rotate(180deg)}
+#map-mode-options{position:absolute;top:22px;left:0;width:20px;display:grid;gap:2px;z-index:1;pointer-events:none}
+#map-mode-options[hidden]{display:none}
+#map-mode-options .map-mode-button{opacity:0;transform:translateY(-22px);transition:transform 240ms cubic-bezier(.2,.7,.25,1),opacity 140ms linear 70ms}
+#map-mode-options .map-mode-button:nth-child(2){transform:translateY(-44px)}
+#map-view-controls.open #map-mode-options{pointer-events:auto}
+#map-view-controls.open #map-mode-options .map-mode-button{opacity:1;transform:translateY(0);transition:transform 240ms cubic-bezier(.2,.7,.25,1),opacity 160ms linear}
+#map-view-controls.open #map-mode-options .map-mode-button:nth-child(2){transition-delay:35ms}
+#map-view-controls:not(.open) #map-mode-options .map-mode-button:first-child{transition-delay:35ms,70ms}
+.map-mode-tip{position:absolute;right:calc(100% + 3px);top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;width:44px;height:20px;padding:0 4px;background:#343434;border:1px solid #888;color:#f3f3f3;font:8px/12px var(--ew4-font-family);text-align:center;white-space:nowrap;pointer-events:none;visibility:hidden;z-index:4}
+.map-mode-button:focus-visible .map-mode-tip{visibility:visible}
+@media(hover:hover){.map-mode-button:hover img{filter:brightness(1.13)}.map-mode-button:hover .map-mode-tip{visibility:visible}}
+#map-view-controls:not(.open) #map-mode-options .map-mode-tip{visibility:hidden}
+@media(prefers-reduced-motion:reduce){.map-mode-arrow,#map-mode-options .map-mode-button,#map-view-controls.open #map-mode-options .map-mode-button,#map-view-controls:not(.open) #map-mode-options .map-mode-button:first-child{transition:none}}

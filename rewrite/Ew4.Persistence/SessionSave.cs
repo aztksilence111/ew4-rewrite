@@ -20,29 +20,26 @@ public static class SessionSave
         state.Validate();
         // Write the authenticated nested world directly, avoiding a complete DOM parse
         // and re-encoding of every cell and unit on each autosave.
-        using var payloadStream = new MemoryStream();
+        using var payloadStream = new SaveBuffer();
         using (var data = new Utf8JsonWriter(payloadStream, new JsonWriterOptions { Encoder = WorldSave.Options.Encoder }))
         {
             data.WriteStartObject();
             data.WriteString("contentRevision", state.ContentRevision); data.WriteNumber("revision", state.Revision);
             data.WriteString("playerFaction", state.PlayerFaction);
-            data.WritePropertyName("world"); data.WriteRawValue(WorldSave.EncodeValidated(state.World), skipInputValidation: true);
+            data.WritePropertyName("world"); WorldSave.WriteValidated(data, state.World);
             void Property<T>(string name, T value) { data.WritePropertyName(name); JsonSerializer.Serialize(data, value, WorldSave.Options); }
             Property("account", state.Account); Property("markets", state.Markets); Property("tavernCandidates", state.TavernCandidates);
             Property("rosterDeployments", state.RosterDeployments); data.WriteString("battleId", state.BattleId);
             Property("battleResult", state.BattleResult); data.WriteNumber("collectedMedals", state.CollectedMedals);
             data.WriteEndObject();
         }
-        var payload = payloadStream.GetBuffer().AsSpan(0, checked((int)payloadStream.Length));
-        using var stream = new MemoryStream();
+        var payload = payloadStream.WrittenSpan;
+        using var stream = new SaveBuffer();
         using (var writer = new Utf8JsonWriter(stream))
         {
-            writer.WriteStartObject();
-            writer.WriteString("format", Format); writer.WriteNumber("version", Version);
-            writer.WriteString("sha256", Convert.ToHexStringLower(SHA256.HashData(payload)));
-            writer.WritePropertyName("payload"); writer.WriteRawValue(payload, skipInputValidation: true); writer.WriteEndObject();
+            SaveBuffer.Envelope(writer, Format, Version, payload);
         }
-        return stream.ToArray();
+        return stream.WrittenSpan.ToArray();
     }
     public static GameSession Decode(byte[] bytes, SessionContentBinding expected, SaveReadLimits? limits = null)
     {

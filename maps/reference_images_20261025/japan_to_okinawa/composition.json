@@ -1,0 +1,161 @@
+{
+  "date": "2026-10-25",
+  "purpose": "Range schematic only; not a formal game map",
+  "source": "../J1_original.jpg",
+  "source_sha256": "89b7a8d28bfe6d1c15621ab2c8517fc660e610e1668c6436f58c643374fb9f37",
+  "author": "Eric Gaba (Sting)",
+  "license": "CC BY-SA 4.0",
+  "clockwise_degrees": 20,
+  "rotated_bounds": [
+    -686,
+    -560,
+    798,
+    416
+  ],
+  "map_pixels": [
+    1484,
+    976
+  ],
+  "prior_map_pixels": [
+    1707,
+    1033
+  ],
+  "frame_area_reduction_from_prior_percent": 17.9,
+  "control_pixels": {
+    "萨摩·鹿儿岛": [
+      319.45,
+      660.43
+    ],
+    "吐噶喇": [
+      244.48,
+      770.17
+    ],
+    "奄美大岛": [
+      203.69,
+      823.64
+    ],
+    "德之岛": [
+      165.43,
+      846.75
+    ],
+    "冲永良部岛": [
+      139.18,
+      864.65
+    ],
+    "与论岛": [
+      125.35,
+      880.69
+    ],
+    "冲绳本岛：首里—那霸": [
+      73.59,
+      914.65
+    ]
+  },
+  "source_regions": {
+    "hokkaido": [
+      870,
+      115,
+      1198,
+      395
+    ],
+    "kunashiri_shikotan_habomai": [
+      1138,
+      182,
+      1270,
+      284
+    ],
+    "tohoku": [
+      873,
+      375,
+      1010,
+      654
+    ],
+    "kanto": [
+      801,
+      621,
+      958,
+      798
+    ],
+    "chubu": [
+      652,
+      648,
+      889,
+      844
+    ],
+    "kansai": [
+      582,
+      737,
+      755,
+      877
+    ],
+    "chugoku": [
+      430,
+      752,
+      644,
+      866
+    ],
+    "shikoku": [
+      490,
+      800,
+      655,
+      901
+    ],
+    "kyushu": [
+      329,
+      839,
+      550,
+      1017
+    ],
+    "tsushima_iki": [
+      329,
+      761,
+      415,
+      855
+    ],
+    "oki": [
+      540,
+      704,
+      624,
+      780
+    ],
+    "sado": [
+      780,
+      642,
+      822,
+      711
+    ],
+    "tanegashima_yakushima": [
+      429,
+      990,
+      502,
+      1048
+    ],
+    "amami_tokara": [
+      292,
+      1043,
+      405,
+      1190
+    ],
+    "etorofu": [
+      1230,
+      120,
+      1350,
+      218
+    ],
+    "okinawa_main_and_kerama": [
+      268,
+      1225,
+      328,
+      1297
+    ],
+    "kumejima": [
+      233,
+      1255,
+      267,
+      1295
+    ]
+  },
+  "route": "Illustrative maritime connection, not a reconstructed historical navigation route",
+  "registration": "Approximate pixel registration from the printed graticule",
+  "game_resources_changed": false
+}

@@ -10,13 +10,21 @@ public sealed record SaveReadLimits(int MaximumBytes = 64 * 1024 * 1024, int Max
 
 public static class WorldSave
 {
-    public const int Version = 4;
+    public const int Version = 5;
     private const string Format = "ew4.rewrite.save";
     internal static readonly JsonSerializerOptions Options = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        TypeInfoResolver = new System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver {
+            Modifiers = { info => {
+                if (info.Type == typeof(MovementCell)) {
+                    info.Properties.Single(p => p.Name == "barrier").ShouldSerialize = (_, value) => (TerrainBarrier)value! != TerrainBarrier.None;
+                    info.Properties.Single(p => p.Name == "minimumEntryCost").ShouldSerialize = (_, value) => (int)value! != 0;
+                }
+            } }
+        },
         Converters = { new JsonStringEnumConverter(allowIntegerValues: false) }
     };
 
@@ -27,19 +35,17 @@ public static class WorldSave
     }
     internal static byte[] EncodeValidated(WorldState state)
     {
-        byte[] payload = JsonSerializer.SerializeToUtf8Bytes(state, Options);
-        using var stream = new MemoryStream();
-        using (var writer = new Utf8JsonWriter(stream))
-        {
-            writer.WriteStartObject();
-            writer.WriteString("format", Format);
-            writer.WriteNumber("version", Version);
-            writer.WriteString("sha256", Convert.ToHexStringLower(SHA256.HashData(payload)));
-            writer.WritePropertyName("payload");
-            writer.WriteRawValue(payload, skipInputValidation: true);
-            writer.WriteEndObject();
-        }
-        return stream.ToArray();
+        using var output = new SaveBuffer();
+        using (var writer = new Utf8JsonWriter(output)) WriteValidated(writer, state);
+        return output.WrittenSpan.ToArray();
+    }
+
+    internal static void WriteValidated(Utf8JsonWriter writer, WorldState state)
+    {
+        using var payload = new SaveBuffer();
+        using (var data = new Utf8JsonWriter(payload, new JsonWriterOptions { Encoder = Options.Encoder }))
+            JsonSerializer.Serialize(data, state, Options);
+        SaveBuffer.Envelope(writer, Format, Version, payload.WrittenSpan);
     }
 
     public static WorldState Decode(byte[] bytes, string expectedContentRevision, SaveReadLimits? limits = null)
@@ -55,7 +61,7 @@ public static class WorldSave
             if (root.ValueKind != JsonValueKind.Object || root.EnumerateObject().Count() != 4
                 || root.GetProperty("format").GetString() != Format)
                 throw new RuleViolation("save.format", "Unknown save format");
-            if (root.GetProperty("version").GetInt32() != Version)
+            if (root.GetProperty("version").GetInt32() is not (4 or Version))
                 throw new RuleViolation("save.version", "Save version requires an explicit migration");
             var payloadElement = root.GetProperty("payload");
             foreach (string key in new[] { "scenarioId", "contentRevision", "width", "height", "round", "activeFaction", "revision",

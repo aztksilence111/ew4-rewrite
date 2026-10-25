@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "entries": [
+    {
+      "name": "1 zone conquest 1",
+      "file": "conquest_western_1.btl",
+      "battle": "1 zone conquest 1"
+    },
+    {
+      "name": "1 zone conquest 2",
+      "file": "conquest_western_2.btl",
+      "battle": "1 zone conquest 2"
+    },
+    {
+      "name": "1 zone conquest 3",
+      "file": "conquest_western_3.btl",
+      "battle": "1 zone conquest 3"
+    },
+    {
+      "name": "1 zone conquest 4",
+      "file": "conquest_western_4.btl",
+      "battle": "1 zone conquest 4"
+    },
+    {
+      "name": "1 zone conquest 5",
+      "file": "conquest_western_5.btl",
+      "battle": "1 zone conquest 5"
+    },
+    {
+      "name": "1 zone conquest 6",
+      "file": "conquest_western_europe_1.btl",
+      "battle": "1 zone conquest 6"
+    },
+    {
+      "name": "1 zone conquest 7",
+      "file": "conquest_western_7.btl",
+      "battle": "1 zone conquest 7"
+    },
+    {
+      "name": "1 zone conquest 8",
+      "file": "conquest_western_8.btl",
+      "battle": "1 zone conquest 8"
+    },
+    {
+      "name": "1 zone conquest 9",
+      "file": "conquest_western_9.btl",
+      "battle": "1 zone conquest 9"
+    },
+    {
+      "name": "2 zone conquest 1",
+      "file": "conquest_axis_1.btl",
+      "battle": "2 zone conquest 1"
+    },
+    {
+      "name": "2 zone conquest 2",
+      "file": "conquest_axis_2.btl",
+      "battle": "2 zone conquest 2"
+    },
+    {
+      "name": "2 zone conquest 3",
+      "file": "conquest_axis_3.btl",
+      "battle": "2 zone conquest 3"
+    }
+  ]
+}

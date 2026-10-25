@@ -16,7 +16,7 @@ internal static class BattleChainChecks
         string[] categories = ["infantry", "cavalry", "artillery", "naval", "fort"];
         string[] terrain = ["open", "medium", "dense"];
         using var data = JsonDocument.Parse(File.ReadAllText(Path.Combine(root, "reverse/reports", importedCatalog ? "catalog_battle_vectors.json" : "battle_chain_vectors.json")));
-        var runtime = importedCatalog ? LegacyRuntimeCatalog.FromJson(File.ReadAllText(Path.Combine(root, "rewrite/data/legacy/catalog.json"))) : null;
+        var runtime = importedCatalog ? LegacyRuntimeCatalog.FromJson(Ew4.Legacy.LegacyCatalogFiles.ReadCatalogFile(Path.Combine(root, "rewrite/data/legacy/catalog.json"))) : null;
         string assets = Path.Combine(root, "apk_work/original/assets");
         var actualCatalog = !importedCatalog ? null : LegacyCombatCatalog.Read(File.ReadAllText(Path.Combine(root, "reverse/reports/runtime_rule_tables.json")),
             File.ReadAllText(Path.Combine(assets, "def_terraintype.xml")), File.ReadAllText(Path.Combine(assets, "def_installation.xml")),

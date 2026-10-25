@@ -1,5 +1,11 @@
 # EW4 rewrite 离线 Mod 工具包
 
+API 3 [通用禁行地形](docs/porting/GEOGRAPHY.md)：任意地图可配置禁行雪山及禁航海洋，附[双地图示例](examples/impassable-geography/README.md)及 `geography-template` 命令。
+
+将领、技能文字、兵种、装备、招募、建筑、地形、战斗和成长等已拆为独立 JSON，
+可直接放入覆盖包 `legacy/` 编辑；文件与字段见[独立规则配置](docs/porting/SPLIT_CATALOG.md)。
+旧 APK/XML 导入继续兼容，`catalog.json` 现在仅作索引。
+
 战役初始显示与隐藏使用 [campaignVisibility 模板](examples/campaign-visibility/README.md)；背景音乐可通过 [client/music.json](data/client/music/README.md) 配置主菜单、随机战斗曲目和失败曲。
 
 全局国家表为 `client/countries.json`，独立于剧本；支持自由命名 ID、国旗/战斗/兵模分别配置，以及 BTL 内嵌 CNTR 长 ID 扩展，见[指南](docs/porting/GLOBAL_COUNTRIES.md)及[示例](examples/global-countries/README.md)。
@@ -29,14 +35,14 @@
 | 修改目标 | 具体入口 | 说明 |
 | --- | --- | --- |
 | 背景、标题、头像、旗帜、按钮 | `client/ui/main.png`、`client/ui/title.png`、`client/ui/commanders1_hd/Napoleon.png`等 | [裁剪图](data/client/ui/README.md)、[完整图集](data/client/images/README.md) |
-| 将领属性/四技能/价格 | `def_commander.xml`的`id/business/skill1...skill4/price` | [原数据字段表](data/original/README.md) |
-| 兵种生命/移动/攻击与招募价 | `def_army.xml`的`strength/movement/minatk/maxatk`，`def_card.xml`的`price/industry` | [规则说明](data/legacy/README.md) |
+| 将领属性/技能/价格 | `legacy/commanders.json`；旧 XML 可经导入转换 | [独立规则配置](docs/porting/SPLIT_CATALOG.md) |
+| 兵种生命/移动/攻击与招募价 | `legacy/units.json`、`legacy/recruitment.json` | [规则说明](data/legacy/README.md) |
 | 征服分页/灰框/卡片图 | `frontend/conquest-pages.json`的`pages[].slots[]` | [完整JSON示例](data/frontend/README.md) |
 | 新征服/新战役章节 | BTL、`def_battleline.xml`、`def_battlelist.xml`、文字表 | [分步示例](examples/README.md) |
 | 地形/底图/辖区 | `def_map.xml`、地形BIN、块索引BIN、PVR、剧本BTL/JURI | [地图依赖](data/client/maps/README.md)、[手工辖区](docs/porting/BTL_JURISDICTIONS.md) |
 | 中文译名/稳定文字 | `frontend/city-names.json`、原文字表、自带TTF | [文字与字体](data/client/fonts/README.md)，不沿用Mod位图字库样式 |
 | 开火/受击/灰尘/音效 | `client/effects.json`、`animations/*.json`、`sounds/*` | [动画与特效](data/client/animations/README.md) |
-| 升级/成长/价格系数 | `legacy/runtime_rule_tables.json`、`metagame_rule_tables.json` | [数值表字段](data/legacy/README.md) |
+| 升级/成长/价格系数 | `legacy/unit-progression.json`、`commander-progression.json`、`economy-rules.json` | [数值表字段](data/legacy/README.md) |
 
 [制作流程](docs/README.md) · [配置索引](docs/CONFIG_REFERENCE.md) · [源码文件/函数索引](docs/SOURCE_INDEX.md) · [排错表](docs/TROUBLESHOOTING.md)。源码索引中的`rewrite/...`指源码仓库，不是发行包里缺失的文件；普通资源修改不需要编译。
 

@@ -17,6 +17,7 @@ const base=process.argv[2]||'http://127.0.0.1:5492',folder=path.resolve(process.
       const bounds=async selector=>page.locator(selector).evaluate(el=>{
         const r=el.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,bottom:r.bottom};
       });
+      if(!process.argv.includes('--battle-only')){
       for(const screen of [80,100,150]){
         await page.evaluate(screen=>{settings.screen=screen;sizeUi();},screen);
         const r=await bounds('#menu-stage');
@@ -39,6 +40,7 @@ const base=process.argv[2]||'http://127.0.0.1:5492',folder=path.resolve(process.
       check((await bounds('#hq-roster')).right<=width+.1,name+' roster fits');
       await page.screenshot({path:path.join(folder,name+'-headquarters.png')});
       report.menus.push({name,width,height,sidebar,confirm});
+      }
       stage=name+' battle';await page.evaluate(()=>start('conquest1','fra'));
       await page.waitForFunction(()=>ctx?.stats?.frames>0&&[...images.values()].every(i=>i.complete));
       const modes=name==='phone'?['gpu','canvas']:['gpu'];
@@ -52,12 +54,18 @@ const base=process.argv[2]||'http://127.0.0.1:5492',folder=path.resolve(process.
           stage=name+' '+backend+' '+relativeZoom;
           const result=await page.evaluate(relativeZoom=>{
             suspendRendering();const reference=Math.max(1,Math.min(innerWidth/568,innerHeight/320,3));
+            const originalState=state;
+            state={...state,units:state.units.map((u,i)=>({...u,morale:[-3,-2,-1,1][i%4],transport:true,veterancy:'2'}))};
             view.zoom=reference*relativeZoom;const p=point(state.units.find(u=>u.commanderImage&&u.owner===state.playerFaction)?.cell||state.units[0].cell);view.x=p.x;view.y=p.y;clampView();
-            const calls={body:0,pose:0,flag:0,trail:0,damage:0,profile:0,badges:[],labels:[],portraits:[]};
+            const calls={body:0,pose:0,flag:0,trail:0,damage:0,profile:0,morale:0,transport:0,rank:0,health:0,badges:[],labels:[],portraits:[]};
             const wrap=(host,key,fn)=>{const old=host[key];host[key]=function(...args){fn.apply(this,args);return old.apply(this,args);};return ()=>{host[key]=old;};};
             const undo=[wrap(battlefield,'unitAnimation',()=>calls.body++),wrap(battlefield,'motionPose',()=>calls.pose++),wrap(battlefield,'flag',()=>calls.flag++),
               wrap(effects,'trail',()=>calls.trail++),wrap(effects,'element',()=>calls.damage++),wrap(effects,'profile',()=>calls.profile++),
+              wrap(battlefield,'healthArc',()=>calls.health++),
               wrap(battlefield.api,'sprite',(atlas,name,x,y)=>{
+                if(name.startsWith('morale_'))calls.morale++;
+                if(name==='ship_mark.png')calls.transport++;
+                if(name.startsWith('rank_'))calls.rank++;
                 if(!/^hpbar_|^board_smallgenerals/.test(name))return;
                 const m=ctx.getTransform(),entry={x:m.a*x+m.e,y:m.d*y+m.f,size:Math.abs(m.a)/viewport.dpr};
                 (name.startsWith('hpbar_')?calls.badges:calls.portraits).push(entry);
@@ -65,7 +73,7 @@ const base=process.argv[2]||'http://127.0.0.1:5492',folder=path.resolve(process.
                 if(![...battlefield.cityLabels.values()].includes(source))return;
                 const m=ctx.getTransform();calls.labels.push({width:args[2]*m.a/viewport.dpr,height:args[3]*m.d/viewport.dpr});
               })];
-            try{render(performance.now());suspendRendering();}finally{undo.reverse().forEach(f=>f());}
+            try{render(performance.now());suspendRendering();}finally{undo.reverse().forEach(f=>f());state=originalState;}
             const pixels=ctx.gpu?ctx.renderer.extract.pixels():ctx.getImageData(0,0,canvas.width,canvas.height).data;
             const colors=new Set();for(let i=0;i<pixels.length;i+=4*101)colors.add(pixels[i]+','+pixels[i+1]+','+pixels[i+2]);
             return {relativeZoom,zoom:view.zoom,reference,badgeOnly:battlefield.badgeOnly,calls,colors:colors.size,
@@ -74,11 +82,15 @@ const base=process.argv[2]||'http://127.0.0.1:5492',folder=path.resolve(process.
           check(result.colors>40,stage+' rendered pixels');
           if(relativeZoom<.52||relativeZoom===.57){
             check(result.badgeOnly,stage+' badge mode');
-            for(const key of ['body','pose','flag','trail','damage','profile'])check(result.calls[key]===0,stage+' skips '+key);
+            for(const key of ['body','pose','flag','trail','damage','profile','morale','transport','rank'])check(result.calls[key]===0,stage+' skips '+key);
             check(result.calls.badges.length>0&&result.calls.badges.every(b=>Math.abs(b.size-result.reference)<.01),stage+' fixed badge size');
+            check(result.calls.health>0&&result.calls.portraits.length>0,stage+' health and commander portraits remain');
             check(result.calls.labels.length>0&&result.calls.labels.every(l=>l.height>=10),stage+' readable city names');
             check(result.trails===0,stage+' no hidden trail emitters');
-          }else check(!result.badgeOnly&&result.calls.body>0&&result.calls.flag>0,stage+' near models restored');
+          }else {
+            check(!result.badgeOnly&&result.calls.body>0&&result.calls.flag>0,stage+' near models restored');
+            check(result.calls.morale>0&&result.calls.transport>0&&result.calls.rank>0,stage+' near status markers restored');
+          }
           report.battle.push({name,backend,...result});
           if(relativeZoom===.48||relativeZoom===1)await page.screenshot({path:path.join(folder,name+'-'+backend+'-'+relativeZoom+'.png')});
         }

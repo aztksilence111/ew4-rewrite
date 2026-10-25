@@ -23,7 +23,8 @@ def main():
     names.update(p.name for p in SOURCE.glob("*.btl"))
     imports = [(SOURCE / name, DATA / "original" / name) for name in sorted(names)]
     imports.extend((ROOT / "reverse/reports" / name, DATA / "legacy" / name)
-                   for name in ("runtime_rule_tables.json", "metagame_rule_tables.json"))
+                   for name in ("runtime_rule_tables.json", "metagame_rule_tables.json")
+                   if not (DATA / "legacy" / name).exists() or json.loads((DATA / "legacy" / name).read_text())["schema_version"] == 1)
     # A previously edited destination must never be overwritten by a source refresh.
     for source, target in imports:
         if not source.is_file():
@@ -37,7 +38,7 @@ def main():
             shutil.copyfile(source, target)
             copied += 1
     files = [dict(path=p.relative_to(DATA).as_posix(), bytes=p.stat().st_size, sha256=digest(p))
-             for p in sorted([target for _, target in imports] + [DATA / "legacy/catalog.json"])]
+             for p in sorted(set([target for _, target in imports] + list((DATA / "legacy").glob("*.json"))))]
     manifest = dict(schema=1, description="Self-contained rewrite runtime data; byte-identical imported source content.", files=files)
     (DATA / "runtime-content.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(dict(files=len(files), copied=copied, bytes=sum(f["bytes"] for f in files), errors=0)))

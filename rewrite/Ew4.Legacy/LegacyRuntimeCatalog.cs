@@ -23,6 +23,7 @@ public sealed class LegacyRuntimeCatalog
     public JsonElement SourceTrees { get; }
     public JsonElement NativeTables { get; }
     public LegacySkillParameters? SkillParameters { get; }
+    public string DefinitionRevision { get; private set; } = "";
     private LegacyRuntimeCatalog(Dictionary<string, LegacyUnitDefinition> profiles, Dictionary<string, IReadOnlyDictionary<string, string>> variants,
         Dictionary<int, LegacyCommanderDefinition> commanders, Dictionary<int, Equipment> items, Dictionary<string, string> sources,
         JsonElement trees, JsonElement tables, LegacySkillParameters? skillParameters)
@@ -158,6 +159,7 @@ public sealed class LegacyRuntimeCatalog
             commanders.Add(id, new(commander, rank, title, Integer("training"), health[rank], healing[title], Percent(1), Percent(2)));
         }
         var sources = root.GetProperty("source_sha256").EnumerateObject().ToDictionary(p => p.Name, p => p.Value.GetString()!, StringComparer.Ordinal);
-        return new(profiles, variants, commanders, items, sources, trees, tables, skillParameters);
+        return new(profiles, variants, commanders, items, sources, trees, tables, skillParameters) {
+            DefinitionRevision = Convert.ToHexStringLower(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(json))) };
     }
 }

@@ -1,0 +1,285 @@
+{
+  "schema": 1,
+  "map": "eastasia",
+  "baseTerrainSha256": "6ebcf0455bccb60553d1aab624d641ec6e69c223dfd3fd5c5ccce2b6312c5883",
+  "blockedCells": [
+    9328,
+    9486,
+    9487,
+    9488,
+    9644,
+    9645,
+    9646,
+    9804,
+    9805,
+    9806,
+    9962,
+    9963,
+    10121,
+    10122,
+    10279,
+    10280,
+    10438,
+    10439,
+    10595,
+    10596,
+    10754,
+    10755,
+    10912,
+    10913,
+    11071,
+    11072,
+    11228,
+    11229,
+    11387,
+    11388,
+    11545,
+    11546,
+    11704,
+    11705,
+    11862,
+    11863,
+    11864,
+    12021,
+    12022,
+    12023,
+    12179,
+    12180,
+    12181,
+    12338,
+    12339,
+    12496,
+    12498,
+    12656,
+    12657,
+    12658,
+    12814,
+    12815,
+    12816,
+    12974,
+    12975,
+    13132,
+    13133,
+    13134,
+    13291,
+    13292,
+    13293,
+    13450,
+    13451,
+    13609,
+    13610,
+    13611,
+    13767,
+    13768,
+    13928,
+    13929,
+    14085,
+    14086,
+    14087,
+    14088,
+    14089,
+    14105,
+    14106,
+    14107,
+    14245,
+    14246,
+    14247,
+    14248,
+    14249,
+    14262,
+    14263,
+    14264,
+    14265,
+    14404,
+    14405,
+    14406,
+    14407,
+    14408,
+    14410,
+    14411,
+    14412,
+    14413,
+    14414,
+    14417,
+    14418,
+    14419,
+    14420,
+    14421,
+    14565,
+    14566,
+    14568,
+    14569,
+    14570,
+    14571,
+    14572,
+    14573,
+    14574,
+    14575,
+    14576,
+    14577,
+    14578,
+    14729,
+    14730,
+    14731,
+    14732,
+    14733,
+    14734
+  ],
+  "passes": [
+    {
+      "id": "lipulekh",
+      "name": "普兰—里普列克",
+      "location": [
+        81.03,
+        30.24
+      ],
+      "route": [
+        [
+          81.2,
+          30.7
+        ],
+        [
+          81.18,
+          30.3
+        ],
+        [
+          81.03,
+          30.24
+        ],
+        [
+          80.85,
+          29.9
+        ],
+        [
+          80.6,
+          29.65
+        ]
+      ],
+      "basis": "Historic pilgrimage and trans-Himalayan trade route; generalized pack route, not a claim of heavy-equipment access.",
+      "reference": "https://en.wikipedia.org/wiki/Lipulekh_Pass",
+      "cells": [
+        12340,
+        12497,
+        12655,
+        12654
+      ],
+      "openedBarrierCells": [
+        12340,
+        12497
+      ],
+      "mappedPassCell": 12497,
+      "mappedPassOffsetKm": 14.12,
+      "localClosureVerified": true
+    },
+    {
+      "id": "gyirong-kuti",
+      "name": "吉隆／聂拉木古道（粗格合并）",
+      "location": [
+        85.3,
+        28.35
+      ],
+      "route": [
+        [
+          85.25,
+          29.1
+        ],
+        [
+          85.3,
+          28.7
+        ],
+        [
+          85.3,
+          28.35
+        ],
+        [
+          85.3,
+          28.05
+        ],
+        [
+          85.3,
+          27.75
+        ]
+      ],
+      "basis": "Nepal-Tibet historical Gyirong and Kuti trade routes; nearby routes represented as one corridor at this map scale, not two independent wide openings.",
+      "reference": "https://en.wikipedia.org/wiki/Gyirong_Town",
+      "cells": [
+        13453,
+        13612,
+        13769,
+        13927,
+        14084
+      ],
+      "openedBarrierCells": [
+        13769,
+        13927
+      ],
+      "mappedPassCell": 13927,
+      "mappedPassOffsetKm": 19.61,
+      "localClosureVerified": true
+    },
+    {
+      "id": "nathu-jelep",
+      "name": "亚东—乃堆拉／则里拉（粗格合并）",
+      "location": [
+        88.83,
+        27.39
+      ],
+      "route": [
+        [
+          89.1,
+          28.45
+        ],
+        [
+          89.0,
+          28.0
+        ],
+        [
+          88.95,
+          27.65
+        ],
+        [
+          88.83,
+          27.39
+        ],
+        [
+          88.65,
+          27.2
+        ],
+        [
+          88.5,
+          27.0
+        ]
+      ],
+      "basis": "Historical Sikkim-Tibet trade route via Chumbi Valley; Nathu and Jelep represented together at coarse scale, independent of present opening status.",
+      "reference": "https://en.wikipedia.org/wiki/Nathu_La",
+      "cells": [
+        14252,
+        14409,
+        14567,
+        14724,
+        14723
+      ],
+      "openedBarrierCells": [
+        14409,
+        14567,
+        14724
+      ],
+      "mappedPassCell": 14724,
+      "mappedPassOffsetKm": 12.61,
+      "localClosureVerified": true
+    }
+  ],
+  "passMountainCells": [
+    12340,
+    12497,
+    13769,
+    13927,
+    14409,
+    14567,
+    14724
+  ],
+  "passMinimumEntryCost": 6,
+  "existingSitesUnchanged": 581,
+  "sourcePlan": "../impassable_plan.json",
+  "errors": 0
+}

@@ -32,16 +32,18 @@ void Check(bool value, string message)
 }
 byte[] BaselineRead(string path) => File.ReadAllBytes(path.StartsWith("frontend/", StringComparison.Ordinal)
     ? Path.Combine(root, "rewrite/Ew4.Web/wwwroot", path[9..]) : Path.Combine(baselineFolder, path));
-var files = new[] { "original", "legacy", "client" }
+var files = new[] { "original", "legacy", "client", "rewrite" }
     .SelectMany(part => Directory.EnumerateFiles(Path.Combine(baselineFolder, part), "*", SearchOption.AllDirectories)
         .Where(p => part != "legacy" || Path.GetDirectoryName(p) == Path.Combine(baselineFolder, part))
         .Select(p => Path.GetRelativePath(baselineFolder, p).Replace('\\', '/')))
     .Concat(["frontend/conquest-pages.json", "frontend/city-names.json"]);
 var baseline = new ModBase(BaselineRead, files);
+using var cityDocument = JsonDocument.Parse(File.ReadAllBytes(Path.Combine(reports, "cities.json")));
+int expectedCities = cityDocument.RootElement.GetArrayLength();
 if (builtin)
 {
     var template = MapDocument.Decode(baseline.Read("original/eastasia.map.json")).Map;
-    Check(template.Cells.Count(c => c.Name != null) == 278 && template.Cells.All(c => c.Owner == null),
+    Check(template.Cells.Count(c => c.Name != null) == expectedCities && template.Cells.All(c => c.Owner == null),
         "Built-in reusable settlements must be complete and politically neutral");
     Check(baseline.Scenarios.Length == 95 && baseline.Content(baseline.Read, baseline.Scenarios).MapNames[3] == "eastasia",
         "Built-in map is available without adding a formal scenario");
@@ -49,10 +51,8 @@ if (builtin)
 var before = new[] { "original/europe.bin", "original/america.bin", "original/def_map.xml", "client/manifest.json", "legacy/catalog.json" }
     .ToDictionary(p => p, p => SHA256.HashData(baseline.Read(p)));
 var store = new ModStore(baseline, Path.Combine(work, "mods"), Path.Combine(work, "saves"));
-using var cityDocument = JsonDocument.Parse(File.ReadAllBytes(Path.Combine(reports, "cities.json")));
 using var facilityDocument = JsonDocument.Parse(File.ReadAllBytes(Path.Combine(reports, "facilities.json")));
 using var bridgeDocument = JsonDocument.Parse(File.ReadAllBytes(Path.Combine(reports, "bridges.json")));
-int expectedCities = cityDocument.RootElement.GetArrayLength();
 int expectedFacilities = facilityDocument.RootElement.GetArrayLength();
 store.Seal(source, "eastasia-map", "东亚底图与城市检查", "0.1.0", baseline.Scenarios.Append("conquest7").ToArray(),
     ["地图检查场景使用原版国家和兵种占位，不代表历史势力或正式剧本。"]);
@@ -92,6 +92,14 @@ Check(start.Session.World.Cells.Count(c => c.Name != null) == expectedCities, "A
 Check(start.Session.World.Cells.Where(c => c.Name != null).All(c => !c.Terrain.Sea), "No city may be a water cell");
 Check(start.Session.World.Units.Count == 2, "Two diagnostic units, no historical army deployment");
 var world = start.Session.World;
+if (builtin)
+{
+    Check(world.Cells.Count(c => c.Terrain.Barrier == TerrainBarrier.Mountain) == 121,
+        "Real inspection scenario applies Himalayan barriers");
+    Check(start.Map.Cells.Select(c => c.Terrain.Barrier).SequenceEqual(
+        MapDocument.Decode(baseline.Read("original/eastasia.map.json")).Map.Cells.Select(c => c.Terrain.Barrier)),
+        "Modern reusable template and live scenario agree on barriers");
+}
 var siteCells = new HashSet<int>();
 foreach (var city in cityDocument.RootElement.EnumerateArray())
 {

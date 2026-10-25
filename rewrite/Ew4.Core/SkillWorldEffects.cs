@@ -73,7 +73,7 @@ public sealed partial class RuleEventBus
     {
         if (cell < 0 || cell >= world.Cells.Count) return false;
         var site = world.Cells[cell];
-        return profile.Category != "fort" && site.Terrain.Active
+        return profile.Category != "fort" && site.Terrain.CanTraverse()
             && (profile.Category == "naval" ? site.Terrain.Sea : !site.Terrain.Sea || transport)
             && (site.Owner == null || WorldDiplomacy.Allied(world, owner, site.Owner))
             && world.Units.Count(u => u.Cell == cell) < world.Limits.UnitsPerCell

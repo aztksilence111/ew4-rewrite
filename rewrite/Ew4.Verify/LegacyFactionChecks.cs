@@ -20,7 +20,7 @@ internal static class LegacyFactionChecks
         string xml = File.ReadAllText(Path.Combine(assets, "def_card.xml"));
         var cards = LegacyRecruitmentCatalog.Read(xml);
         var buildings = LegacyBuildingCatalog.Read(File.ReadAllText(Path.Combine(assets, "def_construction.xml")), File.ReadAllText(Path.Combine(assets, "def_capital.xml")));
-        var runtime = LegacyRuntimeCatalog.FromJson(File.ReadAllText(Path.Combine(root, "rewrite/data/legacy/catalog.json")));
+        var runtime = LegacyRuntimeCatalog.FromJson(Ew4.Legacy.LegacyCatalogFiles.ReadCatalogFile(Path.Combine(root, "rewrite/data/legacy/catalog.json")));
         var sample = LegacyBattle.Read(File.ReadAllBytes(Path.Combine(assets, "campaign1_01.btl"))).Factions[0];
         var offers = cards.Offers("fra", runtime, buildings);
         using var vectors = JsonDocument.Parse(File.ReadAllText(Path.Combine(root, "reverse/reports/faction_recruitment_vectors.json")));

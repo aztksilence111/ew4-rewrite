@@ -89,7 +89,7 @@ internal static class ScenarioFactionChecks
         Put("rewrite/extension.json", new { schema = 1, apiVersion = 1, scenarioEvents = "rewrite/events.json" });
         Put("rewrite/events.json", new Dictionary<string, ScriptedScenarioEvent[]>());
         overrides[identity.FlagImage!] = Read("client/ui/image_flag_hd/rus1.png");
-        var catalog = JsonNode.Parse(Read("data/catalog.json"))!;
+        var catalog = Ew4.Legacy.LegacyCatalogFiles.Load(Read).Catalog;
         catalog["variants"]!["rebellion"] = catalog["variants"]!["rus"]!.DeepClone();
         overrides["data/catalog.json"] = JsonSerializer.SerializeToUtf8Bytes(catalog);
         var content = new ClientContent(Read, ["conquest1.btl"]);

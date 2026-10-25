@@ -183,7 +183,7 @@ internal static class LegacyEventChecks
         Integration(fixture, shared, textCatalog);
         int files = 0, records = 0, deathBindings = 0, captureBindings = 0, objectiveUnits = 0, preservedMarker2 = 0;
         var missingReferences = new List<object>();
-        var catalog = LegacyRuntimeCatalog.FromJson(File.ReadAllText(Path.Combine(root, "rewrite/data/legacy/catalog.json")));
+        var catalog = LegacyRuntimeCatalog.FromJson(Ew4.Legacy.LegacyCatalogFiles.ReadCatalogFile(Path.Combine(root, "rewrite/data/legacy/catalog.json")));
         var terrainRules = LegacyTerrainRules.FromXml(File.ReadAllText(Path.Combine(assets, "def_mapterrain.xml")), File.ReadAllText(Path.Combine(assets, "def_terraintype.xml")));
         var maps = new Dictionary<int, LegacyTerrainMap> { [1] = LegacyTerrainMap.Read(File.ReadAllBytes(Path.Combine(assets, "europe.bin"))),
             [2] = LegacyTerrainMap.Read(File.ReadAllBytes(Path.Combine(assets, "america.bin"))) };
@@ -289,6 +289,6 @@ internal static class LegacyEventChecks
             Check(json.Contains(field, StringComparison.Ordinal), "required field test actually removes " + field);
             Reject(() => WorldSave.Decode(Encoding.UTF8.GetBytes(json.Replace(field, "")), bound.ContentRevision), "save.required_field");
         }
-        Reject(() => WorldSave.Decode(Encoding.UTF8.GetBytes(json.Replace("\"version\":4", "\"version\":3")), bound.ContentRevision), "save.version");
+        Reject(() => WorldSave.Decode(Encoding.UTF8.GetBytes(json.Replace("\"version\":" + WorldSave.Version, "\"version\":3")), bound.ContentRevision), "save.version");
     }
 }

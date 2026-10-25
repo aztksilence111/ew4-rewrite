@@ -24,6 +24,7 @@ public sealed record MetagameRules
     public long InitialMedals { get; init; } = 20_000_000;
     public long InitialBadges { get; init; } = 20_000_000;
     public IReadOnlyList<MarketSlot>? ShopSlots { get; init; }
+    public IReadOnlyList<MetagameObjective> Objectives { get; init; } = Array.Empty<MetagameObjective>();
     public IReadOnlyDictionary<string, int> CommanderSectionCapacities { get; init; } = new Dictionary<string, int>();
     public IReadOnlyDictionary<string, RefreshPolicy> Refresh { get; init; } = new Dictionary<string, RefreshPolicy>();
     public int CommanderSectionCapacity(int section) => CommanderSectionCapacities.GetValueOrDefault(
@@ -40,6 +41,7 @@ public sealed record MetagameRules
                 || ShopSlots.Select(s => s.Slot).Distinct().Count() != ShopSlots.Count))
             throw new RuleViolation("metagame.configuration", "Invalid metagame resources, refresh target or shop slots");
         foreach (var policy in Refresh.Values) policy.Validate();
+        MetagameObjectives.Validate(Objectives);
     }
 }
 

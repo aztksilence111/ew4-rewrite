@@ -8,7 +8,7 @@ public sealed partial class ClientGame
 {
     private Dictionary<string, string> FactionCountries(WorldState world)
     {
-        var countries = content.Battle(world.ScenarioId).Factions.Select((source, index) => (source, index))
+        var countries = RequestBattle(world.ScenarioId).Factions.Select((source, index) => (source, index))
             .ToDictionary(p => LegacyScenarioInitialization.FactionId(world.ScenarioId, p.index, p.source),
                 p => content.Countries.Canonical(p.source.CountryId));
         foreach (var creation in ScenarioFactions.Creations(world.ScenarioEvents))

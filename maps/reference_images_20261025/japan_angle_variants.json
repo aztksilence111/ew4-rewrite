@@ -1,0 +1,374 @@
+{
+  "source": "J1_original.jpg",
+  "source_sha256": "89b7a8d28bfe6d1c15621ab2c8517fc660e610e1668c6436f58c643374fb9f37",
+  "source_author": "Eric Gaba (Sting)",
+  "license": "CC BY-SA 4.0",
+  "source_page": "https://commons.wikimedia.org/wiki/File:Japan_relief_location_map.jpg",
+  "edits": "Whole-image rotation and crop; no island repositioning or fabricated geography",
+  "outside_source": "Neutral grey; not classified as land or sea",
+  "variants": [
+    {
+      "code": "A",
+      "clockwise_degrees": 20,
+      "output": "japan_clockwise_20.jpg",
+      "map_pixels": [
+        1834,
+        1061
+      ],
+      "frame_area_reduction_percent": 11.1,
+      "rotated_bounds": [
+        -923,
+        -570,
+        911,
+        491
+      ],
+      "source_regions": {
+        "hokkaido": [
+          870,
+          115,
+          1198,
+          395
+        ],
+        "etorofu": [
+          1230,
+          80,
+          1440,
+          218
+        ],
+        "kunashiri_shikotan_habomai": [
+          1138,
+          182,
+          1270,
+          284
+        ],
+        "tohoku": [
+          873,
+          375,
+          1010,
+          654
+        ],
+        "kanto": [
+          801,
+          621,
+          958,
+          798
+        ],
+        "chubu": [
+          652,
+          648,
+          889,
+          844
+        ],
+        "kansai": [
+          582,
+          737,
+          755,
+          877
+        ],
+        "chugoku": [
+          430,
+          752,
+          644,
+          866
+        ],
+        "shikoku": [
+          490,
+          800,
+          655,
+          901
+        ],
+        "kyushu": [
+          329,
+          839,
+          550,
+          1017
+        ],
+        "tsushima_iki": [
+          329,
+          761,
+          415,
+          855
+        ],
+        "oki": [
+          540,
+          704,
+          624,
+          780
+        ],
+        "sado": [
+          780,
+          642,
+          822,
+          711
+        ],
+        "tanegashima_yakushima": [
+          429,
+          990,
+          502,
+          1048
+        ],
+        "amami_tokara": [
+          292,
+          1043,
+          405,
+          1190
+        ],
+        "okinawa": [
+          224,
+          1200,
+          300,
+          1303
+        ],
+        "miyako_yaeyama_yonaguni": [
+          42,
+          1368,
+          185,
+          1433
+        ]
+      },
+      "game_resources_changed": false
+    },
+    {
+      "code": "B",
+      "clockwise_degrees": 30,
+      "output": "japan_clockwise_30.jpg",
+      "map_pixels": [
+        1944,
+        856
+      ],
+      "frame_area_reduction_percent": 24.0,
+      "rotated_bounds": [
+        -981,
+        -504,
+        963,
+        352
+      ],
+      "source_regions": {
+        "hokkaido": [
+          870,
+          115,
+          1198,
+          395
+        ],
+        "etorofu": [
+          1230,
+          80,
+          1440,
+          218
+        ],
+        "kunashiri_shikotan_habomai": [
+          1138,
+          182,
+          1270,
+          284
+        ],
+        "tohoku": [
+          873,
+          375,
+          1010,
+          654
+        ],
+        "kanto": [
+          801,
+          621,
+          958,
+          798
+        ],
+        "chubu": [
+          652,
+          648,
+          889,
+          844
+        ],
+        "kansai": [
+          582,
+          737,
+          755,
+          877
+        ],
+        "chugoku": [
+          430,
+          752,
+          644,
+          866
+        ],
+        "shikoku": [
+          490,
+          800,
+          655,
+          901
+        ],
+        "kyushu": [
+          329,
+          839,
+          550,
+          1017
+        ],
+        "tsushima_iki": [
+          329,
+          761,
+          415,
+          855
+        ],
+        "oki": [
+          540,
+          704,
+          624,
+          780
+        ],
+        "sado": [
+          780,
+          642,
+          822,
+          711
+        ],
+        "tanegashima_yakushima": [
+          429,
+          990,
+          502,
+          1048
+        ],
+        "amami_tokara": [
+          292,
+          1043,
+          405,
+          1190
+        ],
+        "okinawa": [
+          224,
+          1200,
+          300,
+          1303
+        ],
+        "miyako_yaeyama_yonaguni": [
+          42,
+          1368,
+          185,
+          1433
+        ]
+      },
+      "game_resources_changed": false
+    },
+    {
+      "code": "C",
+      "clockwise_degrees": -30,
+      "output": "japan_counterclockwise_30.jpg",
+      "map_pixels": [
+        748,
+        1927
+      ],
+      "frame_area_reduction_percent": 34.2,
+      "rotated_bounds": [
+        -374,
+        -948,
+        374,
+        979
+      ],
+      "source_regions": {
+        "hokkaido": [
+          870,
+          115,
+          1198,
+          395
+        ],
+        "etorofu": [
+          1230,
+          80,
+          1440,
+          218
+        ],
+        "kunashiri_shikotan_habomai": [
+          1138,
+          182,
+          1270,
+          284
+        ],
+        "tohoku": [
+          873,
+          375,
+          1010,
+          654
+        ],
+        "kanto": [
+          801,
+          621,
+          958,
+          798
+        ],
+        "chubu": [
+          652,
+          648,
+          889,
+          844
+        ],
+        "kansai": [
+          582,
+          737,
+          755,
+          877
+        ],
+        "chugoku": [
+          430,
+          752,
+          644,
+          866
+        ],
+        "shikoku": [
+          490,
+          800,
+          655,
+          901
+        ],
+        "kyushu": [
+          329,
+          839,
+          550,
+          1017
+        ],
+        "tsushima_iki": [
+          329,
+          761,
+          415,
+          855
+        ],
+        "oki": [
+          540,
+          704,
+          624,
+          780
+        ],
+        "sado": [
+          780,
+          642,
+          822,
+          711
+        ],
+        "tanegashima_yakushima": [
+          429,
+          990,
+          502,
+          1048
+        ],
+        "amami_tokara": [
+          292,
+          1043,
+          405,
+          1190
+        ],
+        "okinawa": [
+          224,
+          1200,
+          300,
+          1303
+        ],
+        "miyako_yaeyama_yonaguni": [
+          42,
+          1368,
+          185,
+          1433
+        ]
+      },
+      "game_resources_changed": false
+    }
+  ]
+}

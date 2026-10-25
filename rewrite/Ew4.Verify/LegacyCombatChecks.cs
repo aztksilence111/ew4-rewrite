@@ -22,7 +22,7 @@ internal static class LegacyCombatChecks
         string installations = File.ReadAllText(Path.Combine(assets, "def_installation.xml"));
         var buildings = LegacyBuildingCatalog.Read(File.ReadAllText(Path.Combine(assets, "def_construction.xml")), File.ReadAllText(Path.Combine(assets, "def_capital.xml")));
         var rules = LegacyCombatCatalog.Read(tables, terrain, installations, buildings);
-        string runtimeJson = File.ReadAllText(Path.Combine(root, "rewrite/data/legacy/catalog.json"));
+        string runtimeJson = Ew4.Legacy.LegacyCatalogFiles.ReadCatalogFile(Path.Combine(root, "rewrite/data/legacy/catalog.json"));
         var runtime = LegacyRuntimeCatalog.FromJson(runtimeJson);
         rules.VerifyNativeSource(File.ReadAllBytes(Path.Combine(root, "apk_work/original/lib/arm64-v8a/lib64ew4_Sagiri.so")));
         Check(rules.NativeSourceHash.Length == 64, "native rules bind preserved source hash");

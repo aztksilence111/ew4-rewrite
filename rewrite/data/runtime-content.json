@@ -474,8 +474,8 @@
     },
     {
       "path": "original/def_areaname.xml",
-      "bytes": 19358,
-      "sha256": "86cf78759abf6c51f4ee9a1ee7e3b670da5f27a57a01d91bd3301dd2f3507271"
+      "bytes": 19399,
+      "sha256": "7cdddd81cdd3a4df1d29080a2cb8266e3c33981c6b18ad8869e1624e48e70547"
     },
     {
       "path": "original/def_army.xml",
@@ -560,12 +560,12 @@
     {
       "path": "original/eastasia.bin",
       "bytes": 257872,
-      "sha256": "dcd1d5dc6777742b1cb0d677178097ea29e81b0f7db09bfe80cdf2c9bc0b3ed1"
+      "sha256": "f70f36427ff30c33d1f0cb221f7789cad0339d62ee84adf336171bfdeaf8e275"
     },
     {
       "path": "original/eastasia.map.json",
-      "bytes": 8103741,
-      "sha256": "acf4347b003951b45d075d1355e67095337b8e4b8b532232386138b267158cab"
+      "bytes": 8106530,
+      "sha256": "eb6884bd07627343f9b21215e022dd92b7ff5b0d7e363b15261bddea1467a18b"
     },
     {
       "path": "original/europe.bin",
@@ -574,8 +574,8 @@
     },
     {
       "path": "original/maptextpos_eastasia.xml",
-      "bytes": 12289,
-      "sha256": "8e3440e19169cf16deb56af77fa571dc23099e69e074394c8bec50d8e59adbcb"
+      "bytes": 12447,
+      "sha256": "cf078c4c5343f1605e407737795dd81b9e6a9076caa6d4322d5bf9bd31b74307"
     },
     {
       "path": "original/stringtable_cn.ini",
@@ -591,6 +591,91 @@
       "path": "original/tutorials2.btl",
       "bytes": 4208,
       "sha256": "d03adc042b41e188c7efdf7a0817c698886339c5767cd091b379123fd5336f2d"
+    },
+    {
+      "path": "legacy/buildings.json",
+      "bytes": 12446,
+      "sha256": "a5f69599c2626ed0bc7f556b98147ef07683a9d6da93f45e05b94acb61c07a2f"
+    },
+    {
+      "path": "legacy/catalog.json",
+      "bytes": 1331,
+      "sha256": "96327a6c01279297ef72b4573fb1019e1b7b3b3be686a960f7505df722901061"
+    },
+    {
+      "path": "legacy/combat-rules.json",
+      "bytes": 1763,
+      "sha256": "00ba1cbbe6d53b2bd22b016c437e8b4b6e6b63009ac4e20dda1245f1fdbca911"
+    },
+    {
+      "path": "legacy/commander-progression.json",
+      "bytes": 711,
+      "sha256": "3af46a6775dd318a5b7db71eb71be8d68da0a4f5eee263d383391a3e3d71cfc7"
+    },
+    {
+      "path": "legacy/commanders.json",
+      "bytes": 300500,
+      "sha256": "25c5cc3abf3c7e1cf8131b95ec8754827a4d946c7f30631c150fc235b626f2e9"
+    },
+    {
+      "path": "legacy/conquest-list.json",
+      "bytes": 1523,
+      "sha256": "21d2dca1f825ca054e342d5202181bc26c8b17fad9914fad5de6e8eb28798298"
+    },
+    {
+      "path": "legacy/economy-rules.json",
+      "bytes": 464,
+      "sha256": "b040f6070dec6e39151e1e634053c070cb1bcfb81a10f5d826f4b1e0dc4ab18f"
+    },
+    {
+      "path": "legacy/installations.json",
+      "bytes": 525,
+      "sha256": "c6ae0d274332d6d650ff2a7a2a6241dc850da0ad8946355b4acb485fb332a1ad"
+    },
+    {
+      "path": "legacy/items.json",
+      "bytes": 33618,
+      "sha256": "8486efca3f92b2a3d7f9e802b69036820199b0eeee9b82704eba133a3c9aea38"
+    },
+    {
+      "path": "legacy/metagame_rule_tables.json",
+      "bytes": 156,
+      "sha256": "6afd44f3060a405680c98276170e8ba6a4eb06891286cfd2769ae9dbd78f1a5c"
+    },
+    {
+      "path": "legacy/recruitment.json",
+      "bytes": 12015,
+      "sha256": "9ad0125f2091070bf6da780266bf08ed268da307e7a407b26fdcf7893aacbdfd"
+    },
+    {
+      "path": "legacy/runtime_rule_tables.json",
+      "bytes": 193,
+      "sha256": "8f3349a29d492f463c710c0c92e51198cc99e04798109b2ae05ee1a031ebc8f0"
+    },
+    {
+      "path": "legacy/skills.json",
+      "bytes": 7587,
+      "sha256": "f8ce5bab7873f7cfba4aa6790d2e1ecb3b89714e06a05541707d57a5a4484850"
+    },
+    {
+      "path": "legacy/terrain-rules.json",
+      "bytes": 1073,
+      "sha256": "f3d02564d8baa38d54505f8d9ce64dae7aa30b11ce2543315f4d5486a7edf9b4"
+    },
+    {
+      "path": "legacy/unit-progression.json",
+      "bytes": 537,
+      "sha256": "db82a371e72a22bbcf02d69b4d71f8f84484c7b38b4bbaa0494b8861ee085688"
+    },
+    {
+      "path": "legacy/unit-variants.json",
+      "bytes": 72764,
+      "sha256": "12c6c690336e34f1a6ebef8c227ed2cc8912059a6070d98e3879e48c71923778"
+    },
+    {
+      "path": "legacy/units.json",
+      "bytes": 160935,
+      "sha256": "2cd9a44911bddaaac95584aed7e563d4b27f1de98fa02702805dbf2a06eb53ca"
     },
     {
       "path": "client/animations/anim_fire.json",
@@ -674,8 +759,8 @@
     },
     {
       "path": "client/animations/maptext.json",
-      "bytes": 399378,
-      "sha256": "462855cff4b95bdcce6361adedefda6d4f862c0394407a7bf40054f41162e58d"
+      "bytes": 419040,
+      "sha256": "b482faf60b4fe63ea514c7fc991a819ce6cb122140a91d2b7b27b096490f6910"
     },
     {
       "path": "client/animations/strategicmap.json",
@@ -683,9 +768,19 @@
       "sha256": "3a74fd3cc4615bfef977f049bda33bb0d624c43dabcc7962c34537bc9dcd287f"
     },
     {
+      "path": "client/countries.json",
+      "bytes": 5959,
+      "sha256": "cb0a5095bfcd2f2e074b4e88a385babb97339be3bae95b3c4c1c969db4f1d744"
+    },
+    {
       "path": "client/effects.json",
       "bytes": 504812,
       "sha256": "36fd052bbbbc9cd52a7bd5be5fc1e7234d5dc127cec387d5cea2017b48b99244"
+    },
+    {
+      "path": "client/fight-font.json",
+      "bytes": 681,
+      "sha256": "cb5d470f233a0a1206db65964544827342386bb50d4fdb5017801e6e95fd6036"
     },
     {
       "path": "client/fonts/coverage.json",
@@ -698,6 +793,11 @@
       "sha256": "437ca31a127c9f1b191ff9a42bb563e5f7e414ae819006dca4635d9fb34aeb94"
     },
     {
+      "path": "client/fonts/Liberation-LICENSE.txt",
+      "bytes": 5756,
+      "sha256": "f32df582a2aab128c07b2f7e36e7b928dc5f6bd82657b905c04f91459f9e5cf9"
+    },
+    {
       "path": "client/fonts/LXGWWenKai-OFL.txt",
       "bytes": 5171,
       "sha256": "1a25e35da1031c6c3436fde545bb9cb5aca954e9873afe510c834b8b79bd21a0"
@@ -706,6 +806,226 @@
       "path": "client/fonts/NotoSerifSC-OFL.txt",
       "bytes": 4350,
       "sha256": "5e0da210fb04058a8c0087985d2d456b931c2579811a49655721d3cf0c36b6d6"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-000.woff2",
+      "bytes": 16040,
+      "sha256": "a8c6198bf5c2db3ad697d5afbe9377ca0dc7c2fca528fb887af62f12d936438b"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-003.woff2",
+      "bytes": 6116,
+      "sha256": "3f07bb769df9841464292f41b6c6e5d0e24beca2bf85a5ca572fff0878501d8a"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-004.woff2",
+      "bytes": 16352,
+      "sha256": "28ea01377ed3364e2dcccb06812e7a00241559f90edbd525a87874628811bf52"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-005.woff2",
+      "bytes": 68624,
+      "sha256": "4457ff02843d09dd4e158777c57187234a919326e9451cad5c3137d49ce8eb87"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-006.woff2",
+      "bytes": 124832,
+      "sha256": "7384dab0d742c0dd0f7e6b649d4658230756d90e50dd409095ffc967377e661b"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-007.woff2",
+      "bytes": 107184,
+      "sha256": "279d6404310fa033aa394c0922b9dcfbaf38f3de8b8d4f5b9bb7d775e7717122"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-008.woff2",
+      "bytes": 77148,
+      "sha256": "37574e65328095973b8ba0b8587b9279c48ba602ff131c616e1ec67a173db862"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-009.woff2",
+      "bytes": 148872,
+      "sha256": "13e37f73dde9fcfcc8733eac57d4f72973b0decab13ad96ef9e9f628d33bff17"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-00a.woff2",
+      "bytes": 514804,
+      "sha256": "473fd94e97697a77602282be8e2aadcd7dd70a2185f7876acc029df5f5775f94"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-00b.woff2",
+      "bytes": 518140,
+      "sha256": "34396d0c4d5e15ce3cecd6d6ce58fc205aa61242471d72055288b679aacf6747"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-00c.woff2",
+      "bytes": 513288,
+      "sha256": "c1a467153a25095618ce1aed752a79f5bf65f02a463be99df22f69c166a80041"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-00d.woff2",
+      "bytes": 564636,
+      "sha256": "35da35d9001c52f6c4ebed118cc7626010580701917cc2a809d14e5b1c6e806f"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-00e.woff2",
+      "bytes": 599888,
+      "sha256": "a38f3cdd85929c9dfc43161006775d30ec9c12fa04bd6b1b89d33eb2732b2e6c"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-00f.woff2",
+      "bytes": 596220,
+      "sha256": "b86b753b2a811a906a4c5610069ad96035a665528ecebda0ee40dab266cf3c0c"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-010.woff2",
+      "bytes": 615860,
+      "sha256": "62b4af810b1c0412f51734802325d223e53d151d927aa4cd7b9e93b656bbae8c"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-011.woff2",
+      "bytes": 614480,
+      "sha256": "0ad547acc26abfb30521f2ca63b99bcbf2b3edbea23f6ef9300c0461ee63efe6"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-012.woff2",
+      "bytes": 623428,
+      "sha256": "5652836c008724d5535461a3b59a725a980aeac60c90d3f4d5d7503451a1a624"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-013.woff2",
+      "bytes": 692472,
+      "sha256": "5f638c3cf1fca003d90216aa92147c1e23d96574de6807e3751febd20c6c0917"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-01c.woff2",
+      "bytes": 2388,
+      "sha256": "26f458c99fa737a7fa95859dc6e86b49a66d57de278cbf61b9f6551b65b37d14"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-01d.woff2",
+      "bytes": 10328,
+      "sha256": "29a036da6349d7c55b262c37738988023c9170665779a6d28a91663e5a1fe7c9"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-01f.woff2",
+      "bytes": 164104,
+      "sha256": "63748c2c8acbbdee6412f281c94534920cc85b2bc51d38a6c455e73854ffcf70"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-040.woff2",
+      "bytes": 31988,
+      "sha256": "75dfd107e8bfffc09c0ff7efbb03c64d5870d2161f2285a3cba173c82d498670"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-041.woff2",
+      "bytes": 49792,
+      "sha256": "f1fb97661aedb3fce8030e061eaded12abc1f7f0dcd5121595a8e8a66f34b88b"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-042.woff2",
+      "bytes": 51904,
+      "sha256": "19a570cfbc94bbc7fd6d7e3c3896e48bcf5deb9fa13fb137d5e155a641f85ca1"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-043.woff2",
+      "bytes": 38400,
+      "sha256": "f7001a27fc3bde5b1f91b69f030933383ff211b52bcf02acf3d7f1010dbb6180"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-044.woff2",
+      "bytes": 23736,
+      "sha256": "67bed7934f349a3dde2add6a556f7541c7477a44e9768c7d4b212a5bcdd9d765"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-045.woff2",
+      "bytes": 32584,
+      "sha256": "c28d8fd8d629a37d0d8781f60389b1a5b24c0ce7055358bb44ca824564fbae64"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-046.woff2",
+      "bytes": 39552,
+      "sha256": "d155b59a6fff1c1ceb37db3ca45bb5210df5ea7da51bf78a49872595dc7e06a5"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-047.woff2",
+      "bytes": 31108,
+      "sha256": "46ba2227c6e880d83bdd4922bb0c8c6632b8695a9fd176a60716f91665b76f83"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-048.woff2",
+      "bytes": 44968,
+      "sha256": "82ed34800270353b65e282647984bf84d4a2e881b5f964631dfa98703604112c"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-049.woff2",
+      "bytes": 56104,
+      "sha256": "cc22e8b792d50198483a0fd54e17475d62f207da3e216a97562bb4467c96c031"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-04a.woff2",
+      "bytes": 26848,
+      "sha256": "713c690c3afaa4eae2054735345a286f0460b0ef68036d36fa2dd32375831ee1"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-04b.woff2",
+      "bytes": 26792,
+      "sha256": "5565f478bd092915bd224cb921bb462ed299aae7b2d7c2c00ea8a6e682d8ce7d"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-04c.woff2",
+      "bytes": 28928,
+      "sha256": "9a484b8ead50a7048e373b465c55644bac7b4582186901a3d45585c9ab3771ab"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-04d.woff2",
+      "bytes": 47956,
+      "sha256": "4801a6702069c508a43d5b13a2558f5ba3864a29b41d96320a1b8c7aefb5da5a"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-04e.woff2",
+      "bytes": 29468,
+      "sha256": "c36e4022b518fe854fde8aab7cedc70eb87ab05aed9c010653dd297ae2c7d08a"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-04f.woff2",
+      "bytes": 24772,
+      "sha256": "05a9592c99fc84b919485b06781dbeb50ddc1f97ebe80f2622c1fd67d201f16d"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-050.woff2",
+      "bytes": 26284,
+      "sha256": "4f1c80b7e191a13da7682486a5f500211f0fa8007f0dc71fcaf0c3d96cdba15d"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-051.woff2",
+      "bytes": 55016,
+      "sha256": "8dc479ec18bb75db879583a78cf48f0ecf1430a5514ea60f2362460d312f09ee"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-052.woff2",
+      "bytes": 19968,
+      "sha256": "87498370a4f25f2e5c9004e5f0c7dfd86274820104eafd172115b4934bd60c67"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-053.woff2",
+      "bytes": 22064,
+      "sha256": "9b79547a1be5b16a1caa7469a41eb274b359de922bbb24cd5d2aecf7583c2bde"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-054.woff2",
+      "bytes": 25748,
+      "sha256": "5ab7587c509fd0e1c54c4401e10fa149555c46723af4cfd2cdd00c99f362cf48"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-05f.woff2",
+      "bytes": 5408,
+      "sha256": "b6eb3f9f02d609fc99cebafb18303b09b10183cab80b02a0172a7f47392f82b2"
+    },
+    {
+      "path": "client/fonts/parts/ARPLUKaiCN-core.woff2",
+      "bytes": 418328,
+      "sha256": "504c15c2354ad6d6bcc5f9921ed0bb907b055eb03818cf28e7f033c665bfdcc6"
     },
     {
       "path": "client/fonts/parts/Jigmo-000.woff2",
@@ -1116,6 +1436,26 @@
       "path": "client/fonts/parts/Jigmo3-200.woff2",
       "bytes": 1768,
       "sha256": "005d8bba424404dd6812a6a0f4e4ae0a3789c84ed19b28bc7eab1e0b167f7123"
+    },
+    {
+      "path": "client/fonts/parts/LiberationSans-BoldItalic-core.woff2",
+      "bytes": 4208,
+      "sha256": "e38195566d7125b8fd605596736ccc34d0d526103e21d062b0437d6c3950836b"
+    },
+    {
+      "path": "client/fonts/parts/LiberationSerif-Bold-003.woff2",
+      "bytes": 15512,
+      "sha256": "f890818cb13b34b70899d7f72116c6c0878fb6bf49da531c167c6ab4868b3c84"
+    },
+    {
+      "path": "client/fonts/parts/LiberationSerif-Bold-004.woff2",
+      "bytes": 9924,
+      "sha256": "159d3d5ead6bd9f7d36f239c1c9e9886b82f71201375fe7df9751365617bffac"
+    },
+    {
+      "path": "client/fonts/parts/LiberationSerif-Bold-core.woff2",
+      "bytes": 36424,
+      "sha256": "f86315fbf07956b510f4f95effa5a971477d72c073bdb780c01e8a9cce4d5362"
     },
     {
       "path": "client/fonts/parts/LXGWWenKai-Regular-000.woff2",
@@ -2433,6 +2773,11 @@
       "sha256": "d382f96034b8d136785008c3e08262562e91a5d4d3477b48211d4eb85c978023"
     },
     {
+      "path": "client/fonts/UKai-LICENSE.txt",
+      "bytes": 8358,
+      "sha256": "f50bd3e5b92c3dcf4e5ae478927297f534989c616dfcb8e507106c20dfb8c798"
+    },
+    {
       "path": "client/fonts/Unifont-LICENSE.txt",
       "bytes": 24142,
       "sha256": "1e74cb82bf476843e97c2596297b04219b1a7e51f7238944a8c031cb9401fa87"
@@ -2696,6 +3041,11 @@
       "path": "client/images/font_fight_num.png",
       "bytes": 6932,
       "sha256": "25c1a787b431deee11591438c3fad3d31968405b07111370ca62b3d3a95f30d3"
+    },
+    {
+      "path": "client/images/font_fight_num_hd.png",
+      "bytes": 11845,
+      "sha256": "b287af59b5b330fbe101bf3d45a51da8a15f1d640026b3ae5c9080d8841faab0"
     },
     {
       "path": "client/images/font_text_1_cn.png",
@@ -2994,13 +3344,13 @@
     },
     {
       "path": "client/images/tiles.png",
-      "bytes": 368171,
-      "sha256": "7517319442d03dc60c198b56bcf2637a95519643c5fbdc52583857cf821d0f9d"
+      "bytes": 446236,
+      "sha256": "33cb19da63163799abc90843df51c6dd210d9b7bf559e6450edf13c95b649ec0"
     },
     {
       "path": "client/images/tiles_hd.png",
-      "bytes": 1039204,
-      "sha256": "a412fb13a01374663ccd133f7e20f10c22ad5c66480ad4921c64f2e2daa6e723"
+      "bytes": 1284045,
+      "sha256": "4c2b24693a75f89bd65a185d0255bb8eac4ea6dfa420d5b81ffd04f23a34b14b"
     },
     {
       "path": "client/import-baseline.json",
@@ -3009,8 +3359,8 @@
     },
     {
       "path": "client/manifest.json",
-      "bytes": 2063690,
-      "sha256": "127952c0202a36bd4c56cdee5e23859f84b10ce156b800836092251f87fa6b9a"
+      "bytes": 2110867,
+      "sha256": "19b7cad336212b56877de3d47ce88c6829786e4905eb97a29172a13e2fed0d84"
     },
     {
       "path": "client/maps/america/0_0.png",
@@ -3294,8 +3644,8 @@
     },
     {
       "path": "client/maps/eastasia/0_0.png",
-      "bytes": 11260,
-      "sha256": "f4ae93bc20347165db48373ff1650c212a790189c8e51a9af438ebe62b6aa963"
+      "bytes": 21629,
+      "sha256": "63e41e75438cae51a037625c003c7a5e77f04336f34339ec42fdef97820faf44"
     },
     {
       "path": "client/maps/eastasia/0_1024.png",
@@ -3309,23 +3659,23 @@
     },
     {
       "path": "client/maps/eastasia/0_3072.png",
-      "bytes": 8255,
-      "sha256": "e1e0845350cafa82ebb5ae65d57ee070dd34a8934d6ad90c895149efea6e5011"
+      "bytes": 11805,
+      "sha256": "51701faac6c02e23635a8120187fe5371e3c4d76b71267f987ee96f0446ef86a"
     },
     {
       "path": "client/maps/eastasia/0_4096.png",
-      "bytes": 19715,
-      "sha256": "6c0f2282de14f1167981d59c8749ddae402a990be5d5f4e24e4daccc28659c48"
+      "bytes": 145991,
+      "sha256": "617af707f1b59106f911e5b4824dad39a332906d6dee3f621f8f86dbe28e66c3"
     },
     {
       "path": "client/maps/eastasia/0_5120.png",
-      "bytes": 17198,
-      "sha256": "20d5e040b3a6b9b0d359cf7e59b68af2370ddea34d136f942ec8fcc2cfff04cc"
+      "bytes": 118765,
+      "sha256": "49c4bd096cea0b8a1994b5acb10da0b9a3a320c714fa1a64d8c18e083417594e"
     },
     {
       "path": "client/maps/eastasia/0_6144.png",
-      "bytes": 13310,
-      "sha256": "0b32d4ef01d2b937eb6c211ed479f60accc875c4abd4958f462b9658ca83f351"
+      "bytes": 40840,
+      "sha256": "1adb881191a5b7645f76ede0bf02b7894ba983c130f88831f950b1e3a3b96697"
     },
     {
       "path": "client/maps/eastasia/0_7168.png",
@@ -3334,13 +3684,13 @@
     },
     {
       "path": "client/maps/eastasia/1024_0.png",
-      "bytes": 18226,
-      "sha256": "9a945a758c4451f863f29ad5d652cf66b2dfef918a8c09101366ee031205eb10"
+      "bytes": 76823,
+      "sha256": "769ca12e4a6b73b0f8a9d34516d7a054e9a445acb49a4836c371b5ec8dae7b38"
     },
     {
       "path": "client/maps/eastasia/1024_1024.png",
-      "bytes": 13554,
-      "sha256": "071eb2818a2e61b19eccb33589c726129c6761a5ad4cd6b6f2db56e3b0205b4f"
+      "bytes": 23774,
+      "sha256": "2c980f547c7d8a56a55f99e8e8b855241cbc508ce9c4ff4f54348a49f99062c5"
     },
     {
       "path": "client/maps/eastasia/1024_2048.png",
@@ -3354,18 +3704,18 @@
     },
     {
       "path": "client/maps/eastasia/1024_4096.png",
-      "bytes": 12389,
-      "sha256": "0902b39de8e2e08a52979f50a9868df010932d36541c83c7ec3a8562c919ebf3"
+      "bytes": 20812,
+      "sha256": "22e41038355d4863f87be62784327921fee0c89c701f81b2092aaa0a5252d945"
     },
     {
       "path": "client/maps/eastasia/1024_5120.png",
-      "bytes": 35261,
-      "sha256": "ba4e0c4c2c362fcaf86405fe1dbe004949aed55886df61ec90393d3e9be3efdc"
+      "bytes": 197962,
+      "sha256": "7959337b207c7f64878512d2318d72bf0a0fc3ce097074924c59eb90910a4049"
     },
     {
       "path": "client/maps/eastasia/1024_6144.png",
-      "bytes": 7981,
-      "sha256": "3464350f166998a24ea9f1038fe2332be5a361f48dee52c9728490868632509b"
+      "bytes": 9543,
+      "sha256": "6c6bca7f5a1361d37e09c940e723642799cc274d72b8aa7d6546aafba73a471d"
     },
     {
       "path": "client/maps/eastasia/1024_7168.png",
@@ -3374,13 +3724,13 @@
     },
     {
       "path": "client/maps/eastasia/2048_0.png",
-      "bytes": 17083,
-      "sha256": "e064d5c0513fbdfd3b7fd330fd9c976e61f8ae084c31ff79986aeb4a5169f061"
+      "bytes": 75809,
+      "sha256": "e5f2f54b85ca0db76228c474565fcb4040f04a69a393ad22b2b8a82619c1f876"
     },
     {
       "path": "client/maps/eastasia/2048_1024.png",
-      "bytes": 14621,
-      "sha256": "7ad96c49885841c983fd8ff555cdc5a77f6f6b79f233227cbe2ebfbe111830df"
+      "bytes": 78998,
+      "sha256": "ee023838cd663a7418a2a47fd0d8b821020ee487db25ed74dfd07c8b0dd63e15"
     },
     {
       "path": "client/maps/eastasia/2048_2048.png",
@@ -3394,33 +3744,33 @@
     },
     {
       "path": "client/maps/eastasia/2048_4096.png",
-      "bytes": 20110,
-      "sha256": "afd4f9961bfe268b85acb04182e323f8bb7eb44830ecf99aa940aa20bb943045"
+      "bytes": 110558,
+      "sha256": "3cd0f33d9daeebdc48cc0e3a3bf7c45823c51580f099df58bc6ab9516c031812"
     },
     {
       "path": "client/maps/eastasia/2048_5120.png",
-      "bytes": 18295,
-      "sha256": "107e018b55a95760998c7d8e2c6ad7c550adb38262d29067f650a5973d7d40e7"
+      "bytes": 94825,
+      "sha256": "3db24244f3fefed6dd5096479610bc511e2a4e5b27a090c74836ec65c37a36b3"
     },
     {
       "path": "client/maps/eastasia/2048_6144.png",
-      "bytes": 31668,
-      "sha256": "653fd1ac6e7638886b10b9bd0cb0ad1ee1c1d90b5026fa11c6a0eab6fab2855d"
+      "bytes": 154258,
+      "sha256": "48cb8faa5109e360901a82f891845efee6115c84fad4a325c129462b6d02f6e4"
     },
     {
       "path": "client/maps/eastasia/2048_7168.png",
-      "bytes": 2310,
-      "sha256": "61ba70debe855dfcd15ef42547fdd80dffbee9fa6734a0476cb4e4db90f8f7bf"
+      "bytes": 2382,
+      "sha256": "bb8a914db7071132c9c0859b52ce5aeb46031587f3d25019fd4a4bb3be8849c1"
     },
     {
       "path": "client/maps/eastasia/3072_0.png",
-      "bytes": 15930,
-      "sha256": "86a2c26a1dcad8e3b9dad50904b6c7ac7b79c67673fc673887ffdb5a8b585b10"
+      "bytes": 62416,
+      "sha256": "de2350f5774547a062314426e11486bfe81a357e639ad0a4f022ab6bd494f74a"
     },
     {
       "path": "client/maps/eastasia/3072_1024.png",
-      "bytes": 13472,
-      "sha256": "295120e9f9c80770ba368e932f7dd98e9356a6b26b6d7f54449122229c30ecc8"
+      "bytes": 33098,
+      "sha256": "896bdc384265719d00d5255858c58d5cbc08dca9d08055f0b94a00007d2e9a9a"
     },
     {
       "path": "client/maps/eastasia/3072_2048.png",
@@ -3429,38 +3779,38 @@
     },
     {
       "path": "client/maps/eastasia/3072_3072.png",
-      "bytes": 17831,
-      "sha256": "c0b789e841e9452c7393f4fe9bd883b6fa8544f1fb77f0d98ca233ce7035d3e4"
+      "bytes": 54116,
+      "sha256": "241e7b1c8c132dbb0dd71fe573ed7356ea802f4ae572ecda31493f87a8ceb76e"
     },
     {
       "path": "client/maps/eastasia/3072_4096.png",
-      "bytes": 18458,
-      "sha256": "d40025464faf7f55e8491279984ae36d5db116d4c6346af275dd9766a261b9e7"
+      "bytes": 144938,
+      "sha256": "4f8264abdf45bc8881234cf3e8e2c30a3a7551faf7e28c071b855f3663a2d122"
     },
     {
       "path": "client/maps/eastasia/3072_5120.png",
-      "bytes": 35055,
-      "sha256": "e848e4697a7732afcfc1e489de3d17bc98731ab1ce644175dba87d496810745e"
+      "bytes": 231648,
+      "sha256": "37da2eae73edb85dfb80d81ba7cfacf1af399b81c81be9aca743fb99f62708ca"
     },
     {
       "path": "client/maps/eastasia/3072_6144.png",
-      "bytes": 24150,
-      "sha256": "21c93ebd846f8e356f7568e24e93c4806e2770828e8e06d71bd47f81f5b13b83"
+      "bytes": 164263,
+      "sha256": "8c3b63ad8dc4c12d358d11ae2bc86a64cc5b13beda0005a86f8a52064bb9b766"
     },
     {
       "path": "client/maps/eastasia/3072_7168.png",
-      "bytes": 2038,
-      "sha256": "ba6f62b1dafba1f596f6dca9da32952d88ea03dbff7cd8e741d25d6b1f28350f"
+      "bytes": 8924,
+      "sha256": "a9971c7000c0b150bf45fa54d96aa6b4924f684cb97911f66c82155f7eaf4e00"
     },
     {
       "path": "client/maps/eastasia/4096_0.png",
-      "bytes": 16474,
-      "sha256": "18378d774de6672d4fac153039538415dca2ae71f72bb6c010e898c39fb2c8ca"
+      "bytes": 87117,
+      "sha256": "aaae8c1fd470c5460b623bdcd83d38673048ce148b25b0c16c6355e19818696e"
     },
     {
       "path": "client/maps/eastasia/4096_1024.png",
-      "bytes": 19206,
-      "sha256": "d3547a46fd9b291c566584a8490265ab2c9b914a0e7fc31c348c1db74616c8a8"
+      "bytes": 65687,
+      "sha256": "af25fb54660bfd72b8bc3619608450dcecccff45d9066d635318ee64479954b2"
     },
     {
       "path": "client/maps/eastasia/4096_2048.png",
@@ -3469,33 +3819,33 @@
     },
     {
       "path": "client/maps/eastasia/4096_3072.png",
-      "bytes": 31695,
-      "sha256": "b3a3471865d2eba57712b25bc5d77b47c85bdec4a2b42ebd6a8565516ae2fc79"
+      "bytes": 101110,
+      "sha256": "3c6d4b3029b0bc5dfc9d4d2e4034cf20b942356acea1d57e37686f8a17930b95"
     },
     {
       "path": "client/maps/eastasia/4096_4096.png",
-      "bytes": 40677,
-      "sha256": "9990d7ce342c13f044d3525cd00017f4b4f8b06b9247214711cef58496f74686"
+      "bytes": 135095,
+      "sha256": "65abef66872cdfa4f5f7c31c43da317c3b55426bff524a7e0a50108ef5f39c91"
     },
     {
       "path": "client/maps/eastasia/4096_5120.png",
-      "bytes": 14415,
-      "sha256": "78e3490be4f70e19067a360520ef1cd4783e3f8ac3f5a42bfd31458156a6cbba"
+      "bytes": 38798,
+      "sha256": "e17e48fefe45898017c4fac1f9156d266e6b9cfebd2d1a777dcfab4b844c53a5"
     },
     {
       "path": "client/maps/eastasia/4096_6144.png",
-      "bytes": 27351,
-      "sha256": "9a4152ef2e65c6235a6f45c082269efc4f8770401900db76696d6bb92f296e49"
+      "bytes": 70269,
+      "sha256": "e4e5690bb6fce81bc0dec3689425603e2fb03eb1adc56b380d3ad7acf4f2d29b"
     },
     {
       "path": "client/maps/eastasia/4096_7168.png",
-      "bytes": 3881,
-      "sha256": "aff72304fe154599e23ad462818bd8f8189432425562de42b7e6a176fed51191"
+      "bytes": 15634,
+      "sha256": "4a7e46013c0d71cc1ffb733293f82eb32c091032a832bee1c3adc3b64778bd03"
     },
     {
       "path": "client/maps/eastasia/5120_0.png",
-      "bytes": 8094,
-      "sha256": "e39670db3c26013dcea8509ef819dad1407447a2746c6c6570e89295531c00e6"
+      "bytes": 19979,
+      "sha256": "9e6a22e1fdc2eb1b84556f3521c994689d26ace5d809af465ab246af7b9fc0ea"
     },
     {
       "path": "client/maps/eastasia/5120_1024.png",
@@ -3504,28 +3854,28 @@
     },
     {
       "path": "client/maps/eastasia/5120_2048.png",
-      "bytes": 8101,
-      "sha256": "9b81ed2781692cde0c074796282b982e20386b94317b85a6e2234d5aaddaeb45"
+      "bytes": 18316,
+      "sha256": "e0b22a4ae4ce9ba29f33bcb8fc8460fc985902ebe03b6def489fbbd874beede7"
     },
     {
       "path": "client/maps/eastasia/5120_3072.png",
-      "bytes": 45667,
-      "sha256": "19107b9e5d2104c1e4597ca7af29293aae243ab3e58d64db1b43704b83096e54"
+      "bytes": 166220,
+      "sha256": "45d08382849d7031a56ce2f2fe0daeb61ff1516baa5292e22fa21e8bf752a11e"
     },
     {
       "path": "client/maps/eastasia/5120_4096.png",
-      "bytes": 62960,
-      "sha256": "f43b52df5f0540d7d5bd34bf4a47bbcbdcfae620003d0839d7a66f1ec407becd"
+      "bytes": 208657,
+      "sha256": "ce471888f5b1e75aa2af6e3cc57e278c9f8e70c3c057ba23f87b7f9557f4844a"
     },
     {
       "path": "client/maps/eastasia/5120_5120.png",
-      "bytes": 24923,
-      "sha256": "1a93beaeb3c9d677a2aad25049a34bf8a389a53cd3183ebacca39c4d4ffb2056"
+      "bytes": 133489,
+      "sha256": "85c973c059376b3e0507e23ffe0670ce8b206c7d1f4f0c522dc7e53a0c403662"
     },
     {
       "path": "client/maps/eastasia/5120_6144.png",
-      "bytes": 16969,
-      "sha256": "087b14f9b600e5e846ac89e375dbb3d8710c31bc38955d62d4555ea1a82ec8b5"
+      "bytes": 28664,
+      "sha256": "af613b50118ac358f42c302575fdc94a46faede3b016d0447a5941a5becad1ea"
     },
     {
       "path": "client/maps/eastasia/5120_7168.png",
@@ -3534,33 +3884,33 @@
     },
     {
       "path": "client/maps/eastasia/6144_0.png",
-      "bytes": 9016,
-      "sha256": "c9f1d65287e6e07351f7c21af72695808cea122471821b11a68093a56e820a79"
+      "bytes": 33923,
+      "sha256": "7f416f7d72cb0bb701cfcae50941e249945b58d1c023c9209877d8f82034a325"
     },
     {
       "path": "client/maps/eastasia/6144_1024.png",
-      "bytes": 19210,
-      "sha256": "9380ad094a030268780be310d6589697ec8a9e01ba0582e7d4793286b451bca7"
+      "bytes": 99027,
+      "sha256": "c41ddbc6d43590319c6ac703b2bedec44de854f3945efde9c8e44df1d8d3f99d"
     },
     {
       "path": "client/maps/eastasia/6144_2048.png",
-      "bytes": 29107,
-      "sha256": "6c7c9dda4898388aa34f11badb132a97cd0a1d82afcb558a82fc2bdc86515042"
+      "bytes": 143276,
+      "sha256": "5d48530abaf8f4b9c3aa3e28b33c56571a46a3cd98452888da95955e57fd64c1"
     },
     {
       "path": "client/maps/eastasia/6144_3072.png",
-      "bytes": 36385,
-      "sha256": "7cc12f1e4cbaa95d2b788b9385fe38e646aaeed732977b27c68b7a68867d2de8"
+      "bytes": 64330,
+      "sha256": "4938f5bd2a22cf96a3d750c35a0a9532558455ef7e55356b189a6b8c0829b77d"
     },
     {
       "path": "client/maps/eastasia/6144_4096.png",
-      "bytes": 41842,
-      "sha256": "929d7225e824d6c3e0ffb1e6cbd3729b0ea81b5f5c044245e7d33ddb20ff4f53"
+      "bytes": 94391,
+      "sha256": "0104b34438ad2e9d614cbd9cde210ab98b21842cea359608e7f539d70804ea7c"
     },
     {
       "path": "client/maps/eastasia/6144_5120.png",
-      "bytes": 23355,
-      "sha256": "df45e34f68d51f63c67afdf9e95eddde832b2161482f0b7e6d85f05a30f3771c"
+      "bytes": 46773,
+      "sha256": "a1940f85da70b4ec217e976f2860de2d4bbe35fdd2289b030a3abb59d3edca73"
     },
     {
       "path": "client/maps/eastasia/6144_6144.png",
@@ -3574,23 +3924,23 @@
     },
     {
       "path": "client/maps/eastasia/7168_0.png",
-      "bytes": 14760,
-      "sha256": "b13f2d1a43c6da9247b5ff54616e6a66969f7b8beaba67e81e6c5bfeb06d2b6e"
+      "bytes": 27685,
+      "sha256": "f4f495fa10dda642f818ddf37dbac07d49b4ac594235f76b59308f810b8ffd12"
     },
     {
       "path": "client/maps/eastasia/7168_1024.png",
-      "bytes": 23007,
-      "sha256": "dd2d7745a06bc9e3b837cf02754e78a8f1dd9b631cbacd9520efb17b250b071f"
+      "bytes": 131501,
+      "sha256": "3d4d719d42a80108d597c9d31766112a23f8c7b4626cad7e4d1b49b9cad37424"
     },
     {
       "path": "client/maps/eastasia/7168_2048.png",
-      "bytes": 19784,
-      "sha256": "546e26d37ae0fe106ad793bc9b926a4251302f0da9f376840aba638f96aaebdc"
+      "bytes": 87257,
+      "sha256": "dbd5708c363b81f01e6f415a9d033aa2dce5acdc68dfad828ce7b704e57bce1a"
     },
     {
       "path": "client/maps/eastasia/7168_3072.png",
-      "bytes": 38677,
-      "sha256": "8a2c701902f7f644a48c428b4755b920a55d747a5ec238863d99c3b3afd68dc3"
+      "bytes": 70445,
+      "sha256": "bc102b78037482c534463afdce252562c875ba099a1ea80501b0890915d5c4de"
     },
     {
       "path": "client/maps/eastasia/7168_4096.png",
@@ -3614,23 +3964,23 @@
     },
     {
       "path": "client/maps/eastasia/8192_0.png",
-      "bytes": 16644,
-      "sha256": "15e8630b4d24067e81005ba2d8d22a92aeb8008cfc96166ceab5d9968aa37ff2"
+      "bytes": 34657,
+      "sha256": "7d8ac7bb7505930c9c03b290abc77721bdf67851a5721fa068134cbfbbc28096"
     },
     {
       "path": "client/maps/eastasia/8192_1024.png",
-      "bytes": 16541,
-      "sha256": "2d54a94a772ac38048f3524db1dcccea9503022af3760da6f9567e9b50ac69b6"
+      "bytes": 24197,
+      "sha256": "55420c6299e06b9ecd191a8c0abf3cfe9896afb2ecd99378d59e9911889ca106"
     },
     {
       "path": "client/maps/eastasia/8192_2048.png",
-      "bytes": 16771,
-      "sha256": "fdb468f6773b30826fb2f75a57df4d88a1ba2c8ad5d98c2912b92f7566bf31a7"
+      "bytes": 24115,
+      "sha256": "1a837238c58019e9df7d859640191fa524abaca27b79165bb737afd4d4298a76"
     },
     {
       "path": "client/maps/eastasia/8192_3072.png",
-      "bytes": 33530,
-      "sha256": "6560013b9cf0d6dde454072654d253eeaeafdf3ef7fde78151acc63f76d326be"
+      "bytes": 53480,
+      "sha256": "6275a6d0ae9d9d97bd53fd9dd0f7de5378db5761b425992fd437ea5309deff4b"
     },
     {
       "path": "client/maps/eastasia/8192_4096.png",
@@ -3694,8 +4044,8 @@
     },
     {
       "path": "client/maps/eastasia/cities.json",
-      "bytes": 130896,
-      "sha256": "db40638f7c6fe70dd1916a09f981948af590d4f8ffec705f82a128ae9b9d23f1"
+      "bytes": 124966,
+      "sha256": "cd3634967e448924f9af9ac9c2a8d42b3212790bda22a08dcf4562ed2bebe86f"
     },
     {
       "path": "client/maps/eastasia/facilities.json",
@@ -4058,9 +4408,59 @@
       "sha256": "6e588101050fadc54e9e3de53de13509f06ba3f80219edaeefb8416307a4042b"
     },
     {
+      "path": "client/music/battle1.mp3",
+      "bytes": 2848809,
+      "sha256": "236a006d0d8d58d6ee55df958cfc246b10d5eb697f2f92b8c05cdde6dfcc87e0"
+    },
+    {
+      "path": "client/music/battle2.mp3",
+      "bytes": 2422491,
+      "sha256": "94c8b0ecc6153d93483232be9d13d19ad2267df45bcf1e10be94d5cd9789b6f0"
+    },
+    {
+      "path": "client/music/battle3.mp3",
+      "bytes": 2368992,
+      "sha256": "0e296554c5b419e21aad97a2d7a7b3c759fdb348d26e3a888b7effb84fe45e7a"
+    },
+    {
+      "path": "client/music/battle4.mp3",
+      "bytes": 2269100,
+      "sha256": "7f0f6dfb62dc4cc72faee33ea93cc98e5358cea68a66f1057c17d61825b0c3d4"
+    },
+    {
+      "path": "client/music/defeat_music.mp3",
+      "bytes": 247420,
+      "sha256": "659a0ea8d287be1f4bbb99fd11fab6e9ce09dba37efc8c0b20042fa9a4036273"
+    },
+    {
+      "path": "client/music.json",
+      "bytes": 149,
+      "sha256": "9dcef7a9b8b89c69025efb1dcee39afee3a0859370b75a181ea5fc03654f07c5"
+    },
+    {
+      "path": "client/presentation.json",
+      "bytes": 3035,
+      "sha256": "49dc78dc54e93ad42896ee7188d32f309d2fb968a0714d6028a11c2aff1adce3"
+    },
+    {
+      "path": "client/sounds/sfx_armourmove.wav",
+      "bytes": 22004,
+      "sha256": "1d03b3843a23599ecd6413648899fc50b9488eaeb17a9452bf16c3231aa923f4"
+    },
+    {
       "path": "client/sounds/sfx_cannon.wav",
       "bytes": 24544,
       "sha256": "41951670f741aafa1449e47a7a1d445e0645633846114cea88f25e3f51a8044f"
+    },
+    {
+      "path": "client/sounds/sfx_cavalrymove.wav",
+      "bytes": 64558,
+      "sha256": "e9233a952a6747d7292dbb7f49b43e4e2bbdb0bd91dbc4a5af9a7cd1ba65b00e"
+    },
+    {
+      "path": "client/sounds/sfx_draft.wav",
+      "bytes": 7318,
+      "sha256": "057fbccce312834632ea854780d3d4475cd61609a17d3b5d9943c731126f94c9"
     },
     {
       "path": "client/sounds/sfx_exp.wav",
@@ -4128,14 +4528,34 @@
       "sha256": "e2d39dfad8c27314e70f49cdce789a41b14cc5471f0a0c0721c33e62be1dc6d6"
     },
     {
+      "path": "client/sounds/sfx_leg.wav",
+      "bytes": 21006,
+      "sha256": "0387a81a45d01615fdaccdf94d0066b58d5f16b7bc88576e8be6db1617794c48"
+    },
+    {
+      "path": "client/sounds/sfx_lvup.wav",
+      "bytes": 20044,
+      "sha256": "2a057c558b251547fabcafdb6d4bb8d8d59d939c91eec9b9803f04f89737d1e8"
+    },
+    {
       "path": "client/sounds/sfx_machine_gun.wav",
       "bytes": 17044,
       "sha256": "36e44a4f25660c82f01abb652479d678a55adb12a98bc7c9f722734d09e0c347"
     },
     {
+      "path": "client/sounds/sfx_naval.wav",
+      "bytes": 16550,
+      "sha256": "f2be4d3a692a8c22c6468502e8829c7f0851f662161fd3ddbf62967153ead1f2"
+    },
+    {
       "path": "client/sounds/sfx_naval_gun.wav",
       "bytes": 31274,
       "sha256": "a41bd71a81ba81b201641ecf33c520737255eaa64e28c124295b3f7baf12c872"
+    },
+    {
+      "path": "client/sounds/sfx_occupy.wav",
+      "bytes": 22074,
+      "sha256": "c73d1315ae8225c81953a99e6dec0eaa7809309b83a340258a5021f341ddb8e6"
     },
     {
       "path": "client/sounds/sfx_rocket.wav",
@@ -4146,6 +4566,11 @@
       "path": "client/sounds/sfx_strike.wav",
       "bytes": 13422,
       "sha256": "440f690fd6da4829b656b1150f1f286d98cfdb832e188715914edadcd55b6443"
+    },
+    {
+      "path": "client/sounds/sfx_supply.wav",
+      "bytes": 24290,
+      "sha256": "3a8617d2479fdfc59e46042a24987c1a5048d42e95d96cfe960fdd1f579ffcb1"
     },
     {
       "path": "client/ui/campaign.png",
@@ -10808,364 +11233,24 @@
       "sha256": "0ae74035cf98a7ff35cf75f346b1de7a16bbc1ba37157939f57a9e9f8d94e625"
     },
     {
-      "path": "legacy/catalog.json",
-      "bytes": 1710270,
-      "sha256": "bbf0ef42342dc82165d956531d4c14d51fe042ea008c9cefc22932ad63d22b53"
-    },
-    {
-      "path": "legacy/runtime_rule_tables.json",
-      "bytes": 1193,
-      "sha256": "6866b8a54e33a65c11500a9e750f2e8d2151428f159d31414f77faa0e60e72f5"
-    },
-    {
-      "path": "legacy/metagame_rule_tables.json",
-      "bytes": 505,
-      "sha256": "ce466cbe16e3633986730efe44cf58ab9591d0e65f449b75873cba12fdd5f42d"
-    },
-    {
-      "path": "client/fight-font.json",
-      "bytes": 681,
-      "sha256": "cb5d470f233a0a1206db65964544827342386bb50d4fdb5017801e6e95fd6036"
-    },
-    {
-      "path": "client/images/font_fight_num_hd.png",
-      "bytes": 11845,
-      "sha256": "b287af59b5b330fbe101bf3d45a51da8a15f1d640026b3ae5c9080d8841faab0"
-    },
-    {
       "path": "client/unit-visuals.json",
       "bytes": 40926,
       "sha256": "108261f84b2c70ce8da9bc22d785ff98c7f223da692bb6916d45793de56b8c09"
     },
     {
-      "path": "client/countries.json",
-      "bytes": 5959,
-      "sha256": "cb0a5095bfcd2f2e074b4e88a385babb97339be3bae95b3c4c1c969db4f1d744"
+      "path": "rewrite/extension.json",
+      "bytes": 126,
+      "sha256": "6ca8e1fd8d219d590b9ac07208fc705eec72ccdf454b6485d6e8d414af1ae7e8"
     },
     {
-      "path": "client/presentation.json",
-      "bytes": 3035,
-      "sha256": "49dc78dc54e93ad42896ee7188d32f309d2fb968a0714d6028a11c2aff1adce3"
+      "path": "rewrite/geography.json",
+      "bytes": 14408,
+      "sha256": "1b7bac1dcde72d0b8471fbc6527219860836ee4f664a2b41a7d26ec4e109f64f"
     },
     {
-      "path": "client/sounds/sfx_armourmove.wav",
-      "bytes": 22004,
-      "sha256": "1d03b3843a23599ecd6413648899fc50b9488eaeb17a9452bf16c3231aa923f4"
-    },
-    {
-      "path": "client/sounds/sfx_cavalrymove.wav",
-      "bytes": 64558,
-      "sha256": "e9233a952a6747d7292dbb7f49b43e4e2bbdb0bd91dbc4a5af9a7cd1ba65b00e"
-    },
-    {
-      "path": "client/sounds/sfx_draft.wav",
-      "bytes": 7318,
-      "sha256": "057fbccce312834632ea854780d3d4475cd61609a17d3b5d9943c731126f94c9"
-    },
-    {
-      "path": "client/sounds/sfx_leg.wav",
-      "bytes": 21006,
-      "sha256": "0387a81a45d01615fdaccdf94d0066b58d5f16b7bc88576e8be6db1617794c48"
-    },
-    {
-      "path": "client/sounds/sfx_lvup.wav",
-      "bytes": 20044,
-      "sha256": "2a057c558b251547fabcafdb6d4bb8d8d59d939c91eec9b9803f04f89737d1e8"
-    },
-    {
-      "path": "client/sounds/sfx_naval.wav",
-      "bytes": 16550,
-      "sha256": "f2be4d3a692a8c22c6468502e8829c7f0851f662161fd3ddbf62967153ead1f2"
-    },
-    {
-      "path": "client/sounds/sfx_occupy.wav",
-      "bytes": 22074,
-      "sha256": "c73d1315ae8225c81953a99e6dec0eaa7809309b83a340258a5021f341ddb8e6"
-    },
-    {
-      "path": "client/sounds/sfx_supply.wav",
-      "bytes": 24290,
-      "sha256": "3a8617d2479fdfc59e46042a24987c1a5048d42e95d96cfe960fdd1f579ffcb1"
-    },
-    {
-      "path": "client/fonts/Liberation-LICENSE.txt",
-      "bytes": 5756,
-      "sha256": "f32df582a2aab128c07b2f7e36e7b928dc5f6bd82657b905c04f91459f9e5cf9"
-    },
-    {
-      "path": "client/fonts/UKai-LICENSE.txt",
-      "bytes": 8358,
-      "sha256": "f50bd3e5b92c3dcf4e5ae478927297f534989c616dfcb8e507106c20dfb8c798"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-000.woff2",
-      "bytes": 16040,
-      "sha256": "a8c6198bf5c2db3ad697d5afbe9377ca0dc7c2fca528fb887af62f12d936438b"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-003.woff2",
-      "bytes": 6116,
-      "sha256": "3f07bb769df9841464292f41b6c6e5d0e24beca2bf85a5ca572fff0878501d8a"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-004.woff2",
-      "bytes": 16352,
-      "sha256": "28ea01377ed3364e2dcccb06812e7a00241559f90edbd525a87874628811bf52"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-005.woff2",
-      "bytes": 68624,
-      "sha256": "4457ff02843d09dd4e158777c57187234a919326e9451cad5c3137d49ce8eb87"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-006.woff2",
-      "bytes": 124832,
-      "sha256": "7384dab0d742c0dd0f7e6b649d4658230756d90e50dd409095ffc967377e661b"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-007.woff2",
-      "bytes": 107184,
-      "sha256": "279d6404310fa033aa394c0922b9dcfbaf38f3de8b8d4f5b9bb7d775e7717122"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-008.woff2",
-      "bytes": 77148,
-      "sha256": "37574e65328095973b8ba0b8587b9279c48ba602ff131c616e1ec67a173db862"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-009.woff2",
-      "bytes": 148872,
-      "sha256": "13e37f73dde9fcfcc8733eac57d4f72973b0decab13ad96ef9e9f628d33bff17"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-00a.woff2",
-      "bytes": 514804,
-      "sha256": "473fd94e97697a77602282be8e2aadcd7dd70a2185f7876acc029df5f5775f94"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-00b.woff2",
-      "bytes": 518140,
-      "sha256": "34396d0c4d5e15ce3cecd6d6ce58fc205aa61242471d72055288b679aacf6747"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-00c.woff2",
-      "bytes": 513288,
-      "sha256": "c1a467153a25095618ce1aed752a79f5bf65f02a463be99df22f69c166a80041"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-00d.woff2",
-      "bytes": 564636,
-      "sha256": "35da35d9001c52f6c4ebed118cc7626010580701917cc2a809d14e5b1c6e806f"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-00e.woff2",
-      "bytes": 599888,
-      "sha256": "a38f3cdd85929c9dfc43161006775d30ec9c12fa04bd6b1b89d33eb2732b2e6c"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-00f.woff2",
-      "bytes": 596220,
-      "sha256": "b86b753b2a811a906a4c5610069ad96035a665528ecebda0ee40dab266cf3c0c"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-010.woff2",
-      "bytes": 615860,
-      "sha256": "62b4af810b1c0412f51734802325d223e53d151d927aa4cd7b9e93b656bbae8c"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-011.woff2",
-      "bytes": 614480,
-      "sha256": "0ad547acc26abfb30521f2ca63b99bcbf2b3edbea23f6ef9300c0461ee63efe6"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-012.woff2",
-      "bytes": 623428,
-      "sha256": "5652836c008724d5535461a3b59a725a980aeac60c90d3f4d5d7503451a1a624"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-013.woff2",
-      "bytes": 692472,
-      "sha256": "5f638c3cf1fca003d90216aa92147c1e23d96574de6807e3751febd20c6c0917"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-01c.woff2",
-      "bytes": 2388,
-      "sha256": "26f458c99fa737a7fa95859dc6e86b49a66d57de278cbf61b9f6551b65b37d14"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-01d.woff2",
-      "bytes": 10328,
-      "sha256": "29a036da6349d7c55b262c37738988023c9170665779a6d28a91663e5a1fe7c9"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-01f.woff2",
-      "bytes": 164104,
-      "sha256": "63748c2c8acbbdee6412f281c94534920cc85b2bc51d38a6c455e73854ffcf70"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-040.woff2",
-      "bytes": 31988,
-      "sha256": "75dfd107e8bfffc09c0ff7efbb03c64d5870d2161f2285a3cba173c82d498670"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-041.woff2",
-      "bytes": 49792,
-      "sha256": "f1fb97661aedb3fce8030e061eaded12abc1f7f0dcd5121595a8e8a66f34b88b"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-042.woff2",
-      "bytes": 51904,
-      "sha256": "19a570cfbc94bbc7fd6d7e3c3896e48bcf5deb9fa13fb137d5e155a641f85ca1"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-043.woff2",
-      "bytes": 38400,
-      "sha256": "f7001a27fc3bde5b1f91b69f030933383ff211b52bcf02acf3d7f1010dbb6180"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-044.woff2",
-      "bytes": 23736,
-      "sha256": "67bed7934f349a3dde2add6a556f7541c7477a44e9768c7d4b212a5bcdd9d765"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-045.woff2",
-      "bytes": 32584,
-      "sha256": "c28d8fd8d629a37d0d8781f60389b1a5b24c0ce7055358bb44ca824564fbae64"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-046.woff2",
-      "bytes": 39552,
-      "sha256": "d155b59a6fff1c1ceb37db3ca45bb5210df5ea7da51bf78a49872595dc7e06a5"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-047.woff2",
-      "bytes": 31108,
-      "sha256": "46ba2227c6e880d83bdd4922bb0c8c6632b8695a9fd176a60716f91665b76f83"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-048.woff2",
-      "bytes": 44968,
-      "sha256": "82ed34800270353b65e282647984bf84d4a2e881b5f964631dfa98703604112c"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-049.woff2",
-      "bytes": 56104,
-      "sha256": "cc22e8b792d50198483a0fd54e17475d62f207da3e216a97562bb4467c96c031"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-04a.woff2",
-      "bytes": 26848,
-      "sha256": "713c690c3afaa4eae2054735345a286f0460b0ef68036d36fa2dd32375831ee1"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-04b.woff2",
-      "bytes": 26792,
-      "sha256": "5565f478bd092915bd224cb921bb462ed299aae7b2d7c2c00ea8a6e682d8ce7d"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-04c.woff2",
-      "bytes": 28928,
-      "sha256": "9a484b8ead50a7048e373b465c55644bac7b4582186901a3d45585c9ab3771ab"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-04d.woff2",
-      "bytes": 47956,
-      "sha256": "4801a6702069c508a43d5b13a2558f5ba3864a29b41d96320a1b8c7aefb5da5a"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-04e.woff2",
-      "bytes": 29468,
-      "sha256": "c36e4022b518fe854fde8aab7cedc70eb87ab05aed9c010653dd297ae2c7d08a"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-04f.woff2",
-      "bytes": 24772,
-      "sha256": "05a9592c99fc84b919485b06781dbeb50ddc1f97ebe80f2622c1fd67d201f16d"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-050.woff2",
-      "bytes": 26284,
-      "sha256": "4f1c80b7e191a13da7682486a5f500211f0fa8007f0dc71fcaf0c3d96cdba15d"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-051.woff2",
-      "bytes": 55016,
-      "sha256": "8dc479ec18bb75db879583a78cf48f0ecf1430a5514ea60f2362460d312f09ee"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-052.woff2",
-      "bytes": 19968,
-      "sha256": "87498370a4f25f2e5c9004e5f0c7dfd86274820104eafd172115b4934bd60c67"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-053.woff2",
-      "bytes": 22064,
-      "sha256": "9b79547a1be5b16a1caa7469a41eb274b359de922bbb24cd5d2aecf7583c2bde"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-054.woff2",
-      "bytes": 25748,
-      "sha256": "5ab7587c509fd0e1c54c4401e10fa149555c46723af4cfd2cdd00c99f362cf48"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-05f.woff2",
-      "bytes": 5408,
-      "sha256": "b6eb3f9f02d609fc99cebafb18303b09b10183cab80b02a0172a7f47392f82b2"
-    },
-    {
-      "path": "client/fonts/parts/ARPLUKaiCN-core.woff2",
-      "bytes": 418328,
-      "sha256": "504c15c2354ad6d6bcc5f9921ed0bb907b055eb03818cf28e7f033c665bfdcc6"
-    },
-    {
-      "path": "client/fonts/parts/LiberationSans-BoldItalic-core.woff2",
-      "bytes": 4208,
-      "sha256": "e38195566d7125b8fd605596736ccc34d0d526103e21d062b0437d6c3950836b"
-    },
-    {
-      "path": "client/fonts/parts/LiberationSerif-Bold-003.woff2",
-      "bytes": 15512,
-      "sha256": "f890818cb13b34b70899d7f72116c6c0878fb6bf49da531c167c6ab4868b3c84"
-    },
-    {
-      "path": "client/fonts/parts/LiberationSerif-Bold-004.woff2",
-      "bytes": 9924,
-      "sha256": "159d3d5ead6bd9f7d36f239c1c9e9886b82f71201375fe7df9751365617bffac"
-    },
-    {
-      "path": "client/fonts/parts/LiberationSerif-Bold-core.woff2",
-      "bytes": 36424,
-      "sha256": "f86315fbf07956b510f4f95effa5a971477d72c073bdb780c01e8a9cce4d5362"
-    },
-    {
-      "path": "client/music.json",
-      "bytes": 149,
-      "sha256": "9dcef7a9b8b89c69025efb1dcee39afee3a0859370b75a181ea5fc03654f07c5"
-    },
-    {
-      "path": "client/music/battle1.mp3",
-      "bytes": 2848809,
-      "sha256": "236a006d0d8d58d6ee55df958cfc246b10d5eb697f2f92b8c05cdde6dfcc87e0"
-    },
-    {
-      "path": "client/music/battle2.mp3",
-      "bytes": 2422491,
-      "sha256": "94c8b0ecc6153d93483232be9d13d19ad2267df45bcf1e10be94d5cd9789b6f0"
-    },
-    {
-      "path": "client/music/battle3.mp3",
-      "bytes": 2368992,
-      "sha256": "0e296554c5b419e21aad97a2d7a7b3c759fdb348d26e3a888b7effb84fe45e7a"
-    },
-    {
-      "path": "client/music/battle4.mp3",
-      "bytes": 2269100,
-      "sha256": "7f0f6dfb62dc4cc72faee33ea93cc98e5358cea68a66f1057c17d61825b0c3d4"
-    },
-    {
-      "path": "client/music/defeat_music.mp3",
-      "bytes": 247420,
-      "sha256": "659a0ea8d287be1f4bbb99fd11fab6e9ce09dba37efc8c0b20042fa9a4036273"
+      "path": "rewrite/map-colors.json",
+      "bytes": 33,
+      "sha256": "96d1f7c5b2ff109d2780d173b0395ed0cca18bfd54ef4844f817302f5ffc9b4b"
     }
   ]
 }

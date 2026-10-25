@@ -1,0 +1,35 @@
+{
+  "addedCities": [
+    {
+      "name": "高知",
+      "lon": 133.5311,
+      "lat": 33.5597,
+      "tier": 2,
+      "group": "日本及琉球桦太",
+      "id": "city-828820864450",
+      "city_id": 10278,
+      "x": 4139.339,
+      "y": 1955.242,
+      "cell": 11505,
+      "col": 129,
+      "row": 72,
+      "world_pixel": [
+        8256,
+        3870
+      ],
+      "generalized_land": false,
+      "displacement_km": 30.67,
+      "addition": true,
+      "building_level": 2,
+      "building_style": 2,
+      "visual_land_patch": false
+    }
+  ],
+  "existingCitiesUnchanged": true,
+  "facilitiesUnchanged": 272,
+  "bridgesUnchanged": 54,
+  "changedTerrainCells": [
+    11505
+  ],
+  "errors": 0
+}

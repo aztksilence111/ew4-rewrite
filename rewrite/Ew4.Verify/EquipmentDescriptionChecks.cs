@@ -67,7 +67,7 @@ internal static class EquipmentDescriptionChecks
         var modItems = LegacyItemTradingCatalog.Read(modXml, true);
         Check(modItems.Items[20].Equipment.Value == 99 && modItems.Items[8].Equipment.Value == 2
             && modItems.Items[1].Equipment.Effect == Ew4Commander.Effect(1), "custom item tables retain author values and effects");
-        var modCatalog = JsonNode.Parse(File.ReadAllText(Path.Combine(root, "rewrite/data/legacy/catalog.json")))!;
+        var modCatalog = JsonNode.Parse(Ew4.Legacy.LegacyCatalogFiles.ReadCatalogFile(Path.Combine(root, "rewrite/data/legacy/catalog.json")))!;
         modCatalog["source_sha256"]!["def_item.xml"] = new string('a', 64);
         var customRuntime = LegacyRuntimeCatalog.FromJson(modCatalog.ToJsonString(), true);
         Check(customRuntime.Items[20].Value == 6 && customRuntime.Items[1].Effect == Ew4Commander.Effect(1), "custom runtime catalog is not normalized by base IDs");

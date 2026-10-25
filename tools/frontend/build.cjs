@@ -35,4 +35,19 @@ for(const name of fs.readdirSync(web).filter(n=>n.endsWith('.css'))){
 const listing=JSON.stringify(manifest,null,2)+'\n';
 if(!fs.existsSync(path.join(output,'manifest.json'))||fs.readFileSync(path.join(output,'manifest.json'),'utf8')!==listing)
   fs.writeFileSync(path.join(output,'manifest.json'),listing);
+const inputs=[];
+function collect(folder){
+  for(const entry of fs.readdirSync(folder,{withFileTypes:true})){
+    if(['bin','obj','compat','node_modules'].includes(entry.name))continue;
+    const file=path.join(folder,entry.name);
+    if(entry.isDirectory())collect(file);
+    else if(/\.(cs|csproj|js|css|html|targets|props)$/.test(entry.name))inputs.push(file);
+  }
+}
+for(const project of fs.readdirSync(path.join(root,'rewrite')).filter(n=>n.startsWith('Ew4.')))collect(path.join(root,'rewrite',project));
+inputs.push(path.join(root,'rewrite/Frontend.Build.targets'),__filename);
+const sourceHash=crypto.createHash('sha256');
+for(const file of inputs.sort()){sourceHash.update(path.relative(root,file).replace(/\\/g,'/'));sourceHash.update('\0');sourceHash.update(fs.readFileSync(file));sourceHash.update('\0');}
+const buildInfo=JSON.stringify({source:sourceHash.digest('hex'),inputs:inputs.length})+'\n',buildInfoPath=path.join(web,'build-info.json');
+if(!fs.existsSync(buildInfoPath)||fs.readFileSync(buildInfoPath,'utf8')!==buildInfo)fs.writeFileSync(buildInfoPath,buildInfo);
 console.log(JSON.stringify({target:manifest.target,files:Object.keys(manifest.files).length,errors:0}));

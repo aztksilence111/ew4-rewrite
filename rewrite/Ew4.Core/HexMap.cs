@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -56,11 +57,16 @@ public sealed class HexMap
     }
 }
 
+public enum TerrainBarrier { None, Mountain, Ocean }
+
 public sealed record MovementCell
 {
     public bool Active { get; init; } = true;
+    public TerrainBarrier Barrier { get; init; }
+    public bool CanTraverse() => Active && Barrier == TerrainBarrier.None;
     public bool Sea { get; init; }
     public int TerrainCost { get; init; } = 3;
+    public int MinimumEntryCost { get; init; }
     public byte BlockedSeaEdges { get; init; }
     public byte RiverEdges { get; init; }
     public byte BridgeEdges { get; init; }
@@ -105,7 +111,7 @@ public static class Movement
         int component = 0;
         for (int start = 0; start < map.Count; start++)
         {
-            if (labels[start] >= 0 || !cells[start].Active) continue;
+            if (labels[start] >= 0 || !cells[start].CanTraverse()) continue;
             labels[start] = component; queue.Enqueue(start);
             while (queue.Count > 0)
             {
@@ -113,7 +119,7 @@ public static class Movement
                 for (int direction = 0; direction < 6; direction++)
                 {
                     int to = map.Neighbor(from, direction);
-                    if (to < 0 || !cells[to].Active || labels[to] >= 0) continue;
+                    if (to < 0 || !cells[to].CanTraverse() || labels[to] >= 0) continue;
                     int? forward = EntryCost(cells[from], cells[to], (direction + 3) % 6, actor, rules);
                     int? reverse = EntryCost(cells[to], cells[from], direction, actor, rules);
                     bool Legal(int? cost) => cost.HasValue && (cost.Value <= actor.FullBudget || rules.AllowOverdrawnEntry);
@@ -132,40 +138,162 @@ public static class Movement
         if (cells.Count != map.Count || actor.FullBudget < 1 || actor.Remaining < 0 || actor.Remaining > actor.FullBudget)
             throw new RuleViolation("movement.state", "Map/actor movement state is inconsistent");
         var rules = configuration ?? new();
-        var distances = new Dictionary<int, long>();
-        var queue = new SortedSet<(long Cost, int Cell)>();
+        var distances = new DistanceField(map.Count);
+        using var queue = new DistanceQueue();
         foreach (int cell in destinations)
         {
             map.Check(cell);
-            if (!cells[cell].Active) continue;
-            distances[cell] = 0;
+            if (!cells[cell].CanTraverse()) continue;
+            if (distances.TryGetValue(cell, out long existing) && existing == 0) continue;
+            distances.Set(cell, 0);
             queue.Add((0, cell));
         }
         while (queue.Count > 0)
         {
-            var current = queue.Min;
-            queue.Remove(current);
+            var current = queue.RemoveMin();
             if (distances[current.Cell] != current.Cost) continue;
             for (int direction = 0; direction < 6; direction++)
             {
                 int previous = map.Neighbor(current.Cell, direction);
-                if (previous < 0 || !cells[previous].Active) continue;
+                if (previous < 0 || !cells[previous].CanTraverse()) continue;
                 int? cost = EntryCost(cells[previous], cells[current.Cell], direction, actor, rules);
                 if (!cost.HasValue || cost.Value > actor.FullBudget && !rules.AllowOverdrawnEntry) continue;
                 long total = checked(current.Cost + cost.Value);
                 if (distances.TryGetValue(previous, out long old) && old <= total) continue;
-                distances[previous] = total;
+                distances.Set(previous, total);
                 queue.Add((total, previous));
             }
         }
         return distances;
     }
 
+    // Only finalized requested distances escape. Once the origin is settled,
+    // every strictly closer landing has already been settled, including zero edges.
+    internal static IReadOnlyDictionary<int, long> DistancesForAdvance(HexMap map, IReadOnlyList<MovementCell> cells,
+        IReadOnlyCollection<int> destinations, MovementActor actor, MovementRules rules, int origin,
+        IReadOnlyCollection<int> landings)
+    {
+        map.Check(origin);
+        if (cells.Count != map.Count || actor.FullBudget < 1 || actor.Remaining < 0 || actor.Remaining > actor.FullBudget)
+            throw new RuleViolation("movement.state", "Map/actor movement state is inconsistent");
+        var requested = new HashSet<int>(landings) { origin };
+        foreach (int cell in requested) map.Check(cell);
+        var result = new Dictionary<int, long>();
+        long[] costs = ArrayPool<long>.Shared.Rent(map.Count);
+        Array.Fill(costs, -1L, 0, map.Count);
+        try
+        {
+            using var queue = new DistanceQueue();
+            foreach (int cell in destinations)
+            {
+                map.Check(cell);
+                if (!cells[cell].CanTraverse() || costs[cell] == 0) continue;
+                costs[cell] = 0;
+                queue.Add((0, cell));
+            }
+            while (queue.Count > 0)
+            {
+                var current = queue.RemoveMin();
+                if (costs[current.Cell] != current.Cost) continue;
+                if (requested.Remove(current.Cell)) result.Add(current.Cell, current.Cost);
+                if (current.Cell == origin || requested.Count == 0) break;
+                for (int direction = 0; direction < 6; direction++)
+                {
+                    int previous = map.Neighbor(current.Cell, direction);
+                    if (previous < 0 || !cells[previous].CanTraverse()) continue;
+                    int? cost = EntryCost(cells[previous], cells[current.Cell], direction, actor, rules);
+                    if (!cost.HasValue || cost.Value > actor.FullBudget && !rules.AllowOverdrawnEntry) continue;
+                    long total = checked(current.Cost + cost.Value);
+                    if (costs[previous] >= 0 && costs[previous] <= total) continue;
+                    costs[previous] = total;
+                    queue.Add((total, previous));
+                }
+            }
+            return result;
+        }
+        finally { ArrayPool<long>.Shared.Return(costs); }
+    }
+
+    // Results own their arrays. Only the temporary heap buffer is returned to a
+    // pool, so cached fields and nested searches cannot overwrite each other.
+    private sealed class DistanceField : IReadOnlyDictionary<int, long>
+    {
+        private readonly long[] costs;
+        private readonly int[] keys;
+        public int Count { get; private set; }
+        internal DistanceField(int size)
+        {
+            costs = new long[size]; keys = new int[size];
+            Array.Fill(costs, -1L);
+        }
+        internal void Set(int cell, long cost)
+        {
+            if (costs[cell] < 0) keys[Count++] = cell;
+            costs[cell] = cost;
+        }
+        public long this[int key] => TryGetValue(key, out long value) ? value : throw new KeyNotFoundException();
+        public bool ContainsKey(int key) => key >= 0 && key < costs.Length && costs[key] >= 0;
+        public bool TryGetValue(int key, out long value)
+        {
+            if (ContainsKey(key)) { value = costs[key]; return true; }
+            value = default; return false;
+        }
+        public IEnumerable<int> Keys { get { for (int i = 0; i < Count; i++) yield return keys[i]; } }
+        public IEnumerable<long> Values { get { for (int i = 0; i < Count; i++) yield return costs[keys[i]]; } }
+        public IEnumerator<KeyValuePair<int, long>> GetEnumerator()
+        {
+            for (int i = 0; i < Count; i++) yield return new(keys[i], costs[keys[i]]);
+        }
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
+    private sealed class DistanceQueue : IDisposable
+    {
+        private (long Cost, int Cell)[] items = ArrayPool<(long, int)>.Shared.Rent(256);
+        public int Count { get; private set; }
+        private static bool Before((long Cost, int Cell) a, (long Cost, int Cell) b) =>
+            a.Cost < b.Cost || a.Cost == b.Cost && a.Cell < b.Cell;
+        internal void Add((long Cost, int Cell) item)
+        {
+            if (Count == items.Length)
+            {
+                var larger = ArrayPool<(long, int)>.Shared.Rent(checked(items.Length * 2));
+                Array.Copy(items, larger, Count);
+                ArrayPool<(long, int)>.Shared.Return(items);
+                items = larger;
+            }
+            int index = Count++;
+            while (index > 0)
+            {
+                int parent = (index - 1) / 2;
+                if (!Before(item, items[parent])) break;
+                items[index] = items[parent]; index = parent;
+            }
+            items[index] = item;
+        }
+        internal (long Cost, int Cell) RemoveMin()
+        {
+            var result = items[0];
+            var last = items[--Count];
+            int index = 0;
+            while (index * 2 + 1 < Count)
+            {
+                int child = index * 2 + 1;
+                if (child + 1 < Count && Before(items[child + 1], items[child])) child++;
+                if (!Before(items[child], last)) break;
+                items[index] = items[child]; index = child;
+            }
+            if (Count > 0) items[index] = last;
+            return result;
+        }
+        public void Dispose() => ArrayPool<(long, int)>.Shared.Return(items);
+    }
+
     public static int? EntryCost(MovementCell from, MovementCell to, int enteringEdge, MovementActor actor, MovementRules rules)
     {
         if (enteringEdge < 0 || enteringEdge >= 6 || rules.BaseLandCost <= 0 || rules.SeaCost <= 0 || to.TerrainCost <= 0)
             throw new RuleViolation("movement.configuration", "Invalid edge or movement cost");
-        if (!to.Active || (rules.BlockEnemyOccupied && to.OccupantCamp != null && to.OccupantCamp != actor.Camp)) return null;
+        if (!from.CanTraverse() || !to.CanTraverse() || (rules.BlockEnemyOccupied && to.OccupantCamp != null && to.OccupantCamp != actor.Camp)) return null;
         int cost;
         if (to.Sea)
         {
@@ -180,7 +308,7 @@ public static class Movement
         if ((actor.Transport && from.Sea != to.Sea)
             || ((to.RiverEdges & (1 << enteringEdge)) != 0 && (to.BridgeEdges & (1 << enteringEdge)) == 0))
             cost = actor.FullBudget;
-        return cost;
+        return Math.Max(cost, to.MinimumEntryCost);
     }
 
     public static IReadOnlyDictionary<int, ReachableCell> Reachable(HexMap map, IReadOnlyList<MovementCell> cells,
@@ -190,6 +318,7 @@ public static class Movement
         if (cells.Count != map.Count || actor.FullBudget < 0 || actor.Remaining < 0 || actor.Remaining > actor.FullBudget)
             throw new RuleViolation("movement.state", "Map/actor movement state is inconsistent");
         var rules = configuration ?? new MovementRules();
+        if (!cells[origin].CanTraverse()) return new Dictionary<int, ReachableCell>();
         actor = AtOrigin(actor, cells[origin]);
         var remaining = new Dictionary<int, int> { [origin] = actor.Remaining };
         var parents = new Dictionary<int, int>();

@@ -81,7 +81,7 @@ public static class WorldActions
     {
         if (cell < 0 || cell >= state.Cells.Count || state.PendingDialogue != null || state.Phase != TurnPhase.Active) return false;
         var site = state.Cells[cell];
-        if (faction.Defeated || !site.Terrain.Active || site.Owner != faction.Id || (!offer.AllowSea && site.Terrain.Sea)
+        if (faction.Defeated || !site.Terrain.CanTraverse() || site.Owner != faction.Id || (!offer.AllowSea && site.Terrain.Sea)
             || offer.Template?.Profile.Category == "fort" && !JurisdictionClaims.CanBuildFort(state, cell, faction.Id)
             || !faction.Recruitment.ContainsKey(offer.Id)
             || (offer.Building == BuildingRequirement.Required && site.BuildingKind == null)
@@ -157,21 +157,22 @@ public static class WorldActions
         if (!(range ?? MovementRange(state, unit, rules)).TryGetValue(destination, out var reachable))
             throw new RuleViolation("move.unreachable", "No affordable legal route to destination");
         var otherUnits = state.Units.Where(u => u.Id != unitId).ToArray();
-        var claimed = JurisdictionClaims.Move(state,
-            TerritoryClaims.Move(map, state.Cells, otherUnits.Select(u => u.Cell).Distinct().ToArray(), reachable.Path, faction.Id, rules.Territory), reachable.Path, faction.Id);
+        var ownership = MovementOwnership.Move(state, map, otherUnits.Select(u => u.Cell).Distinct().ToArray(),
+            reachable.Path, faction.Id, rules.Territory);
+        var claimed = ownership.Cells;
         var moved = unit with
         {
             Cell = destination, RemainingMovement = rules.SpendAllMovement ? 0 : Math.Max(0, reachable.Remaining),
             Combatant = unit.Combatant with { AtSea = claimed[destination].Terrain.Sea, BuildingKind = claimed[destination].BuildingKind }
         };
         var notices = new List<WorldNotice> { new("unit.moved", unitId, destination) };
-        for (int i = 0; i < claimed.Count; i++)
-            if (claimed[i].Owner != state.Cells[i].Owner) notices.Add(new("cell.owner_changed", i.ToString()));
-        var next = state with { Cells = claimed, Units = state.Units.Select(u => u.Id == unitId ? moved : u).ToArray(),
-            Revision = checked(state.Revision + 1) };
+        foreach (int i in ownership.Changed) notices.Add(new("cell.owner_changed", i.ToString()));
+        var next = projection ? PlanningScope.ProjectMovement(state, unit, destination, moved.RemainingMovement, claimed, ownership)
+            : state with { Cells = claimed, Units = state.Units.Select(u => u.Id == unitId ? moved : u).ToArray(),
+                Revision = checked(state.Revision + 1) };
         if (!projection) next = next.Copy();
         next.Validate();
-        var previousOwners = Enumerable.Range(0, claimed.Count).Where(i => claimed[i].Owner != state.Cells[i].Owner)
+        var previousOwners = ownership.Changed
             .Select(i => state.Cells[i].Owner).Where(id => id != null && id != faction.Id).Distinct().ToArray();
         foreach (string? owner in previousOwners)
         {
@@ -208,7 +209,10 @@ public static class WorldActions
             var events = WorldEvents.DuringAction(next, new(TriggerKind.CellCaptured, Cell: destination, PreviousOwner: previous, NewOwner: current));
             next = events.State; notices.AddRange(events.Notices);
         }
-        next = next with { Revision = checked(state.Revision + 1) };
+        var provocation = WorldProvocations.Captured(state, next, destination);
+        next = provocation.State; notices.AddRange(provocation.Notices);
+        next = projection ? PlanningScope.WithRevision(next, checked(state.Revision + 1))
+            : next with { Revision = checked(state.Revision + 1) };
         next.Validate();
         return new(next, notices) { Movements = new[] { new WorldMovement(unitId, reachable.Path) } };
     }
@@ -289,6 +293,17 @@ public static class WorldActions
 
     internal static (MovementCell[] Cells, MovementActor Actor) MovementContext(WorldState state, UnitState unit, WorldMoveRules? rules = null)
     {
+        if (PlanningScope.Queries(state) is { } queries)
+        {
+            var prepared = queries.Movement(unit.Owner);
+            var mover = MovementActorFor(unit, prepared.Camp);
+            if (rules?.Extensions != null)
+            {
+                int budget = rules.Extensions.MovementBudget(unit.Combatant);
+                mover = mover with { FullBudget = budget, Remaining = Math.Min(unit.RemainingMovement, budget) };
+            }
+            return (prepared.Cells, mover);
+        }
         var campIndex = state.Factions.ToDictionary(f => f.Id, f => f.Camp, StringComparer.Ordinal);
         if (state.DiplomaticRelations.Count > 0)
             campIndex = state.Factions.ToDictionary(f => f.Id, f => WorldDiplomacy.Allied(state, unit.Owner, f.Id) ? "allied" : "other", StringComparer.Ordinal);

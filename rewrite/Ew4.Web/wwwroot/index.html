@@ -6,12 +6,16 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self'; connect-src 'self'">
   <title>欧陆战争4</title>
   <link rel="stylesheet" href="style.css?v=20261023.1">
-  <link rel="stylesheet" href="original-ui.css?v=20261023.6">
+  <link rel="stylesheet" href="original-ui.css?v=20261025.2">
   <link rel="stylesheet" href="mods.css?v=20261020.4">
   <link rel="stylesheet" href="victory-ui.css?v=20261021.3">
   <link rel="stylesheet" href="local-multiplayer.css?v=20261021.1">
-  <link rel="stylesheet" href="single-action.css?v=20261021.2">
+  <link rel="stylesheet" href="single-action.css?v=20261025.1">
   <link rel="stylesheet" href="screen-layout.css?v=20261024.1">
+  <link rel="stylesheet" href="tutorial.css?v=20261025.1">
+  <link rel="stylesheet" href="map-views.css?v=20261025.3">
+  <link rel="stylesheet" href="headquarters-ui.css?v=20261025.1">
+  <link rel="stylesheet" href="pause-objectives.css?v=20261025.1">
   <link rel="stylesheet" href="runtime-compat.css?v=20261024.1">
 </head>
 <body>
@@ -59,6 +63,10 @@
       <span class="resource-item" data-resource="food"><img src="content/ui/image_ui_hd/marker_food.png" alt=""><span class="resource-value"></span></span>
     </div></div>
     <button id="menu-button" class="corner-button" title="暂停" aria-label="暂停"><span class="pause-symbol"></span></button>
+    <div id="map-view-controls" data-map-mode="normal">
+      <button id="map-mode" class="map-mode-button" type="button" title="普通地图" aria-label="普通地图" aria-haspopup="menu" aria-controls="map-mode-options" aria-expanded="false"><img src="map-normal.png" alt=""><span class="map-mode-arrow" aria-hidden="true"></span><span class="map-mode-tip">普通地图</span></button>
+      <div id="map-mode-options" role="menu" aria-label="地图显示方式" aria-hidden="true" hidden></div>
+    </div>
     <button id="end-turn" class="corner-button" title="结束回合" aria-label="结束回合"><span class="hourglass-symbol"></span></button>
     <button id="undo-move" class="corner-button" title="撤回移动" aria-label="撤回移动" disabled></button>
     <button id="next-unit" class="corner-button" title="寻找可行动部队" aria-label="寻找可行动部队" disabled><span id="next-unit-count" aria-hidden="true">0</span></button>
@@ -66,10 +74,10 @@
     <div id="ai-action" aria-label="电脑行动中" hidden><img id="ai-flag" alt=""><span>&gt;&gt;&gt;</span></div>
     <aside id="selection" hidden><div id="terrain-info" aria-label="地块收入与防御"></div><div id="actions" aria-label="地块操作"></div><div id="single-action" hidden><div id="single-action-cost" role="group"></div><button id="single-action-confirm" type="button" data-tutorial-id="btn_done" title="确认" aria-label="确认"></button></div></aside>
     <footer id="status" role="status"></footer>
-    <div id="pause" class="modal" hidden><div class="dialog pause-dialog"><header class="menu-bar"><button id="resume" class="close-icon" aria-label="返回战场" title="返回战场"></button><h2 data-label="pause_label">暂停</h2></header><p id="turn"></p><button id="save" data-label="save_label">保存</button><button id="pause-settings" data-label="settings_label">设定</button><button id="restart" data-label="restart_label">重新开始</button><button id="return-menu" data-label="main_label">退出</button></div></div>
+    <div id="pause" class="modal" hidden><aside id="pause-objectives" aria-label="战局目标" hidden></aside><div class="dialog pause-dialog"><header class="menu-bar"><button id="resume" class="close-icon" aria-label="返回战场" title="返回战场"></button><h2 data-label="pause_label">暂停</h2></header><p id="turn"></p><button id="save" data-label="save_label">保存</button><button id="pause-settings" data-label="settings_label">设定</button><button id="restart" data-label="restart_label">重新开始</button><button id="return-menu" data-label="main_label">退出</button></div></div>
     <div id="dialogue" hidden><button id="dialogue-ok" aria-label="继续对白"><img id="dialogue-portrait" alt=""><div class="talk-content"><div id="dialogue-speaker"></div><p id="dialogue-text"></p></div></button></div>
     <div id="scenario-event" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="scenario-event-title"><section class="dialog scenario-event-dialog"><div class="menu-bar"><h2 id="scenario-event-title"></h2></div><div id="scenario-event-content" tabindex="0" role="region" aria-label="事件内容"><img id="scenario-event-image" alt="" hidden><p id="scenario-event-text" hidden></p></div><div id="scenario-event-choices" tabindex="0" role="group" aria-label="事件选项"></div></section></div>
-    <div id="tutorial-talk" hidden><img id="tutorial-portrait" alt="拿破仑"><div class="talk-content"><div id="tutorial-speaker"></div><p id="tutorial-text"></p></div></div><div id="tutorial-focus" hidden></div>
+    <div id="tutorial-talk" hidden><img id="tutorial-portrait" alt="拿破仑"><div class="talk-content"><div id="tutorial-speaker"></div><p id="tutorial-text"></p></div></div>
   </section>
   <div id="detail-modal" class="modal" hidden><div class="dialog original-dialog"><header class="menu-bar"><button id="close-detail" class="close-icon" aria-label="关闭信息" title="关闭"></button><h2 id="detail-title"></h2></header><div id="detail-content"></div><button id="detail-confirm" class="confirm-corner" aria-label="确认" title="确认"></button></div></div>
   <div id="settings" class="modal" hidden><div class="dialog settings-dialog">
@@ -103,6 +111,7 @@
   </dialog>
   <div id="startup-status" role="status" aria-live="polite"><span id="startup-message">正在载入…</span><button id="startup-retry" type="button" title="重试载入" aria-label="重试载入" hidden>&#8635;</button></div>
   <div id="loading-screen" role="status" aria-label="载入" hidden><div class="loading-stage"><img src="content/ui/title.png" alt="欧陆战争4 拿破仑"><div id="loading-tip"></div><div id="loading-word"></div></div></div>
+  <div id="tutorial-focus" hidden aria-hidden="true"></div>
   <script src="startup.js?v=20261021.1"></script>
   <script src="runtime-compat.js?v=20261023.1"></script>
   <script src="camera.js"></script>
@@ -110,21 +119,25 @@
   <script src="vendor/pixi-7.4.3.min.js"></script>
   <script src="vendor/pixi-csp-7.4.3.min.js"></script>
   <script src="pixi-battle.js"></script>
-  <script src="battlefield.js?v=20261023.5"></script>
-  <script src="original-ui.js?v=20261023.2"></script>
+  <script src="map-views.js?v=20261025.2"></script>
+  <script src="battlefield.js?v=20261025.4"></script>
+  <script src="original-ui.js?v=20261025.1"></script>
   <script src="menu-art.js?v=20261023.1"></script>
   <script src="effects.js?v=20261023.4"></script>
   <script src="native-layout.js?v=20261023.1"></script>
-  <script src="menus.js?v=20261023.7"></script>
+  <script src="menus.js?v=20261025.1"></script>
   <script src="music.js?v=20261023.2"></script>
   <script src="commander-workflows.js?v=20261023.1"></script>
+  <script src="headquarters-ui.js?v=20261025.1"></script>
   <script src="tutorial.js"></script>
   <script src="skill-ui.js?v=20261020.3"></script>
   <script src="victory-ui.js?v=20261021.4"></script>
+  <script src="pause-objectives.js?v=20261025.1"></script>
   <script src="local-multiplayer.js?v=20261021.3"></script>
   <script src="unit-navigation.js?v=20261023.3"></script>
   <script src="screen-layout.js?v=20261024.1"></script>
-  <script src="app.js?v=20261024.1"></script>
+  <script src="performance.js"></script>
+  <script src="app.js?v=20261025.1"></script>
   <script src="mods.js?v=20261020.4"></script>
 </body>
 </html>

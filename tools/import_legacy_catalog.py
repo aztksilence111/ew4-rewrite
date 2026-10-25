@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 import re
 import xml.etree.ElementTree as ET
+from catalog_files import write_catalog
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "apk_work/original/assets"
@@ -101,9 +102,7 @@ def main():
         raise ValueError("Duplicate profile IDs")
     output = ROOT / "rewrite/data/legacy/catalog.json"
     output.parent.mkdir(parents=True, exist_ok=True)
-    encoded = json.dumps(catalog, ensure_ascii=False, indent=2) + "\n"
-    if not output.exists() or output.read_text(encoding="utf-8") != encoded:
-        output.write_text(encoded, encoding="utf-8")
+    write_catalog(output, catalog)
     print(json.dumps({"profiles": len(ids), "variants": len(catalog["variants"]), "skills": len(catalog["skills"]),
                       "commanders": len(catalog["commanders"]), "errors": 0}))
 

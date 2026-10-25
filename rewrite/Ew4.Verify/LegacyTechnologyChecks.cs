@@ -18,7 +18,7 @@ internal static class LegacyTechnologyChecks
         string xml = File.ReadAllText(Path.Combine(assets, "def_warzonetech.xml"));
         var technology = LegacyWarzoneTechnology.Read(xml);
         var cards = LegacyRecruitmentCatalog.Read(File.ReadAllText(Path.Combine(assets, "def_card.xml")));
-        var runtime = LegacyRuntimeCatalog.FromJson(File.ReadAllText(Path.Combine(root, "rewrite/data/legacy/catalog.json")));
+        var runtime = LegacyRuntimeCatalog.FromJson(Ew4.Legacy.LegacyCatalogFiles.ReadCatalogFile(Path.Combine(root, "rewrite/data/legacy/catalog.json")));
         var sample = LegacyBattle.Read(File.ReadAllBytes(Path.Combine(assets, "campaign1_01.btl"))).Factions[0];
         Check(technology.Defaults.Count == 6 && technology.Defaults.Values.All(v => v.Count == 26) && technology.SourceXml == xml, "complete original XML defaults retained");
         using var vectors = JsonDocument.Parse(File.ReadAllText(Path.Combine(root, "reverse/reports/technology_vectors.json")));

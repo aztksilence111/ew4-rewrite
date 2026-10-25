@@ -6,6 +6,16 @@ require('../rewrite/Ew4.Web/wwwroot/effects.js');
 const vectors=JSON.parse(fs.readFileSync('reverse/reports/frontend_draw_vectors.json','utf8'));
 const manifest=JSON.parse(fs.readFileSync('rewrite/data/client/manifest.json','utf8'));
 let checks=0;
+const bridgeRenderer=new Ew4Battlefield.Renderer({sprite:(...args)=>bridgeCalls.push(args)}),bridgeCalls=[];
+for(let style=0;style<3;style++)for(let mask=0;mask<64;mask++){
+  bridgeCalls.length=0;
+  const site={active:true,bridgeEdges:63,['bridgeStyle'+style]:mask},p={x:320,y:540};
+  bridgeRenderer.visibleCells=[{site,p}];bridgeRenderer.bridges();
+  assert.deepEqual(bridgeCalls.map(c=>c.slice(0,5)),[0,1,2].filter(d=>mask&(1<<d)).map(d=>['buildings',`bridge_${style+1}_${d+1}.png`,320,540,1]));checks++;
+  site.active=false;bridgeCalls.length=0;bridgeRenderer.bridges();assert.equal(bridgeCalls.length,0);checks++;
+  site.active=true;site.bridgeEdges=0;bridgeRenderer.bridges();assert.equal(bridgeCalls.length,0);checks++;
+}
+bridgeRenderer.visibleCells=[{site:{active:true},p:{x:0,y:0}}];bridgeRenderer.bridges();assert.equal(bridgeCalls.length,0);checks++;
 const markers=JSON.parse(fs.readFileSync('reverse/reports/objective_marker_draws.json','utf8'));
 for(const fixture of markers.objectives){
   const selected=Ew4Battlefield.objectiveMarker({objectiveMarker:fixture.site},{objectiveMarker:fixture.unit});

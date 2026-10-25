@@ -1,0 +1,653 @@
+{
+  "schema": 1,
+  "maps": [
+    {
+      "map": "eastasia",
+      "width": 158,
+      "height": 136,
+      "baseTerrainSha256": "f70f36427ff30c33d1f0cb221f7789cad0339d62ee84adf336171bfdeaf8e275",
+      "terrainOverrides": [
+        {
+          "column": 6,
+          "row": 59,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 6,
+          "row": 60,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 7,
+          "row": 60,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 8,
+          "row": 60,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 6,
+          "row": 61,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 7,
+          "row": 61,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 8,
+          "row": 61,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 8,
+          "row": 62,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 9,
+          "row": 62,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 10,
+          "row": 62,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 8,
+          "row": 63,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 9,
+          "row": 63,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 9,
+          "row": 64,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 10,
+          "row": 64,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 9,
+          "row": 65,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 10,
+          "row": 65,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 10,
+          "row": 66,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 11,
+          "row": 66,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 9,
+          "row": 67,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 10,
+          "row": 67,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 10,
+          "row": 68,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 11,
+          "row": 68,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 10,
+          "row": 69,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 11,
+          "row": 69,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 11,
+          "row": 70,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 12,
+          "row": 70,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 10,
+          "row": 71,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 11,
+          "row": 71,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 11,
+          "row": 72,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 12,
+          "row": 72,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 11,
+          "row": 73,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 12,
+          "row": 73,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 12,
+          "row": 74,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 13,
+          "row": 74,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 12,
+          "row": 75,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 13,
+          "row": 75,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 14,
+          "row": 75,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 13,
+          "row": 76,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 14,
+          "row": 76,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 15,
+          "row": 76,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 13,
+          "row": 77,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 14,
+          "row": 77,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 15,
+          "row": 77,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 14,
+          "row": 78,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 15,
+          "row": 78,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 14,
+          "row": 79,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 16,
+          "row": 79,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 16,
+          "row": 80,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 17,
+          "row": 80,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 18,
+          "row": 80,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 16,
+          "row": 81,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 17,
+          "row": 81,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 18,
+          "row": 81,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 18,
+          "row": 82,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 19,
+          "row": 82,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 18,
+          "row": 83,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 19,
+          "row": 83,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 20,
+          "row": 83,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 19,
+          "row": 84,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 20,
+          "row": 84,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 21,
+          "row": 84,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 20,
+          "row": 85,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 21,
+          "row": 85,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 21,
+          "row": 86,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 22,
+          "row": 86,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 23,
+          "row": 86,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 21,
+          "row": 87,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 22,
+          "row": 87,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 24,
+          "row": 88,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 25,
+          "row": 88,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 23,
+          "row": 89,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 24,
+          "row": 89,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 25,
+          "row": 89,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 26,
+          "row": 89,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 27,
+          "row": 89,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 43,
+          "row": 89,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 44,
+          "row": 89,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 45,
+          "row": 89,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 25,
+          "row": 90,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 26,
+          "row": 90,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 27,
+          "row": 90,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 28,
+          "row": 90,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 29,
+          "row": 90,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 42,
+          "row": 90,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 43,
+          "row": 90,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 44,
+          "row": 90,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 45,
+          "row": 90,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 26,
+          "row": 91,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 27,
+          "row": 91,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 28,
+          "row": 91,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 29,
+          "row": 91,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 30,
+          "row": 91,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 32,
+          "row": 91,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 33,
+          "row": 91,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 34,
+          "row": 91,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 35,
+          "row": 91,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 36,
+          "row": 91,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 39,
+          "row": 91,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 40,
+          "row": 91,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 41,
+          "row": 91,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 42,
+          "row": 91,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 43,
+          "row": 91,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 29,
+          "row": 92,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 30,
+          "row": 92,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 32,
+          "row": 92,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 33,
+          "row": 92,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 34,
+          "row": 92,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 35,
+          "row": 92,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 36,
+          "row": 92,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 37,
+          "row": 92,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 38,
+          "row": 92,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 39,
+          "row": 92,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 40,
+          "row": 92,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 41,
+          "row": 92,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 42,
+          "row": 92,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 35,
+          "row": 93,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 36,
+          "row": 93,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 37,
+          "row": 93,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 38,
+          "row": 93,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 39,
+          "row": 93,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 40,
+          "row": 93,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 16,
+          "row": 78,
+          "type": "mountain_pass"
+        },
+        {
+          "column": 15,
+          "row": 79,
+          "type": "mountain_pass"
+        },
+        {
+          "column": 23,
+          "row": 87,
+          "type": "mountain_pass"
+        },
+        {
+          "column": 23,
+          "row": 88,
+          "type": "mountain_pass"
+        },
+        {
+          "column": 31,
+          "row": 91,
+          "type": "mountain_pass"
+        },
+        {
+          "column": 31,
+          "row": 92,
+          "type": "mountain_pass"
+        },
+        {
+          "column": 30,
+          "row": 93,
+          "type": "mountain_pass"
+        }
+      ]
+    }
+  ]
+}

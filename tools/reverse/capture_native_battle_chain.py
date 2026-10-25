@@ -10,6 +10,8 @@ import random
 import sys
 
 from validate_native_rules import NativeProbe, ROOT, SCRATCH, RNG_STATE
+sys.path.insert(0, str(ROOT / "tools"))
+from catalog_files import read_catalog
 
 
 def main(catalog_mode=False):
@@ -40,7 +42,7 @@ def main(catalog_mode=False):
                     0x5be90, 0x5c060, 0xbcf08, 0xbcfd8, 0xbcb4c, 0xc60d0, 0xc6328):
         p.hook(address, lambda *args: 0)
     generator = random.Random(1928)
-    catalog = json.loads((ROOT / "rewrite/data/legacy/catalog.json").read_text(encoding="utf-8")) if catalog_mode else None
+    catalog = read_catalog(ROOT / "rewrite/data/legacy/catalog.json") if catalog_mode else None
     weapons = ("gun", "guns", "mgun", "cannon", "rocket", "cold")
     weapon_by_profile = {}
     if catalog_mode:

@@ -5,13 +5,14 @@
       addEventListener('resize',()=>requestAnimationFrame(()=>this.fitStageIntro()));
       document.getElementById('campaign-back').onclick=()=>{document.getElementById('campaign-screen').hidden=true;};
       document.getElementById('hq-back').onclick=()=>{
+        if(this.closeHeadquartersFilter?.())return;
         if(this.tagSaving)return;
         if(this.tagDraft){this.tagDraft=null;this.drawRoster();return;}
         if(this.deployment){this.closeRoster();this.api.tutorialUi('winbtn_back');return;}
         if(this.recruiting){this.recruiting=false;this.drawRoster();return;}
         this.api.main();
       };
-      document.getElementById('hq-recruit').onclick=()=>{this.recruiting=true;this.rating=0;this.offer=null;this.drawRoster();};
+      document.getElementById('hq-recruit').onclick=()=>{this.closeHeadquartersFilter?.(true);this.recruiting=true;this.rating=0;this.offer=null;this.drawRoster();};
       const roster=document.getElementById('hq-roster');let drag=null,dragged=false;
       roster.onpointerdown=e=>{if(this.recruiting||e.button!==0)return;dragged=false;drag={id:e.pointerId,x:e.clientX,scroll:roster.scrollLeft};};
       roster.onpointermove=e=>{
@@ -192,6 +193,7 @@
       return img;
     }
     async headquarters(deployment=null){
+      this.closeHeadquartersFilter?.(true);
       this.data=await this.api.rpc('headquarters');this.deployment=deployment;this.recruiting=false;this.tagDraft=null;
       if(deployment)document.getElementById('play').hidden=true;
       for(const id of ['main-menu','scenario-menu','countries','campaign-screen'])document.getElementById(id).hidden=true;
@@ -220,7 +222,7 @@
     }
     drawRoster(){
       const data=this.data,screen=document.getElementById('hq-screen');screen.classList.toggle('recruiting',this.recruiting);screen.classList.toggle('tag-editing',!!this.tagDraft);screen.classList.toggle('deploying',!!this.deployment);
-      const heading=screen.querySelector('h1'),headingKey=this.deployment?'title_deploygeneral':'title_headquarters';heading.dataset.label=headingKey;heading.setAttribute('aria-label',this.text(headingKey));heading.replaceChildren(this.api.labels(headingKey,this.text(headingKey),heading));
+      const heading=screen.querySelector('h1'),headingKey=this.deployment?'title_deploygeneral':this.recruiting?'title_buygeneral':'title_headquarters';heading.dataset.label=headingKey;heading.setAttribute('aria-label',this.text(headingKey));heading.replaceChildren(this.api.labels(headingKey,this.text(headingKey),heading));
       document.getElementById('hq-medals').replaceChildren(this.api.uiImage('medals.png',13,17),this.lettering(data.medals,'font_char_2_hd','#ebe6e1'),this.api.uiImage('badges.png',13,17),this.lettering(data.badges,'font_char_2_hd','#ebe6e1'));
       const recruit=document.getElementById('hq-recruit');recruit.replaceChildren(this.lettering(this.text('btn_college'),'font_text_3_cn_hd','#ebe6e1'));recruit.setAttribute('aria-label',this.text('btn_college'));recruit.hidden=!!this.deployment;
       recruit.disabled=!!this.tagDraft;
@@ -229,17 +231,12 @@
       const section=d=>Math.max(0,Math.min(2,Math.floor((d.rating-1)/3)));
       const entries=this.recruiting?(data.offers[this.rating]||[]).map(id=>byId.get(id)).filter(Boolean):data.roster.map(c=>byId.get(c.definitionId)).filter(d=>d&&(this.deployment||this.rosterRating===null||section(d)===this.rosterRating))
         .sort((a,b)=>Number(!!owned.get(b.id)?.tag)-Number(!!owned.get(a.id)?.tag)||section(b)-section(a));
-      const filters=document.getElementById('hq-filters');filters.replaceChildren();
+      const filters=document.getElementById('hq-filters');
+      if(this.recruiting||this.deployment){this.closeHeadquartersFilter?.(true);filters.replaceChildren();filters.removeAttribute('style');filters.setAttribute('role','tablist');}
       if(this.recruiting)for(const [rating,count] of [6,4,2].entries()){
         const b=this.api.button('',()=>{this.rating=rating;this.offer=null;this.drawRoster();},filters);b.setAttribute('role','tab');b.setAttribute('aria-label',['一星招募区','二星招募区','三星招募区'][rating]);b.setAttribute('aria-selected',String(rating===this.rating));b.append(this.api.uiImage('button_general_'+count+'.png',152,55));
       }
-      else if(!this.deployment)for(const rating of [null,0,1,2]){
-        const label=rating===null?'全选':['一星区','二星区','三星区'][rating];
-        const b=this.api.button('',()=>{this.rosterRating=rating;document.getElementById('hq-roster').scrollLeft=0;this.drawRoster();},filters);
-        b.setAttribute('role','tab');b.setAttribute('aria-label',label);b.title=label;b.setAttribute('aria-selected',String(rating===this.rosterRating));
-        if(rating===null){b.className='native-command blue';b.append(this.lettering(label,'font_text_3_cn_hd','#ebe6e1'));}
-        else b.append(this.api.uiImage('button_general_'+[6,4,2][rating]+'.png',110,40));
-      }
+      else if(!this.deployment)this.renderHeadquartersFilters();
       const roster=document.getElementById('hq-roster'),scroll=roster.scrollLeft;roster.replaceChildren();
       roster.dataset.count=this.recruiting?[6,4,2][this.rating]:entries.length;
       for(const definition of entries){
@@ -257,18 +254,24 @@
         b.setAttribute('aria-pressed',String(definition.id===(this.recruiting?this.offer?.id:this.rosterSelected)));
       }
       const capacities=data.sectionCapacities??Array(3).fill(data.sectionCapacity??20),capacity=this.rosterRating===null?capacities.reduce((sum,value)=>sum+value,0):capacities[this.rosterRating];
-      const slots=this.recruiting?[6,4,2][this.rating]:this.deployment?Math.max(12,entries.length):Math.max(capacity,entries.length);
+      const slots=this.recruiting?[6,4,2][this.rating]:Math.max(this.deployment?capacities.reduce((sum,value)=>sum+value,0):capacity,entries.length);
       for(let i=entries.length;i<slots;i++){const b=this.api.button('',()=>{if(!this.deployment){this.recruiting=true;this.rating=this.rosterRating??0;this.drawRoster();}},roster);b.className='commander-card empty-commander';b.setAttribute('aria-label','空将领位');b.append(this.api.uiImage('button_add_generals.png',78,78));const name=document.createElement('span');name.className='commander-name';b.append(name);b.disabled=this.recruiting||!!this.deployment||!!this.tagDraft;}
       if(!this.recruiting)for(const [i,card] of [...roster.children].entries()){card.style.gridRow=i%2+1;card.style.gridColumn=Math.floor(i/2)+1;}
       for(const id of ['hq-recruit-band','hq-refresh','hq-buy-buttons'])document.getElementById(id)?.remove();
       if(this.recruiting){const band=document.createElement('div');band.id='hq-recruit-band';screen.insertBefore(band,roster);
         const refresh=this.api.button('',async()=>{this.offer=null;await this.transact({op:'refresh',group:this.rating});},screen);refresh.id='hq-refresh';refresh.className='native-command blue';refresh.setAttribute('aria-label','刷新将领');for(let i=0;i<3;i++)refresh.append(this.api.uiImage('button_refresh.png',13,16));
+        for(const side of ['left','right']){const ornament=this.api.uiImage('pattern_getgeneral_2_1.png',36,26);ornament.className='hq-refresh-ornament '+side;ornament.setAttribute('aria-hidden','true');refresh.append(ornament);}
         const remaining=data.refresh?.[this.rating]?.remaining;if(remaining!=null){refresh.append(this.lettering(remaining,'font_char_2_hd','#ebe6e1'));refresh.title='剩余 '+remaining+' 次';}this.drawPurchases();}
       roster.scrollLeft=scroll;this.headquartersControls();
       const count=document.getElementById('hq-count');
       count.hidden=this.recruiting;count.replaceChildren(this.lettering(entries.length+' / '+(this.deployment?slots:capacity),'font_char_2_hd','#404040'));
       document.getElementById('hq-deployment-quota')?.remove();
-      if(this.deployment){const quota=document.createElement('div');quota.id='hq-deployment-quota';quota.append(this.api.uiImage('generalnumber.png',26,19),this.lettering((this.deploymentQuota?.used??0)+' / '+(this.deploymentQuota?.limit??'∞'),'font_char_4_hd','#404040'));screen.append(quota);}
+      if(this.deployment){
+        const quota=document.createElement('div'),icon=this.manifest.layouts.form_deploygeneral.children.find(e=>e.attributes.id==='image_depnums')?.attributes;
+        quota.id='hq-deployment-quota';
+        quota.append(this.api.uiImage(icon?.name||'generalnumber.png',Number(icon?.w)||26,Number(icon?.h)||19),this.lettering((this.deploymentQuota?.used??0)+' / '+(this.deploymentQuota?.limit??'∞'),'font_char_4_hd','#404040'));
+        screen.append(quota);
+      }
     }
     drawPurchases(){
       document.getElementById('hq-buy-buttons')?.remove();if(!this.offer)return;

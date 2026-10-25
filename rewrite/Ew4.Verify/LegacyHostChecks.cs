@@ -12,7 +12,7 @@ internal static class LegacyHostChecks
     {
         string assets = Path.Combine(root, "apk_work/original/assets");
         string Text(string name) => File.ReadAllText(Path.Combine(assets, name));
-        var runtime = LegacyRuntimeCatalog.FromJson(File.ReadAllText(Path.Combine(root, "rewrite/data/legacy/catalog.json")));
+        var runtime = LegacyRuntimeCatalog.FromJson(Ew4.Legacy.LegacyCatalogFiles.ReadCatalogFile(Path.Combine(root, "rewrite/data/legacy/catalog.json")));
         runtime.VerifySources(name => File.ReadAllBytes(Path.Combine(assets, name)));
         var buildings = LegacyBuildingCatalog.Read(Text("def_construction.xml"), Text("def_capital.xml"));
         var combat = LegacyCombatCatalog.Read(File.ReadAllText(Path.Combine(root, "reverse/reports/runtime_rule_tables.json")),

@@ -9,7 +9,7 @@
 #country-list::-webkit-scrollbar{display:none}
 #countries #country-list{width:180px}
 #countries .country-entry{transform:translateX(20px);width:160px}
-#countries .country-entry[aria-pressed=true]{transform:none;width:160px}
+#countries .country-entry[aria-pressed=true]{transform:none;width:180px}
 #countries #confirm-country{background-image:url("content/ui/image_newgame_hd/new_confirm.png")}
 #campaign-battles.country-sidebar .country-entry{background-image:var(--chapter-entry-image);padding:0 12px;justify-content:center}
 #menu,#play,#map{position:fixed;inset:0;width:100%;height:100%}#menu{background:#222}#menu-stage{position:absolute;width:568px;height:320px;left:50%;top:50%;transform:translate(-50%,-50%) scale(var(--ui-scale));overflow:hidden}
@@ -72,3 +72,4 @@
 #scenario-event-choices button:disabled{opacity:.45}
 #scenario-event-content:focus-visible,#scenario-event-choices:focus-visible{outline:2px solid #536b59;outline-offset:-2px}
 @media(orientation:portrait){#scenario-event .scenario-event-dialog{height:min(400px,var(--event-available-height))}#scenario-event-image{height:152px}#scenario-event-choices{grid-template-columns:minmax(0,1fr);max-height:118px}}
+#performance-caption{display:block;font-size:11px;line-height:1.4;max-width:100%;overflow-wrap:anywhere;margin:0 0 4px;}

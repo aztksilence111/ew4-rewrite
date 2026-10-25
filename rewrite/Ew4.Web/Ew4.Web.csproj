@@ -19,8 +19,10 @@
              CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="../data/original/**/*" Link="data/original/%(RecursiveDir)%(Filename)%(Extension)"
              CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
-    <Content Include="../data/legacy/catalog.json;../data/legacy/runtime_rule_tables.json;../data/legacy/metagame_rule_tables.json"
+    <Content Include="../data/legacy/*.json"
              Link="data/legacy/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="../data/rewrite/**/*" Link="data/rewrite/%(RecursiveDir)%(Filename)%(Extension)"
+             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="../data/runtime-content.json" Link="data/runtime-content.json"
              CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>

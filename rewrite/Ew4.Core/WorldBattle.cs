@@ -148,8 +148,12 @@ public static class WorldBattle
             var attacker = Unit(battle.Attacker)!;
             var defender = Unit(battle.Defender)!;
             var splash = battle.SplashTarget == null ? null : Unit(battle.SplashTarget);
-            state = WorldDiplomacy.Attacked(state, attacker.Owner, defender.Owner, rules.NeutralCamps);
-            if (splash != null && battle.SplashDamage > 0) state = WorldDiplomacy.Attacked(state, attacker.Owner, splash.Owner, rules.NeutralCamps);
+            if (state.Provocations == null)
+            {
+                state = WorldDiplomacy.Attacked(state, attacker.Owner, defender.Owner, rules.NeutralCamps);
+                if (splash != null && battle.SplashDamage > 0)
+                    state = WorldDiplomacy.Attacked(state, attacker.Owner, splash.Owner, rules.NeutralCamps);
+            }
             if (battle.Counterattack) Ignite(attacker, defender.Combatant.Profile);
             bool attackerDead = Damage(attacker.Id, battle.Taken, defender);
             if (!attackerDead)
@@ -182,6 +186,15 @@ public static class WorldBattle
             ConsumeWeapon(attacker.Id);
             if (battle.Counterattack) ConsumeWeapon(defender.Id);
             RefreshLocalMorale();
+            var provocation = WorldProvocations.Attacked(state, attacker.Owner, defender.Owner, rules.NeutralCamps);
+            state = provocation.State; notices.AddRange(provocation.Notices);
+            if (splash != null && battle.SplashDamage > 0 && splash.Owner != defender.Owner
+                && (state.Provocations == null || state.LocalMultiplayer?.ShareAlliedVictory == true
+                    && state.LocalMultiplayer.HumanFactions.Contains(splash.Owner)))
+            {
+                var splashProvocation = WorldProvocations.Attacked(state, attacker.Owner, splash.Owner, rules.NeutralCamps);
+                state = splashProvocation.State; notices.AddRange(splashProvocation.Notices);
+            }
             if (rules.Combat.Extensions != null)
             {
                 var beforeEffects = state;

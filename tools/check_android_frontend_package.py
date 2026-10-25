@@ -25,7 +25,7 @@ with zipfile.ZipFile(APK) as archive:
         assert hashlib.sha256(archive.read(relative)).hexdigest() == entry["sha256"], relative + " is stale"
         files[relative] = entry["sha256"]
     assert archive.read("assets/www/compat/manifest.json") == (frontend / "compat/manifest.json").read_bytes(), "Compatibility manifest is stale"
-    for name in ("victory-ui.js", "victory-ui.css", "local-multiplayer.js", "local-multiplayer.css", "screen-layout.js", "screen-layout.css"):
+    for name in ("victory-ui.js", "victory-ui.css", "local-multiplayer.js", "local-multiplayer.css", "screen-layout.js", "screen-layout.css", "pause-objectives.js", "pause-objectives.css"):
         relative = "assets/www/" + name
         source = ROOT / "rewrite/Ew4.Web/wwwroot" / name
         assert archive.read(relative) == source.read_bytes(), relative + " is stale"

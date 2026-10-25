@@ -1,0 +1,5 @@
+#tutorial-focus{border:0;animation:none}
+#tutorial-focus::before{content:"";position:absolute;inset:0;border:var(--tutorial-frame-width,2px) solid transparent;border-image:url("content/ui/image_ui_hd/framebox_bold.png") 16 stretch;animation:tutorial-frame-pulse 1.64s linear infinite}
+#tutorial-focus::after{left:var(--tutorial-hand-left);top:var(--tutorial-hand-top);width:var(--tutorial-hand-width);height:var(--tutorial-hand-height);background-size:100% 100%;transform:scaleY(var(--tutorial-hand-flip));animation:tutorial-hand-move .75s linear infinite alternate}
+@keyframes tutorial-frame-pulse{50%{opacity:.196}}
+@keyframes tutorial-hand-move{to{transform:translateY(var(--tutorial-hand-travel)) scaleY(var(--tutorial-hand-flip))}}

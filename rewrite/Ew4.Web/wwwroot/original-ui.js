@@ -228,12 +228,13 @@
       }
       const font=number?'font_char_2_hd':element.closest('h1,h2')?'font_text_4_cn_hd':'font_text_2_cn_hd';
       const bounded=(singleLine||paragraph)&&width>8?width:undefined;
+      if(element.matches('.map-mode-tip'))return this.element(text,font,style.color,bounded,'center',{size:px(style.fontSize)||8,singleLine:true,shrinkWidth:true,inkCenter:true,maxHeight:18});
       return this.element(text,font,style.color,bounded,style.textAlign,{size:px(style.fontSize)||12,singleLine,shrinkWidth:singleLine||notice});
     }
     paintTree(rootElement){
       const walker=document.createTreeWalker(rootElement,NodeFilter.SHOW_TEXT),nodes=[];
       // Event prose is rendered in bounded chunks by refreshHud.
-      while(walker.nextNode()){const node=walker.currentNode;if(!node.textContent.trim()||node.parentElement.closest('#startup-status,#scenario-event-text,.original-text,script,style,canvas,select,option,textarea,output,[hidden]')||!node.parentElement.getClientRects().length)continue;nodes.push(node);}
+      while(walker.nextNode()){const node=walker.currentNode;if(!node.textContent.trim()||node.parentElement.closest('#startup-status,#scenario-event-text,#pause-objectives,.original-text,script,style,canvas,select,option,textarea,output,[hidden]')||!node.parentElement.getClientRects().length)continue;nodes.push(node);}
       for(const node of nodes)node.replaceWith(this.forElement(node.parentElement,node.textContent));
     }
   }

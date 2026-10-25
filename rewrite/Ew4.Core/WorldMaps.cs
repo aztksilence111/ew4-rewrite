@@ -25,6 +25,7 @@ public sealed class WorldMapDefinition
             throw new RuleViolation("map.definition", "Invalid map identity or dimensions");
         foreach (var cell in cells)
         {
+            if (cell != null && cell.Terrain != null) Geography.Validate(cell);
             if (cell == null || cell.Terrain == null || cell.Owner != null || cell.Terrain.OccupantCamp != null
                 || cell.Terrain.TerrainCost < 1 || cell.Terrain.RiverEdges > 63 || cell.Terrain.BridgeEdges > 63 || cell.Terrain.BlockedSeaEdges > 63
                 || cell.BuildingLevel < 0 || cell.BuildingUpgradesThisTurn != 0 || cell.Environment != 0 || cell.Objective || cell.BlocksTerritoryExpansion

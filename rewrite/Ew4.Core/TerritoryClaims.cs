@@ -30,7 +30,7 @@ public static class TerritoryClaims
                 int neighbor = map.Neighbor(center, direction);
                 if (neighbor < 0) continue;
                 var cell = result[neighbor];
-                if (cell.Terrain.Active && !cell.Terrain.Sea && !cell.Objective && !cell.BlocksTerritoryExpansion && !occupied.Contains(neighbor)
+                if (cell.Terrain.CanTraverse() && !cell.Terrain.Sea && !cell.Objective && !cell.BlocksTerritoryExpansion && !occupied.Contains(neighbor)
                     && (cell.BuildingKind == null || passThroughBuildings.Contains(cell.BuildingKind)))
                     result[neighbor] = cell with { Owner = owner };
             }
@@ -41,7 +41,14 @@ public static class TerritoryClaims
     public static IReadOnlyList<CellState> Move(HexMap map, IReadOnlyList<CellState> cells, IReadOnlyCollection<int> otherOccupiedCells,
         IReadOnlyList<int> route, string owner, TerritoryMoveRules? configuration = null)
     {
-        var rules = configuration ?? new();
+        var result = new OwnershipBuffer(cells);
+        MoveOwners(map, cells, otherOccupiedCells, route, owner, configuration ?? new(), result);
+        return result.Seal();
+    }
+
+    internal static void MoveOwners(HexMap map, IReadOnlyList<CellState> cells, IReadOnlyCollection<int> otherOccupiedCells,
+        IReadOnlyList<int> route, string owner, TerritoryMoveRules rules, OwnershipBuffer result)
+    {
         if (cells.Count != map.Count || route.Count < 2 || string.IsNullOrWhiteSpace(owner))
             throw new RuleViolation("capture.route", "Invalid capture route or owner");
         for (int i = 0; i < route.Count; i++)
@@ -51,16 +58,15 @@ public static class TerritoryClaims
                 throw new RuleViolation("capture.route", "Capture route must follow adjacent cells");
         }
         var occupied = new HashSet<int>(otherOccupiedCells);
-        var result = cells.ToArray();
         int start = route[0], end = route[route.Count - 1];
         if (rules.ReleaseEmptySea && !occupied.Contains(start) && cells[start].Terrain.Sea && cells[start].BuildingKind == null)
-            result[start] = result[start] with { Owner = null };
+            result.SetOwner(start, null);
         void Claim(int cell)
         {
             var site = result[cell];
-            if (!site.Terrain.Sea && !occupied.Contains(cell) && !site.Objective && !site.BlocksTerritoryExpansion
+            if (site.Terrain.Barrier == TerrainBarrier.None && !site.Terrain.Sea && !occupied.Contains(cell) && !site.Objective && !site.BlocksTerritoryExpansion
                 && (site.BuildingKind == null || rules.PassThroughBuildingKinds.Contains(site.BuildingKind)))
-                result[cell] = site with { Owner = owner };
+                result.SetOwner(cell, owner);
         }
         for (int i = 1; i < route.Count - 1; i++)
         {
@@ -74,7 +80,6 @@ public static class TerritoryClaims
                 if (neighbor >= 0 && cells[neighbor].Terrain.Active) Claim(neighbor);
             }
         }
-        if (rules.ClaimEndpoint) result[end] = result[end] with { Owner = owner };
-        return result;
+        if (rules.ClaimEndpoint && cells[end].Terrain.Barrier == TerrainBarrier.None) result.SetOwner(end, owner);
     }
 }

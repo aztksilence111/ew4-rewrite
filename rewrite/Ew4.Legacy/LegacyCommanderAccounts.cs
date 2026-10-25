@@ -35,6 +35,10 @@ public sealed class LegacyCommanderAccounts
     public IReadOnlyDictionary<int, int> CommanderCommerce { get; }
     public CommanderInheritanceRules Inheritance { get; }
     public string SourceRevision { get; }
+    // Verified stock 0.2.19 -> schema-3 split: definitions are unchanged, only their encoding differs.
+    public bool CanMigrateFrom(string revision) =>
+        revision == "e47fb936518323a29848404514de602e25bfc04bbc5fafa191485fa32c7d39e5"
+        && SourceRevision == "73e030e5c7d0f9a227b27cc1eb43cbe28f158177b02104788d02bca563ea12eb";
     private LegacyCommanderAccounts(LegacyRuntimeCatalog runtime, Dictionary<int, int> title, Dictionary<int, int> commanders, CommanderInheritanceRules inheritance, string revision)
     { this.runtime = runtime; TitleCommerce = new ReadOnlyDictionary<int, int>(title); CommanderCommerce = new ReadOnlyDictionary<int, int>(commanders); Inheritance = inheritance; SourceRevision = revision; }
     public static LegacyCommanderAccounts Read(LegacyRuntimeCatalog runtime, LegacyCombatCatalog combat, string nativeTables)
@@ -57,7 +61,7 @@ public sealed class LegacyCommanderAccounts
                 v => int.Parse(v.GetProperty("business").GetString()!, CultureInfo.InvariantCulture));
         if (business.Count != runtime.Commanders.Count || business.Any(p => !runtime.Commanders.ContainsKey(p.Key) || p.Value < 0))
             throw new RuleViolation("legacy.metagame_tables", "Commander commerce attributes disagree with the catalog");
-        string revision = Convert.ToHexStringLower(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new { nativeTables, combat.SourceRevision, runtime.SourceHashes })));
+        string revision = Convert.ToHexStringLower(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new { nativeTables, combat.SourceRevision, runtime.SourceHashes, runtime.DefinitionRevision })));
         return new(runtime, commerce, business, inheritance, revision);
     }
     public AccountCommanderRules Rules() => new() { Inheritance = Inheritance,

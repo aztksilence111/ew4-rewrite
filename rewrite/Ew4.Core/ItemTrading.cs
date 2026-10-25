@@ -35,6 +35,8 @@ public sealed record PlayerAccount
     public IReadOnlyDictionary<string, long> Inventory { get; init; } = new Dictionary<string, long>();
     public IReadOnlyList<OwnedCommander> Roster { get; init; } = Array.Empty<OwnedCommander>();
     public IReadOnlyList<string> ClaimedRewards { get; init; } = Array.Empty<string>();
+    public IReadOnlyList<string> CompletedObjectives { get; init; } = Array.Empty<string>();
+    public IReadOnlyDictionary<string, ObjectiveBattleProgress> ObjectiveBattles { get; init; } = new Dictionary<string, ObjectiveBattleProgress>();
     public IReadOnlyList<string> UnlockedCampaigns { get; init; } = Array.Empty<string>();
     public IReadOnlyDictionary<string, int> CampaignStars { get; init; } = new Dictionary<string, int>();
     public IReadOnlyDictionary<string, BattleResult> BattleResults { get; init; } = new Dictionary<string, BattleResult>();
@@ -43,6 +45,14 @@ public sealed record PlayerAccount
     public IReadOnlyDictionary<string, RefreshBalance> RefreshBalances { get; init; } = new Dictionary<string, RefreshBalance>();
     public void Validate()
     {
+        if (CompletedObjectives == null || CompletedObjectives.Any(string.IsNullOrWhiteSpace)
+            || CompletedObjectives.Distinct(StringComparer.Ordinal).Count() != CompletedObjectives.Count || ObjectiveBattles == null
+            || ObjectiveBattles.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Value == null || string.IsNullOrWhiteSpace(p.Value.Scenario)
+                || string.IsNullOrWhiteSpace(p.Value.BattleId) || string.IsNullOrWhiteSpace(p.Value.Faction) || p.Key != p.Value.BattleId + ":" + p.Value.Faction
+                || p.Value.Mode is not (1 or 2) || string.IsNullOrWhiteSpace(p.Value.Country) || p.Value.UnitsDestroyed < 0
+                || p.Value.CapturedCities == null || p.Value.CapturedCities.Any(c => c < 0)
+                || p.Value.CapturedCities.Distinct().Count() != p.Value.CapturedCities.Count))
+            throw new RuleViolation("account.objectives", "Invalid objective progress");
         if (CollectedMedalReceipts.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Value < 0))
             throw new RuleViolation("account.medal_receipts", "Invalid collected medal receipt");
         if (RefreshBalances.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Value == null || p.Value.Remaining < 0 || p.Value.Victories < 0))
@@ -73,6 +83,7 @@ public sealed record PlayerAccount
             throw new RuleViolation("account.equipment", "Equipped items must be owned by this account");
     }
     public PlayerAccount Copy() => this with { Inventory = Inventory.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal), Roster = Roster.Select(c => c.Copy()).ToArray(),
+        CompletedObjectives = CompletedObjectives.ToArray(), ObjectiveBattles = ObjectiveBattles.ToDictionary(p => p.Key, p => p.Value with { CapturedCities = p.Value.CapturedCities.ToArray() }),
         CommanderOffers = CommanderOffers.ToDictionary(p => p.Key, p => (IReadOnlyList<string>)p.Value.ToArray()), ClaimedRewards = ClaimedRewards.ToArray(), UnlockedCampaigns = UnlockedCampaigns.ToArray(),
         CampaignStars = CampaignStars.ToDictionary(p => p.Key, p => p.Value), BattleResults = BattleResults.ToDictionary(p => p.Key, p => p.Value),
         CollectedMedalReceipts = CollectedMedalReceipts.ToDictionary(p => p.Key, p => p.Value),

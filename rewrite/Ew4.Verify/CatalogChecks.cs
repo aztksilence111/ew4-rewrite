@@ -7,7 +7,7 @@ internal static class CatalogChecks
 {
     public static int Run(string root)
     {
-        using var data = JsonDocument.Parse(File.ReadAllText(Path.Combine(root, "rewrite/data/legacy/catalog.json")));
+        using var data = JsonDocument.Parse(Ew4.Legacy.LegacyCatalogFiles.ReadCatalogFile(Path.Combine(root, "rewrite/data/legacy/catalog.json")));
         var document = data.RootElement;
         if (document.GetProperty("schema_version").GetInt32() != 2) throw new InvalidOperationException("Unknown catalog schema");
         int count = 1;

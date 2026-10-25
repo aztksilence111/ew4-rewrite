@@ -32,7 +32,7 @@ public static class RosterDeployment
     public static bool IsDeploymentLocation(WorldState world, UnitState unit)
     {
         var cell = world.Cells[unit.Cell];
-        return cell.Terrain.Active && (cell.Owner == unit.Owner
+        return cell.Terrain.CanTraverse() && (cell.Owner == unit.Owner
             || cell.Terrain.Sea && unit.Combatant.Profile.Category == "naval");
     }
 

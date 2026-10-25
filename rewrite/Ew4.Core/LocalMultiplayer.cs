@@ -10,10 +10,30 @@ public sealed record LocalMultiplayerState(string MainFaction, IReadOnlyList<str
 // Campaign allies share victory; conquest countries retain independent results.
 public static class LocalMultiplayerGame
 {
-    private static bool SharesVictory(WorldState world, string first, string second) => first == second
-        || world.LocalMultiplayer?.ShareAlliedVictory == true && WorldDiplomacy.Allied(world, first, second);
+    private static bool Neutral(WorldState world, string faction) => world.LocalMultiplayer?.ShareAlliedVictory == true
+        && WorldDiplomacy.IsNeutral(world, faction, world.DiplomacyNeutralCamps);
 
-    public static bool Won(WorldState world, string faction, string winner) => SharesVictory(world, faction, winner);
+    private static bool SharesVictory(WorldState world, string first, string second) => first == second
+        || world.LocalMultiplayer?.ShareAlliedVictory == true && !Neutral(world, first) && !Neutral(world, second)
+            && WorldDiplomacy.Allied(world, first, second);
+
+    public static bool Won(WorldState world, string faction, string winner) => !Neutral(world, faction)
+        && !Neutral(world, winner) && SharesVictory(world, faction, winner);
+
+    public static WorldState Engaged(WorldState world, string attacker, string defender, IReadOnlyCollection<string> neutralCamps)
+    {
+        if (world.LocalMultiplayer?.ShareAlliedVictory != true || attacker == defender) return world;
+        bool attackerNeutral = WorldDiplomacy.IsNeutral(world, attacker, neutralCamps);
+        bool defenderNeutral = WorldDiplomacy.IsNeutral(world, defender, neutralCamps);
+        if (attackerNeutral == defenderNeutral) return world;
+        string neutral = attackerNeutral ? attacker : defender, opponent = attackerNeutral ? defender : attacker;
+        if (!world.LocalMultiplayer.HumanFactions.Contains(neutral)) return world;
+        // Pick an existing opposing side in saved turn order, even if it has lost its last country.
+        string camp = world.Factions.FirstOrDefault(f => !neutralCamps.Contains(f.Camp)
+            && WorldDiplomacy.Hostile(world, f.Id, opponent, neutralCamps))?.Camp ?? neutral;
+        world = world with { Factions = world.Factions.Select(f => f.Id == neutral ? f with { Camp = camp } : f).ToArray() };
+        return WorldDiplomacy.Set(world, attacker, defender, "hostile");
+    }
 
     private static BattleOutcome Outcome(WorldState world, string winner) => world.LocalMultiplayer!.HumanFactions
         .Any(id => Won(world, id, winner)) ? BattleOutcome.Victory : BattleOutcome.Defeat;
@@ -30,6 +50,7 @@ public static class LocalMultiplayerGame
             || world.Factions.Any(f => f.Human != local.HumanFactions.Contains(f.Id))
             || !local.HumanFactions.SequenceEqual(world.Factions.Where(f => f.Human).Select(f => f.Id))
             || local.WinnerFaction != null && (!world.Factions.Any(f => f.Id == local.WinnerFaction && !f.Defeated)
+                || Neutral(world, local.WinnerFaction)
                 || world.Phase != TurnPhase.Finished
                 || world.Outcome != Outcome(world, local.WinnerFaction)))
             throw new RuleViolation("local.state", "Invalid local multiplayer selection or winner");
@@ -43,7 +64,7 @@ public static class LocalMultiplayerGame
         var custom = world.ScenarioVictory ?? rules.Custom;
         var objectiveOwners = ObjectiveOwners(world, rules.UnitObjectiveOwnership);
         // Iteration uses the saved turn order, including AI countries, for deterministic ties.
-        foreach (var candidate in world.Factions.Where(f => !f.Defeated))
+        foreach (var candidate in world.Factions.Where(f => !f.Defeated && !Neutral(world, f.Id)))
         {
             if (custom != null)
             {
@@ -58,7 +79,7 @@ public static class LocalMultiplayerGame
             }
             else
             {
-                bool soleSurvivor = world.Factions.All(f => SharesVictory(world, candidate.Id, f.Id) || f.Defeated);
+                bool soleSurvivor = world.Factions.All(f => SharesVictory(world, candidate.Id, f.Id) || f.Defeated || Neutral(world, f.Id));
                 // A defending country can start with every marked objective in a campaign.
                 // Initial ownership is not a completed conquest. Resolve removes this guard
                 // once an objective changes hands, allowing the defender to reclaim them.
@@ -90,7 +111,7 @@ public static class LocalMultiplayerGame
     public static WorldState Finish(WorldState world, string winner)
     {
         var local = world.LocalMultiplayer!;
-        if (local.WinnerFaction != null || !world.Factions.Any(f => f.Id == winner && !f.Defeated)) return world;
+        if (local.WinnerFaction != null || Neutral(world, winner) || !world.Factions.Any(f => f.Id == winner && !f.Defeated)) return world;
         return world with { LocalMultiplayer = local with { WinnerFaction = winner }, Phase = TurnPhase.Finished,
             Outcome = Outcome(world, winner) };
     }

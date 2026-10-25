@@ -7,7 +7,8 @@ internal static class PerformanceContractChecks
 {
     internal static int Run(string root)
     {
-        int checks = 0;
+        int checks = ValidationReuseChecks.Run() + SearchWorkspaceChecks.Run() + SnapshotAllocationChecks.Run() + ControlledMovementChecks.Run()
+            + SaveEncodingChecks.Run(root) + ExtensionPlanningChecks.Run(root) + JurisdictionQueryChecks.Run() + RequestBattleChecks.Run(root);
         void Check(bool value, string label) { checks++; if (!value) throw new InvalidOperationException(label); }
         var fixture = WorldChecks.Example();
         var rules = new WorldAiRules { Tactics = LegacyAiTactics.Rules(), ExperienceLevels = new Dictionary<string, int> { ["0"] = 0 } };
@@ -52,14 +53,27 @@ internal static class PerformanceContractChecks
         runtime.Calls = 0;
         WorldAi.TacticalMoveCandidates(scriptedWorld, scriptedActor.Id, scriptedRules);
         Check(runtime.Calls == expectedCalls, "Scripted movement must retain every simulation callback");
+        bool scriptRejected = false;
+        runtime.OnCall = () =>
+        {
+            var cells = (CellState[])scriptedWorld.Cells;
+            var original = cells[1];
+            cells[1] = original with { Owner = "missing" };
+            try { scriptedWorld.Validate(); }
+            catch (RuleViolation error) { scriptRejected |= error.Code == "world.cell"; }
+            finally { cells[1] = original; }
+        };
+        WorldAi.PlanUnit(scriptedWorld, scriptedActor.Id, scriptedRules);
+        Check(scriptRejected, "Script mutation reused a proof of the pre-callback world");
         byte[] Read(string path) => File.ReadAllBytes(Path.Combine(root, "rewrite/data", path.StartsWith("data/", StringComparison.Ordinal) ? "legacy/" + path[5..] : path));
         var content = new ClientContent(Read, ["conquest1.btl"]);
-        string folder = Path.Combine(root, "build/pixi-performance-20261023/contracts");
+        string folder = Path.Combine(root, "build/device-plan-20261024/contracts", Guid.NewGuid().ToString("N"));
         var host = new ClientGame(content, folder);
         JsonElement Call(string route, object command)
         {
             using var response = JsonDocument.Parse(host.Dispatch("/api/" + route, JsonSerializer.Serialize(command, ClientGame.Json)));
-            Check(response.RootElement.GetProperty("ok").GetBoolean(), "Incremental command failed");
+            Check(response.RootElement.GetProperty("ok").GetBoolean(), "Incremental command failed: "
+                + (response.RootElement.TryGetProperty("code", out var code) ? code.GetString() : "unknown"));
             return response.RootElement.GetProperty("data").Clone();
         }
         var view = Call("start", new { scenario = "conquest1", country = "fra" });
@@ -87,7 +101,8 @@ internal static class PerformanceContractChecks
     private sealed class MovementProbe : IRuleScriptRuntime
     {
         internal int Calls;
+        internal Action? OnCall;
         public RuleScriptResult Run(string file, string function, RuleScriptContext context, Ew4Random random)
-        { Calls++; return new(0); }
+        { Calls++; OnCall?.Invoke(); return new(0); }
     }
 }

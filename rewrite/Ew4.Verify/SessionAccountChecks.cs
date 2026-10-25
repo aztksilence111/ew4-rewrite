@@ -23,7 +23,7 @@ internal static class SessionAccountChecks
         var buildings = LegacyBuildingCatalog.Read(File.ReadAllText(Path.Combine(assets, "def_construction.xml")), File.ReadAllText(Path.Combine(assets, "def_capital.xml")));
         var combat = LegacyCombatCatalog.Read(File.ReadAllText(Path.Combine(root, "reverse/reports/runtime_rule_tables.json")),
             File.ReadAllText(Path.Combine(assets, "def_terraintype.xml")), File.ReadAllText(Path.Combine(assets, "def_installation.xml")), buildings);
-        var runtime = LegacyRuntimeCatalog.FromJson(File.ReadAllText(Path.Combine(root, "rewrite/data/legacy/catalog.json")));
+        var runtime = LegacyRuntimeCatalog.FromJson(Ew4.Legacy.LegacyCatalogFiles.ReadCatalogFile(Path.Combine(root, "rewrite/data/legacy/catalog.json")));
         var itemCatalog = LegacyItemTradingCatalog.Read(File.ReadAllText(Path.Combine(assets, "def_item.xml")));
         string metaTables = File.ReadAllText(Path.Combine(root, "reverse/reports/metagame_rule_tables.json"));
         var accounts = LegacyCommanderAccounts.Read(runtime, combat, metaTables);

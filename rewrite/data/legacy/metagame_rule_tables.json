@@ -1,45 +1,7 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "source_sha256": "c16905a2f6d155111a1ff702f2b0f8fbad09482dcedce08785a2bf7965fe7f63",
-  "title_commerce": [
-    0,
-    0,
-    0,
-    0,
-    1,
-    1,
-    2,
-    2,
-    3,
-    3
-  ],
-  "rank_percent": [
-    100,
-    97,
-    94,
-    91,
-    88,
-    85,
-    82,
-    79,
-    76,
-    73,
-    70,
-    67,
-    64,
-    61,
-    58
-  ],
-  "title_percent": [
-    100,
-    96,
-    92,
-    88,
-    84,
-    80,
-    76,
-    72,
-    68,
-    64
+  "files": [
+    "economy-rules.json"
   ]
 }

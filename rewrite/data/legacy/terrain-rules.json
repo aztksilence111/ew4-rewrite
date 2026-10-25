@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "terrain": [
+    {
+      "type": "land",
+      "movementcost": 3,
+      "penalty_infantry": 0,
+      "penalty_cavalry": 0,
+      "penalty_artillery": 0
+    },
+    {
+      "type": "sea",
+      "movementcost": 1,
+      "penalty_infantry": 0,
+      "penalty_cavalry": 0,
+      "penalty_artillery": 0
+    },
+    {
+      "type": "plant",
+      "movementcost": 4,
+      "penalty_infantry": 0,
+      "penalty_cavalry": 10,
+      "penalty_artillery": 5
+    },
+    {
+      "type": "forest",
+      "movementcost": 5,
+      "penalty_infantry": 0,
+      "penalty_cavalry": 20,
+      "penalty_artillery": 10
+    },
+    {
+      "type": "desert",
+      "movementcost": 4,
+      "penalty_infantry": 5,
+      "penalty_cavalry": 5,
+      "penalty_artillery": 5
+    },
+    {
+      "type": "hill",
+      "movementcost": 5,
+      "penalty_infantry": 0,
+      "penalty_cavalry": 5,
+      "penalty_artillery": 10
+    },
+    {
+      "type": "mountain",
+      "movementcost": 6,
+      "penalty_infantry": 0,
+      "penalty_cavalry": 10,
+      "penalty_artillery": 20
+    }
+  ]
+}

@@ -117,8 +117,9 @@ internal static class WorldChecks
         Check(true, "stack capacity is configured");
         Reject((example with { Limits = new() { MaximumCells = 8 } }).Validate, "world.header");
         var cloned = example.Copy();
-        ((Dictionary<string, float>)cloned.Units[0].Combatant.Profile.DamageMultipliers)["infantry"] = 3;
-        Check(example.Units[0].Combatant.Profile.DamageMultipliers["infantry"] == 1, "snapshot owns nested collections");
+        ((Dictionary<string, float>)example.Units[0].Combatant.Profile.DamageMultipliers)["infantry"] = 3;
+        Check(cloned.Units[0].Combatant.Profile.DamageMultipliers["infantry"] == 1, "snapshot owns nested collections");
+        ((Dictionary<string, float>)example.Units[0].Combatant.Profile.DamageMultipliers)["infantry"] = 1;
 
         byte[] bytes = WorldSave.Encode(paused);
         var restored = WorldSave.Decode(bytes, "fixture.1");

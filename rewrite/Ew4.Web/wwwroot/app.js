@@ -19,6 +19,20 @@ const originalTextChanges=new MutationObserver(()=>{
 originalTextChanges.observe(document.body,{childList:true,characterData:true,attributes:true,attributeFilter:['hidden'],subtree:true});
 let view = {x: 0, y: 0, zoom: 1}, viewport = {w: 0, h: 0, dpr: 1};
 const images = new Map(), libraries = new Map();
+const imageLoads=new Map(),libraryLoads=new Map(),performanceLog=new Ew4Performance();
+window.ew4Performance=performanceLog;
+let preloadVersion=0;
+function cancelBattlePreload(){preloadVersion++;}
+async function preloadBattleResources(){
+  const version=++preloadVersion;
+  const tasks=[...['choose','maptext','anim_fire','anim_upgrade','anim_smoke'].map(name=>()=>loadLibrary(name)),
+    ...['images/tiles_hd.png','images/buildings_hd.png'].map(path=>()=>loadImage(path))];
+  for(const task of tasks){
+    await new Promise(resolve=>typeof requestIdleCallback==='function'?requestIdleCallback(resolve,{timeout:1000}):setTimeout(resolve,80));
+    if(version!==preloadVersion||busy||$('countries').hidden||document.hidden)return;
+    try{await task();}catch(_){return;}
+  }
+}
 let errorTimer, aiRunning = false;
 const unitNavigation=new Ew4UnitNavigation.Cycle();
 let findingUnit=false;
@@ -28,7 +42,7 @@ const battleDialogues = [];
 const presentationWaiters = new Set();
 const motions = new Map(), facings = new Map(), arrivals = new Map(), combatMotions = new Map();
 const deaths = new Map();
-let renderRequest=0,renderDirty=true,lastRenderTime=-Infinity,appVisible=true;
+let renderRequest=0,renderDirty=true,lastRenderTime=-Infinity,appVisible=true,cameraInputUntil=0;
 function requestRender(){
   renderDirty=true;
   if(document.hidden||!appVisible)return;
@@ -39,7 +53,13 @@ window.ew4SetAppVisible=visible=>{appVisible=visible;music?.setVisible(visible);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)suspendRendering();else requestRender();});
 new MutationObserver(requestRender).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden']});
 for(const event of ['pointerdown','pointermove','pointerup','wheel','input','change','click'])document.addEventListener(event,requestRender,{passive:true});
-const battlefield = new Ew4Battlefield.Renderer({image,sprite,animation,libraries,get visible(){return appVisible;},get imageRevision(){return imageRevision;},get effects(){return effects;},get manifest(){return manifest;},get geographicLanguage(){return settings.geographicLanguage;},cityLabel:(name,cell,rasterScale=1)=>{
+const mapViews=new Ew4MapViews.Controls($('map-view-controls'),requestRender);
+const pauseObjectives=new Ew4PauseObjectives.Panel({rpc,state:()=>state,notice,
+  label:value=>manifest?.strings[value]||value,image:name=>uiImage(name,16,16),
+  imagePath:name=>Ew4NativeUI.resource(manifest,name)?.file||'',
+  repaintMenu:()=>{for(const element of document.querySelectorAll('#pause [data-label]'))element.replaceChildren(originalTextRenderer.forElement(element,element.getAttribute('aria-label')));
+    $('turn').replaceChildren(originalTextRenderer.element('回合  '+state.round,'font_text_2_cn_hd','#404040',undefined,'center',{size:20}));}});
+const battlefield = new Ew4Battlefield.Renderer({image,sprite,animation,libraries,loadLibrary,requestFrame:requestRender,get mapMode(){return mapViews.mode;},get cameraActive(){return performance.now()<cameraInputUntil;},get warmingPaused(){return aiRunning;},get visible(){return appVisible;},get imageRevision(){return imageRevision;},get effects(){return effects;},get manifest(){return manifest;},get geographicLanguage(){return settings.geographicLanguage;},cityLabel:(name,cell,rasterScale=1)=>{
   const translated=manifest.maps[state.map].cityNames?.[cell];
   const text=translated?.name===name?translated[settings.cityLanguage]:Ew4MenuArt.cityName(name,settings.cityLanguage,cityNames);
   return originalTextRenderer.element(text,'font_city_labels_hd','#ffffff',undefined,'left',{rasterScale});
@@ -128,8 +148,10 @@ function originalLabels() {
   }
 }
 async function showMain() {
+  mapViews.close();
   if(sessionTransition)return;
   sessionTransition=true;
+  cancelBattlePreload();
   const wasBusy=busy&&!aiRunning;
   try {
     await stopAi();
@@ -140,7 +162,7 @@ async function showMain() {
     battleDialogues.length=0;
     detailReturn=null;victoryUi.reset();localMultiplayerUi.sync(null);
     closeSingleAction();menus.dismissSkillTip();menus.deployment=null;
-    motions.clear();arrivals.clear();deaths.clear();combatMotions.clear();
+    motions.clear();facings.clear();arrivals.clear();deaths.clear();combatMotions.clear();
     effects?.clear();damageNumbers?.clear();finishPresentation?.();
     $('detail-modal').hidden=true;$('pause').hidden=true;$('selection').hidden=true;
     $('play').hidden = true; $('menu').hidden = false; $('main-menu').hidden = false;
@@ -156,7 +178,7 @@ async function rpc(route, args = {}) {
   const response = await fetch('/api/' + route + '?q=' + encodeURIComponent(JSON.stringify(args)), {method: 'POST', cache: 'no-store'});
   if (!response.ok) throw Error('连接失败 (' + response.status + ')');
   const result = await response.json();
-  if (!result.ok) throw Error(failure(result.code, result.message));
+  if (!result.ok) throw Error(failure(result.code, result.message || result.error) || '游戏数据载入失败');
   const data=result.data,next=route==='action'?(args.op==='ai_batch'?data.state:data):null;
   if(next&&(next.baseRevision!=null||!next.cells&&next.cellUpdates)){
     if(!state||next.baseRevision!=null&&next.baseRevision!==state.revision){
@@ -186,6 +208,13 @@ function image(path) {
   return images.get(path);
 }
 async function loadImage(path) {
+  if(imageLoads.has(path))return imageLoads.get(path);
+  const task=loadImageCore(path);
+  imageLoads.set(path,task);
+  try{return await task;}catch(error){images.delete(path);throw error;}
+  finally{imageLoads.delete(path);}
+}
+async function loadImageCore(path) {
   const img = image(path);
   if (img.complete && img.naturalWidth) return img;
   try{await img.decode();}catch(error){
@@ -273,25 +302,45 @@ async function chooseScenario(scenario) {
     $('country-list').firstElementChild?.click();
     menus.slideInSidebar($('country-list'));
   } finally { busy = false; }
+  preloadBattleResources();
 }
 async function loadLibrary(name) {
   if (libraries.has(name)) return libraries.get(name);
-  const data = await (await fetch('/content/animations/' + name + '.json')).json();
+  if(libraryLoads.has(name))return libraryLoads.get(name);
+  const task=loadLibraryCore(name);libraryLoads.set(name,task);
+  try{return await task;}finally{libraryLoads.delete(name);}
+}
+async function loadLibraryCore(name){
+  const response=await fetch('/content/animations/' + name + '.json');
+  if(!response.ok)throw Error('图集载入失败：'+name+' ('+response.status+')');
+  const data = await response.json();
   data.byName = new Map(data.items.map(item => [item.name, item]));
   data.sprites = new Map(data.atlas.sprites.map(sprite => [sprite.name, sprite]));
   data.texture = await loadImage('images/' + data.atlas.textures[0].name.replace(/\.(?:pkm|pvr)$/i, '.png'));
   libraries.set(name, data); return data;
 }
 function visualProfile(unit,world=state){return unit&&(effects?.profile(unit.profile,world?.factions.find(f=>f.id===unit.owner))||manifest.profiles[unit.profile]);}
+function battleLibraries(next,center){
+  const width=canvas.clientWidth||innerWidth,height=canvas.clientHeight||innerHeight;
+  let camera=view;
+  if(center){const cell=next.units.find(u=>u.owner===next.playerFaction)?.cell??next.cells.findIndex(c=>c.owner===next.playerFaction);
+    camera={...Ew4Battlefield.point(Math.max(0,cell),next.width),zoom:Math.min(innerWidth/568,innerHeight/320)};}
+  camera=Ew4Camera.constrain(camera,{w:width,h:height},Ew4Battlefield.cameraBounds(next,manifest.maps[next.map]));
+  const involved=new Set([next.combat?.attacker,next.combat?.defender,next.combat?.splashTarget,selected?.id,...(next.recruited||[]),
+    ...(next.movements||[]).map(m=>m.unit),...(next.combat?.movements||[]).map(m=>m.unit)]);
+  const nearby=unit=>{const p=Ew4Battlefield.point(unit.cell,next.width);return involved.has(unit.id)||Math.abs(p.x-camera.x)<=width/camera.zoom/2+512&&Math.abs(p.y-camera.y)<=height/camera.zoom/2+512;};
+  return [...new Set([...next.units,...(state?.units||[])].filter(nearby).map(u=>visualProfile(u,next)?.library).filter(Boolean))];
+}
 async function installState(next, center = false) {
   closeSingleAction();
   const resetPause=center;
+  if(resetPause)mapViews.reset();
   const previous=state;
   center=center||!!(state&&(state.map!==next.map||state.scenario!==next.scenario||state.width!==next.width||state.height!==next.height||state.playerFaction!==next.playerFaction));
-  if(center){effects?.clear();damageNumbers?.clear();deaths.clear();combatMotions.clear();battlefield.resetMotions();battleDialogues.length=0;unitNavigation.reset();}
+  if(center){effects?.clear();damageNumbers?.clear();facings.clear();deaths.clear();combatMotions.clear();battlefield.resetMotions();battleDialogues.length=0;unitNavigation.reset();}
   const keepUnit=center?null:selected?.id,keepCell=center?null:selection?.cell;
-  const used = [...new Set([...next.units,...(state?.units||[])].map(u => visualProfile(u,next)?.library).filter(Boolean))];
-  await Promise.all([...used, 'choose', 'maptext', 'anim_fire', 'anim_upgrade', 'anim_smoke'].map(loadLibrary));
+  const used = battleLibraries(next,center);
+  await performanceLog.stage('libraries',()=>Promise.all([...used, 'choose', 'maptext', 'anim_fire', 'anim_upgrade', 'anim_smoke'].map(loadLibrary)));
   if(!center)focusAiAction(next);
   if(!center&&next.combat&&!(aiRunning&&skipAi)){
     selection=undefined;$('selection').hidden=true;
@@ -341,6 +390,8 @@ async function installState(next, center = false) {
     }
   }
   state = next; selected = undefined; selection = undefined; $('selection').hidden = true;
+  if(resetPause)pauseObjectives.reset();
+  else if(!$('pause').hidden)pauseObjectives.sync();
   music?.sync(next,center);
   if(!center&&!skipAi&&previous&&next.revision>previous.revision)playAttachedEffects(previous,next);
   presentBattleDialogue();
@@ -349,10 +400,13 @@ async function installState(next, center = false) {
   if(resetPause)$('pause').hidden = true;
   if (center) centerPlayer(); else clampView();
   if(center){
-    const map=manifest.maps[state.map],files=[...map.tiles.map(t=>t.file),'images/map_pt@2x.png',manifest.mapDrawing?.borderTexture,'images/tiles.png','images/tiles_hd.png','images/buildings.png','images/buildings_hd.png'].filter(Boolean);
-    await Promise.all(files.map(loadImage));
-    const w=canvas.clientWidth/.48+512,h=canvas.clientHeight/.48+512;
-    await battlefield.prewarm(state,map,{left:view.x-w/2,top:view.y-h/2,width:w,height:h});
+    const map=manifest.maps[state.map],w=canvas.clientWidth/view.zoom,h=canvas.clientHeight/view.zoom;
+    const rect={left:view.x-w/2,top:view.y-h/2,width:w,height:h};
+    // Include the ground chunk margin used by both renderers on the first frame.
+    const tiles=map.tiles;
+    const files=[...tiles.map(t=>t.file),'images/map_pt@2x.png',manifest.mapDrawing?.borderTexture,'images/tiles.png','images/tiles_hd.png','images/buildings.png','images/buildings_hd.png'].filter(Boolean);
+    await performanceLog.stage('images',()=>Promise.all(files.map(loadImage)));
+    await performanceLog.stage('templates',()=>battlefield.prewarm(state,map,rect));
   }
   refreshHud();
   motions.clear(); arrivals.clear();
@@ -496,6 +550,7 @@ function playImpact(profile,target,damage,facing,speed){
 }
 async function start(scenario, country, localPlayers) {
   if(busy)return;
+  cancelBattlePreload();
   busy = true; $('countries').querySelectorAll('button').forEach(b => b.disabled = true);
   try {
     const scenarioMode=catalog.scenarios.find(s=>s.id===scenario)?.mode;
@@ -506,7 +561,17 @@ async function start(scenario, country, localPlayers) {
       const available=new Set((await rpc('local-players',{scenario,country})).map(f=>f.id));
       localPlayers=localPlayers.filter(id=>available.has(id));
     }
-    await withLoading(async()=>{tutorial=null;stageIntroOpen=false;await installState(await rpc('start', {scenario, country,localPlayers}), true);showStageIntro();await beginTutorial();});
+    performanceLog.beginEntry(scenario);
+    try{
+      await withLoading(async()=>{
+        tutorial=null;stageIntroOpen=false;
+        const next=await performanceLog.stage('backend',()=>rpc('start', {scenario, country,localPlayers}));
+        await installState(next, true);
+        await performanceLog.stage('firstFrame',async()=>{requestRender();await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});
+        showStageIntro();await beginTutorial();
+      });
+      performanceLog.endEntry('ready');
+    }catch(error){performanceLog.endEntry('error');throw error;}
   }
   finally { busy = false; $('countries').querySelectorAll('button').forEach(b => b.disabled = false); if(state)refreshHud(); }
 }
@@ -540,17 +605,18 @@ async function presentAiProgress(){
     if(flag.complete)paint();else flag.decode().catch(()=>{}).then(paint);
   });
 }
-function updateHudText(host,value,font,color) {
+function updateHudText(host,value,font,color,size) {
   const text=String(value);
-  if(host.ew4HudText===text&&host.ew4HudRenderer===originalTextRenderer)return false;
-  host.replaceChildren(originalTextRenderer.element(text,font,color));
-  host.ew4HudText=text;host.ew4HudRenderer=originalTextRenderer;
+  if(host.ew4HudText===text&&host.ew4HudRenderer===originalTextRenderer&&host.ew4HudSize===size)return false;
+  host.replaceChildren(originalTextRenderer.element(text,font,color,undefined,undefined,size?{size}:undefined));
+  host.ew4HudText=text;host.ew4HudRenderer=originalTextRenderer;host.ew4HudSize=size;
   return true;
 }
 function refreshHud() {
+  if(!$('pause').hidden||state?.dialogue||state?.scenarioPopup)mapViews.close();
   const active = state.factions.find(f => f.id === state.activeFaction);
   const player = state.factions.find(f => f.id === state.playerFaction);
-  updateHudText($('turn'),'回合  ' + state.round,'font_text_2_cn_hd','#404040');
+  updateHudText($('turn'),'回合  ' + state.round,'font_text_2_cn_hd','#404040',$('pause').classList.contains('pause-objectives-active')?20:undefined);
   const flag=$('player-flag'),source=flagSource(player);
   if(flag.getAttribute('src')!==source)flag.src=source;
   if(flag.alt!==player.name)flag.alt=flag.title=player.name;
@@ -617,6 +683,9 @@ function refreshHud() {
 }
 async function act(op, extra = {}) {
   if (busy || !state || stageIntroOpen) return;
+  const timedTurn=op==='end';
+  const turnMeasurement=timedTurn?performanceLog.beginTurn(state,settings):null;
+  try{
   if(state.localBattleDialogue){
     if(op!=='dialogue')return;
     battleDialogues.shift();
@@ -631,6 +700,15 @@ async function act(op, extra = {}) {
     await installState(next);
   } finally { busy = false; refreshHud(); }
   if (op === 'end' || op === 'dialogue' || op === 'event_choice') await runAi();
+  }catch(error){if(turnMeasurement)turnMeasurement.failed=true;throw error;}
+  finally{
+    if(timedTurn){
+      requestRender();
+      if(!document.hidden)await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+      const status=turnMeasurement.failed?'error':document.hidden||turnMeasurement.interrupted?'interrupted':state?.phase==='Finished'?'finished':state&&!busy&&$('pause').hidden&&!state.dialogue&&!state.scenarioPopup&&state.factions.find(f=>f.id===state.activeFaction)?.human?'returned':'interrupted';
+      performanceLog.endTurn(status,turnMeasurement);refreshPerformanceCaption();
+    }
+  }
 }
 function runAi() {
   if(aiTask)return aiTask;
@@ -669,6 +747,7 @@ async function runAiLoop() {
       if(!skipAi&&$('pause').hidden)await new Promise(resolve => setTimeout(resolve, 180/settings.speed));
     }
   } catch (error) {
+    if(performanceLog.turn)performanceLog.turn.failed=true;
     try{await installState(await rpc('action',{op:'state'}));}catch(_){}
     notice(error.message);
   }
@@ -699,7 +778,10 @@ async function selectCell(cell,restore=false,selectOnly=false) {
     const column=document.createElement('div');column.className='terrain-column';
     for(const row of rows){
       const entry=document.createElement('div');entry.className='terrain-row';
-      entry.append(uiImage(row.icon,18),originalTextRenderer.element(row.text,'font_char_2_hd','#eeeeee'));column.append(entry);
+      if(row.icon)entry.append(uiImage(row.icon,18));
+      if(row.geography){const label=document.createElement('span');label.textContent=row.text;entry.append(label);}
+      else entry.append(originalTextRenderer.element(row.text,'font_char_2_hd','#eeeeee'));
+      column.append(entry);
     }
     $('terrain-info').append(column);
   }
@@ -746,7 +828,7 @@ function uiImage(name,width,height=width){
 function toolButton(icon,title,action){const b=button('',action,$('actions'));b.title=title;b.setAttribute('aria-label',title);
   if(icon==='disband'){const img=new Image(33,33);img.alt='';img.src='/disband.png';b.append(img);}
   else b.append(uiImage('button_'+(icon==='general'?'generals':icon)+'.png',33));
-  b.dataset.tutorialId=({general:'btn_general',items:'btn_item',city:'btn_city',factory:'btn_factory',stable:'btn_stable',dock:'btn_dock',buildfortress:'btn_fortress',builddefense:'btn_defense',buyship:'btn_ship',training:'btn_training',buildupgrade:'btn_upgrade'})[icon]||'';return b;}
+  b.dataset.tutorialId=({general:'btn_general',items:'btn_item',city:'btn_city',factory:'btn_factory',stable:'btn_stable',dock:'btn_dock',buildfortress:'btn_fortress',builddefense:'btn_defense',buyship:'btn_ship',training:'btn_training',buildupgrade:'btn_upgrade',trade:'btn_trading'})[icon]||'';return b;}
 let detailReturn,detailRevision=0,stageIntroOpen=false;
 function showStageIntro(){
   if(!state?.stageIntro||state.phase==='Finished')return;
@@ -758,6 +840,7 @@ function confirmDisband(unit,refund,anchor){openSingleAction('disband','解散�
 function popupOpen(element){element.classList.remove('popup-opening');void element.offsetWidth;element.classList.add('popup-opening');}
 function closeDetail(){const back=detailReturn;detailReturn=null;menus.dismissSkillTip();$('detail-modal').hidden=true;if(back)back();}
 function detailWindow(title,width,height,confirm,onClose){
+  menus.closeHeadquartersFilter?.(true);
   closeSingleAction();
   const generation=++detailRevision;
   menus.dismissSkillTip();detailReturn=onClose;
@@ -886,6 +969,7 @@ function positionSingleAction(){
   const host=$('single-action'),panel=$('single-action-cost'),parent=$('selection').getBoundingClientRect(),rect=anchor.getBoundingClientRect();
   if(!rect.width){closeSingleAction();return;}
   const scale=rect.width/33,left=rect.left-parent.left;
+  host.style.transform='scale('+scale+')';
   host.style.left=left+'px';host.style.top=(rect.top-parent.top)+'px';
   const panelLeft=Math.max(2,Math.min(parent.width-84*scale-2,left-25.5*scale));
   panel.style.left=(panelLeft-left)/scale+'px';
@@ -1052,7 +1136,7 @@ function render(time) {
   if(animated)renderRequest=requestAnimationFrame(render);
   if(manifest&&menuVisible)menus.draw(time);
   positionSingleAction();
-  if(tutorial&&!$('play').hidden)positionTutorial();
+  if(tutorial)positionTutorial();
   if(tutorial?.wait?.name==='wait action'&&!busy&&!aiRunning)tutorial.notify({type:'action'}).catch(e=>notice(e.message));
   if(!$('countries').hidden&&!$('menu').hidden)drawStrategicMap(time);
   if(!playVisible||fastSkipping())return;
@@ -1067,7 +1151,8 @@ function render(time) {
   ctx.translate(w/2,h/2);ctx.scale(view.zoom,view.zoom);ctx.translate(-view.x,-view.y);
   const min=screenToWorld(0,0),max=screenToWorld(w,h);
   battlefield.frame({draw:ctx,state,map:manifest.maps[state.map],visibleRect:{left:min.x,top:min.y,width:max.x-min.x,height:max.y-min.y},
-    zoom:view.zoom,detailScale:Math.max(1,Math.min(w/568,h/320,3)),showGrid,selection,selected,selectedAt,motions,facings,arrivals,arrivalSpeed:Math.sqrt(settings.speed),deaths,combatMotions},time);
+    zoom:view.zoom,detailScale:Math.max(1,Math.min(w/568,h/320,3)),showGrid,selection,selected,selectedAt,motions,facings,arrivals,arrivalSpeed:Math.sqrt(settings.speed),deaths,combatMotions,
+    tutorialCell:tutorial?.wait?.name==='wait area'?Number(tutorial.wait.id):null},time);
   effects?.frame(ctx,time,'foreground',battlefield.visibleRect);
   damageNumbers?.frame(ctx,time,battlefield.visibleRect);
   ctx.end();
@@ -1079,6 +1164,7 @@ async function beginTutorial(checkpoint){
   const source=manifest.tutorials?.[state.scenario];if(!source){tutorial=null;return;}
   tutorial=new Ew4Tutorial.Runner(source,async command=>{
     const cell=Number(command.id);
+    requestRender();
     switch(command.name){
       case 'rand seed':break;
       case 'show text':$('tutorial-text').replaceChildren(originalTextRenderer.element(manifest.strings['desc_tutorials_word_'+command.id]||'','font_text_1_cn_hd','#404040',216));$('tutorial-speaker').replaceChildren(originalTextRenderer.element(manifest.strings.name_Napoleon||'拿破仑','font_text_2_cn_hd','#646464'));$('tutorial-portrait').src=menus.portrait('Napoleon.png').src;$('tutorial-talk').hidden=false;break;
@@ -1095,20 +1181,36 @@ async function beginTutorial(checkpoint){
   await tutorial.begin(checkpoint);
 }
 function positionTutorial(){
-  if(!tutorialRect||!state){$('tutorial-focus').hidden=true;return;}
-  const command=tutorialRect;let rect;
+  const focus=$('tutorial-focus');
+  if(!tutorialRect||!state||!$('pause').hidden||!$('settings').hidden||!$('loading-screen').hidden){focus.hidden=true;return;}
+  const command=tutorialRect;let rect,target,scale=Number(getComputedStyle(document.documentElement).getPropertyValue('--battle-scale'))||1;
   if(command.name==='draw rect'){
-    const p=point(Number(command.id));rect={left:(p.x-view.x+Number(command.x||0))*view.zoom+viewport.w/2,top:(p.y-view.y+Number(command.y||0))*view.zoom+viewport.h/2,width:Number(command.w)*view.zoom,height:Number(command.h)*view.zoom};
+    if($('play').hidden||!$('detail-modal').hidden){focus.hidden=true;return;}
+    const p=point(Number(command.id)),bounds=canvas.getBoundingClientRect();
+    rect=Ew4Tutorial.frame({left:bounds.left+(p.x-view.x+Number(command.x||0))*view.zoom+viewport.w/2,
+      top:bounds.top+(p.y-view.y+Number(command.y||0))*view.zoom+viewport.h/2,
+      width:Number(command.w)*view.zoom,height:Number(command.h)*view.zoom},{},scale);
   }else{
     const controls={group_res:'#resources',group_incom:'#terrain-info',btn_next:'#end-turn',btn_undo:'#undo-move',winbtn_close:'#close-detail',winbtn_ok:'#detail-confirm',btn_done:pendingAction?'#single-action-confirm':'#detail-confirm',winbtn_back:'#hq-back',grid_general:'#hq-roster',lbox_unit:'.recruit-cards>button',lbox_defense:'.defense-cards>button'};
-    const selector=controls[command.string]||'[data-tutorial-id="'+command.string+'"]';const candidates=[...document.querySelectorAll(selector)].filter(e=>e.getClientRects().length);
-    const target=candidates[command.string==='grid_general'?0:command.row===undefined?0:Number(command.row)];
-    if(target){rect=target.getBoundingClientRect();
-      if(command.string==='grid_general'&&command.row!==undefined)rect={left:rect.left,top:rect.top+Number(command.row)*rect.height/2,width:rect.width,height:rect.height/2};
+    const selector=controls[command.string]||'[data-tutorial-id="'+command.string+'"]';
+    let candidates=[...document.querySelectorAll(selector)].filter(e=>e.getClientRects().length);
+    const rowTarget=command.row===undefined?null:candidates.find(e=>e.dataset.tutorialRow===String(command.row));
+    // Native lists expose their container ID; tutorial rows refer to its items.
+    if(candidates.length===1&&command.row!==undefined&&(candidates[0].classList.contains('native-list')||command.string==='grid_general'))
+      candidates=[...candidates[0].children];
+    target=rowTarget||candidates[command.row===undefined?0:Number(command.row)];
+    if(target&&target.getClientRects().length){
+      const bounds=target.getBoundingClientRect();scale=target.offsetWidth?bounds.width/target.offsetWidth:scale;
+      rect=Ew4Tutorial.frame(bounds,command,scale);
     }
   }
-  $('tutorial-focus').hidden=!rect;if(!rect)return;
-  Object.assign($('tutorial-focus').style,{left:rect.left+'px',top:rect.top+'px',width:Math.max(1,rect.width)+'px',height:Math.max(1,rect.height)+'px'});
+  focus.hidden=!rect;if(!rect)return;
+  const hand=Ew4Tutorial.pointer(rect,scale,innerWidth,innerHeight);
+  Object.assign(focus.style,{left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',height:rect.height+'px'});
+  for(const [name,value] of Object.entries({left:hand.left-rect.left,top:hand.top-rect.top,width:hand.width,height:hand.height,travel:hand.travel}))
+    focus.style.setProperty('--tutorial-hand-'+name,value+'px');
+  focus.style.setProperty('--tutorial-hand-flip',hand.flip);
+  focus.style.setProperty('--tutorial-frame-width',Math.max(1,2*scale)+'px');
 }
 let tutorialTouchTime=-Infinity;
 document.addEventListener('pointerup',event=>{
@@ -1123,6 +1225,7 @@ canvas.addEventListener('pointerdown',e=>{if(followingAi())return;canvas.setPoin
 canvas.addEventListener('pointermove',e=>{
   if(followingAi()){pointers.clear();return;}
   const last=pointers.get(e.pointerId);if(!last)return;
+  cameraInputUntil=performance.now()+120;
   const dx=e.clientX-last.x,dy=e.clientY-last.y;pointers.set(e.pointerId,{...last,x:e.clientX,y:e.clientY});
   if(pointers.size===1){view.x-=dx/view.zoom;view.y-=dy/view.zoom;clampView();if(Math.hypot(e.clientX-last.startX,e.clientY-last.startY)>4)dragged=true;}
   else{const[a,b]=[...pointers.values()],distance=Math.hypot(a.x-b.x,a.y-b.y);if(lastDistance)zoom(distance/lastDistance,(a.x+b.x)/2,(a.y+b.y)/2);lastDistance=distance;}
@@ -1132,11 +1235,11 @@ canvas.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);dragged
 canvas.addEventListener('wheel',e=>{e.preventDefault();if(!followingAi())zoom(Math.exp(-e.deltaY*.001),e.clientX,e.clientY);},{passive:false});
 }
 bindMapInput();
-function zoom(factor,x=viewport.w/2,y=viewport.h/2){const before=screenToWorld(x,y);view.zoom*=factor;clampView();const after=screenToWorld(x,y);view.x+=before.x-after.x;view.y+=before.y-after.y;clampView();}
+function zoom(factor,x=viewport.w/2,y=viewport.h/2){cameraInputUntil=performance.now()+120;const before=screenToWorld(x,y);view.zoom*=factor;clampView();const after=screenToWorld(x,y);view.x+=before.x-after.x;view.y+=before.y-after.y;clampView();}
 document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=async()=>{if(!startupReady)return;mode=Number(b.dataset.mode);if(mode===4){menus.tutorialMenu();return;}$('main-menu').hidden=true;$('scenario-menu').hidden=false;$('countries').hidden=true;$('conquest-pagination').hidden=mode!==2;$('scenario-menu').classList.toggle('campaign-mode',mode===1);menuArt.apply(mode);$('mode-title').replaceChildren(labelImage(b.dataset.label,b.getAttribute('aria-label')));if(!await menus.open(mode))scenarioList();});
 $('conquest-prev').onclick=()=>turnConquestPage(-1);
 $('conquest-next').onclick=()=>turnConquestPage(1);
-$('cancel-country').onclick=()=>$('countries').hidden=true;
+$('cancel-country').onclick=()=>{cancelBattlePreload();$('countries').hidden=true;};
 $('confirm-country').onclick=()=>{if(chosenScenario&&chosenCountry&&!busy)start(chosenScenario,chosenCountry).catch(e=>notice(e.message));};
 $('menu-back').onclick=showMain;
 $('headquarters').onclick=()=>{if(startupReady)menus.headquarters().catch(e=>notice(e.message));};
@@ -1175,7 +1278,13 @@ $('local-multiplayer-mode').onchange=e=>{if(!$('play').hidden){e.target.checked=
 function persistSettings(){try{localStorage.setItem('ew4.settings',JSON.stringify(settings));}catch(_){} }
 $('close-detail').onclick=async()=>{closeDetail();await tutorialUi('winbtn_close');};
 $('show-grid').onchange=e=>{showGrid=e.target.checked;try{localStorage.setItem('ew4.showGrid',String(showGrid));}catch(_){notice('无法保存设定');}};
-$('menu-button').onclick=()=>$('pause').hidden=false;
+function refreshPerformanceCaption(){
+  let caption=$('performance-caption');
+  if(!caption){caption=document.createElement('small');caption.id='performance-caption';$('turn').after(caption);}
+  const last=[...performanceLog.records].reverse().find(r=>r.kind==='turn'&&r.status==='returned'&&r.build===performanceLog.build);
+  caption.textContent=performanceLog.build+(last?' · '+(last.elapsedMs/1000).toFixed(2)+' s':'');
+}
+$('menu-button').onclick=()=>{mapViews.close();refreshPerformanceCaption();$('pause').hidden=false;pauseObjectives.sync();};
 $('resume').onclick=()=>{$('pause').hidden=true;if(!busy)runAi().catch(e=>notice(e.message));};
 $('end-turn').onclick=()=>act('end').catch(e=>notice(e.message));
 $('undo-move').onclick=()=>{if(!selected||!selection?.undo||$('undo-move').disabled)return;return act('undo',{unit:selected.id}).then(()=>tutorialUi('btn_undo')).catch(e=>notice(e.message));};
@@ -1205,6 +1314,7 @@ $('restart').onclick=async()=>{
 };
 $('return-menu').onclick=()=>{if(busy&&!aiRunning){notice('请等待当前行动完成');return;}return showMain();};
 window.ew4Back=()=>{
+  if(mapViews.close())return 'handled';
   if(pendingAction){closeSingleAction();return 'handled';}
   const visible=id=>!$(id).hidden;
   const modal=document.querySelector('dialog[open]');
@@ -1249,6 +1359,8 @@ async function initializeClient(){
     Ew4Startup.pending('菜单图像');
     const art=new Ew4MenuArt.MenuArt({manifest:m,image});await art.prepare();
     catalog=c;manifest=m;cityNames=names;conquestPages=pages;menuArt=art;
+    const buildInfo=await startupJson('/build-info.json');
+    performanceLog.build=buildInfo.source.slice(0,12)+'/'+(c.build||'unknown').slice(0,8)+'/'+(c.buildVariant||'unknown');
     fx.elements??=presentation.elements;fx.sounds=[...new Set([...fx.sounds,...presentation.sounds])];
     effects=new Ew4Effects.Effects({image,sprite,animation,libraries,get manifest(){return manifest;},volume:()=>settings.sound},fx,visuals);
     effects.preloadSounds(presentation.sounds);

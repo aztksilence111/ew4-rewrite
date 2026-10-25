@@ -1,5 +1,7 @@
 # 全局国家表与 BTL 国家 ID 扩展
 
+国家地块颜色可用本表 `color` 设置；新增势力与阵营地图各自的配色入口见[地块颜色指南](MAP_COLORS.md)。
+
 全局定义位于 `client/countries.json`，独立于所有剧本。源码位置为 `rewrite/data/client/countries.json`。国家 ID 是唯一、非空的字符串，可以用中文、数字、空格、标点或长名称，不限三个字母，也没有 15 字节或 128 字符上限；不接受控制字符，整个 JSON 有 2 MiB 预算。ID 按原字符串精确匹配、区分大小写，不会自动截断或规范化；配置字段名使用下述固定大小写。ID 是稳定引用，显示国名用 `name` 修改，发布后改 ID 需要同步所有引用并新开局。
 
 ## 国家定义
@@ -27,11 +29,11 @@
 | `flag` | 已有国旗资源键，例如 `fra`；HUD 图片及建筑旗帜四帧必须存在 |
 | `flagImage` | 与 `flag` 二选一，自定义包内 PNG，例如 `rewrite/images/republic.png` |
 | `color` | 可选领土颜色，`#RRGGBB` 或 `#RRGGBBAA` |
-| `unitVariant` | `legacy/catalog.json.variants` 中已有的战斗兵种配置；更改会影响开局部队及招募 |
+| `unitVariant` | `legacy/unit-variants.json.variants` 中已有的战斗兵种配置；更改会影响开局部队及招募 |
 | `visualVariant` | `client/unit-visuals.json.variants` 的兵模外观键，独立于战斗属性 |
 | `aliases` | 可选的旧 ID 到规范 ID 映射；目标必须直接存在，禁止链式或覆盖现有国家键 |
 
-国家定义省略的外观/兵种项沿用剧本或模板默认值。旗帜、战斗变体与兵模变体是资源引用，仍需满足各自资源格式；国家 ID 可以自由命名，不需要将它们也改成同一个名称。战斗数值仍在 `legacy/catalog.json.profiles`，面板显示在 `client/manifest.json.profiles`，修改数值时同步显示配置。
+国家定义省略的外观/兵种项沿用剧本或模板默认值。旗帜、战斗变体与兵模变体是资源引用，仍需满足各自资源格式；国家 ID 可以自由命名，不需要将它们也改成同一个名称。战斗数值在 `legacy/units.json.units`，面板显示在 `client/manifest.json.profiles`，修改数值时同步显示配置。
 
 内置表含 43 个原版身份。覆盖包中的 `countries.json` 替换整张表，需要保留正在使用的国家定义；不是增量合并。推荐复制内置表再增改。重复键、无效资源和不存在的战斗配置会在加载或打包时失败。
 

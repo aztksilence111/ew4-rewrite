@@ -98,6 +98,11 @@
   };
   proto.equipment=function(id){
     const held=this.held(id),definition=this.definition(held),l=this.native('form_deployitem',()=>this.reopenCommander(id));
+    const description=l.get('group_desc'),equip=l.get('btn_equip');
+    description.append(equip);
+    Object.assign(equip.style,{left:'50%',transform:'translateX(-50%)',top:'auto',bottom:'4px',width:'83px',height:'30px'});
+    Object.assign(l.get('text_desc').style,{height:(parseFloat(description.style.height)-60)+'px',overflowY:'auto'});
+    l.text('btn_equip',this.text('btn_equip'),{size:15});
     l.fill('tcmder',this.card(definition,held,()=>{}));
     const list=this.data.roster,index=list.indexOf(held);
     for(const [name,offset] of [['btn_prev',-1],['btn_next',1]])l.action(name,offset<0?'上一位将领':'下一位将领',()=>this.equipment(list[index+offset].id),index+offset>=0&&index+offset<list.length);
@@ -177,6 +182,7 @@
     };
     for(const item of data.items){
       const b=this.itemButton(item,item.quantity,()=>choose(item,b));
+      b.dataset.tutorialId='lbox_item';b.dataset.tutorialRow=data.items.indexOf(item);
       b.setAttribute('aria-label',item.name+' × '+item.quantity);b.title=item.name+' × '+item.quantity;
       b.classList.toggle('unavailable-item',!item.available);
       if(item.quantity<=1){const n=document.createElement('span');n.className='item-quantity';n.append(this.lettering(item.quantity,'font_char_2_hd','#ebe6e1'));b.append(n);}

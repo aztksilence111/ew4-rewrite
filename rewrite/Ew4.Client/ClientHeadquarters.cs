@@ -12,26 +12,31 @@ public sealed partial class ClientGame
     private PlayerAccount Account()
     {
         if (localAccount != null) return localAccount;
+        PlayerAccount account;
         if (File.Exists(Profile))
         {
             if (new FileInfo(Profile).Length > 16 * 1024 * 1024) throw new RuleViolation("account.size", "Account exceeds read budget");
-            localAccount = JsonSerializer.Deserialize<PlayerAccount>(File.ReadAllBytes(Profile), Json)
+            account = JsonSerializer.Deserialize<PlayerAccount>(File.ReadAllBytes(Profile), Json)
                 ?? throw new RuleViolation("account.format", "Invalid local account");
         }
-        else localAccount = new PlayerAccount { Id = "local", ContentRevision = content.Catalogs.Accounts.SourceRevision,
+        else account = new PlayerAccount { Id = "local", ContentRevision = content.Catalogs.Accounts.SourceRevision,
             Medals = content.Extensions.Metagame.InitialMedals, Badges = content.Extensions.Metagame.InitialBadges };
-        if (localAccount.CommanderOffers.Count == 0)
-            for (int group = 0; group < 3; group++) localAccount = DrawCommanders(localAccount, group);
-        localAccount.Validate();
-        if (localAccount.ContentRevision != content.Catalogs.Accounts.SourceRevision)
+        bool migrated = content.Catalogs.Accounts.CanMigrateFrom(account.ContentRevision);
+        if (migrated) account = account with { ContentRevision = content.Catalogs.Accounts.SourceRevision,
+            Revision = checked(account.Revision + 1) };
+        if (account.CommanderOffers.Count == 0)
+            for (int group = 0; group < 3; group++) account = DrawCommanders(account, group);
+        account.Validate();
+        if (account.ContentRevision != content.Catalogs.Accounts.SourceRevision)
             throw new RuleViolation("account.content", "Local account requires a content migration");
-        foreach (var owned in localAccount.Roster) AccountCommanders.Resolve(owned, content.Catalogs.Accounts.Rules());
-        var balances = localAccount.RefreshBalances.ToDictionary(p => p.Key, p => p.Value);
+        foreach (var owned in account.Roster) AccountCommanders.Resolve(owned, content.Catalogs.Accounts.Rules());
+        var balances = account.RefreshBalances.ToDictionary(p => p.Key, p => p.Value);
         foreach (var (key, policy) in content.Extensions.Metagame.Refresh.Where(p => p.Value.Limit.HasValue))
-            if (!balances.ContainsKey(key)) balances[key] = new(policy.Initial ?? policy.Limit!.Value, Now(), RefreshUses.Victories(localAccount));
-        if (balances.Count != localAccount.RefreshBalances.Count)
-            StoreAccount(localAccount with { Revision = checked(localAccount.Revision + 1), RefreshBalances = balances });
-        return localAccount;
+            if (!balances.ContainsKey(key)) balances[key] = new(policy.Initial ?? policy.Limit!.Value, Now(), RefreshUses.Victories(account));
+        if (migrated || balances.Count != account.RefreshBalances.Count)
+            StoreAccount(account with { Revision = migrated ? account.Revision : checked(account.Revision + 1), RefreshBalances = balances });
+        else localAccount = account;
+        return localAccount!;
     }
     private DateTimeOffset Now() => clock?.Invoke() ?? DateTimeOffset.UtcNow;
     private RefreshPolicy? RefreshPolicy(string target) => content.Extensions.Metagame.Refresh.GetValueOrDefault(target);
@@ -56,7 +61,7 @@ public sealed partial class ClientGame
         .SelectMany(q => q.CommanderIds).Concat(game.Session.World.Commanders.Select(c => c.Id)).ToHashSet(StringComparer.Ordinal);
     private object Headquarters()
     {
-        var account = Account(); var locked = LockedCommanders();
+        var account = ObserveObjectives(Account()); var locked = LockedCommanders();
         var sources = content.Catalogs.Runtime.SourceTrees.GetProperty("def_commander.xml").GetProperty("children");
         return new { account.Revision, account.Medals, account.Badges, sectionCapacity = MetagameRules.DefaultCommanderSectionCapacity,
             sectionCapacities = Enumerable.Range(0, 3).Select(content.Extensions.Metagame.CommanderSectionCapacity).ToArray(),

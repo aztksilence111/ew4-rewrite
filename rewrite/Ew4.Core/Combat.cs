@@ -49,6 +49,12 @@ public sealed record UnitProfile
     public bool HasTrait(string trait) => Traits.Contains(trait);
     public void Validate()
     {
+        if (FrozenUnitProfiles.IsValidated(this)) return;
+        ValidateCore();
+        FrozenUnitProfiles.Validated(this);
+    }
+    private void ValidateCore()
+    {
         SkillSlot.Validate(SkillSlots);
         if (string.IsNullOrWhiteSpace(Id) || string.IsNullOrWhiteSpace(Category) || MaxHealth <= 0
             || Movement < 0 || MinimumAttack < 0 || MaximumAttack < 0 || MinimumRange < 0
@@ -85,7 +91,8 @@ public sealed record Combatant
     public float EvasionIgnoringBuilding { get; init; }
     public bool Has(string skill) => !Profile.LegacySkillOverrides.Contains(skill)
         && (Skills.Contains(skill) || Profile.SkillSlots.Any(s => s.Id == skill));
-    public void Validate()
+    public void Validate() => PlanningScope.Validate(this, ValidateCore);
+    private void ValidateCore()
     {
         PlanningScope.Validate(Profile, Profile.Validate);
         SkillSlot.Validate(Profile.SkillSlots.Concat(SkillSlots));

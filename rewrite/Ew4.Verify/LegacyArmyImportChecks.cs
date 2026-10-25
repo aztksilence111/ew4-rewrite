@@ -19,7 +19,7 @@ internal static class LegacyArmyImportChecks
     {
         checks = 0;
         string assets = Path.Combine(root, "apk_work/original/assets");
-        var catalog = LegacyRuntimeCatalog.FromJson(File.ReadAllText(Path.Combine(root, "rewrite/data/legacy/catalog.json")));
+        var catalog = LegacyRuntimeCatalog.FromJson(Ew4.Legacy.LegacyCatalogFiles.ReadCatalogFile(Path.Combine(root, "rewrite/data/legacy/catalog.json")));
         catalog.VerifySources(name => File.ReadAllBytes(Path.Combine(assets, name)));
         Check(catalog.Profiles.Count == 369 && catalog.Variants.Count == 33 && catalog.Commanders.Count == 588 && catalog.Items.Count == 228, "runtime catalog inventory");
         Reject(() => catalog.VerifySources(_ => []), "legacy.source_changed");

@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Xml.Linq;
+using Ew4.Legacy;
 
 namespace Ew4.Mods;
 
@@ -65,7 +66,11 @@ internal sealed class LegacyModImporter
             && (p.EndsWith(".xml", StringComparison.Ordinal) || p.EndsWith(".ini", StringComparison.Ordinal))))
             if (!names.Contains(path[9..])) ModFiles.Write(stage, path, Read(path[9..]));
         if (LegacyCatalogConverter.Sources.Any(Changed))
-            ModFiles.WriteJson(stage, "legacy/catalog.json", LegacyCatalogConverter.Convert(Read, ModFiles.Object(baseline.Read("legacy/catalog.json"))));
+        {
+            var bundle = LegacyCatalogFiles.Load(p => baseline.Read(p.StartsWith("data/", StringComparison.Ordinal) ? "legacy/" + p[5..] : p));
+            var catalog = LegacyCatalogConverter.Convert(Read, bundle.Catalog);
+            foreach (var (file, bytes) in LegacyCatalogFiles.Split(catalog, bundle.RuntimeRules, bundle.MetagameRules)) ModFiles.Write(stage, "legacy/" + file, bytes);
+        }
         var strings = LegacyCatalogConverter.Strings(Read("stringtable_cn.ini"));
         manifest["strings"] = JsonSerializer.SerializeToNode(strings);
         manifest["commanders"] = new JsonObject(Xml("def_commander.xml").Elements().Select(e => KeyValuePair.Create<string, JsonNode?>((string)e.Attribute("id")!, JsonValue.Create((string)e.Attribute("name")!))));
@@ -329,8 +334,11 @@ internal sealed class LegacyModImporter
                 if (!variants.TryGetValue(faction.CountryId, out var choices)) variants[faction.CountryId] = choices = [];
                 choices.Add(faction.Variant);
             }
-        string catalogPath = Path.Combine(stage, "legacy/catalog.json");
-        var catalog = ModFiles.Object(File.Exists(catalogPath) ? File.ReadAllBytes(catalogPath) : baseline.Read("legacy/catalog.json"));
+        var catalog = LegacyCatalogFiles.Load(p => {
+            string name = p.StartsWith("data/", StringComparison.Ordinal) ? "legacy/" + p[5..] : p;
+            string file = ModFiles.Under(stage, name);
+            return File.Exists(file) ? File.ReadAllBytes(file) : baseline.Read(name);
+        }).Catalog;
         var countries = new JsonObject();
         foreach (var (id, choices) in variants.OrderBy(p => p.Key, StringComparer.Ordinal))
         {

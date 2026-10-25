@@ -30,7 +30,7 @@ const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
     check(!links.has(link),'unique Android package path '+link);links.add(link);
   }
   for(const item of manifest.files){
-    const name=item.path.startsWith('original/')?item.path:item.path.startsWith('client/')?'www/content/'+item.path.slice(7):'data/'+path.basename(item.path);
+    const name=/^(original|rewrite)\//.test(item.path)?item.path:item.path.startsWith('client/')?'www/content/'+item.path.slice(7):'data/'+path.basename(item.path);
     check(links.has(name),'Android packages runtime input '+name);
   }
   report.androidAssets=assets.length;report.originalAssets=assets.filter(a=>a.Link.startsWith('original/')).length;

@@ -1,6 +1,9 @@
 # EW4 rewrite
 
-2026-10-24：[0.2.18双端正式下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.18-20261024)，包含运输、经济面板、Android 音乐与网格层级修复，继承 0.2.17 更新；Windows x64 Web 与 Android ARM64 APK code21，远端四附件核验通过。[发行说明](rewrite/RELEASE_0.2.18_20261024.md)、[发布记录](rewrite/RELEASE_PROGRESS_0.2.18_20261024.md)。
+规则配置现已拆为独立 JSON：[文件与修改指南](rewrite/mod-kit/docs/porting/SPLIT_CATALOG.md)。
+源码数据位于 `rewrite/data/legacy/`，覆盖包使用 `legacy/` 路径；旧 APK/XML 导入继续兼容。
+
+2026-10-25：0.2.20 双端发行准备中，包含地图、教程、指挥部、暂停目标及回合优化；Windows x64 Web 与 Android ARM64 APK code23，规则 API 3。[发行说明](rewrite/RELEASE_0.2.20_20261025.md)、[发布记录](rewrite/RELEASE_PROGRESS_0.2.20_20261025.md)。
 
 本仓库保存 rewrite 游戏源码、运行资源、地图制作配置和 Mod 制作指南。
 名称约定：**r版**就是 **rewrite版**的简称，后续不再另行注明。
@@ -67,6 +70,9 @@ dotnet run --project rewrite/Ew4.Verify -- . --client-only
 Git 中保留一份实际运行资源和独立地图内容。2026-10-22 已按用户要求直接删除
 无用旧构建、安装包和测试临时资源，不保留恢复归档；详见
 [清理记录](reverse/LOCAL_RESOURCE_CLEANUP_20261022.md)。
+本地双端正式包只保留最新三个版本批次，同版本重复构建只留实际发布的一套；
+新包验证后自行滚动清理旧包。活动程序与玩家档案保留，详见
+[项目维护规则](AGENTS.md)及[资源维护记录](reverse/LOCAL_RESOURCE_MAINTENANCE.md)。
 不包含签名密钥或登录凭据。
 
 现有原游戏和第三方 Mod 资源的权利归各自权利人所有；本文件不授予这些资源的新授权。

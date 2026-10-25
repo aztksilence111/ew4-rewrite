@@ -1,5 +1,10 @@
 # 原包入库与 rewrite 入口对照
 
+API 3 禁行地形：`rewrite/extension.json.geography` → `GeographyCatalog.Validate/Apply` → `ClientContent.Start`；核心 `Movement.EntryCost`、`Geography.Validate`；显示 `ClientGame.CellView`、`battlefield.geography`。见[配置指南](GEOGRAPHY.md)。
+
+2026-10-24：规则数据已拆为[独立 JSON](SPLIT_CATALOG.md)。下表的 catalog 字段指旧格式或内存合成视图；
+直接编辑入口为 `legacy/units.json`、`commanders.json`、`items.json` 等。原包输入路径继续有效。
+
 更新时间：2026-10-20。与[移植步骤](README.md)、[配置字段](../CONFIG_REFERENCE.md)、[完整源码索引](../SOURCE_INDEX.md)配套使用。这里区分“读取原包”“生成转换产物”和“实际运行”，不能只替换显示产物就认为玩法已经改变。
 
 新规则不必伪装成原格式字段：[规则API 1](RULE_EXTENSIONS.md)通过包根rewrite/extension.json接入定义、绑定、Lua与胜负条件。核心映射为ExtensionLoader.Load/PatchCatalog → RuleEventBus.Modify/Dispatch或WorldSkillActions.Execute → ClientExtensions/skill-ui.js。BTL VICT由LegacyBattleExtensions.Victory/WriteVictory接ExtensionVictory.Evaluate；原BTL主体及JURI保留。

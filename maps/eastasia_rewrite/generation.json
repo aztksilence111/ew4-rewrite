@@ -4,7 +4,7 @@
   "height": 136,
   "cells": 21488,
   "bytes": 257872,
-  "city_count": 278,
+  "city_count": 279,
   "max_city_displacement_km": 41.2,
   "generalized_cities": [
     "定海",
@@ -19,10 +19,10 @@
     "香港"
   ],
   "terrain_counts": {
-    "0": 8560,
+    "0": 8561,
     "6": 1521,
     "1": 7293,
-    "9": 1738,
+    "9": 1737,
     "8": 1098,
     "7": 667,
     "3": 162,

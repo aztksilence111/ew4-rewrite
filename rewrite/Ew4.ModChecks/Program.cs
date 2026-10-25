@@ -5,6 +5,26 @@ using System.Text.Json.Nodes;
 using System.Xml.Linq;
 using Ew4.Mods;
 
+if (args.ElementAtOrDefault(1) == "--map-text-paths-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { mapTextPathChecks = MapTextPathChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--geography-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { geographyModChecks = GeographyModChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--android-package-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { androidPackageChecks = AndroidPackageChecks.Run(Path.GetFullPath(args[0]), Path.GetFullPath(args[2])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--catalog-files-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { catalogFileModChecks = CatalogFileModChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
 if (args.ElementAtOrDefault(1) == "--campaign-music-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { campaignMusicModChecks = CampaignMusicModChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
@@ -84,6 +104,7 @@ void Reject(Action action, string message) { try { action(); } catch (Exception 
 var baseline = new ModBase(p => File.ReadAllBytes(p.StartsWith("frontend/") ? Path.Combine(root, "rewrite/Ew4.Web/wwwroot", p[9..]) : Path.Combine(data, p)),
     Directory.EnumerateFiles(data, "*", SearchOption.AllDirectories).Select(p => Path.GetRelativePath(data, p).Replace('\\', '/')));
 checks += LegacyResourceChecks.Run(baseline, run);
+checks += MapTextPathChecks.Run(root);
 checks += LegacySkillParameterModChecks.Run(root);
 checks += JurisdictionModChecks.Run(root);
 var store = new ModStore(baseline, Path.Combine(run, "mods"), Path.Combine(run, "saves"));
@@ -117,7 +138,11 @@ Check(importedEffects["sounds"]!.AsArray().Any(n => (string?)n == "sfx_presentat
 Check(File.ReadAllBytes(Path.Combine(installed, "client/sounds/sfx_presentation_test.wav")).SequenceEqual(customSound), "custom sound bytes preserved");
 Check((string?)importedEffects["timelines"]!["presentation test"]![0]!["sound"] == "sfx_presentation_test.wav", "custom effect timeline retained");
 Check(importedEffects["elements"]!["damaged 3"]!.AsArray().Count == 3, "element animation groups imported without def_motion");
-var catalog = JsonNode.Parse(File.ReadAllBytes(Path.Combine(installed, "legacy/catalog.json")))!;
+var catalog = Ew4.Legacy.LegacyCatalogFiles.Load(p => {
+    string name = p.StartsWith("data/", StringComparison.Ordinal) ? "legacy/" + p[5..] : p;
+    string file = Path.Combine(installed, name);
+    return File.Exists(file) ? File.ReadAllBytes(file) : baseline.Read(name);
+}).Catalog;
 Check((int)catalog["profiles"]![0]!["max_health"]! == strength + 7, "unit values converted");
 Check((string)catalog["commanders"]![0]!["legacy_attributes"]!["business"]! == "4", "commander values converted");
 store.Activate(imported.Key); Check(StbImageSharp.ImageResult.FromMemory(store.Read("client/ui/title.png"), StbImageSharp.ColorComponents.RedGreenBlueAlpha).Data.SequenceEqual(StbImageSharp.ImageResult.FromMemory(title, StbImageSharp.ColorComponents.RedGreenBlueAlpha).Data), "derived UI override");

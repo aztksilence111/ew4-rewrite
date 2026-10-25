@@ -17,7 +17,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 from shapely import transform as transform_geometry
 from shapely.geometry import LineString, Point, box, shape
-from shapely.ops import unary_union
+from shapely.ops import nearest_points, unary_union
 
 import build_eastasia as geo
 import eastasia_relief
@@ -25,6 +25,8 @@ import eastasia_settlements
 import eastasia_crossings
 import eastasia_additions
 import eastasia_cartography
+import eastasia_water
+import eastasia_hydrology
 from ew4_formats import TerrainMap
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,7 +40,7 @@ IMAGE_W, IMAGE_H = 10144, 7362
 SOURCE_CITIES = ROOT / "maps/city_plan/conquest_v2/projected_cities.json"
 TERRAIN_ADDITIONS = REPORT / "terrain_additions.geojson"
 RIVER_ADDITIONS = {"ganges", "yamuna", "godavari", "mahanadi", "narmada", "tapti",
-                   "ob", "irtysh", "yenisey", "lena", "tobol", "xiang", "luan", "red", "ping", "selenga", "nen"}
+                   "ob", "irtysh", "yenisey", "lena", "tobol", "xiang", "luan", "red", "ping", "selenga", "nen", "fuchun"}
 
 
 def sha(data):
@@ -96,6 +98,26 @@ def geography():
     for feature in json.loads((REPORT/'river_additions.geojson').read_text(encoding='utf-8'))['features']:
         geometry=transform_geometry(shape(feature['geometry']),geo.PROJ.xy,interleaved=False)
         rivers.append((to_source_geometry(geometry),feature['properties']))
+    for index, (geometry, attrs) in enumerate(rivers):
+        if attrs.get('continueRiver'):
+            parts = [part for g, a in rivers if
+                     str(a.get('name_en') or a.get('name') or '').lower() == attrs['continueRiver'].lower()
+                     for part in geo.geometries(g, 'LineString')]
+            endpoints = [Point(part.coords[i]) for part in parts for i in (0, -1)]
+            start = Point(geometry.coords[0])
+            joined = min(endpoints, key=start.distance)
+            assert start.distance(joined)*SCALE < 120, attrs['name']+' continuation is too far from river'
+            geometry = LineString([joined.coords[0]]+list(geometry.coords))
+            rivers[index] = (geometry, attrs)
+        if not attrs.get('joinRiver'):
+            continue
+        target = unary_union([g for g, a in rivers if a is not attrs and attrs['joinRiver'].lower() in
+                              str(a.get('name_en') or a.get('name') or '').lower()])
+        end = Point(geometry.coords[-1])
+        joined = nearest_points(end, target)[1]
+        assert end.distance(joined)*SCALE < 40, attrs['name']+' outlet is too far from target river'
+        if end.distance(joined) > .0001:
+            rivers[index] = (LineString(list(geometry.coords)+[joined.coords[0]]), attrs)
     regions = []
     features = json.loads((ROOT/"maps/terrain_regions.geojson").read_text(encoding="utf-8"))["features"]
     features += json.loads(TERRAIN_ADDITIONS.read_text(encoding="utf-8"))["features"]
@@ -104,7 +126,7 @@ def geography():
         if "buffer_km" in feature["properties"]:
             region = region.buffer(feature["properties"]["buffer_km"]*1000)
         regions.append((to_source_geometry(region), feature["properties"]["terrain"], feature['properties'].get('density')))
-    return land, rivers, regions
+    return land, eastasia_hydrology.join_seams(sys.modules[__name__], rivers), regions
 
 
 def make_terrain(land, regions):
@@ -234,14 +256,7 @@ def background(land,rivers,placements,bridges,mask):
     edge = np.asarray(outer,dtype=np.int16)-np.asarray(mask,dtype=np.int16)
     sea.paste((110,143,153,255),(0,0,IMAGE_W,IMAGE_H),Image.fromarray(edge.astype(np.uint8)))
     del edge,outer
-    draw = ImageDraw.Draw(sea)
-    for geometry,attrs in rivers:
-        rank = attrs.get('scalerank')
-        width = 6 if rank is not None and rank < 5 else 4
-        for line in geo.geometries(geometry,"LineString"):
-            coordinates=[source_to_image(x,y) for x,y in line.coords]
-            draw.line(coordinates,fill=(54,94,122,255),width=width+2,joint="curve")
-            draw.line(coordinates,fill=(112,168,188,255),width=width,joint="curve")
+    sea = eastasia_water.rivers(sys.modules[__name__], sea, rivers, mask)
     atlas=Image.open(BASE/'client/images/buildings.png').convert('RGBA')
     sprites=json.loads((BASE/'client/manifest.json').read_text(encoding='utf-8'))['atlases']['buildings']
     for bridge in bridges:
@@ -419,12 +434,68 @@ def checks(data,placements,fractions,mask):
     return report
 
 
+def add_saved_cities():
+    binary = OUT/'original/eastasia.bin'
+    before = binary.read_bytes()
+    data = np.frombuffer(before[16:], dtype=np.uint8).reshape((GRID_H, GRID_W, 12)).copy()
+    placements = json.loads((REPORT/'cities.json').read_text(encoding='utf-8'))
+    old_ids = {c['city_id'] for c in placements}
+    old_cities = json.loads(json.dumps(placements))
+    facilities = json.loads((REPORT/'facilities.json').read_text(encoding='utf-8'))
+    bridges = json.loads((REPORT/'bridges.json').read_text(encoding='utf-8'))
+    placements = eastasia_additions.apply(sys.modules[__name__], data, placements, geography()[0])
+    added = [c for c in placements if c['city_id'] not in old_ids]
+    if not added:
+        print(json.dumps(dict(addedCities=0, errors=0)))
+        return
+    occupied = {f['cell'] for f in facilities} | {b[k] for b in bridges for k in ('cell', 'other')}
+    if any(c['cell'] in occupied for c in added):
+        raise ValueError('Additional city intersects an existing facility or bridge')
+    plan = json.loads((REPORT/'settlement_plan.json').read_text(encoding='utf-8'))
+    translations = json.loads((REPORT/'city_names.json').read_text(encoding='utf-8'))
+    manifest_path = OUT/'client/manifest.json'
+    manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+    template_path = OUT/'eastasia.map.json'
+    template = json.loads(template_path.read_text(encoding='utf-8'))
+    added_cells = {c['cell'] for c in added}
+    for city in added:
+        city.update(building_level=plan['cityLevelByTier'][str(city['tier'])], building_style=2,
+                    visual_land_patch=False)
+        c = template['cells'][city['cell']]
+        c.update(name=city['name'], buildingKind='city', buildingLevel=city['building_level'], defenseTerrain='land')
+        c['terrain'].update(sea=False, terrainCost=3)
+        manifest['maps']['eastasia']['cityNames'][str(city['cell'])] = dict(
+            name=city['name'], zh=city['name'], en=translations['names'][city['name']])
+    assert placements[:len(old_cities)] == old_cities, 'Existing city records changed'
+    changed = np.flatnonzero(np.any(data.reshape((-1, 12)) != np.frombuffer(before[16:], dtype=np.uint8).reshape((-1, 12)), axis=1))
+    assert set(map(int, changed)) <= added_cells, 'Unrelated terrain changed'
+    manifest['maps']['eastasia']['overlays'] = [o for o in manifest['maps']['eastasia']['overlays'] if o['cell'] not in added_cells]
+    write_json(manifest_path, manifest)
+    write_json(template_path, template)
+    binary.write_bytes(before[:16]+data.tobytes())
+    for folder in (REPORT, OUT/'client/maps/eastasia'):
+        write_json(folder/'cities.json', placements)
+    make_preview(data, placements, Image.open(OUT/'client/maps/eastasia/selection.png').copy(), facilities, bridges)
+    settlements = json.loads((REPORT/'settlements.json').read_text(encoding='utf-8'))
+    settlements.update(cities=len(placements), city_levels=dict(sorted(Counter(c['building_level'] for c in placements).items())))
+    write_json(REPORT/'settlements.json', settlements)
+    checks(data, placements, np.load(REPORT/'land_fraction.npy'), Image.open(REPORT/'land_mask.png'))
+    report = dict(addedCities=added, existingCitiesUnchanged=True, facilitiesUnchanged=len(facilities),
+                  bridgesUnchanged=len(bridges), changedTerrainCells=list(map(int, changed)), errors=0)
+    write_json(REPORT/'city-additions-verification.json', report)
+    print(json.dumps(dict(addedCities=len(added), cities=len(placements), errors=0)))
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--render-only',action='store_true',help='Reuse existing terrain and city placements; rebuild display resources only')
     parser.add_argument('--settlements-only',action='store_true',help='Reuse existing geography and art; update initial city levels and economic sites')
+    parser.add_argument('--additions-only',action='store_true',help='Append requested cities, preserving existing art, city records and facilities')
     args=parser.parse_args()
     for folder in (OUT/'original',OUT/'client',OUT/'legacy',OUT/'frontend',REPORT):folder.mkdir(parents=True,exist_ok=True)
+    if args.additions_only:
+        add_saved_cities()
+        return
     if args.settlements_only:
         data=np.frombuffer((OUT/'original/eastasia.bin').read_bytes()[16:],dtype=np.uint8).reshape((GRID_H,GRID_W,12)).copy()
         placements=json.loads((REPORT/'cities.json').read_text(encoding='utf-8'))

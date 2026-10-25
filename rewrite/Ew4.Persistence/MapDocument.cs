@@ -11,7 +11,8 @@ public static class MapDocument
     private sealed record Payload(string Format, int Version, string Id, string Name, int Width, int Height,
         IReadOnlyList<CellState> Cells, IReadOnlyList<MapImageLayer> Images);
     public static byte[] Encode(WorldMapDefinition map) => JsonSerializer.SerializeToUtf8Bytes(
-        new Payload("ew4.rewrite.map", 1, map.Id, map.Name, map.Width, map.Height, map.Cells, map.Images), WorldSave.Options);
+        new Payload("ew4.rewrite.map", map.Cells.Any(c => c.Terrain.Barrier != TerrainBarrier.None || c.Terrain.MinimumEntryCost > 0) ? 2 : 1,
+            map.Id, map.Name, map.Width, map.Height, map.Cells, map.Images), WorldSave.Options);
 
     public static LoadedMap Decode(byte[] bytes, SaveReadLimits? limits = null)
     {
@@ -26,7 +27,7 @@ public static class MapDocument
                 WorldSave.Require(document.RootElement, key);
             var data = JsonSerializer.Deserialize<Payload>(bytes, WorldSave.Options) ?? throw new RuleViolation("map.format", "Missing map data");
             if (data.Format != "ew4.rewrite.map") throw new RuleViolation("map.format", "Unknown map format");
-            if (data.Version != 1) throw new RuleViolation("map.version", "Map requires an explicit migration");
+            if (data.Version is not (1 or 2)) throw new RuleViolation("map.version", "Map requires an explicit migration");
             foreach (var cell in document.RootElement.GetProperty("cells").EnumerateArray())
             {
                 foreach (string key in new[] { "terrain", "name", "buildingKind", "buildingLevel", "installationKind", "fireTerrain", "defenseTerrain" })

@@ -16,7 +16,7 @@ const base=process.argv[2]||'http://127.0.0.1:5493',folder=path.resolve(process.
       const input={width,height,screen,touch,insets,reserve:28},before=baseline.Ew4ScreenLayout.measure(input);
       const layout=current.Ew4ScreenLayout.measure(input);
       check(Object.keys(before).filter(key=>!key.startsWith('menu')).every(key=>before[key]===layout[key]),'battlefield values match baseline '+[width,height,screen,touch]);
-      check(layout.menuWidth===568&&layout.menuHeight===320,'all platforms use original menu canvas');
+      check(Math.abs(layout.menuWidth*layout.menuScale-width)<.001&&Math.abs(layout.menuHeight*layout.menuScale-(height-28))<.001,'menu anchors span the viewport independently of insets and preference');
     }
   }
   const browser=await chromium.launch({headless:true,executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',args:['--mute-audio']});
@@ -24,24 +24,42 @@ const base=process.argv[2]||'http://127.0.0.1:5493',folder=path.resolve(process.
   page.on('pageerror',e=>report.errors.push(e.message));
   page.on('response',r=>{if(r.status()>=400)report.missing.push(r.url());});
   const fits=async selector=>page.locator(selector).evaluateAll(nodes=>nodes.every(el=>{const r=el.getBoundingClientRect();return r.left>=-.1&&r.top>=-.1&&r.right<=innerWidth+.1&&r.bottom<=innerHeight+.1;}));
+  const edges=async (target,selector,sides)=>target.locator(selector).evaluateAll((nodes,sides)=>nodes.length>0&&nodes.every(el=>{
+    const r=el.getBoundingClientRect();return sides.every(side=>Math.abs(r[side]-(side==='right'?innerWidth:side==='bottom'?innerHeight:0))<.1);
+  }),sides);
+  const captureFilled=async(target,name)=>{
+    const bytes=await target.screenshot({path:path.join(folder,name+'.png')});
+    check(await target.evaluate(async base64=>{
+      const image=new Image();image.src='data:image/png;base64,'+base64;await image.decode();
+      const canvas=document.createElement('canvas');canvas.width=image.width;canvas.height=image.height;
+      const draw=canvas.getContext('2d');draw.drawImage(image,0,0);
+      return [1,canvas.width-2].every(x=>[.1,.5,.9].every(y=>{
+        const pixel=draw.getImageData(x,Math.floor(y*canvas.height),1,1).data;return pixel[0]+pixel[1]+pixel[2]>0;
+      }));
+    },bytes.toString('base64')),name+' has rendered artwork at both screen edges');
+  };
   try{
     await page.goto(base);await page.waitForFunction(()=>startupReady,null,{timeout:60000});
-    check(await page.locator('#menu').evaluate(el=>getComputedStyle(el).backgroundColor==='rgb(119, 119, 119)'),'unused menu area stays gray');
-    for(const [width,height] of [[2550,1275],[3440,1440],[1920,1080],[1366,768],[844,390],[390,844]]){
+    check(await page.locator('#menu').evaluate(el=>getComputedStyle(el).backgroundColor==='rgb(0, 0, 0)'),'unused menu area stays black');
+    for(const [width,height] of [[2376,1080],[2550,1275],[3440,1440],[1920,1080],[1366,768],[844,390],[390,844]]){
       await page.setViewportSize({width,height});await page.evaluate(()=>showMain());
       for(const screen of [80,100,150]){
         await page.evaluate(screen=>{settings.screen=screen;sizeUi();},screen);
         check(await fits('#main-menu .game-title, #main-menu .main-entry'),'main content fits '+[width,height,screen]);
-        check(await page.locator('#main-menu').evaluate(el=>getComputedStyle(el).backgroundSize==='100% 100%'),'main art uses complete original composition');
+        check(await page.locator('#main-menu').evaluate(el=>getComputedStyle(el).backgroundSize==='cover'),'main art fills viewport without stretching');
+        check(await edges(page,'#main-menu .main-entry',['right']),'main buttons align to screen right');
+        check(await edges(page,'#mod-open',['left']),'Mod button aligns to screen left');
+        check(await page.locator('#menu-stage').evaluate(el=>getComputedStyle(el).overflow==='hidden'&&!el.scrollLeft&&!el.scrollTop),'menu clips overflow without scrolling edge anchors');
         const layout=await page.evaluate(()=>({width:innerWidth,height:innerHeight,screen:settings.screen,menuScale:screenLayout.menuScale,uiScale:screenLayout.uiScale}));
         const stage=await page.locator('#menu-stage').evaluate(el=>{const r=el.getBoundingClientRect();return {width:r.width,height:r.height,x:r.x,y:r.y};});
-        check(Math.abs(stage.width/stage.height-568/320)<.001,'complete menu retains original aspect ratio');
-        check(stage.x>=-.1&&stage.y>=-.1&&Math.abs(stage.x*2+stage.width-width)<.1&&Math.abs(stage.y*2+stage.height-height)<.1,'menu fits and is centered');
-        check(Math.abs(stage.width-568*layout.menuScale)<.1&&layout.menuScale<=Math.min(width/568,height/320)+.001,'menu scale matches available space');
-        if(width/height>568/320)check(stage.x>0,'wide windows retain side bars');
-        if(width/height<568/320)check(stage.y>0,'tall windows retain top and bottom bars');
+        check(Math.abs(stage.width-width)<.1&&Math.abs(stage.height-height)<.1,'menu stage fills screen on both axes');
+        check(Math.abs(stage.x)<.1&&Math.abs(stage.y)<.1,'menu starts at screen origin');
+        check(layout.menuScale<=Math.min(width/568,height/320)+.001,'controls retain uniform fitting scale');
         if(width===2550&&screen===100)await page.screenshot({path:path.join(folder,'main-desktop.png')});
+        if(screen===100)await captureFilled(page,`main-${width}x${height}`);
         await page.locator('[data-mode="2"]').click();await page.waitForFunction(()=>!conquestEntering);
+        check(await edges(page,'#scenario-menu>.menu-bar',['left','right','top']),'scenario header spans screen');
+        check(await edges(page,'#menu-back',['left','top']),'scenario back button touches screen left');
         check(await fits('#scenarios .scenario-entry, #conquest-pagination'),'conquest content fits '+[width,height,screen]);
         const grid=await page.locator('#scenarios').evaluate(el=>{
           const r=el.getBoundingClientRect(),cards=[...el.children].map(c=>c.getBoundingClientRect()),pager=document.getElementById('conquest-pagination').getBoundingClientRect();
@@ -50,7 +68,8 @@ const base=process.argv[2]||'http://127.0.0.1:5493',folder=path.resolve(process.
         check(Math.abs(grid.gap/layout.menuScale-18)<.1,'columns retain original spacing');
         check(Math.abs(grid.center-width/2)<=3*layout.menuScale,'cards remain centered');
         check(grid.pagerGap>0,'pager clears cards');
-        check(await page.locator('#scenario-menu').evaluate(el=>getComputedStyle(el).backgroundSize==='100% 100%'),'conquest keeps complete original background');
+        check(await page.locator('#scenario-menu').evaluate(el=>getComputedStyle(el).backgroundSize==='cover'),'conquest background fills viewport without stretching');
+        check(await page.locator('#scenario-menu').evaluate(el=>getComputedStyle(el,'::before').content==='none'),'conquest background has no overflowing duplicate');
         if(width===2550&&screen===100)await page.screenshot({path:path.join(folder,'conquest-desktop.png')});
         if(screen===100)await page.screenshot({path:path.join(folder,`conquest-${width}x${height}.png`)});
         await page.locator('#conquest-next').click();await page.waitForFunction(()=>!conquestEntering);
@@ -60,9 +79,13 @@ const base=process.argv[2]||'http://127.0.0.1:5493',folder=path.resolve(process.
           await page.locator('#scenarios button').first().click();await page.locator('#countries').waitFor();
           await page.waitForFunction(()=>!busy);await page.waitForTimeout(500);
           check(await fits('#country-list, #confirm-country'),'country controls fit '+[width,height]);
+          check(await edges(page,'#country-list',['right']),'country sidebar touches screen right');
+          check(await edges(page,'#countries>.menu-bar',['left','right','top']),'country header spans screen');
+          check(await edges(page,'#cancel-country',['left','top']),'country back button touches screen left');
           const pixels=await page.evaluate(()=>{drawStrategicMap(540);const c=$('strategic-map'),d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let n=0;for(let i=3;i<d.length;i+=4)if(d[i])n++;return n;});
           check(pixels>10000,'strategic map remains nonblank');
           await page.screenshot({path:path.join(folder,`countries-${width}x${height}.png`)});
+          await captureFilled(page,`country-edges-${width}x${height}`);
         }
         report.layouts.push({...layout,...grid});await page.evaluate(()=>showMain());
       }
@@ -72,6 +95,9 @@ const base=process.argv[2]||'http://127.0.0.1:5493',folder=path.resolve(process.
     await page.locator('.chapter-preview-confirm').click();await page.locator('#campaign-screen').waitFor();
     await page.waitForTimeout(500);
     check(await fits('#campaign-battles, #campaign-confirm'),'campaign controls fit');
+    check(await edges(page,'#campaign-battles',['right']),'campaign sidebar touches screen right');
+    check(await edges(page,'#campaign-screen>.menu-bar',['left','right','top']),'campaign header spans screen');
+    check(await edges(page,'#campaign-back',['left','top']),'campaign back button touches screen left');
     await page.screenshot({path:path.join(folder,'campaign-desktop.png')});
     await page.evaluate(()=>showMain());await page.locator('#headquarters').click();
     await page.waitForFunction(()=>!busy);await page.waitForTimeout(500);
@@ -99,14 +125,17 @@ const base=process.argv[2]||'http://127.0.0.1:5493',folder=path.resolve(process.
         await nativePage.evaluate(screen=>{showMain();settings.screen=screen;sizeUi();},screen);
         check(await nativePage.evaluate(()=>{
           const r=$('menu-stage').getBoundingClientRect();
-          return Math.abs(r.width/r.height-568/320)<.001&&r.x>=-.1&&r.y>=-.1&&r.right<=innerWidth+.1&&r.bottom<=innerHeight+.1
-            &&Math.abs(r.x*2+r.width-innerWidth)<.1&&Math.abs(r.y*2+r.height-innerHeight)<.1;
-        }),'Android menu keeps centered original composition '+[width,height,screen]);
+          return Math.abs(r.x)<.1&&Math.abs(r.y)<.1&&Math.abs(r.right-innerWidth)<.1&&Math.abs(r.bottom-innerHeight)<.1;
+        }),'Android menu fills actual screen '+[width,height,screen]);
+        check(await edges(nativePage,'#main-menu .main-entry',['right']),'Android main buttons touch screen right');
+        check(await edges(nativePage,'#mod-open',['left']),'Android Mod button touches screen left');
         check(await nativePage.locator('#main-menu .game-title, #main-menu .main-entry').evaluateAll(nodes=>nodes.every(el=>{
           const r=el.getBoundingClientRect();return r.x>=-.1&&r.y>=-.1&&r.right<=innerWidth+.1&&r.bottom<=innerHeight+.1;
         })),'Android title and menu buttons fit');
-        if(screen===100)await nativePage.screenshot({path:path.join(folder,`native-main-${width}x${height}.png`)});
+        if(screen===100)await captureFilled(nativePage,`native-main-${width}x${height}`);
         await nativePage.locator('[data-mode="2"]').click();await nativePage.waitForFunction(()=>!conquestEntering);
+        check(await edges(nativePage,'#scenario-menu>.menu-bar',['left','right','top']),'Android scenario header spans screen');
+        check(await edges(nativePage,'#menu-back',['left','top']),'Android scenario back button touches screen left');
         check(await nativePage.locator('#scenarios').evaluate(el=>{
           const cards=[...el.children].map(c=>c.getBoundingClientRect()),scale=screenLayout.menuScale;
           return cards.length===6&&Math.abs((cards[1].left-cards[0].right)/scale-18)<.1
@@ -125,6 +154,10 @@ const base=process.argv[2]||'http://127.0.0.1:5493',folder=path.resolve(process.
           check(await nativePage.locator('#country-list, #confirm-country').evaluateAll(nodes=>nodes.every(el=>{
             const r=el.getBoundingClientRect();return r.x>=-.1&&r.y>=-.1&&r.right<=innerWidth+.1&&r.bottom<=innerHeight+.1;
           })),'Android country controls fit');
+          check(await edges(nativePage,'#country-list',['right']),'Android country sidebar touches screen right');
+          check(await edges(nativePage,'#countries>.menu-bar',['left','right','top']),'Android country header spans screen');
+          check(await edges(nativePage,'#cancel-country',['left','top']),'Android country back button touches screen left');
+          await captureFilled(nativePage,`native-country-edges-${width}x${height}`);
         }
         report.layouts.push({platform:'Android origin',width,height,screen});
       }

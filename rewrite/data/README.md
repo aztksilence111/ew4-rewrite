@@ -1,5 +1,9 @@
 # Runtime Content
 
+`rewrite/` contains the API 3 extension manifest and reusable geography rules.
+The built-in East Asia map uses 121 impassable mountain cells; the two barrier
+types and default atlas sprites are available to every registered map and Mod.
+
 Everything needed to run and package the current rewrite is stored under
 `rewrite/`. The preserved APK workspace and reverse-engineering reports are
 not runtime or packaging inputs.
@@ -7,13 +11,16 @@ not runtime or packaging inputs.
 - `original/`: the original 95 scenarios, terrain maps and XML/INI definitions,
   plus the reviewed East Asia BIN and geographic label positions. Map and city
   catalogs include East Asia; Europe, America and the scenario list are unchanged.
-- `legacy/`: the imported runtime catalog and the two extracted rule tables.
+- `legacy/`: independently editable rule sections for commanders, skills, units,
+  variants, items, recruitment, buildings, terrain, installations, conquest
+  metadata, combat, progression and economy. The three old filenames are now
+  compatibility indexes. See `../mod-kit/docs/porting/SPLIT_CATALOG.md`.
   Its `animations/` directory is an intermediate research export, not a
   packaging input.
 - `client/`: the converted maps, textures, fonts, animations, sounds, UI and
   frontend manifests used by the renderer.
 - `runtime-content.json`: sizes and SHA-256 hashes for all packaged runtime
-  inputs in `original/`, `client/` and the three runtime `legacy/` files.
+  inputs in `original/`, `client/` and all top-level runtime `legacy/` JSON files.
 
 East Asia is built in alongside Europe and America. Its 278 settlements,
 terrain, rivers, crossings and bilingual labels are available to future

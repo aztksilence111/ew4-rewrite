@@ -1,0 +1,6 @@
+{
+  "schema": 1,
+  "apiVersion": 3,
+  "geography": "rewrite/geography.json",
+  "mapColors": "rewrite/map-colors.json"
+}

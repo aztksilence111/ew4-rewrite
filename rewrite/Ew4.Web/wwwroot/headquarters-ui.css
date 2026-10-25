@@ -1,0 +1,33 @@
+#hq-screen:not(.recruiting) #hq-filters{--hq-button-width:70px;--hq-star-width:94px;--hq-gap:5px;--hq-button-height:40px;display:flex;align-items:center;gap:var(--hq-gap);width:auto;height:var(--hq-button-height);z-index:6;pointer-events:none}
+#hq-screen:not(.recruiting) #hq-filters button{display:flex;align-items:center;justify-content:center;box-sizing:border-box;flex:none;width:var(--hq-button-width);height:var(--hq-button-height);min-width:0;min-height:0;padding:0;pointer-events:auto}
+#hq-screen:not(.recruiting) #hq-filters .native-command{border:8px solid transparent;border-image:url('/content/ui/image_ui_hd/btn_common_blue.png') 16 fill stretch}
+#hq-screen:not(.recruiting) #hq-filter-main{z-index:4;padding-right:6px}
+#hq-screen:not(.recruiting) #hq-filters>button:not(#hq-filter-main){z-index:1}
+.hq-filter-arrow{position:absolute;right:-2px;top:50%;width:5px;height:8px;margin-top:-4px;background:#e5e1da;clip-path:polygon(0 0,100% 50%,0 100%);pointer-events:none;transition:transform 240ms cubic-bezier(.2,.7,.25,1)}
+.filter-open .hq-filter-arrow{transform:rotate(180deg)}
+#hq-screen #hq-filter-options{position:absolute;left:calc(var(--hq-button-width) + var(--hq-gap));top:0;display:flex;align-items:center;gap:var(--hq-gap);height:var(--hq-button-height);background:#e9e6e0;z-index:3;pointer-events:none}
+#hq-filter-options[hidden],#hq-filter-shield[hidden]{display:none!important}
+#hq-screen:not(.recruiting) #hq-filter-options button{opacity:0;transform:translateX(calc(-1 * var(--hq-option-index) * (var(--hq-button-width) + var(--hq-gap))));transition:transform 240ms cubic-bezier(.2,.7,.25,1),opacity 140ms linear;pointer-events:none}
+#hq-screen:not(.recruiting) #hq-filter-options .hq-star-filter{width:var(--hq-star-width);border:0;background:none}
+#hq-screen:not(.recruiting) #hq-filter-options button>img{display:block;width:100%;height:auto;max-height:100%;object-fit:contain;pointer-events:none}
+#hq-screen .filter-open #hq-filter-options{visibility:visible;pointer-events:auto}
+#hq-screen:not(.recruiting) .filter-open #hq-filter-options button{opacity:1;transform:translateX(0);pointer-events:auto;transition:transform 240ms cubic-bezier(.2,.7,.25,1),opacity 160ms linear;transition-delay:calc((var(--hq-option-index) - 1) * 12ms)}
+#hq-screen #hq-filter-options [aria-checked=true]{outline:2px solid #bf7028;outline-offset:-2px}
+#hq-screen #hq-filters button:focus-visible{outline:2px solid #bf7028;outline-offset:-2px}
+#hq-filter-shield{position:absolute;inset:0;z-index:5;background:transparent;touch-action:none}
+.hq-objectives{overflow:hidden}
+.hq-objective-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.hq-objective-list{position:relative;height:100%;overflow-x:hidden;overflow-y:scroll;display:flex;flex-direction:column;touch-action:pan-y;overscroll-behavior:contain;scrollbar-gutter:stable;scrollbar-width:auto;scrollbar-color:auto}
+.hq-objective-list::-webkit-scrollbar{display:block;width:8px}
+.hq-objective-list::-webkit-scrollbar-thumb{background:#87817a;border:1px solid #ded9d0;min-height:18px}
+.hq-objective-list::-webkit-scrollbar-track{background:#ded9d0;border-left:1px solid #b5afa7}
+.hq-objective-row{position:relative;flex:none;min-height:83px;border-bottom:1px solid #aaa;padding:4px 86px 8px 4px;color:#404040}
+.hq-objective-name{min-height:18px;overflow-wrap:anywhere}
+.hq-objective-description{font-size:11px;line-height:1.4;overflow-wrap:anywhere;white-space:pre-wrap}
+.hq-objective-rewards{display:flex;align-items:center;flex-wrap:wrap;gap:4px;min-height:20px}
+.hq-objective-rewards .original-text{max-width:calc(100% - 21px)}
+.hq-objective-resource{display:flex;align-items:center;gap:3px;max-width:100%;font-size:11px;line-height:1.4;overflow-wrap:anywhere}
+.hq-objective-resource img{flex:none;width:22px;height:22px;object-fit:contain}
+.hq-objective-progress{font-size:10px;color:#77736f}
+.hq-objective-row>.native-command{position:absolute;right:4px;top:24px;width:74px;height:30px}
+@media(prefers-reduced-motion:reduce){.hq-filter-arrow,#hq-screen:not(.recruiting) #hq-filter-options button,#hq-screen:not(.recruiting) .filter-open #hq-filter-options button{transition:none}}

@@ -1,9 +1,10 @@
-"""Read-only inventory of original campaign bridges and frontend resources."""
+"""Read-only inventory of original campaign/conquest bridges and frontend resources."""
 import hashlib
 import json
 from pathlib import Path
 import struct
 import xml.etree.ElementTree as ET
+import argparse
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "rewrite/data"
@@ -18,6 +19,12 @@ def neighbor(cell, direction, width, height):
 
 
 def main():
+    global OUT
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--conquest", action="store_true", help="Audit the six conquest scenarios")
+    conquest = parser.parse_args().conquest
+    if conquest:
+        OUT = ROOT / "build/conquest-bridges-20261024"
     OUT.mkdir(parents=True, exist_ok=True)
     names = dict(line.split("=", 1) for line in (DATA / "original/stringtable_cn.ini").read_text(encoding="utf-8-sig").splitlines() if "=" in line)
     listed = {}
@@ -31,7 +38,7 @@ def main():
         maps[int(entry.attrib["id"])] = (struct.unpack_from("<2i", raw, 8), raw, entry.attrib["name"])
     manifest = json.loads((DATA / "client/manifest.json").read_text(encoding="utf-8"))
     cases = []
-    for path in sorted((DATA / "original").glob("campaign*.btl")):
+    for path in sorted((DATA / "original").glob("conquest*.btl" if conquest else "campaign*.btl")):
         raw = path.read_bytes()
         h = struct.unpack_from("<18i", raw)
         (width, height), terrain, map_name = maps[h[1]]
@@ -62,7 +69,8 @@ def main():
                         anomalies.append(dict(cell=cell, other=other, reciprocal=reciprocal, river=river, active=active(cell), otherActive=active(other)))
             bridges.append(dict(cell=cell, styles=list(site[12:15]), active=active(cell), directions=directions))
         original = ROOT / "apk_work/original/assets" / path.name
-        cases.append(dict(id=path.stem, chapter=int(path.stem[8]), **listed.get(path.name, dict(name="未列入战役菜单", hidden=False, branch=False)),
+        label = dict(name=names.get("text_conquest_age_" + path.stem[8:], path.stem), hidden=False, branch=False) if conquest else listed.get(path.name, dict(name="未列入战役菜单", hidden=False, branch=False))
+        cases.append(dict(id=path.stem, chapter=0 if conquest else int(path.stem[8]), **label,
             listed=path.name in listed, map=map_name, width=width, activeBridgeSites=sum(b["active"] for b in bridges),
             uniqueBridgeEdges=len(edges), bridgeSites=bridges, anomalies=anomalies,
             matchesOriginal=original.exists() and hashlib.sha256(original.read_bytes()).digest() == hashlib.sha256(raw).digest()))
@@ -72,6 +80,15 @@ def main():
         bridgeSprites={atlas:len([n for n in manifest["atlases"][atlas] if n.startswith("bridge_")]) for atlas in ("buildings", "buildings_hd")},
         chapters=[dict(chapter=i, files=sum(c["chapter"] == i for c in cases), affected=sum(c["chapter"] == i and c["uniqueBridgeEdges"] > 0 for c in cases),
             bridges=sum(c["uniqueBridgeEdges"] for c in cases if c["chapter"] == i)) for i in range(1,7)])
+    if conquest:
+        summary["conquestFiles"] = summary.pop("campaignFiles")
+        for key in ("listedFiles", "affectedListedFiles", "chapters"):
+            summary.pop(key)
+        (OUT / "inventory.json").write_text(json.dumps(dict(summary=summary, conquests=cases), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        print(json.dumps(summary))
+        for case in cases:
+            print(json.dumps({key:case[key] for key in ("id", "name", "uniqueBridgeEdges", "anomalies", "matchesOriginal")}, ensure_ascii=False))
+        return
     (OUT / "inventory.json").write_text(json.dumps(dict(summary=summary, campaigns=cases), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(summary))
     first = next(c for c in cases if c["id"] == "campaign2_01")

@@ -8,7 +8,7 @@ public static partial class WorldAi
 {
     public static AiStepPlan PlanStep(WorldState state, WorldAiRules ai, WorldProductionRules production, WorldTurnRules turns)
     {
-        using var planning = PlanningScope.Begin(ai);
+        using var planning = PlanningScope.Begin(ai, production, turns);
         WorldActions.Ready(state, state.Revision);
         ai.Validate();
         if (WorldDiplomacy.Dormant(state, state.ActiveFaction, ai.NeutralCamps))
@@ -16,7 +16,7 @@ public static partial class WorldAi
         var attempt = PlanProduction(state, ai, production, turns);
         if (attempt.Command != null) return new(attempt, null);
         // Failed production consumed private draws; subsequent planning starts from that state.
-        var projected = state with { AiRandomState = attempt.FinalRandomState };
+        var projected = PlanningScope.WithAiRandomState(state, attempt.FinalRandomState);
         var commander = production.Commanders == null ? null : PlanCommander(projected, production.Commanders, production.CommanderScoring);
         if (commander != null) return new(attempt, null, commander);
         return new(attempt, PlanNextUnit(projected, ai));
@@ -25,6 +25,7 @@ public static partial class WorldAi
     public static WorldChange ExecuteStep(WorldState state, AiStepPlan plan, WorldAiRules ai, WorldProductionRules production,
         WorldTurnRules turns, WorldBattleRules battle)
     {
+        using var execution = PlanningScope.Begin(ai, production, turns, battle);
         WorldActions.Ready(state, plan.Production.ExpectedRevision);
         ai.Validate(); production.Validate(); turns.Validate();
         if (state.AiRandomState != plan.Production.InitialRandomState)
@@ -34,7 +35,7 @@ public static partial class WorldAi
             if (plan.Unit != null || plan.Commander != null) throw new RuleViolation("ai.step_selection", "Step cannot execute production and a fallback command");
             return ExecuteProduction(state, plan.Production, production, ai);
         }
-        var projected = state with { AiRandomState = plan.Production.FinalRandomState };
+        var projected = PlanningScope.WithAiRandomState(state, plan.Production.FinalRandomState);
         if (plan.Commander != null)
         {
             if (plan.Unit != null || plan.Commander.ExpectedRevision != state.Revision || production.Commanders == null)

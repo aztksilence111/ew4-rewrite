@@ -127,7 +127,7 @@ public static class ScenarioRules
                 case "food": return faction.Resources.Food;
                 case "city_count": return world.Cells.Select((cell, i) => (cell, i)).Count(p => p.cell.BuildingKind == "city" && Owned(world, p.i, c));
                 case "objective_count": return world.Cells.Select((cell, i) => (cell, i)).Count(p => p.cell.Objective && Owned(world, p.i, c));
-                case "territory_count": return Enumerable.Range(0, world.Cells.Count).Count(i => world.Cells[i].Terrain.Active && Owned(world, i, c));
+                case "territory_count": return Enumerable.Range(0, world.Cells.Count).Count(i => world.Cells[i].Terrain.CanTraverse() && Owned(world, i, c));
                 case "unit_count": return world.Units.Count(u => (c.Camp == null ? u.Owner == faction.Id : world.Factions.Single(f => f.Id == u.Owner).Camp == c.Camp)
                     && (c.Profile == null || c.Profile == u.Combatant.Profile.Id) && (c.Category == null || c.Category == u.Combatant.Profile.Category));
                 case "kill_count": return c.Key == null ? faction.Kills.Values.Sum() : faction.Kills.TryGetValue(c.Key, out long kills) ? kills : 0;
@@ -485,14 +485,14 @@ public static class ScenarioRules
                 throw new RuleViolation("scenario.state", "Recurring event is missing progress");
             foreach (var c in Conditions(ev))
                 if (!KnownFaction(c.Faction) || c.OtherFaction != null && !KnownFaction(c.OtherFaction)
-                    || c.Cells.Any(i => i < 0 || i >= world.Cells.Count || !world.Cells[i].Terrain.Active)
+                    || c.Cells.Any(i => i < 0 || i >= world.Cells.Count || !world.Cells[i].Terrain.CanTraverse())
                     || initial && (c.Unit != null && world.Units.All(u => u.Id != c.Unit) || c.Commander != null && world.Commanders.All(k => k.Id != c.Commander)))
                     throw new RuleViolation("scenario.reference", "Unknown condition target in " + ev.Id);
             foreach (var e in Effects(ev))
             {
                 if (!KnownFaction(e.Faction) || e.OtherFaction != null && (!KnownFaction(e.OtherFaction) || e.Faction == e.OtherFaction
                         || initial && e.Faction != "@active" && e.OtherFaction != "@active" && Faction(world, e.Faction) == Faction(world, e.OtherFaction))
-                    || e.Cells.Any(i => i < 0 || i >= world.Cells.Count || !world.Cells[i].Terrain.Active)
+                    || e.Cells.Any(i => i < 0 || i >= world.Cells.Count || !world.Cells[i].Terrain.CanTraverse())
                     || initial && e.Unit != null && world.Units.All(u => u.Id != e.Unit))
                     throw new RuleViolation("scenario.reference", "Unknown effect target in " + ev.Id);
                 if (e.VictoryRules != null) ExtensionVictory.ValidateTargets(e.VictoryRules, world, initial, id => !id.StartsWith("@", StringComparison.Ordinal) && KnownFaction(id));

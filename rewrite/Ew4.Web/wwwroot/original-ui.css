@@ -61,6 +61,9 @@ input,select,textarea{font-family:inherit;font-synthesis:none}
 #hq-recruit-band{position:absolute;left:0;right:0;top:93px;height:152px;background:#c6c3bc64;border-top:1px solid #888;border-bottom:1px solid #888;pointer-events:none}
 #hq-refresh{position:absolute;left:234px;top:257px;width:100px;height:40px;gap:10px}
 #hq-refresh img{width:13px;height:16px}
+#hq-refresh .hq-refresh-ornament{position:absolute;top:50%;width:36px;height:26px;pointer-events:none;transform:translateY(-50%)}
+#hq-refresh .hq-refresh-ornament.left{right:calc(100% + 22px);transform:translateY(-50%) scaleX(-1)}
+#hq-refresh .hq-refresh-ornament.right{left:calc(100% + 22px)}
 #hq-buy-buttons{position:absolute;left:0;right:0;top:210px;height:32px;display:flex;justify-content:center;gap:5px}
 #hq-buy-buttons button{width:75px;height:32px;gap:3px}
 #hq-buy-buttons img{width:13px;height:17px}
@@ -100,7 +103,7 @@ input,select,textarea{font-family:inherit;font-synthesis:none}
 #hq-screen.deploying::before,#hq-screen.deploying::after{content:"";position:absolute;left:0;right:0;top:73px;height:1px;background:url('/content/ui/image_ui_hd/common_boldline.png') center/100% 100%;pointer-events:none}
 #hq-screen.deploying::after{top:298px}
 #hq-screen.deploying .empty-commander:disabled{opacity:1}
-#hq-deployment-quota{position:absolute;left:255px;top:43px;height:21px;display:flex;align-items:center;gap:9px}
+#hq-deployment-quota{position:absolute;left:50%;top:43px;height:21px;max-width:calc(100% - 60px);transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:9px}
 .deploy-card-confirm{display:none;position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:59px;height:26px;padding:0;background:url('/content/ui/image_ui_hd/button_confirm_blue.png') center/100% 100%;z-index:5;align-items:center;justify-content:center}
 .commander-card[aria-pressed=true]>.deploy-card-confirm{display:flex}
 .unit-detail [data-native-id=group_unit],.unit-detail [data-native-id=group_info]{top:3px!important;width:78px!important;height:78px!important}

@@ -4,12 +4,16 @@
     <_CompatibleFrontendVendor Include="$(MSBuildThisFileDirectory)Ew4.Web/wwwroot/vendor/*.js" />
   </ItemGroup>
   <ItemGroup Condition="'$(MSBuildProjectName)' == 'Ew4.Web'">
+    <Content Remove="wwwroot/build-info.json" />
+    <Content Include="wwwroot/build-info.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Remove="wwwroot/compat/**/*" />
     <Content Include="@(_CompatibleFrontendRoot->'wwwroot/compat/%(Filename)%(Extension)')" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="@(_CompatibleFrontendVendor->'wwwroot/compat/vendor/%(Filename)%(Extension)')" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="wwwroot/compat/manifest.json" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup Condition="'$(MSBuildProjectName)' == 'Ew4.Android'">
+    <AndroidAsset Remove="../Ew4.Web/wwwroot/build-info.json" />
+    <AndroidAsset Include="../Ew4.Web/wwwroot/build-info.json" Link="www/build-info.json" />
     <AndroidAsset Remove="../Ew4.Web/wwwroot/compat/**/*" />
     <AndroidAsset Include="@(_CompatibleFrontendRoot->'../Ew4.Web/wwwroot/compat/%(Filename)%(Extension)')" Link="www/compat/%(Filename)%(Extension)" />
     <AndroidAsset Include="@(_CompatibleFrontendVendor->'../Ew4.Web/wwwroot/compat/vendor/%(Filename)%(Extension)')" Link="www/compat/vendor/%(Filename)%(Extension)" />

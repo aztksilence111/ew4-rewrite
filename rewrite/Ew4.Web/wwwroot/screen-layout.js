@@ -14,7 +14,7 @@
     const preference=Number.isFinite(screen)?clamp(screen/100,.8,1.5):1;
     const stageFit=Math.min(safeWidth/568,safeHeight/320);
     const uiScale=Math.min(stageFit,stageFit*preference,tablet?2.5:3);
-    // Keep artwork and menu spacing on the original canvas on every platform.
+    // Scale controls uniformly while allowing edge anchors to reach the viewport.
     const menuScale=Math.min(stageFit,stageFit*preference);
     // Corner size depends on the viewport, never on the space removed by safe insets.
     const legacyScale=Math.min(Math.max(Math.min(width/568,height/320)*preference,48/27,height/300),width/420,height/180);
@@ -28,7 +28,7 @@
     const hudScale=Math.min(compactScale,Math.max(1,(width-cornerSize-32)/164));
     // Insets constrain floating content, not the viewport used by the map and edge HUD.
     return {profile,orientation:height>=width?'portrait':'landscape',width,height:viewportHeight,safeWidth,safeHeight,
-      uiScale,menuScale,menuWidth:568,menuHeight:320,
+      uiScale,menuScale,menuWidth:width/menuScale,menuHeight:viewportHeight/menuScale,
       menuSafeLeft:0,menuSafeRight:0,menuSafeTop:0,menuSafeBottom:0,
       battleScale,compactScale,hudScale,cornerSize,cornerInset,actionWidth,
       pauseScale:fit(168,274,uiScale,safeWidth,safeHeight),

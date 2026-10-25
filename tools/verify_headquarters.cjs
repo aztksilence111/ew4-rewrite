@@ -5,13 +5,18 @@ const path = require('node:path');
 const { createRequire } = require('node:module');
 const { chromium } = createRequire('C:/Users/WIN11/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/_probe.cjs')('playwright');
 const base = process.argv[2] || 'http://127.0.0.1:5262';
-const folder = path.resolve(__dirname, '../rewrite/reports/headquarters-mode-20261021');
+const folder = path.resolve(process.argv[3] || path.join(__dirname, '../rewrite/reports/headquarters-mode-20261021'));
 (async () => {
   await fs.mkdir(folder, { recursive: true });
   const report = { checks: 0, errors: [], missing: [], screenshots: [] };
   const check = (value, label) => { assert.ok(value, label); report.checks++; };
   const browser = await chromium.launch({ headless: true, executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe' });
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, hasTouch: true });
+  const selectFilter = async label => {
+    await page.locator('#hq-filter-main').click();
+    await page.getByRole('menuitemradio', { name: label, exact: true }).click();
+    await page.waitForFunction(() => document.getElementById('hq-filter-shield').hidden);
+  };
   page.on('pageerror', e => report.errors.push(e.message));
   page.on('response', r => { if (r.status() >= 400) report.missing.push(r.url()); });
   const shot = async name => {
@@ -33,7 +38,7 @@ const folder = path.resolve(__dirname, '../rewrite/reports/headquarters-mode-202
         }
       }
     });
-    check(await page.locator('#hq-filters [role=tab]').count() === 4, 'four filters');
+    check(await page.locator('#hq-filters [role=menuitemradio]').count() === 4, 'four filters');
     check(await page.locator('#hq-roster .commander-card').count() === 60, 'all filter contains 60 slots');
     check(await page.locator('#hq-scrollbar').count() === 0, 'no visible scrollbar control');
     await page.evaluate(async () => { await menus.updateAccount({ op: 'tags', taggedCommanders: [] }); });
@@ -67,8 +72,8 @@ const folder = path.resolve(__dirname, '../rewrite/reports/headquarters-mode-202
       return Math.abs(marker.left - r.left) < 1 && Math.abs(marker.bottom - r.bottom) < 1;
     }), 'triangle is at slot bottom left');
     check(JSON.stringify(await rosterOrder()) === JSON.stringify(initialOrder), 'editing does not reorder cards');
-    await page.getByRole('tab', { name: '二星区', exact: true }).click();
-    await page.getByRole('tab', { name: '全选', exact: true }).click();
+    await selectFilter('二星区');
+    await selectFilter('全选');
     check(await taggedCard().locator('.commander-tag').count() === 1, 'draft survives filter changes');
     await shot('tag-mode-desktop');
     await page.route('**/api/commander?*', route => route.fulfill({ json: { ok: false, code: 'test.failure', message: '保存失败测试' } }));
@@ -87,7 +92,7 @@ const folder = path.resolve(__dirname, '../rewrite/reports/headquarters-mode-202
     check(await page.locator('#hq-roster .commander-card').first().getAttribute('data-commander') === tagged.id, 'pin remains first after reload');
     for (const [name, width, height] of [['desktop', 1280, 720], ['landscape', 844, 390], ['portrait', 390, 844]]) {
       await page.setViewportSize({ width, height });
-      await page.getByRole('tab', { name: '全选', exact: true }).click();
+      await selectFilter('全选');
       await shot(name + '-all');
       check(await page.locator('#hq-tags').evaluate(el => {
         const r = el.getBoundingClientRect(), shop = document.getElementById('hq-shop').getBoundingClientRect(), count = document.getElementById('hq-count').getBoundingClientRect();
@@ -104,7 +109,7 @@ const folder = path.resolve(__dirname, '../rewrite/reports/headquarters-mode-202
       check(geometry.rows === 2 && geometry.contained, name + ' exactly two fully visible rows');
       check(geometry.alternating, name + ' columns fill top then bottom before moving right');
       check(await page.locator('#hq-filters').evaluate(el => {
-        const children = [...el.children].map(e => e.getBoundingClientRect()), recruit = document.getElementById('hq-recruit').getBoundingClientRect();
+        const children = [...el.querySelectorAll(':scope>button')].map(e => e.getBoundingClientRect()), recruit = document.getElementById('hq-recruit').getBoundingClientRect();
         return children.every((r, i) => r.right <= recruit.left && (!i || r.left >= children[i - 1].right));
       }), name + ' filters do not overlap');
       // Start on a portrait to verify drag suppresses the ordinary detail click.
@@ -125,7 +130,7 @@ const folder = path.resolve(__dirname, '../rewrite/reports/headquarters-mode-202
       check(await page.evaluate(() => menus.tagDraft.size) === 1, name + ' touch swipe does not toggle tags');
       await cdp.detach();
       for (const label of ['一星区', '二星区', '三星区']) {
-        await page.getByRole('tab', { name: label, exact: true }).click();
+        await selectFilter(label);
         check(await page.locator('#hq-roster .commander-card').count() === 20, name + ' ' + label + ' 20 slots');
         check(await page.locator('#hq-roster .commander-card:not(.empty-commander)').count() === 2, name + ' ' + label + ' correct members');
         check(await page.locator('#hq-roster').evaluate(el => el.scrollLeft === 0), name + ' filter resets scroll');
@@ -158,7 +163,7 @@ const folder = path.resolve(__dirname, '../rewrite/reports/headquarters-mode-202
     }), 'last slot is reachable');
     await shot('full-roster-last-page');
     await page.evaluate(async () => { menus.data = await rpc('headquarters'); menus.drawRoster(); });
-    await page.getByRole('tab', { name: '全选', exact: true }).click();
+    await selectFilter('全选');
     await page.locator('#hq-tags').click();
     await taggedCard().locator('.commander-open').click();
     await page.locator('#hq-back').click();

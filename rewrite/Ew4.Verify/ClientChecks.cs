@@ -35,6 +35,20 @@ internal static class ClientChecks
         Check(view.GetProperty("factions").EnumerateArray().Select(f => f.GetProperty("color").GetInt32()).SequenceEqual(sourceColors), "original packed faction colors retained");
         Check(view.GetProperty("units").GetArrayLength() == content.Battle("conquest1").Armies.Count, "render view retains original armies");
         Check(view.GetProperty("map").GetString() == "europe", "map binding");
+        void CheckBridges(JsonElement rendered, string scenario)
+        {
+            var source = content.Battle(scenario).EffectiveSites.ToDictionary(s => (int)s.Cell);
+            int i = 0;
+            foreach (var cell in rendered.GetProperty("cells").EnumerateArray())
+            {
+                source.TryGetValue(i++, out var site);
+                Check(cell.GetProperty("bridgeStyle0").GetInt32() == (site?.BridgeStyle0 ?? 0)
+                    && cell.GetProperty("bridgeStyle1").GetInt32() == (site?.BridgeStyle1 ?? 0)
+                    && cell.GetProperty("bridgeStyle2").GetInt32() == (site?.BridgeStyle2 ?? 0)
+                    && cell.GetProperty("bridgeEdges").GetInt32() == (site?.BridgeEdges ?? 0), "bridge display matches scenario at " + (i - 1));
+            }
+        }
+        CheckBridges(view, "conquest1");
         var detailRevision = view.GetProperty("revision").GetInt64();
         foreach (var displayed in view.GetProperty("units").EnumerateArray().Where(u => u.GetProperty("commanderId").ValueKind != JsonValueKind.Null))
         {
@@ -130,6 +144,7 @@ internal static class ClientChecks
         var beforeSave = Call("action", new { op = "state", revision });
         Call("save");
         var restored = Call("load");
+        CheckBridges(restored, "conquest1");
         foreach (string key in new[] { "revision", "round", "phase", "playerFaction", "units", "cells", "factions", "dialogue" })
             Check(beforeSave.GetProperty(key).GetRawText() == restored.GetProperty(key).GetRawText(), "save restores " + key);
         Call("save"); Check(File.Exists(Path.Combine(folder, "session.json.bak")), "slot retains previous backup");
@@ -153,6 +168,7 @@ internal static class ClientChecks
         {
             string country = Call("countries", new { scenario = scenario.Id })[0].GetProperty("id").GetString()!;
             var started = Call("start", new { scenario = scenario.Id, country });
+            CheckBridges(started, scenario.Id);
             Check(started.GetProperty("cells").GetArrayLength() == content.Maps[content.Battle(scenario.Id).MapId].Cells.Count, "render grid matches " + scenario.Id);
         }
         var profileDirectory = Path.Combine(folder, "account-" + Guid.NewGuid().ToString("N"));
@@ -229,6 +245,7 @@ internal static class ClientChecks
         foreach (string scenario in new[] { "campaign1_01", "campaign3_08", "campaign3_08b", "tutorials1", "tutorials2" }) {
             var started=RosterCall("start", new { scenario });
             Check(started.GetProperty("scenario").GetString() == scenario, "campaign/tutorial host entry " + scenario);
+            CheckBridges(started, scenario);
             var sourceWorld=content.Start(scenario,null).Session.World;
             Check(started.GetProperty("units").EnumerateArray().Where(u=>u.GetProperty("objective").GetBoolean()).Select(u=>u.GetProperty("id").GetString())
                 .SequenceEqual(sourceWorld.Units.Where(u=>u.Objective).Select(u=>u.Id)), "display exposes exact backend unit objectives " + scenario);

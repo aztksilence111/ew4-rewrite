@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='utf-8'?>
+<battlelist>
+  <battle name="1 zone 1" file="campaign1_01.btl" map="1" hide="0" commander="Treville" centerx="450" centery="320" age="1793" agex="464" agey="365" />
+  <battle name="1 zone 2" file="campaign1_02.btl" map="1" hide="0" commander="Berthier" centerx="523" centery="320" age="1796" agex="526" agey="353" />
+  <battle name="1 zone 3" file="campaign1_03.btl" map="1" hide="0" commander="Massena" centerx="572" centery="293" age="1797" agex="490" agey="320" />
+  <battle name="1 zone 4" file="campaign1_04.btl" map="1" hide="0" commander="Desaix" centerx="700" centery="444" age="1798" agex="623" agey="408" />
+  <battle name="1 zone 5" file="campaign1_05.btl" map="1" hide="1" commander="Savary" centerx="525" centery="450" age="1799" agex="522" agey="399" />
+  <battle name="1 zone 6" file="campaign1_06.btl" map="1" hide="0" commander="Desaix" centerx="530" centery="261" age="1800" agex="593" agey="206" />
+  <battle name="1 zone 7" file="campaign1_07.btl" map="1" hide="0" commander="Napoleon" centerx="562" centery="235" age="1805" agex="613" agey="222" />
+  <battle name="1 zone 8" file="campaign1_08.btl" map="1" hide="0" commander="Murat" centerx="550" centery="200" age="1806" agex="580" agey="228" />
+  <battle name="1 zone 9" file="campaign1_09.btl" map="1" hide="0" commander="Ney" centerx="626" centery="187" age="1807" agex="641" agey="228" />
+  <battle name="1 zone 10" file="campaign1_10.btl" map="1" hide="0" commander="Junot" centerx="405" centery="367" age="1808" agex="440" agey="395" />
+  <battle name="1 zone 11" file="campaign1_11.btl" map="1" hide="0" commander="MacDonald" centerx="582" centery="229" age="1809" agex="558" agey="273" />
+  <battle name="1 zone 12" file="campaign1_12.btl" map="1" hide="0" commander="Murat" centerx="657" centery="180" age="1812" agex="708" agey="200" />
+  <battle name="1 zone 13" file="campaign1_13.btl" map="1" hide="0" commander="Ney" centerx="699" centery="167" age="1812" agex="638" agey="190" />
+  <battle name="1 zone 14" file="campaign1_14.btl" map="1" hide="0" commander="Murat" centerx="563" centery="235" age="1813" agex="648" agey="194" />
+  <battle name="1 zone 15" file="campaign1_15.btl" map="1" hide="0" commander="Napoleon" centerx="524" centery="258" age="1815" agex="576" agey="225" />
+  <battle name="1 zone 16" file="campaign1_16.btl" map="1" hide="0" commander="Grouchy" centerx="443" centery="214" age="1817" agex="500" agey="253" />
+  <battle name="1 zone 17" file="campaign1_17.btl" map="1" hide="0" commander="Oudinot" centerx="204" centery="164" age="1818" agex="276" agey="159" />
+  <battle name="1 zone 18" file="campaign1_18.btl" map="1" hide="1" commander="Jourdan" centerx="155" centery="237" age="1820" agex="219" agey="224" />
+  <battle name="2 zone 1" file="campaign2_01.btl" map="1" hide="0" commander="Archduke.C" centerx="492" centery="230" age="1793" agex="525" agey="250" />
+  <battle name="2 zone 2" file="campaign2_02.btl" map="1" hide="0" commander="Hood" centerx="455" centery="323" age="1793" agex="450" agey="350" />
+  <battle name="2 zone 3" file="campaign2_03.btl" map="1" hide="0" commander="Nelson" centerx="712" centery="442" age="1798" agex="636" agey="436" />
+  <battle name="2 zone 4" file="campaign2_04.btl" map="1" hide="0" commander="Radetzky" centerx="563" centery="235" age="1799" agex="628" agey="275" />
+  <battle name="2 zone 5" file="campaign2_05.btl" map="1" hide="1" commander="Bagration" centerx="574" centery="319" age="1799" agex="517" agey="345" />
+  <battle name="2 zone 6" file="campaign2_06.btl" map="1" hide="0" commander="Nelson" centerx="560" centery="153" age="1801" agex="545" agey="200" />
+  <battle name="2 zone 7" file="campaign2_07.btl" map="1" hide="0" commander="Nelson" centerx="277" centery="434" age="1805" agex="272" agey="357" />
+  <battle name="2 zone 8" file="campaign2_08.btl" map="1" hide="0" commander="Kutuzov" centerx="596" centery="236" age="1805" agex="654" agey="265" />
+  <battle name="2 zone 9" file="campaign2_09.btl" map="1" hide="0" commander="Blucher" centerx="546" centery="230" age="1806" agex="613" agey="221" />
+  <battle name="2 zone 10" file="campaign2_10.btl" map="1" hide="0" commander="Barclay" centerx="644" centery="175" age="1807" agex="603" agey="215" />
+  <battle name="2 zone 11" file="campaign2_11.btl" map="1" hide="0" commander="Wellesley" centerx="523" centery="164" age="1807" agex="576" agey="183" />
+  <battle name="2 zone 12" file="campaign2_12.btl" map="1" hide="0" commander="Palafox" centerx="385" centery="373" age="1809" agex="428" agey="411" />
+  <battle name="2 zone 13" file="campaign2_13.btl" map="1" hide="0" commander="Archduke.C" centerx="578" centery="228" age="1809" agex="659" agey="271" />
+  <battle name="2 zone 14" file="campaign2_14.btl" map="1" hide="1" commander="Archduke.C" centerx="615" centery="235" age="1812" agex="670" agey="274" />
+  <battle name="2 zone 15" file="campaign2_15.btl" map="1" hide="0" commander="Blucher" centerx="550" centery="234" age="1813" agex="539" agey="275" />
+  <battle name="2 zone 16" file="campaign2_16.btl" map="1" hide="0" commander="Wellesley" centerx="463" centery="232" age="1815" agex="423" agey="214" />
+  <battle name="2 zone 17" file="campaign2_17.btl" map="1" hide="0" commander="Wellesley" centerx="466" centery="273" age="1815" agex="398" agey="287" />
+  <battle name="3 zone 1" file="campaign3_01.btl" map="1" hide="0" commander="Dornberg" centerx="558" centery="234" age="1810" agex="630" agey="225" />
+  <battle name="3 zone 2" file="campaign3_02.btl" map="1" hide="0" commander="Kienmayer" centerx="623" centery="302" age="1811" agex="583" agey="324" />
+  <battle name="3 zone 3" file="campaign3_03.btl" map="1" hide="0" commander="Radetzky" centerx="628" centery="315" age="1812" agex="653" agey="346" />
+  <battle name="3 zone 4" file="campaign3_04.btl" map="1" hide="0" commander="Blucher" centerx="530" centery="229" age="1813" agex="500" agey="265" />
+  <battle name="3 zone 5" file="campaign3_05.btl" map="1" hide="0" commander="Merveldt" centerx="543" centery="342" age="1813" agex="489" agey="293" />
+  <battle name="3 zone 6" file="campaign3_06.btl" map="1" hide="0" commander="Blucher" centerx="514" centery="232" age="1813" agex="489" agey="155" />
+  <battle name="3 zone 7" file="campaign3_07.btl" map="1" hide="0" commander="Blucher" centerx="605" centery="225" age="1814" agex="556" agey="149" />
+  <battle name="3 zone 8" file="campaign3_08.btl" file2="campaign3_08b.btl" map="1" hide="0" commander="Deroy" centerx="600" centery="239" age="1815" agex="677" agey="230" countries="pru,aus" />
+  <battle name="3 zone 9" file="campaign3_09.btl" map="1" hide="0" commander="Yorck" centerx="497" centery="239" age="1816" agex="570" agey="226" />
+  <battle name="3 zone 10" file="campaign3_10.btl" map="1" hide="0" commander="Blucher" centerx="393" centery="342" age="1817" agex="331" agey="310" />
+  <battle name="3 zone 11" file="campaign3_11.btl" map="1" hide="0" commander="Archduke.C" centerx="476" centery="198" age="1818" agex="569" agey="191" />
+  <battle name="3 zone 12" file="campaign3_12.btl" map="1" hide="1" commander="Archduke.C" centerx="444" centery="179" age="1819" agex="507" agey="161" />
+  <battle name="3 zone 13" file="campaign3_13.btl" map="1" hide="0" commander="Radetzky" centerx="678" centery="333" age="1820" agex="700" agey="254" />
+  <battle name="3 zone 14" file="campaign3_14.btl" map="1" hide="1" commander="Yorck" centerx="704" centery="413" age="1820" agex="603" agey="405" />
+  <battle name="3 zone 15" file="campaign3_15.btl" map="1" hide="0" commander="JohannI" centerx="128" centery="309" age="1821" agex="211" agey="327" />
+  <battle name="4 zone 1" file="campaign4_01.btl" map="1" hide="0" commander="Milinovic" centerx="723" centery="444" age="1798" agex="640" agey="393" />
+  <battle name="4 zone 2" file="campaign4_02.btl" map="1" hide="0" commander="Wittgenstein" centerx="734" centery="279" age="1804" agex="633" agey="231" />
+  <battle name="4 zone 3" file="campaign4_03.btl" map="1" hide="0" commander="Pasha" centerx="459" centery="421" age="1805" agex="488" agey="411" />
+  <battle name="4 zone 4" file="campaign4_04.btl" map="1" hide="0" commander="Barclay" centerx="593" centery="134" age="1808" agex="649" agey="178" />
+  <battle name="4 zone 5" file="campaign4_05.btl" map="1" hide="0" commander="Pasha" centerx="704" centery="377" age="1809" agex="604" agey="332" />
+  <battle name="4 zone 6" file="campaign4_06.btl" map="1" hide="0" commander="SelimIII" centerx="676" centery="300" age="1810" agex="665" agey="240" />
+  <battle name="4 zone 7" file="campaign4_07.btl" map="1" hide="0" commander="Raevsky" centerx="632" centery="199" age="1812" agex="570" agey="191" />
+  <battle name="4 zone 8" file="campaign4_08.btl" map="1" hide="0" commander="Kutuzov" centerx="738" centery="150" age="1812" agex="679" agey="96" />
+  <battle name="4 zone 9" file="campaign4_09.btl" map="1" hide="0" commander="AlexanderI" centerx="656" centery="150" age="1813" agex="701" agey="103" />
+  <battle name="4 zone 10" file="campaign4_10.btl" file2="campaign4_10b.btl" map="1" hide="0" commander="Milinovic" centerx="719" centery="313" age="1814" agex="673" agey="257" countries="tur,rus" />
+  <battle name="4 zone 11" file="campaign4_11.btl" map="1" hide="1" commander="Pasha" centerx="702" centery="208" age="1815" agex="639" agey="200" countries="tur" />
+  <battle name="4 zone 12" file="campaign4_12.btl" map="1" hide="1" commander="Bennigsen" centerx="685" centery="351" age="1815" agex="644" agey="320" countries="rus" />
+  <battle name="4 zone 13" file="campaign4_13.btl" map="1" hide="0" commander="Golitsyn" centerx="657" centery="230" age="1818" agex="639" agey="171" countries="gbr" />
+  <battle name="5 zone 1" file="campaign5_01.btl" map="1" hide="0" commander="Arnold" centerx="190" centery="162" age="1775" agex="174" agey="77" />
+  <battle name="5 zone 2" file="campaign5_02.btl" map="1" hide="0" commander="Dearborn" centerx="99" centery="312" age="1777" agex="99" agey="266" />
+  <battle name="5 zone 3" file="campaign5_03.btl" map="1" hide="0" commander="Dearborn" centerx="99" centery="310" age="1781" agex="159" agey="315" />
+  <battle name="5 zone 4" file="campaign5_04.btl" map="1" hide="0" commander="Jackson" centerx="97" centery="358" age="1798" agex="108" agey="280" />
+  <battle name="5 zone 5" file="campaign5_05.btl" map="1" hide="1" commander="Hull" centerx="72" centery="299" age="1800" agex="179" agey="278" />
+  <battle name="5 zone 6" file="campaign5_06.btl" map="1" hide="0" commander="Dearborn" centerx="106" centery="189" age="1812" agex="143" agey="115" />
+  <battle name="5 zone 7" file="campaign5_07.btl" map="1" hide="0" commander="Jackson" centerx="125" centery="277" age="1813" agex="173" agey="182" />
+  <battle name="5 zone 8" file="campaign5_08.btl" map="1" hide="0" commander="Jackson" centerx="196" centery="124" age="1815" agex="267" agey="172" />
+  <battle name="5 zone 9" file="campaign5_09.btl" map="1" hide="1" commander="Jackson" centerx="391" centery="138" age="1817" agex="468" agey="104" />
+  <battle name="5 zone 10" file="campaign5_10.btl" map="1" hide="0" commander="Dearborn" centerx="392" centery="332" age="1820" agex="294" agey="331" />
+  <battle name="5 zone 11" file="campaign5_11.btl" map="1" hide="0" commander="Dearborn" centerx="486" centery="286" age="1821" agex="546" agey="266" />
+  <battle name="6 zone 1" file="campaign6_01.btl" map="1" hide="0" commander="Brock" centerx="122" centery="270" age="1775" agex="229" agey="219" />
+  <battle name="6 zone 2" file="campaign6_02.btl" map="1" hide="0" commander="Clinton" centerx="58" centery="346" age="1781" agex="147" agey="334" />
+  <battle name="6 zone 3" file="campaign6_03.btl" map="1" hide="0" commander="Rowland" centerx="498" centery="297" age="1793" agex="377" agey="265" />
+  <battle name="6 zone 4" file="campaign6_04.btl" map="1" hide="0" commander="Nelson" centerx="701" centery="453" age="1798" agex="666" agey="333" />
+  <battle name="6 zone 5" file="campaign6_05.btl" map="1" hide="0" commander="Collingwood" centerx="400" centery="303" age="1800" agex="289" agey="288" />
+  <battle name="6 zone 6" file="campaign6_06.btl" map="1" hide="0" commander="Nelson" centerx="612" centery="126" age="1801" agex="660" agey="170" />
+  <battle name="6 zone 7" file="campaign6_07.btl" map="1" hide="0" commander="Wellesley" centerx="354" centery="394" age="1808" agex="378" agey="331" />
+  <battle name="6 zone 8" file="campaign6_08.btl" map="1" hide="0" commander="Duckworth" centerx="595" centery="430" age="1809" agex="638" agey="324" />
+  <battle name="6 zone 9" file="campaign6_09.btl" map="1" hide="1" commander="Dearborn" centerx="727" centery="306" age="1811" agex="674" agey="280" />
+  <battle name="6 zone 10" file="campaign6_10.btl" map="1" hide="0" commander="Wellesley" centerx="429" centery="309" age="1814" agex="394" agey="299" />
+  <battle name="conquest 1" file="conquest1.btl" map="1" hide="0" centerx="511" centery="273" scale="1" age="" agex="544" agey="470" />
+  <battle name="conquest 2" file="conquest2.btl" map="1" hide="0" centerx="105" centery="280" scale="1" age="" agex="544" agey="470" />
+  <battle name="conquest 3" file="conquest3.btl" map="1" hide="0" centerx="493" centery="278" scale="1" age="" agex="544" agey="470" />
+  <battle name="conquest 4" file="conquest4.btl" map="1" hide="0" centerx="506" centery="254" scale="0.9" age="" agex="544" agey="470" />
+  <battle name="conquest 5" file="conquest5.btl" map="1" hide="0" centerx="115" centery="217" scale="1" age="" agex="544" agey="470" />
+  <battle name="conquest 6" file="conquest6.btl" map="1" hide="0" centerx="586" centery="318" scale="0.8" age="" agex="544" agey="470" />
+  <battle name="multiplay 1" file="multiplay1.btl" map="1" hide="0" centerx="683" centery="428" age="" agex="544" agey="470" countries="fra,gbr" />
+  <battle name="multiplay 2" file="multiplay2.btl" map="1" hide="0" centerx="556" centery="222" age="" agex="544" agey="470" countries="fra,pru" />
+  <battle name="multiplay 3" file="multiplay3.btl" map="1" hide="0" centerx="696" centery="163" age="" agex="544" agey="470" countries="fra,rus" />
+  <battle name="multiplay 4" file="multiplay4.btl" map="1" hide="0" centerx="460" centery="212" age="" agex="544" agey="470" countries="fra,gbr" />
+  <battle name="multiplay 5" file="multiplay5.btl" map="1" hide="0" centerx="140" centery="252" age="" agex="544" agey="470" countries="gbr,usa" />
+  <battle name="multiplay 6" file="multiplay6.btl" map="1" hide="0" centerx="640" centery="320" age="" agex="544" agey="470" countries="aus,tur" />
+  <battle name="conquest 7" file="conquest7.btl" map="3" hide="0" centerx="284" centery="160" scale="1" age="" agex="0" agey="0" citynames="conquest7.names.xml" />
+</battlelist>

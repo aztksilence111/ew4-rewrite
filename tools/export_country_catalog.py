@@ -1,6 +1,7 @@
 """Create the global country registry from the preserved scenario identities."""
 import hashlib
 import json
+from catalog_files import read_catalog
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
@@ -28,7 +29,7 @@ def main():
         if "=" in line and not line.lstrip().startswith(";"):
             key, value = line.split("=", 1)
             strings[key.strip()] = value.strip()
-    runtime = json.loads((DATA / "legacy/catalog.json").read_text(encoding="utf-8"))
+    runtime = read_catalog(DATA / "legacy/catalog.json")
     countries = {country: dict(name=strings.get(country, strings.get("name_" + country, country)), flag=variant,
                               unitVariant=variant if variant in runtime["variants"] else "others", visualVariant=variant)
                  for country, variant in sorted(variants.items())}

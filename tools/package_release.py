@@ -13,7 +13,7 @@ parser.add_argument("--build", default="build/release-0.2.4-20261020")
 parser.add_argument("--version", default="0.2.4")
 parser.add_argument("--date", default="20261020")
 parser.add_argument("--notes", default="rewrite/RELEASE_0.2.4_20261020.md")
-parser.add_argument("--rule-api", type=int, choices=(1, 2), default=1)
+parser.add_argument("--rule-api", type=int, choices=(1, 2, 3), default=1)
 parser.add_argument("--android-only", action="store_true")
 args = parser.parse_args()
 build = ROOT / args.build

@@ -1,5 +1,14 @@
 # 配置索引：从目标定位到文件
 
+国家地块颜色：`client/countries.json` 的 `color`；新增/现有势力：`faction_create.color` / `faction_identity.color`；阵营地图：API 3 `mapColors` 引用 `rewrite/map-colors.json`。见[格式、优先级与模板](porting/MAP_COLORS.md)。
+
+中英文地理名称沿曲线逐字排列使用 `client/manifest.json` 中的 `maps.<地图名>.labels[].textPath`，见[字段与作者配置](porting/MAP_TEXT_PATHS.md)。
+
+API 3 的 `geography` 引用 `rewrite/geography.json`，配置禁行山地/海洋与默认图集外观，见[通用地理接口](porting/GEOGRAPHY.md)。
+
+基础规则现支持直接编辑 `legacy/` 下的独立 JSON，见[文件与字段](porting/SPLIT_CATALOG.md)。
+下文原 XML 路径继续作为旧资源导入入口。
+
 战役初始显示与隐藏可用 API 2 的 `campaignVisibility` 逐关设置，见[示例](../examples/campaign-visibility/README.md)。背景音乐使用 `client/music.json`，见[音乐配置](../data/client/music/README.md)。
 
 局外初始货币、商品位/库存、刷新次数及恢复条件使用 API 2 的 `metagame`；战役说明UI/目标展示使用 `stageIntroPresentation`，真实目标沿用胜负规则。见[配置指南](porting/METAGAME_AND_BRIEFING.md)及[示例](../examples/feedback-config/README.md)。
@@ -17,7 +26,7 @@
 | 目标 | 文件及关键节点 | 加载/执行入口 |
 | --- | --- | --- |
 | 导入包标识/版本/文件哈希 | 根mod.json：schema/id/name/version/baseRevision/scenarios/files/warnings/logicRevision | ModStore.Seal/Validate |
-| 将领基础属性和四技能 | original/def_commander.xml：commander的id/name及能力/skill1～4 | LegacyCatalogConverter.Convert；LegacyRuntimeCatalog.FromJson |
+| 将领基础属性和技能 | legacy/commanders.json；旧 XML 经导入器转换 | LegacyCatalogFiles.Load；LegacyRuntimeCatalog.FromJson |
 | 将领专属喊话 | extension.json的commanderDialogues，apiVersion:2；JSON的schema:1/commanders/ew4.commander.N/kill及killRules | ExtensionLoader.Load；ClientGame；app.js；[条件、固定/随机选句及回退规则](../examples/commander-dialogues/README.md)，occupy/retreat仅预留 |
 | 自定义技能/特性/Lua | rewrite/extension.json及其skills/traits/scripts引用 | ExtensionLoader.Load；RuleEventBus.Modify/Dispatch；[完整接口](porting/RULE_EXTENSIONS.md) |
 | 物品/装备外置效果 | extension.json的itemBindings，apiVersion:2；target/skills/useSkill/replaceLegacyEffect/value | ExtensionLoader.ConfigureItem；Ew4Commander.Attach；ConsumableItems.Use；[字段与模板](porting/ITEM_EFFECTS.md) |
@@ -54,8 +63,8 @@
 | 粒子/受击时间轴 | client/effects.json：bindings/motions/timelines/definitions | Effects.motion/timeline/emit；app.playCombat |
 | 动画关键帧 | client/animations/<library>.json：fps/items/elements/atlas | LegacyBinary.Animation；app.animation |
 | 音效 | client/sounds/<文件名>与effects.sounds及时间轴sound | Effects.sound |
-| 升级经验/治疗/费用 | legacy/runtime_rule_tables.json | LegacyCombatCatalog.Read |
-| 局外折扣/商业 | legacy/metagame_rule_tables.json | LegacyCommanderAccounts.Read |
+| 升级经验/治疗/费用 | legacy/unit-progression.json、commander-progression.json | LegacyCatalogFiles.Rules；LegacyCombatCatalog.Read |
+| 局外折扣/商业 | legacy/economy-rules.json | LegacyCatalogFiles.Rules；LegacyCommanderAccounts.Read |
 | 使用哪个Mod | 安装目录active.json，不是包内配置 | ModStore.Activate |
 | 账户和战局 | account.json、saves/mode-*/slot-*.json | ClientGame、ClientSaves |
 

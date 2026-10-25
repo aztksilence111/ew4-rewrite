@@ -14,6 +14,16 @@ public sealed record LegacyMapDiagnostic(string Code, int Cell, int Value);
 
 public static class LegacyScenarioMap
 {
+    private static readonly System.Text.Json.JsonSerializerOptions GeographyJson = new() {
+        TypeInfoResolver = new System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver {
+            Modifiers = { info => {
+                if (info.Type == typeof(MovementCell)) {
+                    info.Properties.Single(p => p.Name == "Barrier").ShouldSerialize = (_, value) => (TerrainBarrier)value! != TerrainBarrier.None;
+                    info.Properties.Single(p => p.Name == "MinimumEntryCost").ShouldSerialize = (_, value) => (int)value! != 0;
+                }
+            } }
+        }
+    };
     // This builds the map component only. Units, accounts, events and runtime rules must still be imported.
     public static LegacyMapImport Import(LegacyTerrainMap map, LegacyBattle battle, LegacyTerrainRules rules,
         IReadOnlyList<string> factionIds, IReadOnlyDictionary<int, string> buildingKinds,
@@ -41,7 +51,7 @@ public static class LegacyScenarioMap
             int x = cell % map.Width - battle.Left, y = cell / map.Width - battle.Top;
             bool active = x >= 0 && y >= 0 && x < battle.Width && y < battle.Height;
             string? owner = null;
-            if (active)
+            if (active && map.Cells[cell].Terrain.CanTraverse())
             {
                 int index = unchecked((sbyte)ownership[y * battle.Width + x]);
                 if (index >= 0)
@@ -65,6 +75,9 @@ public static class LegacyScenarioMap
             if (!cells[site.Cell].Terrain.Active) diagnostics.Add(new("legacy.site_inactive", site.Cell, site.BuildingKind));
             if (sites.ContainsKey(site.Cell)) diagnostics.Add(new("legacy.site_replaced", site.Cell, site.BuildingKind));
             sites[site.Cell] = site;
+            if (cells[site.Cell].Terrain.Barrier != TerrainBarrier.None && (site.BuildingKind != 255
+                || site.InstallationKind != -1 || site.CityId >= 0 || site.Marker != 0))
+                throw new RuleViolation("geography.site", $"{map.Id}: site conflicts with impassable cell {site.Cell}");
             if (site.BridgeEdges > 63) throw new RuleViolation("legacy.bridge", "Unknown bridge direction flags");
             string? building = null, installation = null, name = null;
             if (site.BuildingKind != 255 && (!buildingKinds.TryGetValue(site.BuildingKind, out building) || string.IsNullOrWhiteSpace(building)))
@@ -101,11 +114,11 @@ public static class LegacyScenarioMap
         // Include resolved map conversion and identity/name policy, not only binary assets.
         using var digest = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
         digest.AppendData(Encoding.UTF8.GetBytes(buildingRules?.SourceRevision ?? ""));
-        digest.AppendData(System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(map)); digest.AppendData(battle.ToBytes());
+        digest.AppendData(System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(map, GeographyJson)); digest.AppendData(battle.ToBytes());
         Span<byte> size = stackalloc byte[4];
         foreach (var cell in cells)
         {
-            string row = System.Text.Json.JsonSerializer.Serialize(cell);
+            string row = System.Text.Json.JsonSerializer.Serialize(cell, GeographyJson);
             byte[] encoded = Encoding.UTF8.GetBytes(row);
             BinaryPrimitives.WriteInt32LittleEndian(size, encoded.Length);
             digest.AppendData(size); digest.AppendData(encoded);

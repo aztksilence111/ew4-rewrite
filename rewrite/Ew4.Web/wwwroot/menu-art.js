@@ -25,7 +25,7 @@
       }
       if(this.api.manifest.uiOverrides?.main){const image=this.api.image(this.api.manifest.uiOverrides.main);await image.decode();draw.clearRect(0,0,568,320);draw.drawImage(image,0,0,568,320);}
       this.main=main.toDataURL();
-      document.getElementById('main-menu').style.background='url("'+this.main+'") center/100% 100% no-repeat';
+      document.getElementById('main-menu').style.background='url("'+this.main+'") center/cover no-repeat';
       const title=layouts.form_mainmenu.children.find(n=>n.attributes.id==='image_title')?.attributes;
       if(title)Object.assign(document.querySelector('#main-menu .game-title').style,{left:Number(title.x||0)+'px',top:Number(title.y||0)+'px'});
       this.backgrounds={};
@@ -45,7 +45,7 @@
     apply(mode){
       const target=document.getElementById('scenario-menu');
       target.style.setProperty('background-image','url("'+this.backgrounds[mode===1?'form_selcampaign':'form_selconquest']+'")','important');
-      target.style.backgroundSize='100% 100%';
+      target.style.backgroundSize='cover';
     }
     drawStrategic(draw,definition,scale,centerX=205,centerY=128,textureScale=1){
       const {image,ratio}=this.strategic,cx=Number(definition.centerx||410),cy=Number(definition.centery||288);

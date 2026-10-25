@@ -1,34 +1,112 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Ew4.Core;
 
-// Only synchronous, built-in planning can reuse validated objects. No cache survives
-// a public planning call, and script callbacks never enter this trusted scope.
+// Only synchronous, built-in operations can reuse validated objects. No dynamic
+// proof survives the call, and untrusted nested calls suspend the outer scope.
 internal sealed class PlanningScope : IDisposable
 {
     [ThreadStatic] private static PlanningScope? current;
     private readonly PlanningScope? previous;
-    private readonly HashSet<object> validated = new(IdentityComparer.Instance);
-    private readonly bool owns;
+    private readonly HashSet<object>? validated;
+    private readonly ConditionalWeakTable<WorldState, PlanningQueries>? queries;
+    private readonly HashSet<object>? projections;
     private PlanningScope(bool enabled)
     {
         previous = current;
-        owns = enabled && current == null;
-        if (owns) current = this;
+        validated = enabled && (previous == null || previous.validated != null)
+            ? previous?.validated ?? new(IdentityComparer.Instance) : null;
+        queries = validated == null ? null : previous?.queries ?? new();
+        projections = validated == null ? null : previous?.projections ?? new(IdentityComparer.Instance);
+        // A disabled subtree may invoke caller code that mutates shared input.
+        // Invalidate ancestor proofs before entry, including exceptional exits.
+        if (validated == null)
+            for (var ancestor = previous; ancestor != null; ancestor = ancestor.previous)
+            { ancestor.validated?.Clear(); ancestor.queries?.Clear(); ancestor.projections?.Clear(); }
+        current = this;
     }
-    internal static bool CanTrust(WorldMoveRules rules) => rules.Extensions == null
-        || rules.Extensions.Scripts == null && rules.Extensions.Skills.Count == 0 && rules.Extensions.Statuses.Count == 0;
+    private static bool CanTrust(RuleEventBus? extensions) => extensions == null
+        || extensions.Scripts == null && extensions.Skills.Count == 0 && extensions.Statuses.Count == 0;
+    internal static bool CanTrust(WorldMoveRules rules) => CanTrust(rules.Extensions) && rules.Victory.Scripts == null;
     internal static PlanningScope Begin(WorldAiRules rules) => new(CanTrust(rules.Movement));
+    internal static PlanningQueries? Queries(WorldState state) => current?.validated?.Contains(state) == true
+        ? current.queries?.GetValue(state, value => new(value)) : null;
+    internal static bool IsMovementProjection(WorldState state) => current?.projections?.Contains(state) == true;
+    internal static PlanningScope Begin(WorldAiRules ai, WorldProductionRules production, WorldTurnRules turns,
+        WorldBattleRules? battle = null) => new(CanTrust(ai.Movement) && CanTrust(production.Commanders?.Extensions)
+            && CanTrust(turns.Extensions) && turns.Victory.Scripts == null
+            && (battle == null || CanTrust(battle.Combat.Extensions) && battle.Victory.Scripts == null));
+
+    internal static WorldState WithAiRandomState(WorldState state, ulong randomState)
+    {
+        var next = state with { AiRandomState = randomState };
+        // No validated constraint depends on this unrestricted ulong. All other
+        // fields are inherited here, rather than supplied by a caller.
+        if (current?.validated?.Contains(state) == true) current.validated.Add(next);
+        return next;
+    }
+    internal static WorldState WithRevision(WorldState state, long revision)
+    {
+        var next = state with { Revision = revision };
+        if (revision >= 0 && current?.validated?.Contains(state) == true) current.validated.Add(next);
+        if (revision >= 0 && IsMovementProjection(state)) current!.projections!.Add(next);
+        return next;
+    }
+
+    // Only this constructor can grant the movement proof. No arbitrary next-world
+    // or caller-provided mutation list can bypass the full validator.
+    internal static WorldState ProjectMovement(WorldState state, UnitState unit, int destination, int remaining,
+        IReadOnlyList<CellState> cells, MovementOwnership? ownership = null)
+    {
+        if (destination < 0 || destination >= cells.Count)
+            throw new RuleViolation("world.unit", "Invalid unit state, commander assignment or owner");
+        var moved = unit with { Cell = destination, RemainingMovement = remaining,
+            Combatant = unit.Combatant with { AtSea = cells[destination].Terrain.Sea, BuildingKind = cells[destination].BuildingKind } };
+        var next = state with { Cells = cells, Units = Array.AsReadOnly(state.Units.Select(u => ReferenceEquals(u, unit) ? moved : u).ToArray()),
+            Revision = checked(state.Revision + 1) };
+        var proofs = current?.validated;
+        if (proofs == null || !proofs.Contains(state) || !state.Units.Any(u => ReferenceEquals(u, unit))
+            || cells.Count != state.Cells.Count)
+        { next.Validate(); return next; }
+
+        bool controlled = ownership != null && ReferenceEquals(ownership.Source, state) && ReferenceEquals(ownership.Cells, cells);
+        foreach (int i in controlled ? ownership!.Changed : Enumerable.Range(0, cells.Count))
+        {
+            var old = state.Cells[i]; var cell = cells[i];
+            if (ReferenceEquals(cell, old)) continue;
+            // Capture code may change only ownership. Any future new write falls
+            // back to all constraints until its dependencies are explicitly covered.
+            if (cell == null || !controlled && cell with { Owner = old.Owner } != old)
+            { next.Validate(); return next; }
+            if (cell.Owner != null && !state.Factions.Any(f => f.Id == cell.Owner))
+                throw new RuleViolation("world.cell", "Invalid cell state or owner");
+        }
+        if (destination < 0 || destination >= cells.Count || !cells[destination].Terrain.CanTraverse()
+            || remaining < 0 || remaining > (unit.ExtensionMovementLimit ?? unit.Combatant.Profile.Movement))
+            throw new RuleViolation("world.unit", "Invalid unit state, commander assignment or owner");
+        var occupants = state.Units.Where(u => !ReferenceEquals(u, unit) && u.Cell == destination).ToArray();
+        if (occupants.Length + 1 > state.Limits.UnitsPerCell)
+            throw new RuleViolation("world.capacity", "Configured unit capacity exceeded");
+        string camp = state.Factions.Single(f => f.Id == unit.Owner).Camp;
+        if (occupants.Any(u => state.Factions.Single(f => f.Id == u.Owner).Camp != camp))
+            throw new RuleViolation("world.occupants", "Opposing camps cannot share a cell");
+        if (VerifyMovementProjections) next.ValidateUncached();
+        proofs.Add(next);
+        if (controlled) current!.projections!.Add(next);
+        return next;
+    }
+    [ThreadStatic] internal static bool VerifyMovementProjections;
     internal static void Validate(object value, Action validate)
     {
         var scope = current;
-        if (scope?.validated.Contains(value) == true) return;
+        if (scope?.validated?.Contains(value) == true) return;
         validate();
-        scope?.validated.Add(value);
+        scope?.validated?.Add(value);
     }
-    public void Dispose() { if (owns) current = previous; }
+    public void Dispose() { current = previous; }
     private sealed class IdentityComparer : IEqualityComparer<object>
     {
         internal static readonly IdentityComparer Instance = new();

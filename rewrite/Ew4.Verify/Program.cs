@@ -1,6 +1,43 @@
 using System.Text.Json;
 using Ew4.Core;
 
+if (args.ElementAtOrDefault(1) == "--map-colors-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { mapColorChecks = MapColorChecks.Run(Path.GetFullPath(args[0])),
+        factionChecks = ScenarioFactionChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--pause-objectives-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { pauseObjectivesChecks = PauseObjectivesChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--objectives-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { objectiveChecks = ObjectiveChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--auto-jurisdiction-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { autoJurisdictionChecks = AutoJurisdictionChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--garrison-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { garrisonChecks = CustomMechanicsChecks.GarrisonChecks(),
+        controlledMovementChecks = ControlledMovementChecks.Run(), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--geography-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { geographyChecks = GeographyChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--catalog-files-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { catalogFileChecks = CatalogFileChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
 if (args.ElementAtOrDefault(1) == "--r-feedback-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { rFeedbackChecks = RFeedbackChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
@@ -56,7 +93,7 @@ if (args.ElementAtOrDefault(1) == "--headquarters-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { headquartersChecks = HeadquartersChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
 }
-if (args.Length is not (1 or 2) || args.Length == 2 && args[1] is not ("--startup-only" or "--client-only" or "--mechanics-only" or "--jurisdiction-only" or "--extension-only" or "--scenario-only" or "--settlement-only" or "--equipment-only" or "--local-only" or "--consumables-only" or "--single-actions-only" or "--legacy-skills-only" or "--dialogues-only"))
+if (args.Length is not (1 or 2) || args.Length == 2 && args[1] is not ("--startup-only" or "--client-only" or "--mechanics-only" or "--jurisdiction-only" or "--extension-only" or "--scenario-only" or "--settlement-only" or "--equipment-only" or "--local-only" or "--provocations-only" or "--consumables-only" or "--single-actions-only" or "--legacy-skills-only" or "--dialogues-only"))
     throw new ArgumentException("Usage: Ew4.Verify <project root> [--startup-only|--client-only|--mechanics-only|--jurisdiction-only]");
 string root = Path.GetFullPath(args[0]);
 if (args.Length == 2 && args[1] == "--dialogues-only")
@@ -81,6 +118,10 @@ if (args.Length == 2 && args[1] == "--local-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { localMultiplayerChecks = LocalMultiplayerChecks.Run(root), errors = 0 })); return;
 }
+if (args.Length == 2 && args[1] == "--provocations-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { provocationChecks = ProvocationChecks.Run(root), errors = 0 })); return;
+}
 if (args.Length == 2 && args[1] == "--equipment-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { equipmentChecks = EquipmentDescriptionChecks.Run(root), errors = 0 })); return;
@@ -99,7 +140,8 @@ if (args.Length == 2 && args[1] == "--extension-only")
 }
 if (args.Length == 2 && args[1] == "--jurisdiction-only")
 {
-    Console.WriteLine(JsonSerializer.Serialize(new { jurisdictionChecks = JurisdictionExtensionChecks.Run(root), errors = 0 })); return;
+    Console.WriteLine(JsonSerializer.Serialize(new { jurisdictionChecks = JurisdictionExtensionChecks.Run(root),
+        autoJurisdictionChecks = AutoJurisdictionChecks.Run(root), errors = 0 })); return;
 }
 if (args.Length == 2 && args[1] == "--mechanics-only")
 {
@@ -218,6 +260,7 @@ int worldTurnEntryChecks = WorldTurnEntryChecks.Run(root);
 int mapCatalogChecks = MapCatalogChecks.Run(root);
 int legacyHostChecks = LegacyHostChecks.Run(root);
 int jurisdictionChecks = JurisdictionExtensionChecks.Run(root);
+int autoJurisdictionChecks = AutoJurisdictionChecks.Run(root);
 int extensionChecks = ExtensionChecks.Run(root);
 extensionChecks += ItemExtensionChecks.Run(root);
 extensionChecks += DeploymentLimitChecks.Run(root);
@@ -225,8 +268,10 @@ int commanderDialogueChecks = CommanderDialogueChecks.Run(root);
 int commonSkillChecks = CommonSkillChecks.Run(root);
 int legacySkillParameterChecks = LegacySkillParameterChecks.Run(root);
 int scenarioRuleChecks = ScenarioRuleChecks.Run(root);
+int mapColorChecks = MapColorChecks.Run(root);
+int objectiveChecks = ObjectiveChecks.Run(root);
 var report = new { combatVectors = cases, ruleChecks = contracts, commanderChecks, animationChecks, catalogChecks, worldChecks, progressionChecks, aiChecks, lifecycleChecks, actionChecks, movementCommitChecks, turnSettlementChecks, worldTurnChecks, battleCommitChecks, battleChainChecks, combatContextChecks, improvementChecks, aiTacticalChecks, splashChecks, supportActionChecks, aiMovementChecks, aiStrategyChecks, aiStrategySelectionChecks, aiUnitChecks, aiProductionChecks, aiOfferPoolChecks, aiConstructionChecks, aiWorldProductionChecks, commanderDeploymentChecks, hazardDeathChecks, legacyImportChecks, legacyArmyImportChecks, legacyEventChecks, legacyBuildingChecks, legacyFactionChecks, legacyCombatChecks, legacyActionAiChecks, legacyCommerceChecks, sessionAccountChecks, rosterDeploymentChecks, legacyTechnologyChecks, legacyStartupChecks, worldTurnEntryChecks, mapCatalogChecks, legacyHostChecks, jurisdictionChecks, errors = 0,
-    extensionChecks, commanderDialogueChecks, commonSkillChecks, legacySkillParameterChecks, scenarioRuleChecks, limitations = new[] { "Headless scenario/session startup and core rules; rendering and Android require separate integration checks.",
+    objectiveChecks, autoJurisdictionChecks, extensionChecks, commanderDialogueChecks, commonSkillChecks, legacySkillParameterChecks, scenarioRuleChecks, mapColorChecks, limitations = new[] { "Headless scenario/session startup and core rules; rendering and Android require separate integration checks.",
         "Native profile migration, commander purchase/cultivation, session tavern AI, tutorial controller, merge flows, full playthroughs and display/Android integration remain incomplete." } };
 Directory.CreateDirectory(Path.Combine(root, "rewrite/reports"));
 File.WriteAllText(Path.Combine(root, "rewrite/reports/core_validation.json"), JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true }) + "\n");

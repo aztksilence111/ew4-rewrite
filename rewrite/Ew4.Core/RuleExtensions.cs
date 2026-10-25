@@ -109,7 +109,8 @@ public sealed partial class RuleEventBus
         foreach (var (skill, slot) in bindings)
             foreach (var effect in skill.Effects.Where(e => e.Event == ev))
             {
-                if (ev == "skill.activate" && !world.Units.Any(u => u.Id == unitId)) return world with { RandomState = random.State };
+                if (ev == "skill.activate" && !world.Units.Any(u => u.Id == unitId))
+                    return world.RandomState == random.State ? world : world with { RandomState = random.State };
                 var status = source.Combatant.Statuses.SingleOrDefault(s => "status." + s.Id == slot.InstanceId);
                 foreach (var affected in EffectTargets(world, source, target, targetCell, effect))
                 {
@@ -140,7 +141,7 @@ public sealed partial class RuleEventBus
                     random.Commit(world.RandomState);
                 }
             }
-        return world with { RandomState = random.State };
+        return world.RandomState == random.State ? world : world with { RandomState = random.State };
     }
 }
 

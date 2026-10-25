@@ -22,6 +22,8 @@
 - 只影响账户将领派遣，不影响剧本自带将领、酒馆候选或局外指挥部的每星区20位容量。已派遣的历史不会因为阵亡、转移或退出任职而返还名额。
 - 名额在新建战局时写入，随存档保存。改配置后需要重新打包导入；逻辑指纹变化会按既有规则隔离 Mod 存档，不会直接改写旧档或原版档案。
 
+帽子图标可通过覆盖包中的 `client/ui/image_ui_hd/generalnumber.png` 替换，默认显示为26×19逻辑像素，保留透明背景即可。需要改图片名或显示尺寸时，修改 `client/manifest.json` 的 `layouts.form_deploygeneral.children` 中 `attributes.id` 为 `image_depnums` 的节点：`name` 指定已登记在 `manifest.atlases` 的图片，`w`、`h` 指定显示宽高；省略尺寸沿用26×19。由原始资源导入时，对应 `layout-568h.xml` 的同名节点。帽子和已用/上限整体居中，名册槽位与名额独立，使用指挥部容量和已存标签，两排横向滑动，不新增标签按钮。
+
 ```powershell
 .\Ew4.ModTool.exe pack "D:\mods\deployment-limits" --id=deployment-limits --name="上将名额" --version=1.0
 .\Ew4.ModTool.exe verify "D:\mods\deployment-limits"

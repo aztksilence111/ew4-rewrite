@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "impassable-geography",
+  "name": "\u901A\u7528\u7981\u884C\u5730\u5F62\u793A\u4F8B",
+  "version": "1.0.0",
+  "baseRevision": "c056eb7c3d6589b286792e527744f8a9f144c52845662f34ba7545079d570b05",
+  "scenarios": [
+    "conquest1",
+    "conquest7"
+  ],
+  "files": {
+    "original/conquest7.btl": "e338cf1115001501cee92591b878503f1eeb4a7a62e87a423485c20f20d648ae",
+    "original/conquest7.names.xml": "36a34a5870f6dfcdaebf8d26e767a1a792eee556b242a92dc8b0e2a4f8f5ab08",
+    "original/def_battlelist.xml": "62c33d15552435d86341ad986db33ea370734664c2fd3c29b976702030d3996c",
+    "rewrite/extension.json": "91f02d8a7460b6db0035383b88a7fbc17d1bdaa7b3beab9e2cb6141d53c1a365",
+    "rewrite/geography.json": "b63bf226b293ed814aac94823d83e621f348cdb4d7264ed9fd51ce8f892fc8aa"
+  },
+  "warnings": [],
+  "logicRevision": "a00cf252e9bc8e1611bdaeb7644b76fdd10405315a9ba1bf5f015a1e69cf598e"
+}

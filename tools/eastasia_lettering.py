@@ -1,6 +1,31 @@
 """Compose regional lettering without rebuilding terrain, cities or wave sprites."""
 
 import math
+from bisect import bisect_left
+import json
+from pathlib import Path
+
+
+def text_path(points):
+    """Arc-distance sampling shared with battlefield.js (64 chords per quadratic)."""
+    assert len(points) >= 3 and len(points) % 2 == 1
+    samples = [(0, *points[0])]
+    for i in range(0, len(points)-2, 2):
+        a, b, c = points[i:i+3]
+        for step in range(1, 65):
+            t = step/64
+            x, y = [(1-t)**2*a[k]+2*(1-t)*t*b[k]+t*t*c[k] for k in (0, 1)]
+            d, px, py = samples[-1]
+            samples.append((d+math.hypot(x-px, y-py), x, y))
+    distances = [p[0] for p in samples]
+
+    def at(distance):
+        i = max(1, min(len(samples)-1, bisect_left(distances, distance)))
+        d0, x0, y0 = samples[i-1]
+        d1, x1, y1 = samples[i]
+        t = max(0, min(1, (distance-d0)/(d1-d0))) if d1 > d0 else 0
+        return x0+(x1-x0)*t, y0+(y1-y0)*t, math.atan2(y1-y0, x1-x0)
+    return distances[-1], at
 
 
 def glyphs(library, text, height, sea, length=0, regional=False):
@@ -64,22 +89,75 @@ def regional_labels(library, labels, plan):
             label.update(size=style['size'], letteringLength=style['length'],
                          tx=style.get('x', label['tx']), ty=style.get('y', label['ty']),
                          angle=style.get('angle', label['angle']), geographicStyle='regional')
-        letters, width = glyphs(library, label['text'], label['size'], label['sea'], label['letteringLength'], bool(style))
+        target_length = style['length'] if style else label.get('pathChordLength', label['letteringLength'])
+        letters, width = glyphs(library, label['text'], label['size'], label['sea'], target_length, bool(style))
+        label['pathChordLength'] = round(width, 3)
         label['letteringLength'] = round(width, 2)
         sine, cosine = math.sin(math.radians(label['angle'])), math.cos(math.radians(label['angle']))
+        bend = plan.get('pathBends', {}).get(label['text'])
+        if bend is not None:
+            label.pop('textPath', None)
+        if bend is not None:
+            label['textPath'] = [[round(cosine*x-sine*y, 3), round(sine*x+cosine*y, 3)]
+                                 for x, y in [(-width/2, -bend), (0, bend), (width/2, -bend)]]
+        geographic = plan.get('geographicPaths', {}).get(label['text'])
+        if geographic:
+            import build_eastasia as geography
+            source = json.loads((Path(__file__).resolve().parents[1]/'maps/eastasia_rewrite'/geographic['source']).read_text(encoding='utf-8'))
+            coordinates = (next(f['geometry']['coordinates'] for f in source['features'] if f['properties']['name'] == geographic['feature'])
+                           if 'feature' in geographic else source[geographic['key']])
+            start, end = geographic.get('slice', [0, len(coordinates)])
+            points = [[float(v)*2 for v in geography.PROJ.pixels(*p)] for p in coordinates[start:end]]
+            if 'trim' in geographic:
+                from shapely.geometry import LineString
+                from shapely.ops import substring
+                points = list(substring(LineString(points), *geographic['trim'], normalized=True).coords)
+            if geographic.get('reverse'):
+                points.reverse()
+            label['tx'] = round((min(p[0] for p in points)+max(p[0] for p in points))/2, 3)
+            label['ty'] = round((min(p[1] for p in points)+max(p[1] for p in points))/2, 3)
+            # Midpoint quadratic spline follows the same crest used to generate the terrain.
+            smooth = [points[0]]
+            for i, control in enumerate(points):
+                following = points[i+1] if i+1 < len(points) else control
+                smooth.extend([control, [(control[k]+following[k])/2 for k in (0, 1)]])
+            label['textPath'] = [[round(x-label['tx'], 3), round(y-label['ty'], 3)] for x, y in smooth]
+        path = text_path(label['textPath']) if label.get('textPath') else None
+        if geographic:
+            letters, width = glyphs(library, label['text'], label['size'], label['sea'], path[0], bool(style))
+            label['pathChordLength'] = round(width, 3)
+        sprites = {s['name']: s for s in library['atlas']['sprites']}
         indices = []
         for item, cursor, height, scale in letters:
             px, py = item['pivot']
-            x, y = cursor-width/2-px*scale, label['size']/2-height-py*scale
+            glyph_width = float(sprites[item['name']+'.png']['w'])*scale
+            if path:
+                cx, cy, angle = path[1]((cursor+glyph_width/2)/width*path[0])
+                sine, cosine = math.sin(angle), math.cos(angle)
+                x, y = -glyph_width/2-px*scale, label['size']/2-height-py*scale
+            else:
+                cx, cy = 0, 0
+                x, y = cursor-width/2-px*scale, label['size']/2-height-py*scale
             indices.append([len(library['elements']), item['id']])
             library['elements'].append(dict(transform=[cosine*scale, sine*scale, -sine*scale, cosine*scale,
-                                                       cosine*x-sine*y, sine*x+cosine*y],
+                                                       cx+cosine*x-sine*y, cy+sine*x+cosine*y],
                                             alpha=1, start_frame=0, playback_mode=0))
         library['items'].append(dict(id=len(library['items']), name=label['libName'], kind=0,
                                      layers=[[dict(key=0, indices=indices)]], pivot=[0, 0], duration=1))
-        corners = [(label['tx']+cosine*x-sine*y, label['ty']+sine*x+cosine*y)
-                   for x, y in [(-width/2-5, -label['size']/2-5), (width/2+5, -label['size']/2-5),
-                                (width/2+5, label['size']/2+5), (-width/2-5, label['size']/2+5)]]
+        if path:
+            upper, lower = [], []
+            for step in range(17):
+                x, y, angle = path[1](path[0]*step/16)
+                s, c = math.sin(angle), math.cos(angle)
+                radius = label['size']*.52+5
+                upper.append((label['tx']+x+s*radius, label['ty']+y-c*radius))
+                lower.append((label['tx']+x-s*radius, label['ty']+y+c*radius))
+            corners = [(round(x, 3), round(y, 3)) for x, y in upper+lower[::-1]]
+            label['letteringLength'] = round(path[0], 3)
+        else:
+            corners = [(label['tx']+cosine*x-sine*y, label['ty']+sine*x+cosine*y)
+                       for x, y in [(-width/2-5, -label['size']/2-5), (width/2+5, -label['size']/2-5),
+                                    (width/2+5, label['size']/2+5), (-width/2-5, label['size']/2+5)]]
         left, top = min(x for x, y in corners), min(y for x, y in corners)
         label.update(left=round(left, 3), top=round(top, 3),
                      width=round(max(x for x, y in corners)-left, 3),
@@ -88,18 +166,12 @@ def regional_labels(library, labels, plan):
 
 
 def verify_layout(labels, width, height):
-    def overlaps(a, b):
-        for polygon in (a, b):
-            for i, (x, y) in enumerate(polygon[:4]):
-                nx, ny = polygon[(i+1) % 4]
-                axis = (ny-y, x-nx)
-                pa = [px*axis[0]+py*axis[1] for px, py in a]
-                pb = [px*axis[0]+py*axis[1] for px, py in b]
-                if max(pa) <= min(pb) or max(pb) <= min(pa):
-                    return False
-        return True
-
+    from shapely.geometry import Polygon
+    occupied = []
     for i, label in enumerate(labels):
         assert all(0 <= x <= width and 0 <= y <= height for x, y in label['polygon']), label['text']+' exceeds map'
-        for other in labels[:i]:
-            assert not overlaps(label['polygon'], other['polygon']), label['text']+' overlaps '+other['text']
+        polygon = Polygon(label['polygon'])
+        assert polygon.is_valid, label['text']+' invalid text ribbon'
+        for other, bounds in occupied:
+            assert not polygon.intersects(bounds), label['text']+' overlaps '+other['text']
+        occupied.append((label, polygon))

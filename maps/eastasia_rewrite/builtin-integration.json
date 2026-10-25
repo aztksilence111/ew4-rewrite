@@ -4,15 +4,15 @@
     "america",
     "eastasia"
   ],
-  "city_count": 278,
-  "labels": 71,
+  "city_count": 279,
+  "labels": 72,
   "tiles": 80,
   "protected": {
     "europe.bin": "cbab47e29b6eeda038a9c529e68298550ed7a7d652b61482eed63181e97c8efa",
     "america.bin": "c81550bb7aab6fc1619c291f0b83e1de51a40c8f73f43fe7b12b5040a3739edb",
     "def_battlelist.xml": "38bd85989c9806dbc1b5ce78da06a4e4cb9d06d9cd8436fb72bad404201a578f"
   },
-  "runtime_files": 1816,
+  "runtime_files": 2270,
   "errors": 0,
   "formal_scenarios_added": 0
 }

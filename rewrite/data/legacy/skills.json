@@ -1,0 +1,325 @@
+{
+  "schema": 1,
+  "skills": [
+    {
+      "id": "ew4.skill.0",
+      "legacy_id": 0,
+      "names": {
+        "zh_CN": "旗手"
+      },
+      "legacy_description": "将军有装备旗帜的能力"
+    },
+    {
+      "id": "ew4.skill.1",
+      "legacy_id": 1,
+      "names": {
+        "zh_CN": "地理学"
+      },
+      "legacy_description": "部队的移动将无视地形影响"
+    },
+    {
+      "id": "ew4.skill.2",
+      "legacy_id": 2,
+      "names": {
+        "zh_CN": "防火术"
+      },
+      "legacy_description": "部队所在区域可以防止火灾"
+    },
+    {
+      "id": "ew4.skill.3",
+      "legacy_id": 3,
+      "names": {
+        "zh_CN": "领导力"
+      },
+      "legacy_description": "部队士气不会出现低落状态"
+    },
+    {
+      "id": "ew4.skill.4",
+      "legacy_id": 4,
+      "names": {
+        "zh_CN": "间谍"
+      },
+      "legacy_description": "部队对炮台和要塞的伤害大幅增加"
+    },
+    {
+      "id": "ew4.skill.5",
+      "legacy_id": 5,
+      "names": {
+        "zh_CN": "精准"
+      },
+      "legacy_description": "使敌军对炮兵的回避无效"
+    },
+    {
+      "id": "ew4.skill.6",
+      "legacy_id": 6,
+      "names": {
+        "zh_CN": "工程学"
+      },
+      "legacy_description": "炮兵移动+2"
+    },
+    {
+      "id": "ew4.skill.7",
+      "legacy_id": 7,
+      "names": {
+        "zh_CN": "弹道"
+      },
+      "legacy_description": "炮兵准确的炮弹轨迹将更有效的杀伤敌军"
+    },
+    {
+      "id": "ew4.skill.8",
+      "legacy_id": 8,
+      "names": {
+        "zh_CN": "炸药"
+      },
+      "legacy_description": "炮兵使用炸药可以大幅提高炮弹的威力"
+    },
+    {
+      "id": "ew4.skill.9",
+      "legacy_id": 9,
+      "names": {
+        "zh_CN": "突袭"
+      },
+      "legacy_description": "使敌军对骑兵的回避无效"
+    },
+    {
+      "id": "ew4.skill.10",
+      "legacy_id": 10,
+      "names": {
+        "zh_CN": "奇袭"
+      },
+      "legacy_description": "突然袭击可以让骑兵的冲锋更具有效果"
+    },
+    {
+      "id": "ew4.skill.11",
+      "legacy_id": 11,
+      "names": {
+        "zh_CN": "机动"
+      },
+      "legacy_description": "利用骑兵的高机动力对敌军造成更大的伤害"
+    },
+    {
+      "id": "ew4.skill.12",
+      "legacy_id": 12,
+      "names": {
+        "zh_CN": "阵型"
+      },
+      "legacy_description": "利用阵形可以有效提高步兵的战斗力"
+    },
+    {
+      "id": "ew4.skill.13",
+      "legacy_id": 13,
+      "names": {
+        "zh_CN": "步兵战术"
+      },
+      "legacy_description": "运用步兵战术能对敌军造成更大伤害"
+    },
+    {
+      "id": "ew4.skill.14",
+      "legacy_id": 14,
+      "names": {
+        "zh_CN": "军号"
+      },
+      "legacy_description": "使敌军对步兵的回避无效"
+    },
+    {
+      "id": "ew4.skill.15",
+      "legacy_id": 15,
+      "names": {
+        "zh_CN": "密集攻击"
+      },
+      "legacy_description": "步兵部队输出不受自身生命值影响"
+    },
+    {
+      "id": "ew4.skill.16",
+      "legacy_id": 16,
+      "names": {
+        "zh_CN": "舵手"
+      },
+      "legacy_description": "减少海军被攻击时所受到的伤害"
+    },
+    {
+      "id": "ew4.skill.17",
+      "legacy_id": 17,
+      "names": {
+        "zh_CN": "水手"
+      },
+      "legacy_description": "陆军在海上作战没有劣势"
+    },
+    {
+      "id": "ew4.skill.18",
+      "legacy_id": 18,
+      "names": {
+        "zh_CN": "航海术"
+      },
+      "legacy_description": "舰船移动+1"
+    },
+    {
+      "id": "ew4.skill.19",
+      "legacy_id": 19,
+      "names": {
+        "zh_CN": "贵族"
+      },
+      "legacy_description": "将军获得的爵位经验大幅增加"
+    },
+    {
+      "id": "ew4.skill.20",
+      "legacy_id": 20,
+      "names": {
+        "zh_CN": "战争专家"
+      },
+      "legacy_description": "将军获得的军衔经验增加"
+    },
+    {
+      "id": "ew4.skill.21",
+      "legacy_id": 21,
+      "names": {
+        "zh_CN": "战争大师"
+      },
+      "legacy_description": "将军获得的军衔经验大幅增加"
+    },
+    {
+      "id": "ew4.skill.22",
+      "legacy_id": 22,
+      "names": {
+        "zh_CN": "后勤学"
+      },
+      "legacy_description": "将军部队不消耗粮草也不受粮食不足影响"
+    },
+    {
+      "id": "ew4.skill.23",
+      "legacy_id": 23,
+      "names": {
+        "zh_CN": "经济专家"
+      },
+      "legacy_description": "将军部队所在地获得的资源增加"
+    },
+    {
+      "id": "ew4.skill.24",
+      "legacy_id": 24,
+      "names": {
+        "zh_CN": "经济大师"
+      },
+      "legacy_description": "将军部队所在地获得的资源大幅增加"
+    },
+    {
+      "id": "ew4.skill.25",
+      "legacy_id": 25,
+      "names": {
+        "zh_CN": "伪装"
+      },
+      "legacy_description": "建造掩体所耗费的资源大幅减少"
+    },
+    {
+      "id": "ew4.skill.26",
+      "legacy_id": 26,
+      "names": {
+        "zh_CN": "运输"
+      },
+      "legacy_description": "建造运输船所耗费的资源大幅减少"
+    },
+    {
+      "id": "ew4.skill.27",
+      "legacy_id": 27,
+      "names": {
+        "zh_CN": "战壕"
+      },
+      "legacy_description": "建造战壕所耗费的资源大幅减少"
+    },
+    {
+      "id": "ew4.skill.28",
+      "legacy_id": 28,
+      "names": {
+        "zh_CN": "栅栏"
+      },
+      "legacy_description": "建造栅栏所耗费的资源大幅减少"
+    },
+    {
+      "id": "ew4.skill.29",
+      "legacy_id": 29,
+      "names": {
+        "zh_CN": "围城术"
+      },
+      "legacy_description": "提高部队对守城敌军的战斗力"
+    },
+    {
+      "id": "ew4.skill.30",
+      "legacy_id": 30,
+      "names": {
+        "zh_CN": "建筑学"
+      },
+      "legacy_description": "减少升级建筑时所耗费的资源"
+    },
+    {
+      "id": "ew4.skill.31",
+      "legacy_id": 31,
+      "names": {
+        "zh_CN": "攻击战术"
+      },
+      "legacy_description": "攻击时有一定概率打出致命一击"
+    },
+    {
+      "id": "ew4.skill.32",
+      "legacy_id": 32,
+      "names": {
+        "zh_CN": "防御战术"
+      },
+      "legacy_description": "防守时有一定概率将受到的伤害降至最低"
+    },
+    {
+      "id": "ew4.skill.33",
+      "legacy_id": 33,
+      "names": {
+        "zh_CN": "步兵教学"
+      },
+      "legacy_description": "将军被整编时增加步兵1级"
+    },
+    {
+      "id": "ew4.skill.34",
+      "legacy_id": 34,
+      "names": {
+        "zh_CN": "骑兵教学"
+      },
+      "legacy_description": "将军被整编时增加骑兵1级"
+    },
+    {
+      "id": "ew4.skill.35",
+      "legacy_id": 35,
+      "names": {
+        "zh_CN": "炮兵教学"
+      },
+      "legacy_description": "将军被整编时增加炮兵1级"
+    },
+    {
+      "id": "ew4.skill.36",
+      "legacy_id": 36,
+      "names": {
+        "zh_CN": "海军教学"
+      },
+      "legacy_description": "将军被整编时增加海军1级"
+    },
+    {
+      "id": "ew4.skill.37",
+      "legacy_id": 37,
+      "names": {
+        "zh_CN": "要塞教学"
+      },
+      "legacy_description": "将军被整编时增加要塞1级"
+    },
+    {
+      "id": "ew4.skill.38",
+      "legacy_id": 38,
+      "names": {
+        "zh_CN": "商业教学"
+      },
+      "legacy_description": "将军被整编时增加商业1级"
+    },
+    {
+      "id": "ew4.skill.39",
+      "legacy_id": 39,
+      "names": {
+        "zh_CN": "行军教学"
+      },
+      "legacy_description": "将军被整编时增加移动1级"
+    }
+  ]
+}

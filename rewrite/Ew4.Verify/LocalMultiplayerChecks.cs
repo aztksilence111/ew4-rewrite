@@ -131,9 +131,9 @@ internal static class LocalMultiplayerChecks
             string? country = scenario.Mode == 2 ? Call("countries", new { scenario = scenario.Id })[0].GetProperty("id").GetString() : null;
             var choices = Call("local-players", new { scenario = scenario.Id, country });
             string[] offered = choices.EnumerateArray().Select(f => f.GetProperty("id").GetString()!).ToArray();
-            var playable = battle.Factions.Select((f, i) => (f, i)).Where(p => p.f.Camp != 4)
+            var playable = battle.Factions.Select((f, i) => (f, i)).Where(p => scenario.Mode == 1 || p.f.Camp != 4)
                 .Select(p => LegacyScenarioInitialization.FactionId(scenario.Id, p.i, p.f)).ToArray();
-            Check(offered.Length == playable.Length && offered.ToHashSet().SetEquals(playable), "campaign/conquest list excludes only nonplayable neutral countries " + scenario.Id);
+            Check(offered.Length == playable.Length && offered.ToHashSet().SetEquals(playable), "campaign includes neutrals; conquest excludes neutrals " + scenario.Id);
             int primary = scenario.Mode == 2 ? battle.Factions.ToList().FindIndex(f => content.Countries.Canonical(f.CountryId) == country)
                 : battle.Factions.ToList().FindIndex(f => !f.Ai);
             Check(choices[0].GetProperty("locked").GetBoolean() && offered[0] == LegacyScenarioInitialization.FactionId(scenario.Id, primary, battle.Factions[primary])
@@ -142,7 +142,7 @@ internal static class LocalMultiplayerChecks
             Check(allSelected.GetProperty("factions").EnumerateArray().All(f =>
                 f.GetProperty("human").GetBoolean() == offered.Contains(f.GetProperty("id").GetString()!)),
                 "select all assigns only combatants to humans " + scenario.Id);
-            foreach (var neutral in battle.Factions.Select((f, i) => (f, i)).Where(p => p.f.Camp == 4))
+            foreach (var neutral in battle.Factions.Select((f, i) => (f, i)).Where(p => scenario.Mode == 2 && p.f.Camp == 4))
             {
                 Call("start", new { scenario = scenario.Id, country, localPlayers = new[] { offered[0],
                     LegacyScenarioInitialization.FactionId(scenario.Id, neutral.i, neutral.f) } }, "local.selection");

@@ -19,7 +19,7 @@
     mount(node,parent,path,pw,ph,topLevel=false){
       const a=node.attributes,id=path?path+'/'+a.id:a.id,type=a.type;
       let el=type.includes('button')?this.api.button('',()=>{},parent):document.createElement('div');
-      if(!el.parentElement)parent.append(el);el.className='native-node native-'+type;el.dataset.nativeId=a.id;
+      if(!el.parentElement)parent.append(el);el.className='native-node native-'+type;el.dataset.nativeId=a.id;el.dataset.tutorialId=a.id;
       this.nodes.set(id,el);el.nativeAttributes=a;
       let art=resource(this.api.manifest,a.name||a.frm1),w=Number(a.w)||art?.w/art?.ratio||pw,h=Number(a.h)||art?.h/art?.ratio||ph;
       if(['extend','hextend'].includes(a.DrawMode)&&!a.w)w=pw;
@@ -78,7 +78,7 @@
       for(const id of ids){const el=this.get(id);el.style.top=y+'px';y+=parseFloat(el.style.height)+gap;}
       this.height=y+27;this.body.parentElement.style.height=this.height+'px';
     }
-    action(id,label,action,enabled=true){const el=this.get(id);el.disabled=!enabled;el.setAttribute('aria-label',label);el.title=label;let pending=false;el.onclick=async()=>{if(pending||el.disabled||!this.current())return;pending=true;el.disabled=true;try{await action();}catch(e){this.api.notice(e.message);}finally{pending=false;if(this.current())el.disabled=!enabled;}};return el;}
+    action(id,label,action,enabled=true){const el=this.get(id);el.disabled=!enabled;el.setAttribute('aria-label',label);el.title=label;let pending=false;el.onclick=async()=>{if(pending||el.disabled||!this.current())return;pending=true;el.disabled=true;try{await action();await this.api.tutorialUi(el.dataset.tutorialId);}catch(e){this.api.notice(e.message);}finally{pending=false;if(this.current())el.disabled=!enabled;}};return el;}
     hide(id,value=true){this.get(id).hidden=value;}
   }
   root.Ew4NativeUI={Layout,resource};

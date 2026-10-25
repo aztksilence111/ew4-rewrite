@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "maps": [
+    {
+      "map": "europe",
+      "width": 79,
+      "height": 68,
+      "baseTerrainSha256": "cbab47e29b6eeda038a9c529e68298550ed7a7d652b61482eed63181e97c8efa",
+      "terrainOverrides": [
+        {
+          "column": 14,
+          "row": 3,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 2,
+          "row": 3,
+          "type": "impassable_sea"
+        }
+      ]
+    },
+    {
+      "map": "eastasia",
+      "width": 158,
+      "height": 136,
+      "baseTerrainSha256": "dcd1d5dc6777742b1cb0d677178097ea29e81b0f7db09bfe80cdf2c9bc0b3ed1",
+      "terrainOverrides": [
+        {
+          "column": 0,
+          "row": 0,
+          "type": "impassable_mountain"
+        },
+        {
+          "column": 122,
+          "row": 0,
+          "type": "impassable_sea"
+        }
+      ]
+    }
+  ],
+  "visuals": null
+}

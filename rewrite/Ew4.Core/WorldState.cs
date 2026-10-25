@@ -24,6 +24,7 @@ public sealed record FactionState
     public string Camp { get; init; } = "";
     public bool Human { get; init; }
     public bool Defeated { get; init; }
+    public bool DiplomacyWarned { get; init; }
     public Resources Resources { get; init; } = new(0, 0, 0);
     public int Shortage { get; init; }
     public float IncomeMultiplier { get; init; } = 1;
@@ -164,6 +165,7 @@ public sealed record WorldState
     public IReadOnlyList<NeutralHostility> NeutralHostilities { get; init; } = Array.Empty<NeutralHostility>();
     public IReadOnlyList<DiplomaticRelation> DiplomaticRelations { get; init; } = Array.Empty<DiplomaticRelation>();
     public IReadOnlyList<string> DiplomacyNeutralCamps { get; init; } = Array.Empty<string>();
+    public ProvocationRules? Provocations { get; init; }
     public IReadOnlyList<UnitState> Units { get; init; } = Array.Empty<UnitState>();
     public IReadOnlyList<CommanderRuntime> Commanders { get; init; } = Array.Empty<CommanderRuntime>();
     public IReadOnlyList<CommanderDeploymentOffer> CommanderOffers { get; init; } = Array.Empty<CommanderDeploymentOffer>();
@@ -185,6 +187,7 @@ public sealed record WorldState
     public BattleOutcome Outcome { get; init; } = BattleOutcome.Continue;
 
     public void Validate() => PlanningScope.Validate(this, ValidateCore);
+    internal void ValidateUncached() => ValidateCore();
     private void ValidateCore()
     {
         Limits.Validate();
@@ -204,6 +207,12 @@ public sealed record WorldState
             return ids;
         }
         var factionIds = Ids(Factions.Select(f => f.Id));
+        if (Provocations is { } provocations && (string.IsNullOrWhiteSpace(provocations.NeutralCamp)
+            || provocations.CombatantCamps == null || provocations.CombatantCamps.Count == 0
+            || provocations.CombatantCamps.Any(string.IsNullOrWhiteSpace)
+            || provocations.CombatantCamps.Contains(provocations.NeutralCamp)
+            || provocations.CombatantCamps.Distinct().Count() != provocations.CombatantCamps.Count))
+            throw new RuleViolation("world.diplomacy", "Invalid provocation policy");
         LocalMultiplayerGame.Validate(this);
         var factionIndex = Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
         if (DiplomaticRelations == null || DiplomacyNeutralCamps == null
@@ -252,6 +261,7 @@ public sealed record WorldState
         }
         foreach (var cell in Cells)
         {
+            if (cell.Terrain.Barrier != TerrainBarrier.None || cell.Terrain.MinimumEntryCost != 0) Geography.Validate(cell);
             cell.IncomeOverride?.Validate();
             if ((cell.Owner != null && !factionIds.Contains(cell.Owner)) || cell.Environment < 0 || cell.Terrain.TerrainCost <= 0 || cell.BuildingLevel < 0
                 || cell.BuildingUpgradesThisTurn < 0
@@ -272,7 +282,7 @@ public sealed record WorldState
                 ValidateSupport(unit.CommanderBase.Support);
             }
             if (!factionIds.Contains(unit.Owner) || factionIndex[unit.Owner].Defeated
-                || unit.Cell < 0 || unit.Cell >= Cells.Count || !Cells[unit.Cell].Terrain.Active || unit.Experience < 0
+                || unit.Cell < 0 || unit.Cell >= Cells.Count || !Cells[unit.Cell].Terrain.CanTraverse() || unit.Experience < 0
                 || unit.ExtensionMovementLimit < 0 || unit.RemainingMovement < 0
                 || unit.RemainingMovement > (unit.ExtensionMovementLimit ?? unit.Combatant.Profile.Movement)
                 || unit.Combatant.Statuses.Any(s => s.SourceOwner != null && !factionIds.Contains(s.SourceOwner))
@@ -291,10 +301,28 @@ public sealed record WorldState
                 || commander.Rank.Experience < 0 || commander.Title.Experience < 0 || commander.RankHealthBonus < 0
                 || commander.RankExperiencePercent < 0 || commander.TitleExperiencePercent < 0 || commander.MaximumTrainingLevel < 0)
                 throw new RuleViolation("world.commander", "Invalid commander runtime state");
-        if (Units.GroupBy(u => u.Cell).Any(g => g.Count() > Limits.UnitsPerCell)
-            || Units.GroupBy(u => u.Owner).Any(g => g.Count() > Limits.UnitsPerFaction))
+        var occupants = new Dictionary<int, (int Count, string Camp)>();
+        var factionCounts = new Dictionary<string, int>(StringComparer.Ordinal);
+        bool overCapacity = false, opposingCamps = false;
+        foreach (var unit in Units)
+        {
+            string camp = factionIndex[unit.Owner].Camp;
+            occupants.TryGetValue(unit.Cell, out var occupied);
+            opposingCamps |= occupied.Count > 0 && !StringComparer.Ordinal.Equals(occupied.Camp, camp);
+            int cellCount = occupied.Count + 1;
+            occupants[unit.Cell] = (cellCount, camp);
+            overCapacity |= cellCount > Limits.UnitsPerCell;
+            if (Limits.UnitsPerFaction.HasValue)
+            {
+                factionCounts.TryGetValue(unit.Owner, out int count);
+                factionCounts[unit.Owner] = count + 1;
+                overCapacity |= count + 1 > Limits.UnitsPerFaction.Value;
+            }
+        }
+        // Keep capacity errors ahead of camp conflicts, as in the full validator.
+        if (overCapacity)
             throw new RuleViolation("world.capacity", "Configured unit capacity exceeded");
-        if (Units.GroupBy(u => u.Cell).Any(g => g.Select(u => factionIndex[u.Owner].Camp).Distinct(StringComparer.Ordinal).Count() > 1))
+        if (opposingCamps)
             throw new RuleViolation("world.occupants", "Opposing camps cannot share a cell");
         foreach (var ev in Events)
         {
@@ -317,6 +345,7 @@ public sealed record WorldState
         }
         ScenarioRules.Validate(this);
         bool KnownDialogue(string id) => Events.Any(e => fired.Contains(e.Id) && e.DialogueId == id)
+            || WorldProvocations.Dialogue(this, id) != null
             || ScenarioEvents.Any(e => e.Popup != null && TriggeredScenarioEvents.Contains(e.Id) && !ScenarioChoices.ContainsKey(e.Id) && ScenarioRules.DialogueId(e.Id) == id);
         if (PendingDialogue != null && !KnownDialogue(PendingDialogue))
             throw new RuleViolation("world.dialogue", "Dialogue does not belong to a fired event");
@@ -335,12 +364,8 @@ public sealed record WorldState
 
     private static Combatant CopyCombatant(Combatant value) => value with
     {
-        Skills = value.Skills.ToArray(), SkillSlots = value.SkillSlots.ToArray(), Statuses = value.Statuses.ToArray(), Profile = value.Profile with
-        {
-            SkillSlots = value.Profile.SkillSlots.ToArray(), LegacySkillOverrides = value.Profile.LegacySkillOverrides.ToArray(),
-            AttackBands = value.Profile.AttackBands.ToArray(), Traits = value.Profile.Traits.ToArray(),
-            DamageMultipliers = value.Profile.DamageMultipliers.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal)
-        }
+        Skills = value.Skills.ToArray(), SkillSlots = value.SkillSlots.ToArray(), Statuses = value.Statuses.ToArray(),
+        Profile = FrozenUnitProfiles.Copy(value.Profile)
     };
 
     public WorldState Copy() => this with
@@ -353,8 +378,11 @@ public sealed record WorldState
             Kills = f.Kills.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal),
             Survival = f.Survival with { ExcludedBuildings = f.Survival.ExcludedBuildings.ToArray() }
         }).ToArray(),
-        Cells = Cells.Select(c => c with { Terrain = c.Terrain with { } }).ToArray(),
+        // CellState, MovementCell and Resources are sealed records containing only
+        // immutable values. Only the caller-owned list needs snapshot isolation.
+        Cells = Cells.ToArray(),
         Jurisdictions = Jurisdictions?.Copy(),
+        Provocations = Provocations == null ? null : Provocations with { CombatantCamps = Provocations.CombatantCamps.ToArray() },
         NeutralHostilities = NeutralHostilities.ToArray(),
         DiplomaticRelations = DiplomaticRelations.ToArray(), DiplomacyNeutralCamps = DiplomacyNeutralCamps.ToArray(),
         Units = Units.Select(u => u with { Combatant = CopyCombatant(u.Combatant),

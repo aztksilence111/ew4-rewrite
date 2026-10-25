@@ -1,5 +1,11 @@
 # Mod制作与排查导航
 
+[国家、势力与阵营地块颜色](porting/MAP_COLORS.md)：国家表/事件颜色沿用现有接口，API 3 新增阵营地图按 ID 配色、默认色池及逐剧本覆盖。
+
+[暂停战局目标栏](porting/PAUSE_OBJECTIVES.md)支持 UI 配置、当前胜负条件及星级区间；暂停菜单居中，左栏避让并纵向滚动。
+
+[任务、成就与局外奖励接口](porting/OBJECTIVES.md)支持将领/装备持有、隐藏关卡解锁、战役/征服胜负、指定地点与占城/击杀累计条件；作者配置列表与原风格UI，R版默认条目为空。
+
 [物品/装备效果接口](porting/ITEM_EFFECTS.md)复用技能 JSON 与外置 Lua，支持装备授予技能、替换消耗品效果和原效果数值覆盖，另有[可打包示例](../examples/item-effects/README.md)。
 
 多阶段更新胜负条件、替换胜利/失败结算界面与控件绑定见[结算扩展指南](porting/VICTORY_MODDING.md)及[三阶段示例](../examples/victory-stages/README.md)。

@@ -1,0 +1,14 @@
+{
+  "*": {
+    "title":"战局目标",
+    "width":350,
+    "maxHeight":650,
+    "fontSize":16,
+    "rowGap":3,
+    "background":"#e9e7e1",
+    "headerBackground":"#414442",
+    "textColor":"#393b39",
+    "accentColor":"#58735e",
+    "sections":["win","limits","ratings"]
+  }
+}

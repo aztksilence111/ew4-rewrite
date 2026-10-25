@@ -126,9 +126,10 @@ internal static class CommanderDeploymentChecks
             "commander cannot make configured immobile fortresses walk");
         var clone = restored.Copy();
         ((string[])clone.Units.Single(u => u.Id == unit.Id).CommanderBase!.Combatant.Skills).AsSpan().Clear();
-        ((Dictionary<string, float>)clone.Units.Single(u => u.Id == unit.Id).CommanderBase!.Combatant.Profile.DamageMultipliers)["infantry"] = 999;
-        Check(restored.Units.Single(u => u.Id == unit.Id).CommanderBase!.Combatant.Profile.DamageMultipliers["infantry"] == 1,
+        ((IDictionary<string, float>)restored.Units.Single(u => u.Id == unit.Id).CommanderBase!.Combatant.Profile.DamageMultipliers)["infantry"] = 999;
+        Check(clone.Units.Single(u => u.Id == unit.Id).CommanderBase!.Combatant.Profile.DamageMultipliers["infantry"] == 1,
             "world copies own nested assignment base collections");
+        ((IDictionary<string, float>)restored.Units.Single(u => u.Id == unit.Id).CommanderBase!.Combatant.Profile.DamageMultipliers)["infantry"] = 1;
         var stacked = world with { Limits = new() { UnitsPerCell = 2 }, Units = [unit with { Combatant = unit.Combatant with { Health = 30 } },
             unit with { Id = "unit.3", Combatant = unit.Combatant with { Health = 100 } }, enemy] };
         Check(WorldAi.PlanCommander(stacked, rules, scoring)?.UnitId == "unit.3", "AI handles a weak first stacked unit and stronger second unit at the same city");

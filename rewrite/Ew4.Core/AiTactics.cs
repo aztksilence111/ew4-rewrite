@@ -84,6 +84,11 @@ public sealed record AiTacticalRules
 
     public void Validate()
     {
+        if (FrozenAiTacticalRules.IsValidated(this)) return;
+        ValidateCore();
+    }
+    private void ValidateCore()
+    {
         bool Invalid(float value) => float.IsNaN(value) || float.IsInfinity(value) || value < 0;
         if (string.IsNullOrWhiteSpace(NavalCategory) || Invalid(NavalStrengthMultiplier) || Invalid(EmbarkedStrengthMultiplier)
             || Buildings.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Value.Base < 0 || p.Value.PerLevel < 0)

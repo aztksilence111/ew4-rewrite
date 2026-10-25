@@ -63,7 +63,7 @@
 | 内容 | 可修改 JSON 与入口 |
 | --- | --- |
 | 国名、国旗、领土色及默认变体 | 全局 `client/countries.json`，见[国家表](GLOBAL_COUNTRIES.md)；局中 `faction_create` / `faction_identity` 可覆盖 `name/flag/flagImage/color`，支持自定义 PNG，见[势力接口](SCENARIO_FACTIONS.md) |
-| 兵种基础数值 | `legacy/catalog.json.profiles` 的 `max_health/movement/minimum_attack/maximum_attack/minimum_range/maximum_range/food_consumption/damage_multipliers/traits`；`variants` 绑定国家兵种配置，实际由 `LegacyRuntimeCatalog.FromJson` 读取 |
+| 兵种基础数值 | `legacy/units.json.units` 的 `max_health/movement/minimum_attack/maximum_attack/minimum_range/maximum_range/food_consumption/damage_multipliers/traits`；`legacy/unit-variants.json.variants` 绑定国家兵种配置，由 `LegacyCatalogFiles` 合成后交给运行模块 |
 | 属性面板文字 | `client/manifest.json.profiles` 的 `stats`；修改底层战斗目录时同步相应显示数据，不能只改面板就认为战斗数值改变 |
 | 技能效果 | `rewrite/extension.json` 注册技能定义、绑定和原技能参数，见[规则 API](RULE_EXTENSIONS.md)与[原技能参数示例](../../examples/legacy-skill-parameters/README.md) |
 | 兵模 | 本文的 `client/unit-visuals.json`，不改变上面任何规则 |

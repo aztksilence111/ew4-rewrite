@@ -1,0 +1,559 @@
+{
+  "schema": 1,
+  "buildings": [
+    {
+      "type": "city",
+      "maxlevel": 6,
+      "children": [
+        {
+          "idx": 0,
+          "image": "city1.png",
+          "tax": 3,
+          "industry": 0,
+          "food": 0,
+          "supply": 1,
+          "avoid": 3,
+          "children": [
+            {
+              "name": "Militia",
+              "grade": 0,
+              "tag": "recruit"
+            }
+          ],
+          "tag": "level"
+        },
+        {
+          "idx": 1,
+          "image": "city2.png",
+          "tax": 6,
+          "industry": 0,
+          "food": 0,
+          "supply": 2,
+          "avoid": 6,
+          "children": [
+            {
+              "name": "Militia",
+              "grade": 1,
+              "tag": "recruit"
+            },
+            {
+              "name": "Line Infantry",
+              "grade": 0,
+              "tag": "recruit"
+            }
+          ],
+          "tag": "level"
+        },
+        {
+          "idx": 2,
+          "image": "city3.png",
+          "tax": 12,
+          "industry": 0,
+          "food": 0,
+          "supply": 4,
+          "avoid": 9,
+          "children": [
+            {
+              "name": "Militia",
+              "grade": 2,
+              "tag": "recruit"
+            },
+            {
+              "name": "Line Infantry",
+              "grade": 1,
+              "tag": "recruit"
+            },
+            {
+              "name": "Light Infantry",
+              "grade": 0,
+              "tag": "recruit"
+            }
+          ],
+          "tag": "level"
+        },
+        {
+          "idx": 3,
+          "image": "city4.png",
+          "tax": 20,
+          "industry": 2,
+          "food": 0,
+          "supply": 6,
+          "avoid": 12,
+          "children": [
+            {
+              "name": "Militia",
+              "grade": 2,
+              "tag": "recruit"
+            },
+            {
+              "name": "Line Infantry",
+              "grade": 2,
+              "tag": "recruit"
+            },
+            {
+              "name": "Light Infantry",
+              "grade": 1,
+              "tag": "recruit"
+            },
+            {
+              "name": "Grenadier",
+              "grade": 0,
+              "tag": "recruit"
+            }
+          ],
+          "tag": "level"
+        },
+        {
+          "idx": 4,
+          "image": "city5.png",
+          "tax": 30,
+          "industry": 4,
+          "food": 0,
+          "supply": 8,
+          "avoid": 15,
+          "children": [
+            {
+              "name": "Militia",
+              "grade": 2,
+              "tag": "recruit"
+            },
+            {
+              "name": "Line Infantry",
+              "grade": 2,
+              "tag": "recruit"
+            },
+            {
+              "name": "Light Infantry",
+              "grade": 2,
+              "tag": "recruit"
+            },
+            {
+              "name": "Grenadier",
+              "grade": 1,
+              "tag": "recruit"
+            },
+            {
+              "name": "Guards",
+              "grade": 0,
+              "tag": "recruit"
+            },
+            {
+              "name": "Machine Gun",
+              "grade": 0,
+              "tag": "recruit"
+            }
+          ],
+          "tag": "level"
+        },
+        {
+          "idx": 5,
+          "image": "city6.png",
+          "tax": 45,
+          "industry": 6,
+          "food": 0,
+          "supply": 10,
+          "avoid": 18,
+          "children": [
+            {
+              "name": "Militia",
+              "grade": 2,
+              "tag": "recruit"
+            },
+            {
+              "name": "Line Infantry",
+              "grade": 2,
+              "tag": "recruit"
+            },
+            {
+              "name": "Light Infantry",
+              "grade": 2,
+              "tag": "recruit"
+            },
+            {
+              "name": "Grenadier",
+              "grade": 2,
+              "tag": "recruit"
+            },
+            {
+              "name": "Guards",
+              "grade": 1,
+              "tag": "recruit"
+            },
+            {
+              "name": "Machine Gun",
+              "grade": 1,
+              "tag": "recruit"
+            }
+          ],
+          "tag": "level"
+        },
+        {
+          "idx": 6,
+          "image": "city7.png",
+          "tax": 60,
+          "industry": 8,
+          "food": 0,
+          "supply": 12,
+          "avoid": 20,
+          "children": [
+            {
+              "name": "Militia",
+              "grade": 2,
+              "tag": "recruit"
+            },
+            {
+              "name": "Line Infantry",
+              "grade": 2,
+              "tag": "recruit"
+            },
+            {
+              "name": "Light Infantry",
+              "grade": 2,
+              "tag": "recruit"
+            },
+            {
+              "name": "Grenadier",
+              "grade": 2,
+              "tag": "recruit"
+            },
+            {
+              "name": "Guards",
+              "grade": 2,
+              "tag": "recruit"
+            },
+            {
+              "name": "Machine Gun",
+              "grade": 1,
+              "tag": "recruit"
+            }
+          ],
+          "tag": "level"
+        }
+      ]
+    },
+    {
+      "type": "industry",
+      "maxlevel": 4,
+      "children": [
+        {
+          "idx": 0,
+          "image": "factory1.png",
+          "tax": 0,
+          "industry": 4,
+          "food": 0,
+          "supply": 2,
+          "avoid": 3,
+          "children": [
+            {
+              "name": "Light Artillery",
+              "grade": 0,
+              "tag": "recruit"
+            },
+            {
+              "name": "Heavy Artillery",
+              "grade": 0,
+              "tag": "recruit"
+            }
+          ],
+          "tag": "level"
+        },
+        {
+          "idx": 1,
+          "image": "factory2.png",
+          "tax": 0,
+          "industry": 8,
+          "food": 0,
+          "supply": 4,
+          "avoid": 6,
+          "children": [
+            {
+              "name": "Light Artillery",
+              "grade": 1,
+              "tag": "recruit"
+            },
+            {
+              "name": "Heavy Artillery",
+              "grade": 0,
+              "tag": "recruit"
+            },
+            {
+              "name": "Siege Artillery",
+              "grade": 0,
+              "tag": "recruit"
+            }
+          ],
+          "tag": "level"
+        },
+        {
+          "idx": 2,
+          "image": "factory3.png",
+          "tax": 0,
+          "industry": 12,
+          "food": 0,
+          "supply": 6,
+          "avoid": 9,
+          "children": [
+            {
+              "name": "Light Artillery",
+              "grade": 1,
+              "tag": "recruit"
+            },
+            {
+              "name": "Heavy Artillery",
+              "grade": 1,
+              "tag": "recruit"
+            },
+            {
+              "name": "Siege Artillery",
+              "grade": 1,
+              "tag": "recruit"
+            },
+            {
+              "name": "Rocket",
+              "grade": 0,
+              "tag": "recruit"
+            }
+          ],
+          "tag": "level"
+        },
+        {
+          "idx": 3,
+          "image": "factory4.png",
+          "tax": 0,
+          "industry": 16,
+          "food": 0,
+          "supply": 8,
+          "avoid": 12,
+          "children": [
+            {
+              "name": "Light Artillery",
+              "grade": 1,
+              "tag": "recruit"
+            },
+            {
+              "name": "Heavy Artillery",
+              "grade": 1,
+              "tag": "recruit"
+            },
+            {
+              "name": "Siege Artillery",
+              "grade": 1,
+              "tag": "recruit"
+            },
+            {
+              "name": "Rocket",
+              "grade": 1,
+              "tag": "recruit"
+            }
+          ],
+          "tag": "level"
+        }
+      ]
+    },
+    {
+      "type": "stable",
+      "maxlevel": 3,
+      "children": [
+        {
+          "idx": 0,
+          "image": "stable1.png",
+          "tax": 2,
+          "industry": 0,
+          "food": 0,
+          "supply": 2,
+          "avoid": 3,
+          "children": [
+            {
+              "name": "Light Cavalry",
+              "grade": 0,
+              "tag": "recruit"
+            },
+            {
+              "name": "Heavy Cavalry",
+              "grade": 0,
+              "tag": "recruit"
+            }
+          ],
+          "tag": "level"
+        },
+        {
+          "idx": 1,
+          "image": "stable2.png",
+          "tax": 4,
+          "industry": 0,
+          "food": 0,
+          "supply": 4,
+          "avoid": 6,
+          "children": [
+            {
+              "name": "Light Cavalry",
+              "grade": 1,
+              "tag": "recruit"
+            },
+            {
+              "name": "Heavy Cavalry",
+              "grade": 1,
+              "tag": "recruit"
+            },
+            {
+              "name": "Guards Cavalry",
+              "grade": 0,
+              "tag": "recruit"
+            },
+            {
+              "name": "Armored Car",
+              "grade": 0,
+              "tag": "recruit"
+            }
+          ],
+          "tag": "level"
+        },
+        {
+          "idx": 2,
+          "image": "stable3.png",
+          "tax": 6,
+          "industry": 0,
+          "food": 0,
+          "supply": 6,
+          "avoid": 9,
+          "children": [
+            {
+              "name": "Light Cavalry",
+              "grade": 1,
+              "tag": "recruit"
+            },
+            {
+              "name": "Heavy Cavalry",
+              "grade": 1,
+              "tag": "recruit"
+            },
+            {
+              "name": "Guards Cavalry",
+              "grade": 1,
+              "tag": "recruit"
+            },
+            {
+              "name": "Armored Car",
+              "grade": 1,
+              "tag": "recruit"
+            }
+          ],
+          "tag": "level"
+        }
+      ]
+    },
+    {
+      "type": "port",
+      "maxlevel": 3,
+      "children": [
+        {
+          "idx": 0,
+          "image": "port1.png",
+          "tax": 3,
+          "industry": 1,
+          "food": 0,
+          "supply": 2,
+          "avoid": 3,
+          "children": [
+            {
+              "name": "Privateer",
+              "grade": 0,
+              "tag": "recruit"
+            }
+          ],
+          "tag": "level"
+        },
+        {
+          "idx": 1,
+          "image": "port2.png",
+          "tax": 6,
+          "industry": 2,
+          "food": 0,
+          "supply": 4,
+          "avoid": 6,
+          "children": [
+            {
+              "name": "Privateer",
+              "grade": 0,
+              "tag": "recruit"
+            },
+            {
+              "name": "Frigate",
+              "grade": 0,
+              "tag": "recruit"
+            }
+          ],
+          "tag": "level"
+        },
+        {
+          "idx": 2,
+          "image": "port3.png",
+          "tax": 9,
+          "industry": 3,
+          "food": 0,
+          "supply": 6,
+          "avoid": 9,
+          "children": [
+            {
+              "name": "Privateer",
+              "grade": 0,
+              "tag": "recruit"
+            },
+            {
+              "name": "Frigate",
+              "grade": 0,
+              "tag": "recruit"
+            },
+            {
+              "name": "Battleship",
+              "grade": 0,
+              "tag": "recruit"
+            },
+            {
+              "name": "Ironclad",
+              "grade": 0,
+              "tag": "recruit"
+            }
+          ],
+          "tag": "level"
+        }
+      ]
+    },
+    {
+      "type": "farmland",
+      "maxlevel": 3,
+      "children": [
+        {
+          "idx": 0,
+          "image": "farmland1.png",
+          "tax": 0,
+          "industry": 0,
+          "food": 5,
+          "supply": 0,
+          "avoid": 0,
+          "tag": "level"
+        },
+        {
+          "idx": 1,
+          "image": "farmland2.png",
+          "tax": 0,
+          "industry": 0,
+          "food": 15,
+          "supply": 0,
+          "avoid": 0,
+          "tag": "level"
+        },
+        {
+          "idx": 2,
+          "image": "farmland3.png",
+          "tax": 0,
+          "industry": 0,
+          "food": 40,
+          "supply": 0,
+          "avoid": 0,
+          "tag": "level"
+        }
+      ]
+    }
+  ]
+}

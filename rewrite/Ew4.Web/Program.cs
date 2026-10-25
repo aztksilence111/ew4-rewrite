@@ -12,7 +12,7 @@ string saves = builder.Configuration["save-root"] ?? (root == null
 string frontend = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
 byte[] Read(string path) => File.ReadAllBytes(path.StartsWith("frontend/", StringComparison.Ordinal)
     ? Path.Combine(frontend, path[9..]) : Path.Combine(data, path));
-var files = new[] { "original", "legacy", "client" }.SelectMany(part => Directory.EnumerateFiles(Path.Combine(data, part), "*", SearchOption.AllDirectories)
+var files = new[] { "original", "legacy", "client", "rewrite" }.Where(part => Directory.Exists(Path.Combine(data, part))).SelectMany(part => Directory.EnumerateFiles(Path.Combine(data, part), "*", SearchOption.AllDirectories)
     .Where(p => part != "legacy" || Path.GetDirectoryName(p) == Path.Combine(data, part))
     .Select(p => Path.GetRelativePath(data, p).Replace('\\', '/'))).Concat(["frontend/conquest-pages.json", "frontend/city-names.json"]);
 var store = new ModStore(new ModBase(Read, files), builder.Configuration["mod-root"] ?? Path.Combine(saves, "content-mods"), saves);

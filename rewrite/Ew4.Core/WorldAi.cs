@@ -44,6 +44,14 @@ public static partial class WorldAi
 {
     private static AiUnitFacts Facts(WorldState state, UnitState value, WorldAiRules rules)
     {
+        var cache = PlanningScope.Queries(state)?.Ai(rules).Units;
+        if (cache != null && cache.TryGetValue(value, out var found)) return found;
+        var facts = BuildFacts(state, value, rules);
+        cache?.Add(value, facts);
+        return facts;
+    }
+    private static AiUnitFacts BuildFacts(WorldState state, UnitState value, WorldAiRules rules)
+    {
         if (!rules.ExperienceLevels.TryGetValue(value.Veterancy, out int level)) throw new RuleViolation("ai.stage", "Unmapped veterancy level");
         var profile = value.Combatant.Profile;
         return new()
@@ -57,16 +65,20 @@ public static partial class WorldAi
 
     private static AiSiteFacts Site(WorldState state, int index, WorldAiRules rules)
     {
+        var cache = PlanningScope.Queries(state)?.Ai(rules).Sites;
+        if (cache != null && cache.TryGetValue(index, out var found)) return found;
         var site = state.Cells[index];
-        return new(site.BuildingKind, site.BuildingLevel, site.InstallationKind,
+        var facts = new AiSiteFacts(site.BuildingKind, site.BuildingLevel, site.InstallationKind,
             rules.SitePriorities.TryGetValue(index, out int priority) ? priority : site.Objective ? 1 : 0,
             site.Owner != null && state.Factions.Single(f => f.Id == site.Owner).Human);
+        cache?.Add(index, facts);
+        return facts;
     }
 
     private static long ThreatStrength(WorldState state, UnitState unit, WorldAiRules rules)
     {
         var map = new HexMap(state.Width, state.Height);
-        var factions = state.Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
+        var factions = PlanningScope.Queries(state)?.Factions ?? state.Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
         var faction = factions[unit.Owner];
         long threat = 0;
         foreach (var enemy in state.Units)
@@ -87,7 +99,7 @@ public static partial class WorldAi
         var unit = state.Units.SingleOrDefault(u => u.Id == unitId);
         if (unit == null || unit.Owner != active.Id) throw new RuleViolation("ai.unit", "Unknown active faction unit");
         var map = new HexMap(state.Width, state.Height);
-        var factions = state.Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
+        var factions = PlanningScope.Queries(state)?.Factions ?? state.Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
         var result = new List<AiCandidate<AiStrikeCommand>>();
         var attacker = Facts(state, unit, rules);
         foreach (var target in state.Units)

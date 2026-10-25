@@ -1,0 +1,15 @@
+{
+  "*": {
+    "campPalette": ["#79AADD60", "#D67B7B60", "#DCB36A60", "#85B38A60"],
+    "camps": {
+      "ew4.camp.1": "#4080C080",
+      "ew4.camp.2": "#C0505080",
+      "civil.rebels": "#237A4D80"
+    }
+  },
+  "conquest1": {
+    "camps": {
+      "ew4.camp.1": "#70904080"
+    }
+  }
+}

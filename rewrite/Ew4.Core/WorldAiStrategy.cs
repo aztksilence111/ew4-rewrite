@@ -34,9 +34,11 @@ public static partial class WorldAi
 {
     public static AiStrategyPlan StrategicCandidates(WorldState state, string unitId, WorldAiRules rules)
     {
+        using var planning = PlanningScope.Begin(rules);
         var faction = WorldActions.Ready(state, state.Revision);
         rules.Validate();
-        var unit = state.Units.SingleOrDefault(u => u.Id == unitId);
+        var unit = PlanningScope.Queries(state) is { } prepared ? prepared.Units.GetValueOrDefault(unitId)
+            : state.Units.SingleOrDefault(u => u.Id == unitId);
         if (unit == null || unit.Owner != faction.Id) throw new RuleViolation("ai.unit", "Unknown active faction unit");
         if (!rules.Strategy.Behaviors.TryGetValue(unit.Behavior, out var behavior))
             throw new RuleViolation("ai.strategy_behavior", "Unmapped strategic behavior");
@@ -45,8 +47,10 @@ public static partial class WorldAi
         if (unit.RemainingMovement < 1 || unit.Combatant.Profile.Movement < 1 || unit.Morale.Effective == -3 || behavior.Weight == AiStrategyBehavior.Zero)
             return new(state.Revision, unitId, state.AiRandomState, random.State, result);
         var map = new HexMap(state.Width, state.Height);
-        var factions = state.Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
-        var occupants = state.Units.GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => g.ToArray());
+        var queries = PlanningScope.Queries(state);
+        var factions = queries?.Factions ?? state.Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
+        var occupants = queries?.Occupants ?? state.Units.GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => g.ToArray());
+        var goalFacts = queries?.Ai(rules).Goals ?? new Dictionary<int, AiStrategyGoal>();
         bool Hostile(string owner) => WorldDiplomacy.Hostile(state, faction.Id, owner, rules.NeutralCamps) && !factions[owner].Defeated;
         var facts = Facts(state, unit, rules);
         long threat = ThreatStrength(state, unit, rules);
@@ -61,23 +65,28 @@ public static partial class WorldAi
             var distanceFields = new Dictionary<string, IReadOnlyDictionary<int, long>>(StringComparer.Ordinal);
             var reachable = Movement.Reachable(map, context.Cells, unit.Cell, context.Actor, rules.Movement.Search);
             if (reachable.Count <= 1) continue;
+            var orderedLandings = reachable.Keys.OrderBy(i => i).ToArray();
             var strategyUnit = new AiStrategyUnit(unit.Combatant.Health, unit.Combatant.Profile.MaxHealth, unit.RemainingMovement,
                 facts.Category == rules.Tactics.NavalCategory, mover.Transport, unit.CommanderId != null, facts.AtSea, strength, threat);
             // Stable identifiers keep independent faction candidates unaffected by collection ordering.
             foreach (var opponent in state.Factions.Where(f => Hostile(f.Id)).OrderBy(f => f.Id, StringComparer.Ordinal))
             {
                 var goals = new List<AiStrategyGoalOption>();
-                for (int i = 0; i < state.Cells.Count; i++)
+                foreach (int i in queries?.Targets[opponent.Id] ?? Enumerable.Range(0, state.Cells.Count))
                 {
                     var cell = state.Cells[i];
                     var stationed = occupants.TryGetValue(i, out var group) ? group : Array.Empty<UnitState>();
-                    if (!cell.Terrain.Active || cell.Owner != opponent.Id && !stationed.Any(u => u.Owner == opponent.Id)) continue;
+                    if (!cell.Terrain.CanTraverse() || cell.Owner != opponent.Id && !stationed.Any(u => u.Owner == opponent.Id)) continue;
                     if (stationed.Length > 0 && stationed.All(u => !Hostile(u.Owner))) continue;
-                    long army = 0;
-                    foreach (var soldier in stationed) army = checked(army + AiTactics.Strength(Facts(state, soldier, rules), rules.Tactics));
-                    bool navalReachable = Enumerable.Range(0, 6).Select(d => map.Neighbor(i, d)).Any(n => n >= 0 && state.Cells[n].Terrain.Active && state.Cells[n].Terrain.Sea);
-                    var goal = new AiStrategyGoal(AiTactics.Location(Site(state, i, rules), stationed.Length == 0 ? null : Facts(state, stationed[0], rules), rules.Tactics),
-                        army, stationed.Length > 0, stationed.Any(u => u.Combatant.Profile.Category == rules.Tactics.NavalCategory), cell.Terrain.Sea, navalReachable);
+                    if (!goalFacts.TryGetValue(i, out var goal))
+                    {
+                        long army = 0;
+                        foreach (var soldier in stationed) army = checked(army + AiTactics.Strength(Facts(state, soldier, rules), rules.Tactics));
+                        bool navalReachable = Enumerable.Range(0, 6).Select(d => map.Neighbor(i, d)).Any(n => n >= 0 && state.Cells[n].Terrain.CanTraverse() && state.Cells[n].Terrain.Sea);
+                        goal = new AiStrategyGoal(AiTactics.Location(Site(state, i, rules), stationed.Length == 0 ? null : Facts(state, stationed[0], rules), rules.Tactics),
+                            army, stationed.Length > 0, stationed.Any(u => u.Combatant.Profile.Category == rules.Tactics.NavalCategory), cell.Terrain.Sea, navalReachable);
+                        goalFacts.Add(i, goal);
+                    }
                     if (AiStrategy.Eligible(strategyUnit, goal, rules.Strategy.Scoring)) goals.Add(new(i, goal));
                 }
                 foreach (var goal in goals.OrderByDescending(g => AiStrategy.GoalScore(strategyUnit, g.Facts, rules.Strategy.Scoring)).ThenBy(g => g.Cell))
@@ -87,7 +96,7 @@ public static partial class WorldAi
                     foreach (int i in goal.Facts.HasUnit ? map.Within(goal.Cell, unit.Combatant.Profile.MaximumRange, true) : new[] { goal.Cell })
                     {
                         var cell = state.Cells[i];
-                        if (!cell.Terrain.Active || occupants.ContainsKey(i) && i != unit.Cell
+                        if (!cell.Terrain.CanTraverse() || occupants.ContainsKey(i) && i != unit.Cell
                             || strategyUnit.Naval && !cell.Terrain.Sea || !strategyUnit.Naval && cell.Terrain.Sea && !mover.Transport) continue;
                         int d = map.Distance(i, goal.Cell);
                         if (i == goal.Cell && !goal.Facts.HasUnit || goal.Facts.HasUnit && d >= unit.Combatant.Profile.MinimumRange && d <= unit.Combatant.Profile.MaximumRange)
@@ -100,11 +109,12 @@ public static partial class WorldAi
                     if (!distanceFields.TryGetValue(fieldKey, out var distances))
                     {
                         if (distanceFields.Count >= 8) distanceFields.Clear();
-                        distanceFields[fieldKey] = distances = Movement.DistancesTo(map, context.Cells, endpoints, context.Actor, rules.Movement.Search);
+                        distanceFields[fieldKey] = distances = Movement.DistancesForAdvance(map, context.Cells, endpoints,
+                            context.Actor, rules.Movement.Search, unit.Cell, orderedLandings);
                     }
                     if (!distances.TryGetValue(unit.Cell, out long sourceDistance)) continue;
                     var landings = new List<AiStrategyDestination>();
-                    foreach (int index in reachable.Keys.OrderBy(i => i))
+                    foreach (int index in orderedLandings)
                     {
                         if (index == unit.Cell || !distances.TryGetValue(index, out long distance) || distance >= sourceDistance) continue;
                         var cell = state.Cells[index];

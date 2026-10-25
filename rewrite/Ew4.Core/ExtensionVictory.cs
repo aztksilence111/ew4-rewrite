@@ -72,7 +72,7 @@ public static class ExtensionVictory
     public static void ValidateTargets(ExtensionVictoryRules rules, WorldState world, bool initial, Func<string, bool>? knownFaction = null)
     {
         foreach (var c in Conditions(rules.Win).Concat(rules.Lose == null ? Array.Empty<VictoryCondition>() : Conditions(rules.Lose)))
-            if (c.Cells.Any(i => i < 0 || i >= world.Cells.Count || !world.Cells[i].Terrain.Active)
+            if (c.Cells.Any(i => i < 0 || i >= world.Cells.Count || !world.Cells[i].Terrain.CanTraverse())
                 || c.Factions.Any(id => !(knownFaction?.Invoke(id) ?? world.Factions.Any(f => f.Id == id)))
                 || initial && c.Units.Any(id => world.Units.All(u => u.Id != id)))
                 throw new RuleViolation("extension.victory_reference", "Victory condition references an unknown unit/faction/cell");

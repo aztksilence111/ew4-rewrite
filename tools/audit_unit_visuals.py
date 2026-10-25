@@ -3,6 +3,7 @@ import argparse
 from collections import Counter
 import hashlib
 import json
+from catalog_files import read_catalog
 from pathlib import Path
 import struct
 import xml.etree.ElementTree as ET
@@ -49,7 +50,7 @@ def main():
     REPORT.mkdir(parents=True, exist_ok=True)
     manifest = json.loads((CLIENT / "manifest.json").read_text(encoding="utf-8"))
     effects = json.loads((CLIENT / "effects.json").read_text(encoding="utf-8"))
-    catalog = json.loads((ROOT / "rewrite/data/legacy/catalog.json").read_text(encoding="utf-8"))
+    catalog = read_catalog(ROOT / "rewrite/data/legacy/catalog.json")
     source_motions = {e.attrib["name"]: dict(e.attrib, motions=[m.attrib for m in e])
                       for e in ET.parse(SOURCE / "def_motion.xml").getroot()}
     armies = ET.parse(SOURCE / "def_army.xml").getroot()

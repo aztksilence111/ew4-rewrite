@@ -66,7 +66,7 @@ internal static class LegacyResourceChecks
         var weapon = army.Root!.Elements().First().Elements("army").First();
         weapon.SetAttributeValue("strength", -999);
         byte[] ReadWeapon(string name) => name == "def_army.xml" ? Encoding.UTF8.GetBytes(army.ToString()) : baseline.Read("original/" + name);
-        var converted = LegacyCatalogConverter.Convert(ReadWeapon, ModFiles.Object(baseline.Read("legacy/catalog.json")));
+        var converted = LegacyCatalogConverter.Convert(ReadWeapon, baseline.Catalog());
         var singleUse = converted["profiles"]![0]!;
         Check((int)singleUse["max_health"]! == 1 && singleUse["traits"]!.AsArray().Any(t => (string)t! == "consumed_on_attack"),
             "negative 999 strength converts to an explicit single-use trait");
@@ -75,7 +75,7 @@ internal static class LegacyResourceChecks
         Check(converted["source_trees"]!["def_army.xml"]!.ToJsonString().Contains("-999"), "source sentinel remains available for audit");
         weapon.SetAttributeValue("strength", -998);
         bool rejected = false;
-        try { LegacyRuntimeCatalog.FromJson(LegacyCatalogConverter.Convert(ReadWeapon, ModFiles.Object(baseline.Read("legacy/catalog.json"))).ToJsonString()); }
+        try { LegacyRuntimeCatalog.FromJson(LegacyCatalogConverter.Convert(ReadWeapon, baseline.Catalog()).ToJsonString()); }
         catch (Ew4.Core.RuleViolation e) when (e.Code == "profile.invalid") { rejected = true; }
         Check(rejected, "unrecognized negative health still fails validation");
         var cards = ModFiles.Xml(baseline.Read("original/def_card.xml"));

@@ -119,6 +119,14 @@ def atlas(runtime, manifest):
         manifest['atlases'][name].update(entries)
 
 
+def position(runtime, overlays):
+    plan = json.loads((runtime.REPORT/'cartography_plan.json').read_text(encoding='utf-8'))
+    for anchor in plan.get('reliefAnchors', []):
+        overlay = next(o for o in overlays if o['cell'] == anchor['cell'] and o['layer'] == 0)
+        assert overlay.get('relief') in ('low', 'middle', 'high'), anchor['name']+' requires a mountain sprite'
+        overlay.update(x=anchor['x'], y=anchor['y'])
+
+
 def apply(runtime, manifest, overlays, data):
     levels = {item['cell']:item for item in classify(runtime,data)}
     atlas(runtime,manifest)
@@ -129,4 +137,5 @@ def apply(runtime, manifest, overlays, data):
         overlay['relief'] = item['level']
         if item['level'] != 'hill':
             overlay['image'] = f"eastasia_{item['level']}_{item['spriteIndex']+1}.png"
+    position(runtime, overlays)
     return levels

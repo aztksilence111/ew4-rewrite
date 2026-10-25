@@ -9,6 +9,14 @@ internal static class ResourceValidation
     {
         void Need(string path) { ModFiles.PathName(path); if (!files.Contains(path)) throw new InvalidDataException("缺少依赖资源: " + path); }
         var manifest = ModFiles.Object(read("client/manifest.json"));
+        foreach (var type in content.Extensions.Geography.Maps.SelectMany(m => m.TerrainOverrides).Select(o => o.Type).Distinct())
+        {
+            var visual = content.Extensions.Geography.Visual(type);
+            foreach (string sprite in visual.Sprites)
+                foreach (string atlas in new[] { "tiles", "tiles_hd" })
+                    if (manifest["atlases"]?[atlas]?[sprite] == null)
+                        throw new InvalidDataException("Geography sprite missing: " + atlas + "/" + sprite);
+        }
         if (files.Contains("client/music.json"))
         {
             var music = ModFiles.Object(read("client/music.json"));
@@ -44,6 +52,7 @@ internal static class ResourceValidation
             if (manifest["maps"]?[map] is not JsonObject metadata) throw new InvalidDataException("地图缺少显示资源: " + map);
             if (metadata["tiles"] is not JsonArray tiles || tiles.Count == 0) throw new InvalidDataException("地图缺少底图片块: " + map);
             foreach (var tile in tiles) Need("client/" + (string)tile!["file"]!);
+            CheckMapLabelPaths(metadata);
         }
         foreach (var (name, font) in manifest["fonts"]!.AsObject())
         {
@@ -79,6 +88,35 @@ internal static class ResourceValidation
         if (manifest["menuTextures"] is JsonObject backgrounds)
             foreach (var (_, texture) in backgrounds) Need("client/" + (string)texture!["file"]!);
     }
+    internal static void CheckMapLabelPaths(JsonObject metadata)
+    {
+        if (metadata["labels"] is not JsonArray labels) return;
+        foreach (var label in labels)
+        {
+            if (label?["textPath"] == null) continue;
+            if (label["textPath"] is not JsonArray path || path.Count is < 3 or > 65 || path.Count % 2 == 0)
+                throw new InvalidDataException("地理文字路径须为3至65个点的连续二次曲线");
+            var points = new List<(double X, double Y)>();
+            foreach (var node in path)
+            {
+                if (node is not JsonArray point || point.Count != 2 ||
+                    point[0] is not JsonValue vx || !vx.TryGetValue<double>(out double x) ||
+                    point[1] is not JsonValue vy || !vy.TryGetValue<double>(out double y) ||
+                    !double.IsFinite(x) || !double.IsFinite(y) || Math.Abs(x) > 32768 || Math.Abs(y) > 32768)
+                    throw new InvalidDataException("地理文字路径坐标无效");
+                points.Add((x, y));
+            }
+            if (points.All(p => p == points[0]) || points.Max(p => p.X) - points.Min(p => p.X) > 8192 ||
+                points.Max(p => p.Y) - points.Min(p => p.Y) > 8192 ||
+                label["size"] is not JsonValue size || !size.TryGetValue<double>(out double height) ||
+                !double.IsFinite(height) || height is < 1 or > 512)
+                throw new InvalidDataException("地理文字路径尺寸无效");
+            if (label["text"] is not JsonValue text || !text.TryGetValue<string>(out string? value) ||
+                string.IsNullOrEmpty(value) || value.Length > 256 || value.Any(c => c != ' ' && !char.IsAsciiLetter(c)))
+                throw new InvalidDataException("地理文字路径英文名称须使用原版字母与空格");
+        }
+    }
+
     internal static void CheckAnimation(JsonObject animation)
     {
         var items = animation["items"]!.AsArray(); var elements = animation["elements"]!.AsArray();

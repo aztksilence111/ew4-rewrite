@@ -1,0 +1,12 @@
+{
+  "protectedAtlasSprites": {
+    "tiles": 76,
+    "tiles_hd": 76
+  },
+  "originalAtlasSpritesUnchanged": true,
+  "newSpritesPerAtlas": 7,
+  "blockedCells": 121,
+  "passCorridors": 3,
+  "runtimeFiles": 2270,
+  "errors": 0
+}

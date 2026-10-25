@@ -20,7 +20,7 @@ public static class LegacyAiCatalog
                 TargetInstallation = m.TargetInstallation == null ? null : Installation(m.TargetInstallation) }).ToArray()
         };
         var landing = new AiStrategyLandingRules();
-        var result = new WorldAiRules { Tactics = tactics, Movement = movement ?? new(),
+        var result = new WorldAiRules { Tactics = FrozenAiTacticalRules.Copy(tactics), Movement = movement ?? new(),
             ExperienceLevels = combat.UnitProgression.Levels.Select((v, i) => (v.Id, i)).ToDictionary(p => p.Id, p => p.i, StringComparer.Ordinal),
             Strategy = new() { Transport = transport, Landing = landing with
                 { ReservedAlliedBuildings = landing.ReservedAlliedBuildings.Select(Building).ToArray(),

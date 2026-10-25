@@ -14,7 +14,8 @@ public static partial class WorldAi
         using var planning = PlanningScope.Begin(rules);
         var faction = WorldActions.Ready(state, state.Revision);
         rules.Validate();
-        var unit = state.Units.SingleOrDefault(u => u.Id == unitId);
+        var unit = PlanningScope.Queries(state) is { } queries ? queries.Units.GetValueOrDefault(unitId)
+            : state.Units.SingleOrDefault(u => u.Id == unitId);
         if (unit == null || unit.Owner != faction.Id) throw new RuleViolation("ai.unit", "Unknown active faction unit");
         if (WorldDiplomacy.Dormant(state, faction.Id, rules.NeutralCamps))
             return new(state.Revision, unitId, state.AiRandomState, state.AiRandomState, Array.Empty<AiCandidate<WorldAiCommand>>());
@@ -80,7 +81,7 @@ public static partial class WorldAi
         if (command.ExpectedRevision != plan.ExpectedRevision || command.UnitId != plan.UnitId)
             throw new RuleViolation("ai.unit_selection", "Unit command does not match its plan");
         WorldChange change;
-        var executionState = state with { AiRandomState = plan.FinalRandomState };
+        var executionState = PlanningScope.WithAiRandomState(state, plan.FinalRandomState);
         switch (command)
         {
             case AiStrikeCommand strike: change = ExecuteStrike(executionState, strike, battleRules); break;

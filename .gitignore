@@ -16,6 +16,7 @@
 **/obj/
 **/node_modules/
 /rewrite/Ew4.Web/wwwroot/compat/
+/rewrite/Ew4.Web/wwwroot/build-info.json
 **/__pycache__/
 *.pyc
 .vs/

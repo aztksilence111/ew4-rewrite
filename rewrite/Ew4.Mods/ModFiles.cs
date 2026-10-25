@@ -6,6 +6,7 @@ using System.Text.Json.Nodes;
 using System.Xml;
 using System.Xml.Linq;
 using Ew4.Client;
+using Ew4.Legacy;
 
 namespace Ew4.Mods;
 
@@ -19,10 +20,14 @@ public sealed class ModBase(Func<string, byte[]> read, IEnumerable<string> files
 {
     public string[] Files { get; } = files.Select(ModFiles.PathName).Where(ModFiles.RuntimePath).Order(StringComparer.Ordinal).ToArray();
     public byte[] Read(string path) => read(ModFiles.PathName(path));
+    public System.Text.Json.Nodes.JsonObject Catalog() => LegacyCatalogFiles.Load(p => Read(
+        p.StartsWith("data/", StringComparison.Ordinal) ? "legacy/" + p[5..] : p)).Catalog;
     public string[] Scenarios => Files.Where(p => p.StartsWith("original/", StringComparison.Ordinal) && p.EndsWith(".btl", StringComparison.Ordinal))
         .Select(Path.GetFileNameWithoutExtension).Select(p => p!).ToArray();
     private string? revision;
-    public string Revision => revision ??= ModFiles.Hash(Read("legacy/catalog.json").Concat(Read("client/manifest.json")).ToArray());
+    public string Revision => revision ??= ModFiles.Hash(Read("legacy/catalog.json").Concat(Read("client/manifest.json"))
+        .Concat(Files.Where(p => p.StartsWith("legacy/", StringComparison.Ordinal) && LegacyCatalogFiles.PartNames.Contains(p[7..]))
+            .Order(StringComparer.Ordinal).SelectMany(Read)).ToArray());
     public ClientContent Content(Func<string, byte[]> reader, IEnumerable<string> scenarios, bool showHiddenCampaigns = false) => new(path => reader(
         path.StartsWith("data/", StringComparison.Ordinal) ? "legacy/" + path[5..] : path), scenarios.Select(s => s + ".btl"), showHiddenCampaigns: showHiddenCampaigns);
 }
@@ -65,6 +70,7 @@ internal static class ModFiles
     internal static bool RuntimePath(string path) => path switch
     {
         "legacy/catalog.json" or "legacy/runtime_rule_tables.json" or "legacy/metagame_rule_tables.json" => true,
+        _ when path.StartsWith("legacy/", StringComparison.Ordinal) && LegacyCatalogFiles.PartNames.Contains(path[7..]) => true,
         "frontend/conquest-pages.json" or "frontend/city-names.json" => true,
         _ when path.StartsWith("rewrite/", StringComparison.Ordinal) => new[] { ".json", ".lua", ".png" }.Contains(Path.GetExtension(path)),
         _ when path.StartsWith("original/", StringComparison.Ordinal) => new[] { ".btl", ".bin", ".xml", ".ini" }.Contains(Path.GetExtension(path)),

@@ -1,4 +1,4 @@
-#single-action{position:absolute;width:33px;height:33px;transform:scale(var(--battle-scale));transform-origin:top left;pointer-events:auto;z-index:2}
+#single-action{position:absolute;width:33px;height:33px;transform:scale(var(--battle-compact-scale));transform-origin:top left;pointer-events:auto;z-index:2}
 #single-action-confirm{display:block;width:33px;height:33px;padding:0;border:0;background:url("content/ui/image_recruit_hd3/button_ok.png") center/100% 100% no-repeat}
 #single-action-confirm:disabled{filter:grayscale(1);opacity:1}
 #single-action-cost{position:absolute;left:-25.5px;bottom:36px;width:84px;height:56px;padding:3px 7px 12px 6px;background:url("content/ui/image_ui_hd/board_button.png") center/100% 100% no-repeat;display:grid;grid-auto-rows:21px;align-content:start;pointer-events:none}

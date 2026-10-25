@@ -5,9 +5,39 @@ using Ew4.Persistence;
 
 internal static class CustomMechanicsChecks
 {
-    public static int Run(string root)
+    internal static int GarrisonChecks()
     {
         int checks = 0;
+        void Check(bool value, string label) { checks++; if (!value) throw new InvalidOperationException("Garrison: " + label); }
+        var fixture = WorldChecks.Example();
+        var own = fixture.Units.Single(u => u.Owner == "winner");
+        var land = fixture with { Width = 9, Height = 5, Units = [],
+            Cells = Enumerable.Range(0, 45).Select(i => new CellState { Owner = i % 9 < 3 ? "winner" : "loser",
+                BuildingKind = i is 19 or 22 or 25 ? "city" : null, BuildingLevel = i is 19 or 22 or 25 ? 1 : 0 }).ToArray() };
+        land = land with { Jurisdictions = TerritorialJurisdictions.Create(land) };
+        foreach (string kind in new[] { "city", "industry", "stable" })
+        foreach (bool sameCamp in new[] { false, true })
+        {
+            var territory = land with { Cells = land.Cells.Select((c, i) => i == 22 ? c with { BuildingKind = kind } : c).ToArray(),
+                Factions = sameCamp ? land.Factions.Select(f => f with { Camp = "allied" }).ToArray() : land.Factions,
+                Units = [own with { Cell = 21, RemainingMovement = 6 }, fixture.Units[0] with { Cell = 23 }] };
+            var captured = WorldActions.Move(territory, 0, own.Id, 22).State;
+            Check(captured.Cells[22].Owner == "winner" && captured.Cells[23].Owner == "loser", kind + " capture preserves foreign garrison ground " + sameCamp);
+            Check(captured.Cells.Select((c, i) => (c, i)).Where(p => territory.Jurisdictions!.CellCenters[p.i] == 22 && p.i != 23)
+                .All(p => p.c.Owner == "winner"), kind + " garrison protects only its occupied cell " + sameCamp);
+            var proposal = territory.Cells.Select((c, i) => i == 22 ? c with { Owner = "winner" } : c).ToArray();
+            Check(JurisdictionClaims.Move(territory, proposal, [21, 22], "winner")[23].Owner == "loser", "public capture retains garrison " + sameCamp);
+            var guardedSave = WorldSave.Decode(WorldSave.Encode(captured), captured.ContentRevision);
+            Check(guardedSave.Cells[23].Owner == "loser", "save preserves guarded ownership " + sameCamp);
+            var oldCapture = territory with { Cells = proposal, Jurisdictions = territory.Jurisdictions! with { CenterCaptureVersion = 0 } };
+            Check(JurisdictionClaims.UpgradeCapturedDistricts(oldCapture, territory).Cells[23].Owner == "loser", "old-save district upgrade retains garrison " + sameCamp);
+        }
+        return checks;
+    }
+
+    public static int Run(string root)
+    {
+        int checks = GarrisonChecks();
         void Check(bool value, string label) { checks++; if (!value) throw new InvalidOperationException("Mechanics: " + label); }
         void Reject(Action action, string code)
         {
