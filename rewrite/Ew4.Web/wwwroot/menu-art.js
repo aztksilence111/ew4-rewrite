@@ -45,7 +45,7 @@
     apply(mode){
       const target=document.getElementById('scenario-menu');
       target.style.setProperty('background-image','url("'+this.backgrounds[mode===1?'form_selcampaign':'form_selconquest']+'")','important');
-      target.style.backgroundSize='cover';
+      target.style.backgroundSize=mode===1?'100% 100%':'cover';
     }
     drawStrategic(draw,definition,scale,centerX=205,centerY=128,textureScale=1){
       const {image,ratio}=this.strategic,cx=Number(definition.centerx||410),cy=Number(definition.centery||288);

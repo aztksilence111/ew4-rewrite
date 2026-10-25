@@ -706,7 +706,7 @@ async function act(op, extra = {}) {
       requestRender();
       if(!document.hidden)await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
       const status=turnMeasurement.failed?'error':document.hidden||turnMeasurement.interrupted?'interrupted':state?.phase==='Finished'?'finished':state&&!busy&&$('pause').hidden&&!state.dialogue&&!state.scenarioPopup&&state.factions.find(f=>f.id===state.activeFaction)?.human?'returned':'interrupted';
-      performanceLog.endTurn(status,turnMeasurement);refreshPerformanceCaption();
+      performanceLog.endTurn(status,turnMeasurement);
     }
   }
 }
@@ -1278,13 +1278,7 @@ $('local-multiplayer-mode').onchange=e=>{if(!$('play').hidden){e.target.checked=
 function persistSettings(){try{localStorage.setItem('ew4.settings',JSON.stringify(settings));}catch(_){} }
 $('close-detail').onclick=async()=>{closeDetail();await tutorialUi('winbtn_close');};
 $('show-grid').onchange=e=>{showGrid=e.target.checked;try{localStorage.setItem('ew4.showGrid',String(showGrid));}catch(_){notice('无法保存设定');}};
-function refreshPerformanceCaption(){
-  let caption=$('performance-caption');
-  if(!caption){caption=document.createElement('small');caption.id='performance-caption';$('turn').after(caption);}
-  const last=[...performanceLog.records].reverse().find(r=>r.kind==='turn'&&r.status==='returned'&&r.build===performanceLog.build);
-  caption.textContent=performanceLog.build+(last?' · '+(last.elapsedMs/1000).toFixed(2)+' s':'');
-}
-$('menu-button').onclick=()=>{mapViews.close();refreshPerformanceCaption();$('pause').hidden=false;pauseObjectives.sync();};
+$('menu-button').onclick=()=>{mapViews.close();$('pause').hidden=false;pauseObjectives.sync();};
 $('resume').onclick=()=>{$('pause').hidden=true;if(!busy)runAi().catch(e=>notice(e.message));};
 $('end-turn').onclick=()=>act('end').catch(e=>notice(e.message));
 $('undo-move').onclick=()=>{if(!selected||!selection?.undo||$('undo-move').disabled)return;return act('undo',{unit:selected.id}).then(()=>tutorialUi('btn_undo')).catch(e=>notice(e.message));};

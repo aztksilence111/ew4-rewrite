@@ -60,15 +60,14 @@ const base=process.argv[2]||'http://127.0.0.1:5510',folder=path.resolve(process.
         await act('end');
         const turn=performanceLog.records.slice(first).find(r=>r.kind==='turn');
         $('menu-button').click();
-        const caption=$('performance-caption'),box=caption.getBoundingClientRect(),parent=caption.parentElement.getBoundingClientRect();
-        const result={turn,caption:caption.textContent,fits:box.left>=parent.left&&box.right<=parent.right+1,world:state.activeFaction,ai:aiRunning};
+        const result={turn,build:performanceLog.build,captionAbsent:!$('performance-caption'),world:state.activeFaction,ai:aiRunning};
         return result;
       });
       check(stateChecks.turn?.status==='returned'&&stateChecks.turn.elapsedMs>0&&!stateChecks.ai,'whole turn automatically timed through control return');
-      check(stateChecks.fits&&stateChecks.caption.includes(performanceLogBuild(entry)),'timing/build caption fits pause');
+      check(stateChecks.captionAbsent&&stateChecks.build===performanceLogBuild(entry),'diagnostic build stays available without a pause caption');
       await page.waitForTimeout(60);
       await page.screenshot({path:path.join(folder,name+'-'+backend+'-pause.png')});
-      check(await page.evaluate(()=>{const caption=$('performance-caption');return caption.scrollWidth<=caption.clientWidth+1;}),'rendered timing caption does not overflow');
+      check(await page.evaluate(()=>!$('performance-caption')),'pause does not insert a timing caption after rendering');
       await page.evaluate(()=>$('resume').click());
       await page.evaluate(()=>{facings.set('obsolete',-1);return showMain();});
       check(await page.evaluate(()=>facings.size===0),'battle-facing cache cleared on exit');

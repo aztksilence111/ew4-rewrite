@@ -52,7 +52,8 @@
       if(custom.length)list.classList.add('extended-chapters');
       for(const chapter of this.catalog.chapters){const placement=layout.children.find(e=>e.attributes.id==='btn_selcamp_'+chapter.id)?.attributes;
         const b=this.api.button('',()=>this.previewChapter(chapter,b),list);b.className='chapter-entry';b.setAttribute('aria-label',chapter.name);
-        if(placement){Object.assign(b.style,{left:placement.x+'px',top:placement.y+'px',width:placement.w+'px',height:placement.h+'px'});b.append(this.api.uiImage(placement.frm1,Number(placement.w),Number(placement.h)));}
+        // Project the marker tip with the map; keep its artwork at the original size.
+        if(placement){Object.assign(b.style,{left:'calc('+((Number(placement.x)+25)/568*100)+'% - 25px)',top:'calc('+((Number(placement.y)+54)/320*100)+'% - 54px)',width:placement.w+'px',height:placement.h+'px'});b.append(this.api.uiImage(placement.frm1,Number(placement.w),Number(placement.h)));}
         else{b.classList.add('custom-chapter');Object.assign(b.style,{left:'356px',top:(14+custom.indexOf(chapter)*48)+'px',width:'185px',height:'40px'});b.append(this.lettering(chapter.name,'font_text_2_cn_hd','#404040',170,'center'));}
         b.title=chapter.name+' '+chapter.start+'–'+chapter.end;
       }
@@ -67,8 +68,8 @@
       const flags=document.createElement('div');flags.className='chapter-preview-flags';for(const country of chapter.countries)flags.append(this.countryFlag(country,26,15));
       popup.append(title,years,flags);const confirm=this.api.button('',()=>{popup.remove();return this.openChapter(chapter);},popup);confirm.className='chapter-preview-confirm';confirm.setAttribute('aria-label','进入 '+chapter.name);confirm.title='进入 '+chapter.name;confirm.append(this.api.uiImage('button_confrim.png',31,31.5));
       // The visible marker tip is (25, 54); its texture includes transparent shadow margins.
-      const targetX=parseFloat(anchor.style.left)+25,targetY=parseFloat(anchor.style.top)+54;
-      const left=Math.max(4,Math.min(425,targetX-69.5));
+      const targetX=anchor.offsetLeft+25,targetY=anchor.offsetTop+54;
+      const left=Math.max(4,Math.min(document.getElementById('scenarios').clientWidth-143,targetX-69.5));
       popup.style.left=left+'px';popup.style.top=Math.max(24,targetY-69.5)+'px';popup.style.setProperty('--chapter-arrow-left',(targetX-left-16.5)+'px');
       document.getElementById('scenarios').append(popup);confirm.focus({preventScroll:true});
     }
