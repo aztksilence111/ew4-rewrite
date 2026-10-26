@@ -1,6 +1,6 @@
 # 现代核心重构
 
-2026-10-24：[0.2.18双端正式下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.18-20261024)，Windows x64 Web 与 Android ARM64 APK code21 包含运输、经济面板、Android 音乐及网格层级修复，继承 0.2.17 更新；远端四附件核验通过，见[发行说明](RELEASE_0.2.18_20261024.md)与[发布记录](RELEASE_PROGRESS_0.2.18_20261024.md)。
+2026-10-26：[0.2.21双端正式下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.21-20261026)，Windows x64 Web 与 Android ARM64 APK code24 包含玩家AI多目标、部队容量、战役科技、东亚调整、启动缓存重建和教程回调修复；远端四附件核验通过，见[发行说明](RELEASE_0.2.21_20261026.md)与[发布记录](RELEASE_PROGRESS_0.2.21_20261026.md)。下方记录为历史阶段，真机验收仍待。
 
 2026-10-23：[运输、经济面板与Android音乐反馈修复](../reverse/R_FEEDBACK_TRANSPORT_ECONOMY_MUSIC_20261023.md)已完成开发验证，并生成本地0.2.17同签名测试APK。海上运输最多两格，经济技能加成进入城市面板，触摸音乐解锁及WebView播放设置修正；核心311034/客户端2693/Mod106和音乐浏览器69项通过。音乐实际出声待真机复测，未发布或更新玩家5191。
 
