@@ -68,6 +68,7 @@ public static class BattleSettlement
         receipts.Add(result.Id, result);
         return session with { BattleResult = result, Account = session.Account with {
             Revision = checked(session.Account.Revision + 1), Medals = checked(session.Account.Medals + award),
+            TechnologyStars = mode == 1 && won ? CampaignTechnologyStars.Award(session.Account, stars, best) : session.Account.TechnologyStars,
             CampaignStars = scores, BattleResults = receipts } };
     }
 }

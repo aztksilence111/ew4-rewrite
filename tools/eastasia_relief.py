@@ -7,8 +7,10 @@ from shapely import transform as transform_geometry
 from shapely.geometry import Point, shape
 
 HIGH_RANGES = {'Himalaya', 'Kunlun', 'Tianshan', 'Altai', 'Qilian', 'Hengduan',
+               'Altyn Tagh', 'Gangdise', 'Nyainqentanglha', 'Tanggula', 'Bayan Har',
                'Minshan Qionglai ranges', 'Daxue range', 'Taiwan central range'}
 LOW_RANGES = {'Dabie range', 'Nanling range', 'Wuyi', 'Arakan range',
+              'Yinshan', 'Helan', 'Liupan', 'Luliang', 'Wushan', 'Wumeng', 'Dalou', 'Xuefeng range',
               'Tenasserim range', 'Sakhalin ranges', 'Taebaek range',
               'Yuecheng range', 'Dupang range', 'Dayao range', 'Jiuwan range',
               'Damingshan', 'Yunkai range', 'Yunwu range', 'Luofu Jiulian ranges',

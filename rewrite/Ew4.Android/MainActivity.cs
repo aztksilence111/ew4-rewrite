@@ -22,6 +22,7 @@ public sealed class MainActivity : Activity
     private SafeInsets? safeInsets;
     private SystemBack? systemBack;
     private AlertDialog? exitDialog;
+    private bool starting;
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
@@ -47,11 +48,12 @@ public sealed class MainActivity : Activity
         byte[] ContentRead(string path) => Read(path.StartsWith("client/", StringComparison.Ordinal) ? "www/content/" + path[7..]
             : path.StartsWith("legacy/", StringComparison.Ordinal) ? "data/" + path[7..]
             : path.StartsWith("frontend/", StringComparison.Ordinal) ? "www/" + path[9..] : path);
-        store = new Lazy<ModStore>(() => new ModStore(new ModBase(ContentRead, Walk("original").Concat(Walk("www/content").Select(p => "client/" + p[12..]))
+        store = new Lazy<ModStore>(() => new ModStore(StartupAssets.Prepare(new ModBase(ContentRead, Walk("original").Concat(Walk("www/content").Select(p => "client/" + p[12..]))
             .Concat(Walk("data").Select(p => "legacy/" + p[5..]))
             .Concat(Walk("rewrite"))
             .Concat(["frontend/conquest-pages.json", "frontend/city-names.json"])),
-            Path.Combine(FilesDir!.AbsolutePath, "content-mods"), Path.Combine(FilesDir.AbsolutePath, "saves")));
+            Path.Combine(FilesDir!.AbsolutePath, "startup-assets")).Content,
+            Path.Combine(FilesDir!.AbsolutePath, "content-mods"), Path.Combine(FilesDir.AbsolutePath, "saves")), LazyThreadSafetyMode.PublicationOnly);
         web = new WebView(this);
         web.Settings.JavaScriptEnabled = true;
         web.Settings.DomStorageEnabled = true;
@@ -72,13 +74,46 @@ public sealed class MainActivity : Activity
         safeInsets = new SafeInsets(this);
         surface.SetOnApplyWindowInsetsListener(safeInsets);
         SetContentView(surface);
+        var loading = new ProgressBar(this) { Indeterminate = true };
+        surface.AddView(loading, new FrameLayout.LayoutParams(64, 64, GravityFlags.Center));
         if (OperatingSystem.IsAndroidVersionAtLeast(33))
         {
             systemBack = new SystemBack(this);
             OnBackInvokedDispatcher.RegisterOnBackInvokedCallback(0, systemBack);
         }
         EnterFullscreen();
-        web.LoadUrl("https://ew4.local/index.html");
+        StartGame(loading);
+    }
+    private void StartGame(ProgressBar loading)
+    {
+        if (starting || store == null) return;
+        starting = true;
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                _ = store.Value;
+                RunOnUiThread(() =>
+                {
+                    if (IsFinishing || IsDestroyed) return;
+                    starting = false;
+                    surface?.RemoveView(loading); loading.Dispose();
+                    web?.LoadUrl("https://ew4.local/index.html");
+                });
+            }
+            catch (Exception error)
+            {
+                RunOnUiThread(() =>
+                {
+                    if (IsFinishing || IsDestroyed) return;
+                    starting = false;
+                    using var dialog = new AlertDialog.Builder(this);
+                    dialog.SetTitle("游戏资源检查失败")!.SetMessage(error.Message)!
+                        .SetPositiveButton("重试", (_, _) => StartGame(loading))!
+                        .SetNegativeButton("退出", (_, _) => Finish())!.SetCancelable(false)!.Show();
+                });
+            }
+        });
     }
     private void EnterFullscreen()
     {

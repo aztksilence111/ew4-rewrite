@@ -18,17 +18,21 @@
       const state=this.api.state();if(!state||document.getElementById('pause').hidden)return;
       const context=state.battleId+'/'+state.playerFaction;
       if(this.context!==context){this.reset();this.context=context;}
+      if(this.snapshot){this.fit();this.api.ready?.(this.snapshot);}
       const serial=++this.serial;
       try{
         const data=await this.api.rpc('pause-objectives',{knownVersion:this.version});
         if(serial!==this.serial||document.getElementById('pause').hidden||this.api.state()?.battleId+'/'+this.api.state()?.playerFaction!==context)return;
-        if(data.context!==context||data.revision!==this.api.state().revision)return this.sync();
-        if(data.version===this.version){this.fit();return;}
+        if(data.context!==context)return;
+        // An in-flight action may be committed on the host before its response reaches the map.
+        if(data.revision!==this.api.state().revision&&this.snapshot)return;
+        if(data.version===this.version){this.fit();this.api.ready?.(this.snapshot);return;}
         const snapshot=data.snapshot;if(!snapshot)return;
         const text=JSON.stringify(snapshot);await root.Ew4OriginalUI.prepareText(text);
-        if(serial!==this.serial||document.getElementById('pause').hidden||data.revision!==this.api.state()?.revision)return;
-        this.version=data.version;this.snapshot=snapshot;this.refreshes++;this.render(snapshot);
-      }catch(error){if(serial===this.serial){this.api.notice(error.message);this.element.hidden=true;document.getElementById('pause').classList.remove('pause-objectives-active');}}
+        if(serial!==this.serial||document.getElementById('pause').hidden)return;
+        this.version=data.revision===this.api.state()?.revision?data.version:null;
+        this.snapshot=snapshot;this.refreshes++;this.render(snapshot);
+      }catch(error){if(serial===this.serial){this.api.notice(error.message);this.element.hidden=true;document.getElementById('pause').classList.remove('pause-objectives-active');this.api.ready?.(null);}}
     }
     write(el,text){if(el.textContent!==String(text??''))el.textContent=text??'';}
     render(snapshot){
@@ -63,7 +67,7 @@
         const signature=JSON.stringify([rating,p.starImage,p.emptyStarImage]);if(entry.signature!==signature){this.rowUpdates++;entry.signature=signature;entry.el.classList.toggle('expired',!rating.available);entry.stars.replaceChildren(...Array.from({length:5},(_,i)=>this.api.image(i<rating.stars?p.starImage:p.emptyStarImage)));entry.stars.setAttribute('aria-label',rating.stars+'星');this.write(entry.range,rating.start===1&&rating.end!==null?'第 '+rating.end+' 回合及以前':rating.end===null?'第 '+rating.start+' 回合起':rating.start===rating.end?'第 '+rating.start+' 回合':'第 '+rating.start+'–'+rating.end+' 回合');this.write(entry.status,rating.available?'可达成':'已不可达');}
       }
       for(const [stars,entry] of this.ratings)if(!ratingUsed.has(stars)){entry.el.remove();this.ratings.delete(stars);}
-      this.fit();this.scroll.scrollTop=scrollTop;
+      this.fit();this.scroll.scrollTop=scrollTop;this.api.ready?.(snapshot);
     }
     fit(){
       if(!this.snapshot||this.element.hidden)return;
@@ -79,7 +83,8 @@
         this.element.style.height=Math.min(p.maxHeight,height-40)+'px';
         this.element.style.top=height/2+'px';this.element.style.transform='translateY(-50%)';this.element.style.setProperty('--objective-slide-y','-50%');
       }else{
-        this.element.style.width=Math.min(p.width,width-18)+'px';
+        const expanded=document.getElementById('pause').classList.contains('ai-compact')&&document.getElementById('pause').classList.contains('ai-sidebar-expanded');
+        this.element.style.width=Math.min(p.width,expanded?width/2-16:width-18)+'px';
         this.element.style.top='12px';this.element.style.height=Math.max(0,menuRect.top-24)+'px';this.element.style.transform='none';this.element.style.setProperty('--objective-slide-y','0px');
       }
     }

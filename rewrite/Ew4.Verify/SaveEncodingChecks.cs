@@ -12,6 +12,8 @@ internal static class SaveEncodingChecks
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         TypeInfoResolver = new System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver {
             Modifiers = { info => {
+                if (info.Type == typeof(WorldState))
+                    info.Properties.Single(p => p.Name == "armyCapacity").ShouldSerialize = (_, value) => value != null;
                 if (info.Type == typeof(MovementCell)) {
                     info.Properties.Single(p => p.Name == "barrier").ShouldSerialize = (_, value) => (TerrainBarrier)value! != TerrainBarrier.None;
                     info.Properties.Single(p => p.Name == "minimumEntryCost").ShouldSerialize = (_, value) => (int)value! != 0;

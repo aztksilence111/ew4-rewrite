@@ -20,7 +20,9 @@
     "city_id": 10000,
     "building_level": 2,
     "visual_land_patch": true,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "那霸",
@@ -43,7 +45,9 @@
     "city_id": 10001,
     "building_level": 2,
     "visual_land_patch": true,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "马公",
@@ -66,7 +70,9 @@
     "city_id": 10002,
     "building_level": 1,
     "visual_land_patch": true,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "香港",
@@ -89,7 +95,9 @@
     "city_id": 10003,
     "building_level": 4,
     "visual_land_patch": true,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "泉州",
@@ -112,7 +120,9 @@
     "city_id": 10004,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "大连",
@@ -135,7 +145,9 @@
     "city_id": 10005,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "澳门",
@@ -158,7 +170,9 @@
     "city_id": 10006,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "基隆",
@@ -181,7 +195,9 @@
     "city_id": 10007,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "长崎",
@@ -204,7 +220,9 @@
     "city_id": 10008,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "汕头",
@@ -227,7 +245,9 @@
     "city_id": 10009,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "台北",
@@ -250,7 +270,9 @@
     "city_id": 10010,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "高雄",
@@ -273,7 +295,9 @@
     "city_id": 10011,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "拉瓦格",
@@ -296,7 +320,9 @@
     "city_id": 10012,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "崖县",
@@ -319,7 +345,9 @@
     "city_id": 10013,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "海州",
@@ -343,7 +371,9 @@
     "building_level": 2,
     "visual_land_patch": false,
     "building_style": 2,
-    "source_name": "海州(朝鲜)"
+    "source_name": "海州(朝鲜)",
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "木浦",
@@ -366,7 +396,9 @@
     "city_id": 10015,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "阿帕里",
@@ -389,7 +421,9 @@
     "city_id": 10016,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "佐世保",
@@ -412,7 +446,9 @@
     "city_id": 10017,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "亚历山德罗夫斯克",
@@ -435,7 +471,9 @@
     "city_id": 10018,
     "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "台南",
@@ -458,7 +496,9 @@
     "city_id": 10019,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "烟台",
@@ -481,7 +521,9 @@
     "city_id": 10020,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "符拉迪沃斯托克",
@@ -504,7 +546,9 @@
     "city_id": 10021,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "釜山",
@@ -527,7 +571,9 @@
     "city_id": 10022,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "厦门",
@@ -550,7 +596,9 @@
     "city_id": 10023,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "青岛",
@@ -571,9 +619,12 @@
     "displacement_km": 34.95,
     "generalized_land": false,
     "city_id": 10024,
-    "building_level": 4,
+    "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "industry",
+    "building_kind": 1,
+    "building_reason": "区域工业、矿冶或兵工节点；替代普通城市并回收重复匿名工厂"
   },
   {
     "name": "仙台",
@@ -596,7 +647,9 @@
     "city_id": 10025,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "福冈",
@@ -619,7 +672,9 @@
     "city_id": 10026,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "上海",
@@ -642,7 +697,9 @@
     "city_id": 10027,
     "building_level": 7,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "宁波",
@@ -665,7 +722,9 @@
     "city_id": 10028,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "丰原",
@@ -688,7 +747,9 @@
     "city_id": 10029,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "维沙卡帕特南",
@@ -711,7 +772,9 @@
     "city_id": 10030,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "文昌",
@@ -734,7 +797,9 @@
     "city_id": 10031,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "鹿儿岛",
@@ -757,7 +822,9 @@
     "city_id": 10032,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "函馆",
@@ -780,7 +847,9 @@
     "city_id": 10033,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "山海关",
@@ -803,7 +872,9 @@
     "city_id": 10034,
     "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "海防",
@@ -826,7 +897,9 @@
     "city_id": 10035,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "海口",
@@ -849,7 +922,9 @@
     "city_id": 10036,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "温州",
@@ -872,7 +947,9 @@
     "city_id": 10037,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "琼海",
@@ -895,7 +972,9 @@
     "city_id": 10038,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "南浦",
@@ -918,7 +997,9 @@
     "city_id": 10039,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "江门",
@@ -941,7 +1022,9 @@
     "city_id": 10040,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "淮阴",
@@ -964,7 +1047,9 @@
     "city_id": 10041,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "广州湾",
@@ -987,7 +1072,9 @@
     "city_id": 10042,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "广岛",
@@ -1010,7 +1097,9 @@
     "city_id": 10043,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "清津",
@@ -1033,7 +1122,9 @@
     "city_id": 10044,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "花莲",
@@ -1056,7 +1147,9 @@
     "city_id": 10045,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "锦州",
@@ -1079,7 +1172,9 @@
     "city_id": 10046,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "元山",
@@ -1102,7 +1197,9 @@
     "city_id": 10047,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "九江",
@@ -1125,7 +1222,9 @@
     "city_id": 10048,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "大阪",
@@ -1148,7 +1247,9 @@
     "city_id": 10049,
     "building_level": 7,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "东京",
@@ -1171,7 +1272,9 @@
     "city_id": 10050,
     "building_level": 7,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "赤塔",
@@ -1194,7 +1297,9 @@
     "city_id": 10051,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "天水",
@@ -1217,7 +1322,9 @@
     "city_id": 10052,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "苏州",
@@ -1240,7 +1347,9 @@
     "city_id": 10053,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "归绥",
@@ -1263,7 +1372,9 @@
     "city_id": 10054,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "安庆",
@@ -1286,7 +1397,9 @@
     "city_id": 10055,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "襄阳",
@@ -1307,9 +1420,12 @@
     "displacement_km": 19.91,
     "generalized_land": false,
     "city_id": 10056,
-    "building_level": 3,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "天津",
@@ -1332,7 +1448,9 @@
     "city_id": 10057,
     "building_level": 6,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "福州",
@@ -1355,7 +1473,9 @@
     "city_id": 10058,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "札幌",
@@ -1378,7 +1498,9 @@
     "city_id": 10059,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "沈阳",
@@ -1402,7 +1524,9 @@
     "building_level": 4,
     "visual_land_patch": false,
     "building_style": 2,
-    "source_name": "沈阳/奉天"
+    "source_name": "沈阳/奉天",
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "台中",
@@ -1423,9 +1547,12 @@
     "displacement_km": 20.33,
     "generalized_land": false,
     "city_id": 10061,
-    "building_level": 3,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "成都",
@@ -1448,7 +1575,9 @@
     "city_id": 10062,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "名古屋",
@@ -1471,7 +1600,9 @@
     "city_id": 10063,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "杭州",
@@ -1494,7 +1625,9 @@
     "city_id": 10064,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "循化",
@@ -1517,7 +1650,9 @@
     "city_id": 10065,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "龙岩",
@@ -1540,7 +1675,9 @@
     "city_id": 10066,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "南充",
@@ -1563,7 +1700,9 @@
     "city_id": 10067,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "吴忠",
@@ -1586,7 +1725,9 @@
     "city_id": 10068,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "雅安",
@@ -1609,7 +1750,9 @@
     "city_id": 10069,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "青森",
@@ -1632,7 +1775,9 @@
     "city_id": 10070,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "咸兴",
@@ -1655,7 +1800,9 @@
     "city_id": 10071,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "仁川",
@@ -1678,7 +1825,9 @@
     "city_id": 10072,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "乐都",
@@ -1701,7 +1850,9 @@
     "city_id": 10073,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "科布多",
@@ -1724,7 +1875,9 @@
     "city_id": 10074,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "老街",
@@ -1747,7 +1900,9 @@
     "city_id": 10075,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "曲靖",
@@ -1770,7 +1925,9 @@
     "city_id": 10076,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "大理",
@@ -1791,9 +1948,12 @@
     "displacement_km": 21.34,
     "generalized_land": false,
     "city_id": 10077,
-    "building_level": 3,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "开封",
@@ -1816,7 +1976,9 @@
     "city_id": 10078,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "遵义",
@@ -1837,9 +1999,12 @@
     "displacement_km": 8.78,
     "generalized_land": false,
     "city_id": 10079,
-    "building_level": 3,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "industry",
+    "building_kind": 1,
+    "building_reason": "区域工业、矿冶或兵工节点；替代普通城市并回收重复匿名工厂"
   },
   {
     "name": "贵阳",
@@ -1862,7 +2027,9 @@
     "city_id": 10080,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "布拉戈维申斯克",
@@ -1885,7 +2052,9 @@
     "city_id": 10081,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "南京",
@@ -1908,7 +2077,9 @@
     "city_id": 10082,
     "building_level": 6,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "清迈",
@@ -1931,7 +2102,9 @@
     "city_id": 10083,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "北京",
@@ -1955,7 +2128,9 @@
     "building_level": 6,
     "visual_land_patch": false,
     "building_style": 2,
-    "source_name": "北京/北平"
+    "source_name": "北京/北平",
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "吉林",
@@ -1978,7 +2153,9 @@
     "city_id": 10085,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "合肥",
@@ -2001,7 +2178,9 @@
     "city_id": 10086,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "昆明",
@@ -2024,7 +2203,9 @@
     "city_id": 10087,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "京城",
@@ -2047,7 +2228,9 @@
     "city_id": 10088,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "长沙",
@@ -2070,7 +2253,9 @@
     "city_id": 10089,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "平壤",
@@ -2093,7 +2278,9 @@
     "city_id": 10090,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "仰光",
@@ -2116,7 +2303,9 @@
     "city_id": 10091,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "南宁",
@@ -2139,7 +2328,9 @@
     "city_id": 10092,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "迪化",
@@ -2162,7 +2353,9 @@
     "city_id": 10093,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "太原",
@@ -2185,7 +2378,9 @@
     "city_id": 10094,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "新西伯利亚",
@@ -2208,7 +2403,9 @@
     "city_id": 10095,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "南阳",
@@ -2229,9 +2426,12 @@
     "displacement_km": 18.77,
     "generalized_land": false,
     "city_id": 10096,
-    "building_level": 3,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "西宁",
@@ -2254,7 +2454,9 @@
     "city_id": 10097,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "济南",
@@ -2277,7 +2479,9 @@
     "city_id": 10098,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "宜昌",
@@ -2300,7 +2504,9 @@
     "city_id": 10099,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "日喀则",
@@ -2323,7 +2529,9 @@
     "city_id": 10100,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "加尔各答",
@@ -2346,7 +2554,9 @@
     "city_id": 10101,
     "building_level": 6,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "包头",
@@ -2367,9 +2577,12 @@
     "displacement_km": 10.96,
     "generalized_land": false,
     "city_id": 10102,
-    "building_level": 3,
+    "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "industry",
+    "building_kind": 1,
+    "building_reason": "区域工业、矿冶或兵工节点；替代普通城市并回收重复匿名工厂"
   },
   {
     "name": "洛阳",
@@ -2392,7 +2605,9 @@
     "city_id": 10103,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "徐州",
@@ -2413,9 +2628,12 @@
     "displacement_km": 6.78,
     "generalized_land": false,
     "city_id": 10104,
-    "building_level": 3,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "银川",
@@ -2438,7 +2656,9 @@
     "city_id": 10105,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "勒克瑙",
@@ -2461,7 +2681,9 @@
     "city_id": 10106,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "广州",
@@ -2484,7 +2706,9 @@
     "city_id": 10107,
     "building_level": 6,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "克拉斯诺亚尔斯克",
@@ -2507,7 +2731,9 @@
     "city_id": 10108,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "武汉",
@@ -2530,7 +2756,9 @@
     "city_id": 10109,
     "building_level": 6,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "大同",
@@ -2551,9 +2779,12 @@
     "displacement_km": 11.9,
     "generalized_land": false,
     "city_id": 10110,
-    "building_level": 3,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "康定",
@@ -2576,7 +2807,9 @@
     "city_id": 10111,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "重庆",
@@ -2599,7 +2832,9 @@
     "city_id": 10112,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "伊尔库茨克",
@@ -2622,7 +2857,9 @@
     "city_id": 10113,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "喀什",
@@ -2645,7 +2882,9 @@
     "city_id": 10114,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "密支那",
@@ -2668,7 +2907,9 @@
     "city_id": 10115,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "芜湖",
@@ -2691,7 +2932,9 @@
     "city_id": 10116,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "常德",
@@ -2714,7 +2957,9 @@
     "city_id": 10117,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "郑州",
@@ -2737,7 +2982,9 @@
     "city_id": 10118,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "光州",
@@ -2760,7 +3007,9 @@
     "city_id": 10119,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "集宁",
@@ -2783,7 +3032,9 @@
     "city_id": 10120,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "安阳",
@@ -2806,7 +3057,9 @@
     "city_id": 10121,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "高州",
@@ -2827,9 +3080,12 @@
     "displacement_km": 12.5,
     "generalized_land": false,
     "city_id": 10122,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "理塘",
@@ -2852,7 +3108,9 @@
     "city_id": 10123,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "大邱",
@@ -2875,7 +3133,9 @@
     "city_id": 10124,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "乌苏里斯克",
@@ -2898,7 +3158,9 @@
     "city_id": 10125,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "那曲",
@@ -2919,9 +3181,12 @@
     "displacement_km": 9.07,
     "generalized_land": false,
     "city_id": 10126,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "通化",
@@ -2944,7 +3209,9 @@
     "city_id": 10127,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "安东",
@@ -2967,7 +3234,9 @@
     "city_id": 10128,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "忻县",
@@ -2990,7 +3259,9 @@
     "city_id": 10129,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "岳阳",
@@ -3013,7 +3284,9 @@
     "city_id": 10130,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "万象",
@@ -3036,7 +3309,9 @@
     "city_id": 10131,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "芷江",
@@ -3057,9 +3332,12 @@
     "displacement_km": 6.66,
     "generalized_land": false,
     "city_id": 10132,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "张北",
@@ -3080,9 +3358,12 @@
     "displacement_km": 19.24,
     "generalized_land": false,
     "city_id": 10133,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "恰克图",
@@ -3105,7 +3386,9 @@
     "city_id": 10134,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "八莫",
@@ -3128,7 +3411,9 @@
     "city_id": 10135,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "唐山",
@@ -3149,9 +3434,12 @@
     "displacement_km": 13.73,
     "generalized_land": false,
     "city_id": 10136,
-    "building_level": 3,
+    "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "industry",
+    "building_kind": 1,
+    "building_reason": "区域工业、矿冶或兵工节点；替代普通城市并回收重复匿名工厂"
   },
   {
     "name": "五原",
@@ -3174,7 +3462,10 @@
     "city_id": 10137,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "酒泉",
@@ -3197,7 +3488,9 @@
     "city_id": 10138,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "济宁",
@@ -3220,7 +3513,9 @@
     "city_id": 10139,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "黑河",
@@ -3243,7 +3538,9 @@
     "city_id": 10140,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "多伦",
@@ -3266,7 +3563,9 @@
     "city_id": 10141,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "白城",
@@ -3287,9 +3586,12 @@
     "displacement_km": 7.48,
     "generalized_land": false,
     "city_id": 10142,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "乔巴山",
@@ -3312,7 +3614,9 @@
     "city_id": 10143,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "弗龙泽",
@@ -3335,7 +3639,9 @@
     "city_id": 10144,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "惠州",
@@ -3358,7 +3664,9 @@
     "city_id": 10145,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "毕节",
@@ -3381,7 +3689,9 @@
     "city_id": 10146,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "商丘",
@@ -3404,7 +3714,9 @@
     "city_id": 10147,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "谅山",
@@ -3427,7 +3739,9 @@
     "city_id": 10148,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "佳木斯",
@@ -3450,7 +3764,9 @@
     "city_id": 10149,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "儋县",
@@ -3471,9 +3787,12 @@
     "displacement_km": 13.92,
     "generalized_land": false,
     "city_id": 10150,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "信阳",
@@ -3496,7 +3815,9 @@
     "city_id": 10151,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "临河",
@@ -3519,7 +3840,9 @@
     "city_id": 10152,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "屯溪",
@@ -3542,7 +3865,9 @@
     "city_id": 10153,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "新义州",
@@ -3565,7 +3890,9 @@
     "city_id": 10154,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "宝鸡",
@@ -3588,7 +3915,9 @@
     "city_id": 10155,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "海拉尔",
@@ -3611,7 +3940,9 @@
     "city_id": 10156,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "恩施",
@@ -3634,7 +3965,9 @@
     "city_id": 10157,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "平凉",
@@ -3655,9 +3988,12 @@
     "displacement_km": 11.89,
     "generalized_land": false,
     "city_id": 10158,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "塞米巴拉金斯克",
@@ -3680,7 +4016,9 @@
     "city_id": 10159,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "铁岭",
@@ -3703,7 +4041,9 @@
     "city_id": 10160,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "贵德",
@@ -3726,7 +4066,9 @@
     "city_id": 10161,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "和田",
@@ -3749,7 +4091,9 @@
     "city_id": 10162,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "因帕尔",
@@ -3772,7 +4116,9 @@
     "city_id": 10163,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "中卫",
@@ -3793,9 +4139,12 @@
     "displacement_km": 19.93,
     "generalized_land": false,
     "city_id": 10164,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "琅勃拉邦",
@@ -3818,7 +4167,9 @@
     "city_id": 10165,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "玉树",
@@ -3839,9 +4190,12 @@
     "displacement_km": 19.12,
     "generalized_land": false,
     "city_id": 10166,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "清莱",
@@ -3864,7 +4218,9 @@
     "city_id": 10167,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "思茅",
@@ -3887,7 +4243,9 @@
     "city_id": 10168,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "朝阳",
@@ -3908,9 +4266,12 @@
     "displacement_km": 19.02,
     "generalized_land": false,
     "city_id": 10169,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "泸州",
@@ -3933,7 +4294,9 @@
     "city_id": 10170,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "衢州",
@@ -3954,9 +4317,12 @@
     "displacement_km": 6.87,
     "generalized_land": false,
     "city_id": 10171,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "上饶",
@@ -3979,7 +4345,9 @@
     "city_id": 10172,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "阿克苏",
@@ -4002,7 +4370,9 @@
     "city_id": 10173,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "满洲里",
@@ -4025,7 +4395,9 @@
     "city_id": 10174,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "梧州",
@@ -4048,7 +4420,9 @@
     "city_id": 10175,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "海州",
@@ -4071,7 +4445,9 @@
     "city_id": 10176,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "扬州",
@@ -4094,7 +4470,9 @@
     "city_id": 10177,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "营口",
@@ -4117,7 +4495,9 @@
     "city_id": 10178,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "临夏",
@@ -4140,7 +4520,9 @@
     "city_id": 10179,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "荆州",
@@ -4163,7 +4545,9 @@
     "city_id": 10180,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "潼关",
@@ -4186,7 +4570,9 @@
     "city_id": 10181,
     "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "瑞金",
@@ -4209,7 +4595,9 @@
     "city_id": 10182,
     "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "噶大克",
@@ -4232,7 +4620,9 @@
     "city_id": 10183,
     "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "独山",
@@ -4255,7 +4645,9 @@
     "city_id": 10184,
     "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "麻城",
@@ -4278,7 +4670,9 @@
     "city_id": 10185,
     "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "德里",
@@ -4301,7 +4695,9 @@
     "city_id": 10186,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "库伦",
@@ -4324,7 +4720,9 @@
     "city_id": 10187,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "哈巴罗夫斯克",
@@ -4347,7 +4745,9 @@
     "city_id": 10188,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "南昌",
@@ -4370,7 +4770,9 @@
     "city_id": 10189,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "齐齐哈尔",
@@ -4393,7 +4795,9 @@
     "city_id": 10190,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "赣州",
@@ -4416,7 +4820,9 @@
     "city_id": 10191,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "哈尔滨",
@@ -4439,7 +4845,9 @@
     "city_id": 10192,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "张家口",
@@ -4462,7 +4870,9 @@
     "city_id": 10193,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "阿拉木图",
@@ -4485,7 +4895,9 @@
     "city_id": 10194,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "长治",
@@ -4508,7 +4920,9 @@
     "city_id": 10195,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "石家庄",
@@ -4531,7 +4945,9 @@
     "city_id": 10196,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "河内",
@@ -4554,7 +4970,9 @@
     "city_id": 10197,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "西安",
@@ -4577,7 +4995,9 @@
     "city_id": 10198,
     "building_level": 4,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "曼德勒",
@@ -4600,7 +5020,9 @@
     "city_id": 10199,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "延安",
@@ -4623,7 +5045,9 @@
     "city_id": 10200,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "兰州",
@@ -4646,7 +5070,9 @@
     "city_id": 10201,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "保定",
@@ -4669,7 +5095,9 @@
     "city_id": 10202,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "西昌",
@@ -4690,9 +5118,12 @@
     "displacement_km": 16.61,
     "generalized_land": false,
     "city_id": 10203,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "乌兰乌德",
@@ -4715,7 +5146,9 @@
     "city_id": 10204,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "拉萨",
@@ -4738,7 +5171,9 @@
     "city_id": 10205,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "韶关",
@@ -4761,7 +5196,9 @@
     "city_id": 10206,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "桂林",
@@ -4784,7 +5221,9 @@
     "city_id": 10207,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "衡阳",
@@ -4805,9 +5244,12 @@
     "displacement_km": 16.32,
     "generalized_land": false,
     "city_id": 10208,
-    "building_level": 3,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "industry",
+    "building_kind": 1,
+    "building_reason": "区域工业、矿冶或兵工节点；替代普通城市并回收重复匿名工厂"
   },
   {
     "name": "伊宁",
@@ -4828,9 +5270,12 @@
     "displacement_km": 14.39,
     "generalized_land": false,
     "city_id": 10209,
-    "building_level": 3,
+    "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "赤峰",
@@ -4853,7 +5298,9 @@
     "city_id": 10210,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "长春",
@@ -4877,7 +5324,9 @@
     "building_level": 4,
     "visual_land_patch": false,
     "building_style": 2,
-    "source_name": "长春/新京"
+    "source_name": "长春/新京",
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "柳州",
@@ -4898,9 +5347,12 @@
     "displacement_km": 19.04,
     "generalized_land": false,
     "city_id": 10212,
-    "building_level": 3,
+    "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "industry",
+    "building_kind": 1,
+    "building_reason": "区域工业、矿冶或兵工节点；替代普通城市并回收重复匿名工厂"
   },
   {
     "name": "彭世洛",
@@ -4923,7 +5375,9 @@
     "city_id": 10213,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "昭通",
@@ -4946,7 +5400,9 @@
     "city_id": 10214,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "万县",
@@ -4969,7 +5425,9 @@
     "city_id": 10215,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "那格浦尔",
@@ -4992,7 +5450,9 @@
     "city_id": 10216,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "阿穆尔共青城",
@@ -5015,7 +5475,9 @@
     "city_id": 10217,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "哈密",
@@ -5038,7 +5500,9 @@
     "city_id": 10218,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "张掖",
@@ -5061,7 +5525,9 @@
     "city_id": 10219,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "镇远",
@@ -5082,9 +5548,12 @@
     "displacement_km": 19.27,
     "generalized_land": false,
     "city_id": 10220,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "运城",
@@ -5107,7 +5576,9 @@
     "city_id": 10221,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "腊戍",
@@ -5130,7 +5601,9 @@
     "city_id": 10222,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "昌都",
@@ -5153,7 +5626,9 @@
     "city_id": 10223,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "广元",
@@ -5176,7 +5651,9 @@
     "city_id": 10224,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "郴州",
@@ -5199,7 +5676,9 @@
     "city_id": 10225,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "安顺",
@@ -5222,7 +5701,9 @@
     "city_id": 10226,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "廊开",
@@ -5245,7 +5726,9 @@
     "city_id": 10227,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "围场",
@@ -5268,7 +5751,9 @@
     "city_id": 10228,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "牡丹江",
@@ -5291,7 +5776,9 @@
     "city_id": 10229,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "延吉",
@@ -5314,7 +5801,9 @@
     "city_id": 10230,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "腾冲",
@@ -5337,7 +5826,9 @@
     "city_id": 10231,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "巴塘",
@@ -5360,7 +5851,9 @@
     "city_id": 10232,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "德格",
@@ -5383,7 +5876,9 @@
     "city_id": 10233,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "金华",
@@ -5406,7 +5901,9 @@
     "city_id": 10234,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "江孜",
@@ -5429,7 +5926,9 @@
     "city_id": 10235,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "吉安",
@@ -5450,9 +5949,12 @@
     "displacement_km": 20.16,
     "generalized_land": false,
     "city_id": 10236,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "临沂",
@@ -5475,7 +5977,9 @@
     "city_id": 10237,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "临汾",
@@ -5498,7 +6002,9 @@
     "city_id": 10238,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "榆林",
@@ -5519,9 +6025,12 @@
     "displacement_km": 20.09,
     "generalized_land": false,
     "city_id": 10239,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "南平",
@@ -5542,9 +6051,12 @@
     "displacement_km": 17.65,
     "generalized_land": false,
     "city_id": 10240,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "沽源",
@@ -5567,7 +6079,9 @@
     "city_id": 10241,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "大田",
@@ -5590,7 +6104,9 @@
     "city_id": 10242,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "阜阳",
@@ -5611,9 +6127,12 @@
     "displacement_km": 15.92,
     "generalized_land": false,
     "city_id": 10243,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "巴特那",
@@ -5636,7 +6155,9 @@
     "city_id": 10244,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "通辽",
@@ -5659,7 +6180,9 @@
     "city_id": 10245,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "宜宾",
@@ -5680,9 +6203,12 @@
     "displacement_km": 13.43,
     "generalized_land": false,
     "city_id": 10246,
-    "building_level": 3,
+    "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "industry",
+    "building_kind": 1,
+    "building_reason": "区域工业、矿冶或兵工节点；替代普通城市并回收重复匿名工厂"
   },
   {
     "name": "德州",
@@ -5703,9 +6229,12 @@
     "displacement_km": 14.92,
     "generalized_land": false,
     "city_id": 10247,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "克孜勒",
@@ -5728,7 +6257,9 @@
     "city_id": 10248,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "固原",
@@ -5751,7 +6282,9 @@
     "city_id": 10249,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "塔城",
@@ -5774,7 +6307,9 @@
     "city_id": 10250,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "四平",
@@ -5797,7 +6332,9 @@
     "city_id": 10251,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "百色",
@@ -5818,9 +6355,12 @@
     "displacement_km": 12.25,
     "generalized_land": false,
     "city_id": 10252,
-    "building_level": 2,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "stable",
+    "building_kind": 2,
+    "building_reason": "军马、地方骑兵及驮运补给节点；一级南方节点表示游戏补给能力，不表示大型历史牧场"
   },
   {
     "name": "乌里雅苏台",
@@ -5843,7 +6383,9 @@
     "city_id": 10253,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "蒙自",
@@ -5866,7 +6408,9 @@
     "city_id": 10254,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "蚌埠",
@@ -5887,9 +6431,12 @@
     "displacement_km": 14.75,
     "generalized_land": false,
     "city_id": 10255,
-    "building_level": 3,
+    "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "industry",
+    "building_kind": 1,
+    "building_reason": "区域工业、矿冶或兵工节点；替代普通城市并回收重复匿名工厂"
   },
   {
     "name": "古瓦哈提",
@@ -5912,7 +6459,9 @@
     "city_id": 10256,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "盐池",
@@ -5935,7 +6484,9 @@
     "city_id": 10257,
     "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "长汀",
@@ -5958,7 +6509,9 @@
     "city_id": 10258,
     "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "林西",
@@ -5981,7 +6534,9 @@
     "city_id": 10259,
     "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "龙州",
@@ -6004,7 +6559,9 @@
     "city_id": 10260,
     "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "蔚县",
@@ -6027,7 +6584,9 @@
     "city_id": 10261,
     "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "东胜",
@@ -6050,7 +6609,9 @@
     "city_id": 10262,
     "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "承德",
@@ -6073,7 +6634,9 @@
     "city_id": 10263,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "汉中",
@@ -6096,7 +6659,9 @@
     "city_id": 10264,
     "building_level": 3,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "肇庆",
@@ -6119,7 +6684,9 @@
     "city_id": 10265,
     "building_level": 2,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "莱多",
@@ -6142,7 +6709,9 @@
     "city_id": 10266,
     "building_level": 1,
     "visual_land_patch": false,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "济州",
@@ -6166,7 +6735,9 @@
     "addition": true,
     "visual_land_patch": false,
     "building_level": 1,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "顺化",
@@ -6190,7 +6761,9 @@
     "addition": true,
     "visual_land_patch": false,
     "building_level": 2,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "岘港",
@@ -6214,7 +6787,9 @@
     "addition": true,
     "visual_land_patch": false,
     "building_level": 2,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "日土",
@@ -6238,7 +6813,9 @@
     "addition": true,
     "visual_land_patch": false,
     "building_level": 1,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "改则",
@@ -6262,7 +6839,9 @@
     "addition": true,
     "visual_land_patch": false,
     "building_level": 1,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "尼玛",
@@ -6286,7 +6865,9 @@
     "addition": true,
     "visual_land_patch": false,
     "building_level": 1,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "曲麻莱",
@@ -6310,7 +6891,9 @@
     "addition": true,
     "visual_land_patch": false,
     "building_level": 1,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "若羌",
@@ -6334,7 +6917,9 @@
     "addition": true,
     "visual_land_patch": false,
     "building_level": 1,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "塔什库尔干",
@@ -6358,7 +6943,9 @@
     "addition": true,
     "visual_land_patch": false,
     "building_level": 1,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "河静",
@@ -6382,7 +6969,9 @@
     "addition": true,
     "visual_land_patch": false,
     "building_level": 2,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "萨尔哈德",
@@ -6406,7 +6995,9 @@
     "addition": true,
     "visual_land_patch": false,
     "building_level": 1,
-    "building_style": 2
+    "building_style": 2,
+    "kind": "city",
+    "building_kind": 0
   },
   {
     "name": "高知",
@@ -6430,6 +7021,34 @@
     "addition": true,
     "building_level": 2,
     "building_style": 2,
-    "visual_land_patch": false
+    "visual_land_patch": false,
+    "kind": "city",
+    "building_kind": 0
+  },
+  {
+    "name": "马格达加奇",
+    "lon": 125.8,
+    "lat": 53.45,
+    "tier": 3,
+    "group": "俄国远东",
+    "reason": "1910年前后形成的铁路节点，补充外兴安岭南侧、布拉戈维申斯克以北的辖区中心",
+    "id": "city-f5c7a1f97e30",
+    "city_id": 10279,
+    "x": 3347.389,
+    "y": 419.0,
+    "cell": 2633,
+    "col": 105,
+    "row": 16,
+    "world_pixel": [
+      6720,
+      846
+    ],
+    "generalized_land": false,
+    "displacement_km": 17.49,
+    "addition": true,
+    "building_level": 1,
+    "kind": "city",
+    "building_kind": 0,
+    "building_style": 2
   }
 ]

@@ -55,6 +55,54 @@ internal static class WorldTurnChecks
         var moved = WorldActions.Move(restored, restored.Revision, "new", 6).State;
         Check(moved.Units.Single(u => u.Id == "new").Cell == 6 && !moved.Units.Single(u => u.Id == "new").Acted, "recruit-end-refresh-save-move workflow");
 
+        foreach (bool human in new[] { false, true })
+        foreach (var sample in new[] { (100L, 0, 0), (99L, 1, 0), (75L, 1, 0),
+            (74L, 2, -1), (50L, 2, -1), (49L, 3, -2), (25L, 3, -2), (24L, 4, -3), (0L, 4, -3) })
+        {
+            var supplyRules = rules with { Buildings = [new("city", 1, new(0, 0, 0))] };
+            var supply = initial with
+            {
+                Round = 2,
+                Factions = initial.Factions.Select(f => f.Id == player.Owner
+                    ? f with { Human = human, Resources = new(100, 100, sample.Item1), Shortage = 0 } : f).ToArray(),
+                Units = [enemy, player with { Morale = new(), Combatant = player.Combatant with { Morale = 0 },
+                    Support = new() { FoodConsumption = 100 } }]
+            };
+            var hungry = WorldTurns.EndTurn(supply, supply.Revision, supplyRules).State;
+            var hungryFaction = hungry.Factions.Single(f => f.Id == player.Owner);
+            var hungryUnit = hungry.Units.Single(u => u.Id == player.Id);
+            Check(hungryFaction.Shortage == sample.Item2 && hungryFaction.Resources.Food == 0,
+                "actual turn entry calculates all shortage boundaries for human and AI factions");
+            Check(hungryUnit.Morale.Effective == sample.Item3 && hungryUnit.Combatant.Morale == sample.Item3,
+                "shortage reaches both unit and combat morale in the same incoming turn");
+            var savedHungry = WorldSave.Decode(WorldSave.Encode(hungry), hungry.ContentRevision);
+            Check(savedHungry.Factions.Single(f => f.Id == player.Owner).Shortage == sample.Item2
+                && savedHungry.Units.Single(u => u.Id == player.Id).Morale.Effective == sample.Item3,
+                "shortage and effective morale survive save/load");
+            var outgoing = WorldTurns.EndTurn(savedHungry, savedHungry.Revision, supplyRules).State;
+            outgoing = outgoing with { Factions = outgoing.Factions.Select(f => f.Id == player.Owner
+                ? f with { Resources = new(100, 100, 100) } : f).ToArray() };
+            var recovered = WorldTurns.EndTurn(outgoing, outgoing.Revision, supplyRules).State;
+            Check(recovered.Factions.Single(f => f.Id == player.Owner).Shortage == 0
+                && recovered.Units.Single(u => u.Id == player.Id).Morale.Effective == 0,
+                "adequate food clears shortage and restores morale next owner turn");
+        }
+        foreach (var protectedUnit in new[] {
+            player with { Support = new() { FoodConsumption = 100, Logistics = true } },
+            player with { Support = new() { FoodConsumption = 100 }, Combatant = player.Combatant with { Skills = [Ew4Combat.Skill(22)] } },
+            player with { Support = new() { FoodConsumption = 100 }, Combatant = player.Combatant with { Skills = [Ew4Combat.Skill(3)] } } })
+        {
+            var supply = initial with { Round = 2, Units = [enemy, protectedUnit],
+                Factions = initial.Factions.Select(f => f with { Resources = new(100, 100, 0) }).ToArray() };
+            var protectedState = WorldTurns.EndTurn(supply, supply.Revision,
+                rules with { Buildings = [new("city", 1, new(0, 0, 0))] }).State;
+            Check(protectedState.Units.Single(u => u.Id == player.Id).Morale.Effective == 0,
+                "actual turn respects logistics and leadership shortage exemptions");
+            Check(protectedState.Factions.Single(f => f.Id == player.Owner).Shortage
+                == (protectedUnit.Combatant.Has(Ew4Combat.Skill(3)) ? 4 : 0),
+                "logistics removes upkeep whereas leadership only protects morale");
+        }
+
         var scripted = first with { Events = [new() { Id = "round.two.a", DialogueId = "opening", Rules = [new() { Round = 2, Trigger = TriggerKind.Round }] },
             new() { Id = "round.two.b", DialogueId = "orders", Rules = [new() { Round = 2, Trigger = TriggerKind.Round,
                 Effect = EventEffectKind.SetMorale, Value = 1, FactionId = "loser" }] }] };

@@ -10,7 +10,7 @@ public sealed record SaveReadLimits(int MaximumBytes = 64 * 1024 * 1024, int Max
 
 public static class WorldSave
 {
-    public const int Version = 5;
+    public const int Version = 7;
     private const string Format = "ew4.rewrite.save";
     internal static readonly JsonSerializerOptions Options = new()
     {
@@ -19,6 +19,8 @@ public static class WorldSave
         UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
         TypeInfoResolver = new System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver {
             Modifiers = { info => {
+                if (info.Type == typeof(WorldState))
+                    info.Properties.Single(p => p.Name == "armyCapacity").ShouldSerialize = (_, value) => value != null;
                 if (info.Type == typeof(MovementCell)) {
                     info.Properties.Single(p => p.Name == "barrier").ShouldSerialize = (_, value) => (TerrainBarrier)value! != TerrainBarrier.None;
                     info.Properties.Single(p => p.Name == "minimumEntryCost").ShouldSerialize = (_, value) => (int)value! != 0;
@@ -61,7 +63,7 @@ public static class WorldSave
             if (root.ValueKind != JsonValueKind.Object || root.EnumerateObject().Count() != 4
                 || root.GetProperty("format").GetString() != Format)
                 throw new RuleViolation("save.format", "Unknown save format");
-            if (root.GetProperty("version").GetInt32() is not (4 or Version))
+            if (root.GetProperty("version").GetInt32() is not (4 or 5 or 6 or Version))
                 throw new RuleViolation("save.version", "Save version requires an explicit migration");
             var payloadElement = root.GetProperty("payload");
             foreach (string key in new[] { "scenarioId", "contentRevision", "width", "height", "round", "activeFaction", "revision",
@@ -88,7 +90,11 @@ public static class WorldSave
                 throw new RuleViolation("save.checksum", "Save payload checksum mismatch");
             var state = JsonSerializer.Deserialize<WorldState>(payload, Options)
                 ?? throw new RuleViolation("save.payload", "Save has no world state");
+            if (root.GetProperty("version").GetInt32() < 6)
+                state = state with { Units = state.Units.Select(u => state.Factions.Any(f => f.Id == u.Owner && f.Human)
+                    ? u with { PlayerControl = new(u.Owner, ActionRound: state.Round) } : u).ToArray() };
             state.Validate();
+            state = PlayerAi.Reconcile(state);
             if (state.ContentRevision != expectedContentRevision)
                 throw new RuleViolation("save.content_revision", "Save content revision does not match installed data");
             return state;

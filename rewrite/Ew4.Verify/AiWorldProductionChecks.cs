@@ -135,6 +135,58 @@ internal static class AiWorldProductionChecks
                 { Profile = template.Profile with { Id = "fort", Category = "fort" } }, Cost = new(10, 5, 0), Building = BuildingRequirement.Forbidden, PerTurnLimit = 1 } },
             FortressScoring = new() { Recipes = [new("fort.recipe", 1, false)], MinimumScore = 0, Admission = new(1, 1, 1) } };
         Verify(world with { Units = [enemy] }, fortress, c => c is AiRecruitCommand { Fortress: true, OfferId: "fort.recipe" });
+
+        var supplyWorld = world with { Units = [actor with { Support = new() { FoodConsumption = 100 } }, enemy] };
+        WorldState Supply(long food, int shortage = 0) => supplyWorld with
+        {
+            Factions = supplyWorld.Factions.Select(f => f.Id == actor.Owner
+                ? f with { Resources = new(1000, 1000, food), Shortage = shortage } : f).ToArray()
+        };
+        WorldProductionRules RecruitSupply(RecruitmentOffer candidate, bool naval = false) => recruit with
+        {
+            Offers = new Dictionary<string, RecruitmentOffer> { [candidate.Id] = candidate },
+            Groups = [new("supply", [candidate.Id], naval)], Tasks = [new(naval ? "naval" : "recruit", 1)],
+            Recruit = recruit.Recruit with { TierAdmissionChance = [100], Economy = [new(long.MinValue, 1, 0)] }
+        };
+        var consumingOffer = offer with { Support = new() { FoodConsumption = 20 }, PerTurnLimit = null };
+        var consumingRecruit = RecruitSupply(consumingOffer);
+        var consumingFort = fortress.Fortresses["fort.recipe"] with { Support = new() { FoodConsumption = 20 } };
+        var consumingFortress = fortress with { Fortresses = new Dictionary<string, RecruitmentOffer> { ["fort.recipe"] = consumingFort } };
+        void BlockSupply(WorldState source, WorldProductionRules rules, WorldTurnRules economy, string label)
+        {
+            for (ulong seed = 0; seed < 12; seed++)
+            {
+                var plan = WorldAi.PlanProduction(source with { AiRandomState = seed }, ai, rules, economy);
+                Check(plan is { Command: null, AttemptedTask: null } && plan.FinalRandomState == seed, label);
+            }
+        }
+        BlockSupply(Supply(29), consumingRecruit, turns, "recruit cost plus new upkeep cannot cause next-turn starvation");
+        BlockSupply(Supply(19), consumingFortress, turns, "fortress also reserves its new upkeep");
+        BlockSupply(Supply(0), fortress, turns with { Buildings = [new("city", 1, new(0, 0, 99))] },
+            "even a zero-upkeep fortress is blocked when the existing army cannot be fed");
+        foreach (int shortage in new[] { 1, 2, 3, 4 })
+        {
+            BlockSupply(Supply(1000, shortage), consumingRecruit, turns, "recorded shortage blocks land recruitment");
+            BlockSupply(Supply(1000, shortage), consumingFortress, turns, "recorded shortage blocks fortress construction");
+        }
+        var navalSupply = Supply(29) with { Cells = navalWorld.Cells };
+        BlockSupply(navalSupply, RecruitSupply(consumingOffer, true), turns, "naval recruitment cannot bypass supply gate");
+        BlockSupply(Supply(1000), consumingRecruit, turns with { ResourceCap = 119 }, "next-turn food cap applies before upkeep");
+        Verify(Supply(30), consumingRecruit, c => c is AiRecruitCommand { Fortress: false });
+        Verify(Supply(20), consumingFortress, c => c is AiRecruitCommand { Fortress: true });
+        foreach (var exempt in new[] { consumingOffer with { Support = consumingOffer.Support with { Logistics = true } },
+            consumingOffer with { Template = consumingOffer.Template! with { Skills = [Ew4Combat.Skill(22)] } } })
+            Verify(Supply(10), RecruitSupply(exempt), c => c is AiRecruitCommand { Fortress: false });
+        Verify(Supply(10) with { Units = [actor with { Support = new() { FoodConsumption = 1000, Logistics = true } }, enemy] },
+            consumingRecruit, c => c is AiRecruitCommand { Fortress: false });
+        var afterSupplyRecruit = WorldAi.ExecuteProduction(Supply(30), WorldAi.PlanProduction(Supply(30), ai, consumingRecruit, turns),
+            consumingRecruit, ai).State;
+        BlockSupply(afterSupplyRecruit, consumingRecruit, turns, "successive production recalculates remaining supply");
+        var mixed = consumingRecruit with { Offers = new Dictionary<string, RecruitmentOffer>
+            { ["recruit"] = consumingOffer, ["fort"] = consumingOffer with { Id = "fort", Support = new() } },
+            Groups = [new("supply", ["recruit", "fort"])] };
+        Verify(Supply(10), mixed, c => c is AiRecruitCommand { OfferId: "fort" });
+
         var upgrade = new WorldProductionRules { Tasks = [new("upgrade", 1)],
             BuildingUpgrades = new() { Steps = [new("city", 1, 2, new(50, 40, 5))] },
             Upgrade = new() { BuildingWeights = new Dictionary<string, long> { ["city"] = 3 }, Chances = [new(0, 100)] } };

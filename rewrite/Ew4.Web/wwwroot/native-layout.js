@@ -78,7 +78,7 @@
       for(const id of ids){const el=this.get(id);el.style.top=y+'px';y+=parseFloat(el.style.height)+gap;}
       this.height=y+27;this.body.parentElement.style.height=this.height+'px';
     }
-    action(id,label,action,enabled=true){const el=this.get(id);el.disabled=!enabled;el.setAttribute('aria-label',label);el.title=label;let pending=false;el.onclick=async()=>{if(pending||el.disabled||!this.current())return;pending=true;el.disabled=true;try{await action();await this.api.tutorialUi(el.dataset.tutorialId);}catch(e){this.api.notice(e.message);}finally{pending=false;if(this.current())el.disabled=!enabled;}};return el;}
+    action(id,label,action,enabled=true){const el=this.get(id);el.disabled=!enabled;el.setAttribute('aria-label',label);el.title=label;let pending=false;el.onclick=async()=>{if(pending||el.disabled||!this.current())return;pending=true;el.disabled=true;try{await action();if(typeof this.api.tutorialUi==='function')await this.api.tutorialUi(el.dataset.tutorialId);}catch(e){this.api.notice(e.message);}finally{pending=false;if(this.current())el.disabled=!enabled;}};return el;}
     hide(id,value=true){this.get(id).hidden=value;}
   }
   root.Ew4NativeUI={Layout,resource};

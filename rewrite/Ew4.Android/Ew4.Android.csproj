@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
     <ApplicationId>org.ew4.reconstruction</ApplicationId>
     <ApplicationTitle>欧陆战争4 重构</ApplicationTitle>
-    <ApplicationVersion>23</ApplicationVersion>
-    <ApplicationDisplayVersion>0.2.20</ApplicationDisplayVersion>
+    <ApplicationVersion>24</ApplicationVersion>
+    <ApplicationDisplayVersion>0.2.21</ApplicationDisplayVersion>
     <SupportedOSPlatformVersion>26</SupportedOSPlatformVersion>
     <RuntimeIdentifiers>android-arm64;android-x64</RuntimeIdentifiers>
     <AndroidPackageFormats>apk</AndroidPackageFormats>
@@ -35,6 +35,7 @@
     <AndroidAsset Include="../data/client/**/*" Link="www/content/%(RecursiveDir)%(Filename)%(Extension)" />
     <AndroidAsset Include="../data/original/**/*" Link="original/%(RecursiveDir)%(Filename)%(Extension)" />
     <AndroidAsset Include="../data/legacy/*.json" Link="data/%(Filename)%(Extension)" />
+    <AndroidAsset Include="../data/runtime-content.json" Link="runtime-content.json" />
     <AndroidAsset Include="../data/rewrite/**/*" Link="rewrite/%(RecursiveDir)%(Filename)%(Extension)" />
     <AndroidAsset Include="../mod-kit/THIRD_PARTY_NOTICES.md" Link="licenses/THIRD_PARTY_NOTICES.md" />
     <AndroidAsset Include="../mod-kit/licenses/MoonSharp-LICENSE.txt" Link="licenses/MoonSharp-LICENSE.txt" />

@@ -1,10 +1,10 @@
 {
   "method": "Generalized range core and flank bands, not surveyed elevations. Existing hill/mountain rules retained.",
   "counts": {
-    "low": 419,
-    "middle": 795,
-    "hill": 1098,
-    "high": 524
+    "low": 493,
+    "middle": 843,
+    "hill": 1020,
+    "high": 593
   },
   "cells": [
     {
@@ -998,6 +998,24 @@
       "spriteIndex": 0
     },
     {
+      "cell": 3351,
+      "level": "low",
+      "range": "Altai",
+      "spriteIndex": 0
+    },
+    {
+      "cell": 3352,
+      "level": "high",
+      "range": "Altai",
+      "spriteIndex": 1
+    },
+    {
+      "cell": 3353,
+      "level": "middle",
+      "range": "Altai",
+      "spriteIndex": 2
+    },
+    {
       "cell": 3361,
       "level": "middle",
       "range": "Sayan ranges",
@@ -1184,6 +1202,24 @@
       "spriteIndex": 5
     },
     {
+      "cell": 3510,
+      "level": "middle",
+      "range": "Altai",
+      "spriteIndex": 0
+    },
+    {
+      "cell": 3511,
+      "level": "high",
+      "range": "Altai",
+      "spriteIndex": 1
+    },
+    {
+      "cell": 3512,
+      "level": "high",
+      "range": "Altai",
+      "spriteIndex": 2
+    },
+    {
       "cell": 3518,
       "level": "middle",
       "range": "Sayan ranges",
@@ -1286,6 +1322,30 @@
       "spriteIndex": 4
     },
     {
+      "cell": 3668,
+      "level": "low",
+      "range": "Altai",
+      "spriteIndex": 5
+    },
+    {
+      "cell": 3669,
+      "level": "high",
+      "range": "Altai",
+      "spriteIndex": 0
+    },
+    {
+      "cell": 3670,
+      "level": "high",
+      "range": "Altai",
+      "spriteIndex": 1
+    },
+    {
+      "cell": 3671,
+      "level": "low",
+      "range": "Altai",
+      "spriteIndex": 2
+    },
+    {
       "cell": 3699,
       "level": "low",
       "range": "Sayan ranges",
@@ -1353,9 +1413,21 @@
     },
     {
       "cell": 3828,
-      "level": "low",
+      "level": "high",
       "range": "Altai",
       "spriteIndex": 0
+    },
+    {
+      "cell": 3829,
+      "level": "high",
+      "range": "Altai",
+      "spriteIndex": 1
+    },
+    {
+      "cell": 3830,
+      "level": "high",
+      "range": "Altai",
+      "spriteIndex": 2
     },
     {
       "cell": 3858,
@@ -1430,22 +1502,28 @@
       "spriteIndex": 3
     },
     {
-      "cell": 3985,
-      "level": "middle",
-      "range": "Altai",
-      "spriteIndex": 4
-    },
-    {
       "cell": 3986,
-      "level": "high",
+      "level": "middle",
       "range": "Altai",
       "spriteIndex": 5
     },
     {
       "cell": 3987,
-      "level": "middle",
+      "level": "high",
       "range": "Altai",
       "spriteIndex": 0
+    },
+    {
+      "cell": 3988,
+      "level": "high",
+      "range": "Altai",
+      "spriteIndex": 1
+    },
+    {
+      "cell": 3989,
+      "level": "middle",
+      "range": "Altai",
+      "spriteIndex": 2
     },
     {
       "cell": 4015,
@@ -1550,22 +1628,28 @@
       "spriteIndex": 2
     },
     {
-      "cell": 4144,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 4
-    },
-    {
       "cell": 4146,
-      "level": "high",
+      "level": "middle",
       "range": "Altai",
       "spriteIndex": 0
     },
     {
       "cell": 4147,
-      "level": "middle",
+      "level": "high",
       "range": "Altai",
       "spriteIndex": 1
+    },
+    {
+      "cell": 4148,
+      "level": "high",
+      "range": "Altai",
+      "spriteIndex": 2
+    },
+    {
+      "cell": 4149,
+      "level": "middle",
+      "range": "Altai",
+      "spriteIndex": 3
     },
     {
       "cell": 4178,
@@ -1640,40 +1724,28 @@
       "spriteIndex": 5
     },
     {
-      "cell": 4301,
-      "level": "middle",
-      "range": "Altai",
-      "spriteIndex": 2
-    },
-    {
-      "cell": 4302,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 3
-    },
-    {
-      "cell": 4303,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 4
-    },
-    {
-      "cell": 4304,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 5
-    },
-    {
       "cell": 4305,
-      "level": "high",
+      "level": "middle",
       "range": "Altai",
       "spriteIndex": 0
     },
     {
       "cell": 4306,
-      "level": "middle",
+      "level": "high",
       "range": "Altai",
       "spriteIndex": 1
+    },
+    {
+      "cell": 4307,
+      "level": "high",
+      "range": "Altai",
+      "spriteIndex": 2
+    },
+    {
+      "cell": 4308,
+      "level": "middle",
+      "range": "Altai",
+      "spriteIndex": 3
     },
     {
       "cell": 4337,
@@ -1730,34 +1802,22 @@
       "spriteIndex": 3
     },
     {
-      "cell": 4461,
-      "level": "middle",
+      "cell": 4466,
+      "level": "high",
+      "range": "Altai",
+      "spriteIndex": 2
+    },
+    {
+      "cell": 4467,
+      "level": "high",
       "range": "Altai",
       "spriteIndex": 3
     },
     {
-      "cell": 4462,
-      "level": "high",
+      "cell": 4468,
+      "level": "low",
       "range": "Altai",
       "spriteIndex": 4
-    },
-    {
-      "cell": 4463,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 5
-    },
-    {
-      "cell": 4464,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 0
-    },
-    {
-      "cell": 4466,
-      "level": "middle",
-      "range": "Altai",
-      "spriteIndex": 2
     },
     {
       "cell": 4504,
@@ -1784,26 +1844,8 @@
       "spriteIndex": 2
     },
     {
-      "cell": 4620,
-      "level": "middle",
-      "range": "Altai",
-      "spriteIndex": 3
-    },
-    {
-      "cell": 4621,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 4
-    },
-    {
-      "cell": 4622,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 5
-    },
-    {
       "cell": 4623,
-      "level": "high",
+      "level": "low",
       "range": "Altai",
       "spriteIndex": 0
     },
@@ -1815,9 +1857,15 @@
     },
     {
       "cell": 4625,
-      "level": "middle",
+      "level": "high",
       "range": "Altai",
       "spriteIndex": 2
+    },
+    {
+      "cell": 4626,
+      "level": "middle",
+      "range": "Altai",
+      "spriteIndex": 3
     },
     {
       "cell": 4642,
@@ -1892,32 +1940,8 @@
       "spriteIndex": 0
     },
     {
-      "cell": 4779,
-      "level": "low",
-      "range": "Altai",
-      "spriteIndex": 3
-    },
-    {
-      "cell": 4780,
-      "level": "middle",
-      "range": "Altai",
-      "spriteIndex": 4
-    },
-    {
-      "cell": 4781,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 5
-    },
-    {
-      "cell": 4782,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 0
-    },
-    {
       "cell": 4783,
-      "level": "high",
+      "level": "middle",
       "range": "Altai",
       "spriteIndex": 1
     },
@@ -2018,26 +2042,8 @@
       "spriteIndex": 5
     },
     {
-      "cell": 4938,
-      "level": "low",
-      "range": "Altai",
-      "spriteIndex": 3
-    },
-    {
-      "cell": 4939,
-      "level": "middle",
-      "range": "Altai",
-      "spriteIndex": 4
-    },
-    {
-      "cell": 4940,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 5
-    },
-    {
       "cell": 4941,
-      "level": "high",
+      "level": "middle",
       "range": "Altai",
       "spriteIndex": 0
     },
@@ -2052,12 +2058,6 @@
       "level": "middle",
       "range": "Altai",
       "spriteIndex": 2
-    },
-    {
-      "cell": 4944,
-      "level": "low",
-      "range": "Altai",
-      "spriteIndex": 3
     },
     {
       "cell": 4956,
@@ -2174,20 +2174,8 @@
       "spriteIndex": 3
     },
     {
-      "cell": 5098,
-      "level": "low",
-      "range": "Altai",
-      "spriteIndex": 4
-    },
-    {
-      "cell": 5099,
-      "level": "middle",
-      "range": "Altai",
-      "spriteIndex": 5
-    },
-    {
       "cell": 5100,
-      "level": "high",
+      "level": "middle",
       "range": "Altai",
       "spriteIndex": 0
     },
@@ -2199,7 +2187,7 @@
     },
     {
       "cell": 5102,
-      "level": "high",
+      "level": "middle",
       "range": "Altai",
       "spriteIndex": 2
     },
@@ -2324,12 +2312,6 @@
       "spriteIndex": 2
     },
     {
-      "cell": 5257,
-      "level": "low",
-      "range": "Altai",
-      "spriteIndex": 4
-    },
-    {
       "cell": 5258,
       "level": "middle",
       "range": "Altai",
@@ -2343,21 +2325,9 @@
     },
     {
       "cell": 5260,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 1
-    },
-    {
-      "cell": 5261,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 2
-    },
-    {
-      "cell": 5262,
       "level": "middle",
       "range": "Altai",
-      "spriteIndex": 3
+      "spriteIndex": 1
     },
     {
       "cell": 5273,
@@ -2481,27 +2451,9 @@
     },
     {
       "cell": 5419,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 1
-    },
-    {
-      "cell": 5420,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 2
-    },
-    {
-      "cell": 5421,
       "level": "middle",
       "range": "Altai",
-      "spriteIndex": 3
-    },
-    {
-      "cell": 5422,
-      "level": "low",
-      "range": "Altai",
-      "spriteIndex": 4
+      "spriteIndex": 1
     },
     {
       "cell": 5429,
@@ -2654,28 +2606,22 @@
       "spriteIndex": 0
     },
     {
-      "cell": 5576,
+      "cell": 5575,
       "level": "middle",
+      "range": "Altai",
+      "spriteIndex": 4
+    },
+    {
+      "cell": 5576,
+      "level": "high",
       "range": "Altai",
       "spriteIndex": 5
     },
     {
       "cell": 5577,
-      "level": "high",
+      "level": "middle",
       "range": "Altai",
       "spriteIndex": 0
-    },
-    {
-      "cell": 5578,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 1
-    },
-    {
-      "cell": 5579,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 2
     },
     {
       "cell": 5587,
@@ -2817,33 +2763,15 @@
     },
     {
       "cell": 5735,
-      "level": "low",
+      "level": "high",
       "range": "Altai",
       "spriteIndex": 5
     },
     {
       "cell": 5736,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 0
-    },
-    {
-      "cell": 5737,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 1
-    },
-    {
-      "cell": 5738,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 2
-    },
-    {
-      "cell": 5740,
       "level": "middle",
       "range": "Altai",
-      "spriteIndex": 4
+      "spriteIndex": 0
     },
     {
       "cell": 5743,
@@ -3014,34 +2942,16 @@
       "spriteIndex": 5
     },
     {
-      "cell": 5894,
-      "level": "middle",
-      "range": "Altai",
-      "spriteIndex": 5
-    },
-    {
-      "cell": 5896,
+      "cell": 5893,
       "level": "high",
-      "range": "Altai",
-      "spriteIndex": 1
-    },
-    {
-      "cell": 5897,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 2
-    },
-    {
-      "cell": 5898,
-      "level": "middle",
-      "range": "Altai",
-      "spriteIndex": 3
-    },
-    {
-      "cell": 5899,
-      "level": "low",
       "range": "Altai",
       "spriteIndex": 4
+    },
+    {
+      "cell": 5894,
+      "level": "high",
+      "range": "Altai",
+      "spriteIndex": 5
     },
     {
       "cell": 5900,
@@ -3194,27 +3104,33 @@
       "spriteIndex": 0
     },
     {
+      "cell": 6052,
+      "level": "high",
+      "range": "Altai",
+      "spriteIndex": 4
+    },
+    {
+      "cell": 6053,
+      "level": "high",
+      "range": "Altai",
+      "spriteIndex": 5
+    },
+    {
       "cell": 6054,
       "level": "middle",
       "range": "Altai",
       "spriteIndex": 0
     },
     {
-      "cell": 6055,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 1
-    },
-    {
       "cell": 6057,
-      "level": "high",
-      "range": "Altai",
+      "level": "hill",
+      "range": null,
       "spriteIndex": 3
     },
     {
       "cell": 6058,
-      "level": "middle",
-      "range": "Altai",
+      "level": "hill",
+      "range": null,
       "spriteIndex": 4
     },
     {
@@ -3392,34 +3308,34 @@
       "spriteIndex": 1
     },
     {
+      "cell": 6210,
+      "level": "middle",
+      "range": "Altai",
+      "spriteIndex": 3
+    },
+    {
       "cell": 6212,
-      "level": "low",
+      "level": "high",
       "range": "Altai",
       "spriteIndex": 5
     },
     {
       "cell": 6213,
-      "level": "high",
+      "level": "low",
       "range": "Altai",
       "spriteIndex": 0
     },
     {
       "cell": 6214,
-      "level": "high",
-      "range": "Altai",
+      "level": "hill",
+      "range": null,
       "spriteIndex": 1
     },
     {
       "cell": 6215,
-      "level": "high",
-      "range": "Altai",
+      "level": "hill",
+      "range": null,
       "spriteIndex": 2
-    },
-    {
-      "cell": 6216,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 3
     },
     {
       "cell": 6217,
@@ -3554,28 +3470,34 @@
       "spriteIndex": 3
     },
     {
+      "cell": 6369,
+      "level": "low",
+      "range": "Altai",
+      "spriteIndex": 3
+    },
+    {
+      "cell": 6370,
+      "level": "high",
+      "range": "Altai",
+      "spriteIndex": 4
+    },
+    {
+      "cell": 6371,
+      "level": "high",
+      "range": "Altai",
+      "spriteIndex": 5
+    },
+    {
       "cell": 6372,
-      "level": "middle",
+      "level": "high",
       "range": "Altai",
       "spriteIndex": 0
     },
     {
       "cell": 6373,
-      "level": "high",
+      "level": "low",
       "range": "Altai",
       "spriteIndex": 1
-    },
-    {
-      "cell": 6374,
-      "level": "high",
-      "range": "Altai",
-      "spriteIndex": 2
-    },
-    {
-      "cell": 6375,
-      "level": "middle",
-      "range": "Altai",
-      "spriteIndex": 3
     },
     {
       "cell": 6376,
@@ -3764,20 +3686,26 @@
       "spriteIndex": 4
     },
     {
+      "cell": 6528,
+      "level": "middle",
+      "range": "Altai",
+      "spriteIndex": 3
+    },
+    {
       "cell": 6530,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Altai",
       "spriteIndex": 5
     },
     {
       "cell": 6531,
-      "level": "middle",
+      "level": "high",
       "range": "Altai",
       "spriteIndex": 0
     },
     {
       "cell": 6532,
-      "level": "middle",
+      "level": "low",
       "range": "Altai",
       "spriteIndex": 1
     },
@@ -4010,10 +3938,22 @@
       "spriteIndex": 4
     },
     {
+      "cell": 6688,
+      "level": "middle",
+      "range": "Altai",
+      "spriteIndex": 4
+    },
+    {
       "cell": 6689,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Altai",
       "spriteIndex": 5
+    },
+    {
+      "cell": 6690,
+      "level": "high",
+      "range": "Altai",
+      "spriteIndex": 0
     },
     {
       "cell": 6691,
@@ -4266,6 +4206,12 @@
       "level": "middle",
       "range": "Tianshan",
       "spriteIndex": 5
+    },
+    {
+      "cell": 6847,
+      "level": "low",
+      "range": "Altai",
+      "spriteIndex": 4
     },
     {
       "cell": 6853,
@@ -5204,6 +5150,18 @@
       "spriteIndex": 0
     },
     {
+      "cell": 8932,
+      "level": "low",
+      "range": "Yinshan",
+      "spriteIndex": 4
+    },
+    {
+      "cell": 8933,
+      "level": "low",
+      "range": "Yinshan",
+      "spriteIndex": 5
+    },
+    {
       "cell": 8938,
       "level": "hill",
       "range": null,
@@ -5346,6 +5304,90 @@
       "level": "middle",
       "range": "Kunlun",
       "spriteIndex": 1
+    },
+    {
+      "cell": 9045,
+      "level": "low",
+      "range": "Altyn Tagh",
+      "spriteIndex": 0
+    },
+    {
+      "cell": 9046,
+      "level": "middle",
+      "range": "Altyn Tagh",
+      "spriteIndex": 1
+    },
+    {
+      "cell": 9047,
+      "level": "low",
+      "range": "Altyn Tagh",
+      "spriteIndex": 2
+    },
+    {
+      "cell": 9048,
+      "level": "low",
+      "range": "Altyn Tagh",
+      "spriteIndex": 3
+    },
+    {
+      "cell": 9079,
+      "level": "low",
+      "range": "Yinshan",
+      "spriteIndex": 4
+    },
+    {
+      "cell": 9080,
+      "level": "low",
+      "range": "Yinshan",
+      "spriteIndex": 5
+    },
+    {
+      "cell": 9082,
+      "level": "low",
+      "range": "Yinshan",
+      "spriteIndex": 1
+    },
+    {
+      "cell": 9084,
+      "level": "low",
+      "range": "Yinshan",
+      "spriteIndex": 3
+    },
+    {
+      "cell": 9085,
+      "level": "low",
+      "range": "Yinshan",
+      "spriteIndex": 4
+    },
+    {
+      "cell": 9086,
+      "level": "low",
+      "range": "Yinshan",
+      "spriteIndex": 5
+    },
+    {
+      "cell": 9087,
+      "level": "low",
+      "range": "Yinshan",
+      "spriteIndex": 0
+    },
+    {
+      "cell": 9088,
+      "level": "low",
+      "range": "Yinshan",
+      "spriteIndex": 1
+    },
+    {
+      "cell": 9089,
+      "level": "middle",
+      "range": "Yinshan",
+      "spriteIndex": 2
+    },
+    {
+      "cell": 9090,
+      "level": "low",
+      "range": "Yinshan",
+      "spriteIndex": 3
     },
     {
       "cell": 9095,
@@ -5498,6 +5540,60 @@
       "spriteIndex": 1
     },
     {
+      "cell": 9200,
+      "level": "low",
+      "range": "Altyn Tagh",
+      "spriteIndex": 2
+    },
+    {
+      "cell": 9201,
+      "level": "middle",
+      "range": "Altyn Tagh",
+      "spriteIndex": 3
+    },
+    {
+      "cell": 9202,
+      "level": "high",
+      "range": "Altyn Tagh",
+      "spriteIndex": 4
+    },
+    {
+      "cell": 9203,
+      "level": "high",
+      "range": "Altyn Tagh",
+      "spriteIndex": 5
+    },
+    {
+      "cell": 9204,
+      "level": "high",
+      "range": "Altyn Tagh",
+      "spriteIndex": 0
+    },
+    {
+      "cell": 9205,
+      "level": "high",
+      "range": "Altyn Tagh",
+      "spriteIndex": 1
+    },
+    {
+      "cell": 9207,
+      "level": "high",
+      "range": "Altyn Tagh",
+      "spriteIndex": 3
+    },
+    {
+      "cell": 9208,
+      "level": "high",
+      "range": "Altyn Tagh",
+      "spriteIndex": 4
+    },
+    {
+      "cell": 9209,
+      "level": "low",
+      "range": "Altyn Tagh",
+      "spriteIndex": 5
+    },
+    {
       "cell": 9214,
       "level": "high",
       "range": "Qilian",
@@ -5514,6 +5610,60 @@
       "level": "middle",
       "range": "Qilian",
       "spriteIndex": 0
+    },
+    {
+      "cell": 9236,
+      "level": "low",
+      "range": "Yinshan",
+      "spriteIndex": 2
+    },
+    {
+      "cell": 9237,
+      "level": "middle",
+      "range": "Yinshan",
+      "spriteIndex": 3
+    },
+    {
+      "cell": 9239,
+      "level": "low",
+      "range": "Yinshan",
+      "spriteIndex": 5
+    },
+    {
+      "cell": 9240,
+      "level": "low",
+      "range": "Yinshan",
+      "spriteIndex": 0
+    },
+    {
+      "cell": 9241,
+      "level": "low",
+      "range": "Yinshan",
+      "spriteIndex": 1
+    },
+    {
+      "cell": 9242,
+      "level": "low",
+      "range": "Yinshan",
+      "spriteIndex": 2
+    },
+    {
+      "cell": 9244,
+      "level": "middle",
+      "range": "Yinshan",
+      "spriteIndex": 4
+    },
+    {
+      "cell": 9245,
+      "level": "middle",
+      "range": "Yinshan",
+      "spriteIndex": 5
+    },
+    {
+      "cell": 9247,
+      "level": "low",
+      "range": "Yinshan",
+      "spriteIndex": 1
     },
     {
       "cell": 9254,
@@ -5658,6 +5808,72 @@
       "level": "middle",
       "range": "Kunlun",
       "spriteIndex": 2
+    },
+    {
+      "cell": 9356,
+      "level": "middle",
+      "range": "Altyn Tagh",
+      "spriteIndex": 5
+    },
+    {
+      "cell": 9357,
+      "level": "high",
+      "range": "Altyn Tagh",
+      "spriteIndex": 0
+    },
+    {
+      "cell": 9359,
+      "level": "high",
+      "range": "Altyn Tagh",
+      "spriteIndex": 2
+    },
+    {
+      "cell": 9360,
+      "level": "middle",
+      "range": "Altyn Tagh",
+      "spriteIndex": 3
+    },
+    {
+      "cell": 9361,
+      "level": "low",
+      "range": "Altyn Tagh",
+      "spriteIndex": 4
+    },
+    {
+      "cell": 9363,
+      "level": "low",
+      "range": "Altyn Tagh",
+      "spriteIndex": 0
+    },
+    {
+      "cell": 9364,
+      "level": "low",
+      "range": "Altyn Tagh",
+      "spriteIndex": 1
+    },
+    {
+      "cell": 9365,
+      "level": "middle",
+      "range": "Altyn Tagh",
+      "spriteIndex": 2
+    },
+    {
+      "cell": 9366,
+      "level": "high",
+      "range": "Altyn Tagh",
+      "spriteIndex": 3
+    },
+    {
+      "cell": 9367,
+      "level": "high",
+      "range": "Altyn Tagh",
+      "spriteIndex": 4
+    },
+    {
+      "cell": 9368,
+      "level": "middle",
+      "range": "Altyn Tagh",
+      "spriteIndex": 5
     },
     {
       "cell": 9371,
@@ -5840,6 +6056,60 @@
       "spriteIndex": 3
     },
     {
+      "cell": 9511,
+      "level": "middle",
+      "range": "Altyn Tagh",
+      "spriteIndex": 1
+    },
+    {
+      "cell": 9512,
+      "level": "high",
+      "range": "Altyn Tagh",
+      "spriteIndex": 2
+    },
+    {
+      "cell": 9513,
+      "level": "high",
+      "range": "Altyn Tagh",
+      "spriteIndex": 3
+    },
+    {
+      "cell": 9514,
+      "level": "high",
+      "range": "Altyn Tagh",
+      "spriteIndex": 4
+    },
+    {
+      "cell": 9515,
+      "level": "high",
+      "range": "Altyn Tagh",
+      "spriteIndex": 5
+    },
+    {
+      "cell": 9516,
+      "level": "middle",
+      "range": "Altyn Tagh",
+      "spriteIndex": 0
+    },
+    {
+      "cell": 9525,
+      "level": "middle",
+      "range": "Altyn Tagh",
+      "spriteIndex": 3
+    },
+    {
+      "cell": 9526,
+      "level": "high",
+      "range": "Altyn Tagh",
+      "spriteIndex": 4
+    },
+    {
+      "cell": 9527,
+      "level": "middle",
+      "range": "Altyn Tagh",
+      "spriteIndex": 5
+    },
+    {
       "cell": 9530,
       "level": "middle",
       "range": "Qilian",
@@ -6006,6 +6276,30 @@
       "level": "low",
       "range": "Kunlun",
       "spriteIndex": 4
+    },
+    {
+      "cell": 9668,
+      "level": "high",
+      "range": "Altyn Tagh",
+      "spriteIndex": 5
+    },
+    {
+      "cell": 9669,
+      "level": "high",
+      "range": "Altyn Tagh",
+      "spriteIndex": 0
+    },
+    {
+      "cell": 9670,
+      "level": "high",
+      "range": "Altyn Tagh",
+      "spriteIndex": 1
+    },
+    {
+      "cell": 9671,
+      "level": "middle",
+      "range": "Altyn Tagh",
+      "spriteIndex": 2
     },
     {
       "cell": 9689,
@@ -6188,6 +6482,18 @@
       "spriteIndex": 0
     },
     {
+      "cell": 9867,
+      "level": "low",
+      "range": "Helan",
+      "spriteIndex": 3
+    },
+    {
+      "cell": 9868,
+      "level": "low",
+      "range": "Helan",
+      "spriteIndex": 4
+    },
+    {
       "cell": 9872,
       "level": "hill",
       "range": null,
@@ -6338,10 +6644,28 @@
       "spriteIndex": 5
     },
     {
+      "cell": 10025,
+      "level": "low",
+      "range": "Helan",
+      "spriteIndex": 2
+    },
+    {
       "cell": 10032,
       "level": "hill",
       "range": null,
       "spriteIndex": 3
+    },
+    {
+      "cell": 10036,
+      "level": "low",
+      "range": "Luliang",
+      "spriteIndex": 1
+    },
+    {
+      "cell": 10037,
+      "level": "low",
+      "range": "Luliang",
+      "spriteIndex": 2
     },
     {
       "cell": 10039,
@@ -6524,6 +6848,12 @@
       "spriteIndex": 0
     },
     {
+      "cell": 10183,
+      "level": "middle",
+      "range": "Helan",
+      "spriteIndex": 1
+    },
+    {
       "cell": 10187,
       "level": "hill",
       "range": null,
@@ -6546,6 +6876,12 @@
       "level": "hill",
       "range": null,
       "spriteIndex": 5
+    },
+    {
+      "cell": 10195,
+      "level": "middle",
+      "range": "Luliang",
+      "spriteIndex": 1
     },
     {
       "cell": 10198,
@@ -6746,6 +7082,12 @@
       "spriteIndex": 1
     },
     {
+      "cell": 10340,
+      "level": "low",
+      "range": "Helan",
+      "spriteIndex": 5
+    },
+    {
       "cell": 10347,
       "level": "hill",
       "range": null,
@@ -6762,6 +7104,12 @@
       "level": "hill",
       "range": null,
       "spriteIndex": 3
+    },
+    {
+      "cell": 10352,
+      "level": "low",
+      "range": "Luliang",
+      "spriteIndex": 5
     },
     {
       "cell": 10355,
@@ -6999,8 +7347,8 @@
     },
     {
       "cell": 10510,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Luliang",
       "spriteIndex": 4
     },
     {
@@ -7268,6 +7616,12 @@
       "spriteIndex": 2
     },
     {
+      "cell": 10668,
+      "level": "low",
+      "range": "Luliang",
+      "spriteIndex": 3
+    },
+    {
       "cell": 10671,
       "level": "middle",
       "range": "Taihang",
@@ -7515,8 +7869,8 @@
     },
     {
       "cell": 10826,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Luliang",
       "spriteIndex": 2
     },
     {
@@ -7803,8 +8157,8 @@
     },
     {
       "cell": 10983,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Luliang",
       "spriteIndex": 0
     },
     {
@@ -8109,8 +8463,8 @@
     },
     {
       "cell": 11142,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Luliang",
       "spriteIndex": 0
     },
     {
@@ -8379,8 +8733,8 @@
     },
     {
       "cell": 11299,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Luliang",
       "spriteIndex": 4
     },
     {
@@ -8625,8 +8979,8 @@
     },
     {
       "cell": 11457,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Luliang",
       "spriteIndex": 3
     },
     {
@@ -8640,12 +8994,6 @@
       "level": "middle",
       "range": "Taihang",
       "spriteIndex": 0
-    },
-    {
-      "cell": 11505,
-      "level": "middle",
-      "range": "Japan ranges",
-      "spriteIndex": 3
     },
     {
       "cell": 11506,
@@ -8816,6 +9164,18 @@
       "spriteIndex": 2
     },
     {
+      "cell": 11604,
+      "level": "low",
+      "range": "Liupan",
+      "spriteIndex": 3
+    },
+    {
+      "cell": 11605,
+      "level": "low",
+      "range": "Liupan",
+      "spriteIndex": 4
+    },
+    {
       "cell": 11606,
       "level": "hill",
       "range": null,
@@ -8841,8 +9201,8 @@
     },
     {
       "cell": 11614,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Luliang",
       "spriteIndex": 1
     },
     {
@@ -8936,22 +9296,46 @@
       "spriteIndex": 3
     },
     {
+      "cell": 11723,
+      "level": "low",
+      "range": "Tanggula",
+      "spriteIndex": 5
+    },
+    {
       "cell": 11724,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Tanggula",
       "spriteIndex": 0
     },
     {
+      "cell": 11725,
+      "level": "middle",
+      "range": "Tanggula",
+      "spriteIndex": 1
+    },
+    {
+      "cell": 11726,
+      "level": "middle",
+      "range": "Tanggula",
+      "spriteIndex": 2
+    },
+    {
       "cell": 11727,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Tanggula",
       "spriteIndex": 3
     },
     {
       "cell": 11728,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Tanggula",
       "spriteIndex": 4
+    },
+    {
+      "cell": 11729,
+      "level": "low",
+      "range": "Tanggula",
+      "spriteIndex": 5
     },
     {
       "cell": 11731,
@@ -8979,14 +9363,14 @@
     },
     {
       "cell": 11740,
-      "level": "middle",
-      "range": "Kunlun",
+      "level": "high",
+      "range": "Bayan Har",
       "spriteIndex": 4
     },
     {
       "cell": 11741,
       "level": "high",
-      "range": "Kunlun",
+      "range": "Bayan Har",
       "spriteIndex": 5
     },
     {
@@ -9012,6 +9396,12 @@
       "level": "hill",
       "range": null,
       "spriteIndex": 0
+    },
+    {
+      "cell": 11762,
+      "level": "low",
+      "range": "Liupan",
+      "spriteIndex": 2
     },
     {
       "cell": 11765,
@@ -9129,38 +9519,38 @@
     },
     {
       "cell": 11880,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Tanggula",
       "spriteIndex": 3
     },
     {
       "cell": 11881,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Tanggula",
       "spriteIndex": 4
     },
     {
       "cell": 11884,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Tanggula",
       "spriteIndex": 1
     },
     {
       "cell": 11886,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Tanggula",
       "spriteIndex": 3
     },
     {
       "cell": 11887,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Tanggula",
       "spriteIndex": 4
     },
     {
       "cell": 11888,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Tanggula",
       "spriteIndex": 5
     },
     {
@@ -9189,20 +9579,20 @@
     },
     {
       "cell": 11898,
-      "level": "low",
-      "range": "Kunlun",
+      "level": "middle",
+      "range": "Bayan Har",
       "spriteIndex": 3
     },
     {
       "cell": 11899,
-      "level": "middle",
-      "range": "Kunlun",
+      "level": "high",
+      "range": "Bayan Har",
       "spriteIndex": 4
     },
     {
       "cell": 11900,
-      "level": "low",
-      "range": "Kunlun",
+      "level": "high",
+      "range": "Bayan Har",
       "spriteIndex": 5
     },
     {
@@ -9298,7 +9688,7 @@
     {
       "cell": 12023,
       "level": "high",
-      "range": "Himalaya",
+      "range": "Gangdise",
       "spriteIndex": 5
     },
     {
@@ -9310,19 +9700,19 @@
     {
       "cell": 12025,
       "level": "high",
-      "range": "Himalaya",
+      "range": "Gangdise",
       "spriteIndex": 1
     },
     {
       "cell": 12026,
-      "level": "middle",
-      "range": "Himalaya",
+      "level": "high",
+      "range": "Gangdise",
       "spriteIndex": 2
     },
     {
       "cell": 12027,
-      "level": "low",
-      "range": "Himalaya",
+      "level": "middle",
+      "range": "Gangdise",
       "spriteIndex": 3
     },
     {
@@ -9368,27 +9758,39 @@
       "spriteIndex": 0
     },
     {
+      "cell": 12039,
+      "level": "low",
+      "range": "Tanggula",
+      "spriteIndex": 3
+    },
+    {
       "cell": 12042,
       "level": "hill",
       "range": null,
       "spriteIndex": 0
     },
     {
+      "cell": 12045,
+      "level": "low",
+      "range": "Tanggula",
+      "spriteIndex": 3
+    },
+    {
       "cell": 12046,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Tanggula",
       "spriteIndex": 4
     },
     {
       "cell": 12047,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Tanggula",
       "spriteIndex": 5
     },
     {
       "cell": 12048,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Tanggula",
       "spriteIndex": 0
     },
     {
@@ -9414,6 +9816,24 @@
       "level": "hill",
       "range": null,
       "spriteIndex": 2
+    },
+    {
+      "cell": 12058,
+      "level": "middle",
+      "range": "Bayan Har",
+      "spriteIndex": 4
+    },
+    {
+      "cell": 12059,
+      "level": "high",
+      "range": "Bayan Har",
+      "spriteIndex": 5
+    },
+    {
+      "cell": 12060,
+      "level": "middle",
+      "range": "Bayan Har",
+      "spriteIndex": 0
     },
     {
       "cell": 12062,
@@ -9525,20 +9945,26 @@
     },
     {
       "cell": 12184,
-      "level": "middle",
-      "range": "Himalaya",
+      "level": "high",
+      "range": "Gangdise",
       "spriteIndex": 1
     },
     {
       "cell": 12185,
-      "level": "low",
-      "range": "Himalaya",
+      "level": "high",
+      "range": "Gangdise",
       "spriteIndex": 2
     },
     {
+      "cell": 12186,
+      "level": "high",
+      "range": "Gangdise",
+      "spriteIndex": 3
+    },
+    {
       "cell": 12187,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Gangdise",
       "spriteIndex": 4
     },
     {
@@ -9578,10 +10004,22 @@
       "spriteIndex": 2
     },
     {
+      "cell": 12205,
+      "level": "middle",
+      "range": "Tanggula",
+      "spriteIndex": 4
+    },
+    {
       "cell": 12206,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Tanggula",
       "spriteIndex": 5
+    },
+    {
+      "cell": 12207,
+      "level": "middle",
+      "range": "Tanggula",
+      "spriteIndex": 0
     },
     {
       "cell": 12209,
@@ -9614,10 +10052,22 @@
       "spriteIndex": 2
     },
     {
+      "cell": 12217,
+      "level": "high",
+      "range": "Bayan Har",
+      "spriteIndex": 4
+    },
+    {
       "cell": 12218,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Bayan Har",
       "spriteIndex": 5
+    },
+    {
+      "cell": 12219,
+      "level": "middle",
+      "range": "Bayan Har",
+      "spriteIndex": 0
     },
     {
       "cell": 12221,
@@ -9735,15 +10185,21 @@
     },
     {
       "cell": 12344,
-      "level": "low",
-      "range": "Himalaya",
+      "level": "high",
+      "range": "Gangdise",
       "spriteIndex": 2
     },
     {
       "cell": 12345,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Gangdise",
       "spriteIndex": 3
+    },
+    {
+      "cell": 12347,
+      "level": "middle",
+      "range": "Gangdise",
+      "spriteIndex": 5
     },
     {
       "cell": 12349,
@@ -9777,14 +10233,14 @@
     },
     {
       "cell": 12365,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Tanggula",
       "spriteIndex": 5
     },
     {
       "cell": 12366,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Tanggula",
       "spriteIndex": 0
     },
     {
@@ -9819,8 +10275,8 @@
     },
     {
       "cell": 12379,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Bayan Har",
       "spriteIndex": 1
     },
     {
@@ -9938,16 +10394,28 @@
       "spriteIndex": 1
     },
     {
+      "cell": 12503,
+      "level": "middle",
+      "range": "Gangdise",
+      "spriteIndex": 2
+    },
+    {
       "cell": 12504,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Gangdise",
       "spriteIndex": 3
     },
     {
       "cell": 12505,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Gangdise",
       "spriteIndex": 4
+    },
+    {
+      "cell": 12506,
+      "level": "high",
+      "range": "Gangdise",
+      "spriteIndex": 5
     },
     {
       "cell": 12507,
@@ -9986,15 +10454,27 @@
       "spriteIndex": 2
     },
     {
+      "cell": 12523,
+      "level": "low",
+      "range": "Tanggula",
+      "spriteIndex": 4
+    },
+    {
       "cell": 12524,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Tanggula",
       "spriteIndex": 5
     },
     {
+      "cell": 12525,
+      "level": "high",
+      "range": "Tanggula",
+      "spriteIndex": 0
+    },
+    {
       "cell": 12526,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Tanggula",
       "spriteIndex": 1
     },
     {
@@ -10011,9 +10491,15 @@
     },
     {
       "cell": 12536,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Bayan Har",
       "spriteIndex": 5
+    },
+    {
+      "cell": 12537,
+      "level": "high",
+      "range": "Bayan Har",
+      "spriteIndex": 0
     },
     {
       "cell": 12547,
@@ -10155,27 +10641,33 @@
     },
     {
       "cell": 12663,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Gangdise",
       "spriteIndex": 3
     },
     {
       "cell": 12664,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Gangdise",
       "spriteIndex": 4
     },
     {
       "cell": 12665,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Gangdise",
       "spriteIndex": 5
     },
     {
       "cell": 12666,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Gangdise",
       "spriteIndex": 0
+    },
+    {
+      "cell": 12667,
+      "level": "low",
+      "range": "Gangdise",
+      "spriteIndex": 1
     },
     {
       "cell": 12672,
@@ -10197,27 +10689,39 @@
     },
     {
       "cell": 12683,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Tanggula",
       "spriteIndex": 5
     },
     {
       "cell": 12684,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Tanggula",
       "spriteIndex": 0
     },
     {
       "cell": 12685,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Tanggula",
       "spriteIndex": 1
     },
     {
+      "cell": 12686,
+      "level": "high",
+      "range": "Tanggula",
+      "spriteIndex": 2
+    },
+    {
       "cell": 12687,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Tanggula",
       "spriteIndex": 3
+    },
+    {
+      "cell": 12688,
+      "level": "middle",
+      "range": "Tanggula",
+      "spriteIndex": 4
     },
     {
       "cell": 12690,
@@ -10230,6 +10734,18 @@
       "level": "hill",
       "range": null,
       "spriteIndex": 4
+    },
+    {
+      "cell": 12696,
+      "level": "high",
+      "range": "Bayan Har",
+      "spriteIndex": 0
+    },
+    {
+      "cell": 12698,
+      "level": "middle",
+      "range": "Bayan Har",
+      "spriteIndex": 2
     },
     {
       "cell": 12704,
@@ -10358,10 +10874,28 @@
       "spriteIndex": 2
     },
     {
+      "cell": 12823,
+      "level": "middle",
+      "range": "Gangdise",
+      "spriteIndex": 4
+    },
+    {
+      "cell": 12824,
+      "level": "high",
+      "range": "Gangdise",
+      "spriteIndex": 5
+    },
+    {
       "cell": 12825,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Gangdise",
       "spriteIndex": 0
+    },
+    {
+      "cell": 12826,
+      "level": "middle",
+      "range": "Gangdise",
+      "spriteIndex": 1
     },
     {
       "cell": 12827,
@@ -10425,26 +10959,26 @@
     },
     {
       "cell": 12843,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Tanggula",
       "spriteIndex": 0
     },
     {
       "cell": 12844,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Tanggula",
       "spriteIndex": 1
     },
     {
       "cell": 12845,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Tanggula",
       "spriteIndex": 2
     },
     {
       "cell": 12846,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Tanggula",
       "spriteIndex": 3
     },
     {
@@ -10470,6 +11004,18 @@
       "level": "hill",
       "range": null,
       "spriteIndex": 2
+    },
+    {
+      "cell": 12855,
+      "level": "high",
+      "range": "Bayan Har",
+      "spriteIndex": 0
+    },
+    {
+      "cell": 12856,
+      "level": "low",
+      "range": "Bayan Har",
+      "spriteIndex": 1
     },
     {
       "cell": 12861,
@@ -10580,21 +11126,33 @@
       "spriteIndex": 2
     },
     {
+      "cell": 12983,
+      "level": "middle",
+      "range": "Gangdise",
+      "spriteIndex": 5
+    },
+    {
       "cell": 12984,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Gangdise",
       "spriteIndex": 0
     },
     {
       "cell": 12985,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Gangdise",
       "spriteIndex": 1
     },
     {
+      "cell": 12986,
+      "level": "high",
+      "range": "Gangdise",
+      "spriteIndex": 2
+    },
+    {
       "cell": 12987,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Gangdise",
       "spriteIndex": 3
     },
     {
@@ -10761,14 +11319,14 @@
     },
     {
       "cell": 13143,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Gangdise",
       "spriteIndex": 0
     },
     {
       "cell": 13144,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Gangdise",
       "spriteIndex": 1
     },
     {
@@ -10803,14 +11361,14 @@
     },
     {
       "cell": 13153,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Nyainqentanglha",
       "spriteIndex": 4
     },
     {
       "cell": 13154,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Nyainqentanglha",
       "spriteIndex": 5
     },
     {
@@ -10946,33 +11504,51 @@
       "spriteIndex": 0
     },
     {
+      "cell": 13304,
+      "level": "low",
+      "range": "Nyainqentanglha",
+      "spriteIndex": 2
+    },
+    {
+      "cell": 13305,
+      "level": "high",
+      "range": "Nyainqentanglha",
+      "spriteIndex": 3
+    },
+    {
       "cell": 13307,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Nyainqentanglha",
       "spriteIndex": 5
     },
     {
+      "cell": 13309,
+      "level": "high",
+      "range": "Nyainqentanglha",
+      "spriteIndex": 1
+    },
+    {
       "cell": 13310,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Nyainqentanglha",
       "spriteIndex": 2
     },
     {
       "cell": 13311,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Nyainqentanglha",
       "spriteIndex": 3
     },
     {
       "cell": 13312,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Nyainqentanglha",
       "spriteIndex": 4
     },
     {
       "cell": 13313,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Nyainqentanglha",
       "spriteIndex": 5
     },
     {
@@ -11121,32 +11697,38 @@
     },
     {
       "cell": 13463,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Nyainqentanglha",
       "spriteIndex": 2
     },
     {
       "cell": 13464,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Nyainqentanglha",
       "spriteIndex": 3
     },
     {
       "cell": 13465,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Nyainqentanglha",
       "spriteIndex": 4
     },
     {
+      "cell": 13466,
+      "level": "middle",
+      "range": "Nyainqentanglha",
+      "spriteIndex": 5
+    },
+    {
       "cell": 13467,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Nyainqentanglha",
       "spriteIndex": 0
     },
     {
       "cell": 13468,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Nyainqentanglha",
       "spriteIndex": 1
     },
     {
@@ -11157,9 +11739,15 @@
     },
     {
       "cell": 13470,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Nyainqentanglha",
       "spriteIndex": 3
+    },
+    {
+      "cell": 13472,
+      "level": "middle",
+      "range": "Nyainqentanglha",
+      "spriteIndex": 5
     },
     {
       "cell": 13474,
@@ -11349,14 +11937,14 @@
     },
     {
       "cell": 13630,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Nyainqentanglha",
       "spriteIndex": 4
     },
     {
       "cell": 13631,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Nyainqentanglha",
       "spriteIndex": 5
     },
     {
@@ -11559,20 +12147,20 @@
     },
     {
       "cell": 13788,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Nyainqentanglha",
       "spriteIndex": 3
     },
     {
       "cell": 13789,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Nyainqentanglha",
       "spriteIndex": 4
     },
     {
       "cell": 13790,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Nyainqentanglha",
       "spriteIndex": 5
     },
     {
@@ -11673,8 +12261,8 @@
     },
     {
       "cell": 13825,
-      "level": "middle",
-      "range": "Daba range",
+      "level": "low",
+      "range": "Wushan",
       "spriteIndex": 4
     },
     {
@@ -11775,15 +12363,21 @@
     },
     {
       "cell": 13947,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Nyainqentanglha",
       "spriteIndex": 3
     },
     {
       "cell": 13948,
-      "level": "hill",
-      "range": null,
+      "level": "high",
+      "range": "Nyainqentanglha",
       "spriteIndex": 4
+    },
+    {
+      "cell": 13949,
+      "level": "high",
+      "range": "Nyainqentanglha",
+      "spriteIndex": 5
     },
     {
       "cell": 13952,
@@ -11850,6 +12444,12 @@
       "level": "hill",
       "range": null,
       "spriteIndex": 1
+    },
+    {
+      "cell": 13983,
+      "level": "middle",
+      "range": "Wushan",
+      "spriteIndex": 3
     },
     {
       "cell": 13997,
@@ -11925,8 +12525,8 @@
     },
     {
       "cell": 14108,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Nyainqentanglha",
       "spriteIndex": 5
     },
     {
@@ -11988,6 +12588,12 @@
       "level": "hill",
       "range": null,
       "spriteIndex": 2
+    },
+    {
+      "cell": 14140,
+      "level": "low",
+      "range": "Wushan",
+      "spriteIndex": 1
     },
     {
       "cell": 14245,
@@ -12384,6 +12990,12 @@
       "level": "hill",
       "range": null,
       "spriteIndex": 0
+    },
+    {
+      "cell": 14456,
+      "level": "low",
+      "range": "Wushan",
+      "spriteIndex": 5
     },
     {
       "cell": 14478,
@@ -12824,18 +13436,6 @@
       "spriteIndex": 0
     },
     {
-      "cell": 14788,
-      "level": "low",
-      "range": "Wuyi",
-      "spriteIndex": 1
-    },
-    {
-      "cell": 14789,
-      "level": "low",
-      "range": "Wuyi",
-      "spriteIndex": 2
-    },
-    {
       "cell": 14795,
       "level": "hill",
       "range": null,
@@ -13034,16 +13634,16 @@
       "spriteIndex": 2
     },
     {
-      "cell": 14947,
-      "level": "middle",
-      "range": "Wuyi",
-      "spriteIndex": 1
-    },
-    {
-      "cell": 14948,
+      "cell": 14950,
       "level": "low",
       "range": "Wuyi",
-      "spriteIndex": 2
+      "spriteIndex": 4
+    },
+    {
+      "cell": 14951,
+      "level": "low",
+      "range": "Wuyi",
+      "spriteIndex": 5
     },
     {
       "cell": 14954,
@@ -13173,8 +13773,8 @@
     },
     {
       "cell": 15084,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Dalou",
       "spriteIndex": 3
     },
     {
@@ -13194,18 +13794,6 @@
       "level": "low",
       "range": "Wuling range",
       "spriteIndex": 1
-    },
-    {
-      "cell": 15104,
-      "level": "low",
-      "range": "Wuyi",
-      "spriteIndex": 5
-    },
-    {
-      "cell": 15105,
-      "level": "middle",
-      "range": "Wuyi",
-      "spriteIndex": 0
     },
     {
       "cell": 15110,
@@ -13293,21 +13881,27 @@
     },
     {
       "cell": 15240,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Dalou",
       "spriteIndex": 0
     },
     {
       "cell": 15241,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Dalou",
       "spriteIndex": 1
     },
     {
       "cell": 15242,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Dalou",
       "spriteIndex": 2
+    },
+    {
+      "cell": 15243,
+      "level": "low",
+      "range": "Dalou",
+      "spriteIndex": 3
     },
     {
       "cell": 15245,
@@ -13328,16 +13922,22 @@
       "spriteIndex": 1
     },
     {
-      "cell": 15248,
-      "level": "hill",
-      "range": null,
-      "spriteIndex": 2
+      "cell": 15250,
+      "level": "low",
+      "range": "Xuefeng range",
+      "spriteIndex": 4
     },
     {
-      "cell": 15263,
-      "level": "middle",
+      "cell": 15265,
+      "level": "low",
       "range": "Wuyi",
-      "spriteIndex": 5
+      "spriteIndex": 1
+    },
+    {
+      "cell": 15266,
+      "level": "low",
+      "range": "Wuyi",
+      "spriteIndex": 2
     },
     {
       "cell": 15268,
@@ -13407,8 +14007,8 @@
     },
     {
       "cell": 15393,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Wumeng",
       "spriteIndex": 0
     },
     {
@@ -13416,6 +14016,24 @@
       "level": "hill",
       "range": null,
       "spriteIndex": 2
+    },
+    {
+      "cell": 15396,
+      "level": "low",
+      "range": "Dalou",
+      "spriteIndex": 3
+    },
+    {
+      "cell": 15397,
+      "level": "middle",
+      "range": "Dalou",
+      "spriteIndex": 4
+    },
+    {
+      "cell": 15398,
+      "level": "low",
+      "range": "Dalou",
+      "spriteIndex": 5
     },
     {
       "cell": 15399,
@@ -13442,16 +14060,28 @@
       "spriteIndex": 0
     },
     {
-      "cell": 15420,
+      "cell": 15407,
       "level": "low",
-      "range": "Wuyi",
+      "range": "Xuefeng range",
+      "spriteIndex": 2
+    },
+    {
+      "cell": 15408,
+      "level": "low",
+      "range": "Xuefeng range",
       "spriteIndex": 3
     },
     {
-      "cell": 15421,
-      "level": "middle",
+      "cell": 15422,
+      "level": "low",
       "range": "Wuyi",
-      "spriteIndex": 4
+      "spriteIndex": 5
+    },
+    {
+      "cell": 15423,
+      "level": "low",
+      "range": "Wuyi",
+      "spriteIndex": 0
     },
     {
       "cell": 15425,
@@ -13514,6 +14144,18 @@
       "spriteIndex": 1
     },
     {
+      "cell": 15550,
+      "level": "low",
+      "range": "Wumeng",
+      "spriteIndex": 4
+    },
+    {
+      "cell": 15551,
+      "level": "middle",
+      "range": "Wumeng",
+      "spriteIndex": 5
+    },
+    {
       "cell": 15552,
       "level": "hill",
       "range": null,
@@ -13527,9 +14169,15 @@
     },
     {
       "cell": 15554,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Dalou",
       "spriteIndex": 2
+    },
+    {
+      "cell": 15555,
+      "level": "low",
+      "range": "Dalou",
+      "spriteIndex": 3
     },
     {
       "cell": 15557,
@@ -13556,16 +14204,22 @@
       "spriteIndex": 5
     },
     {
-      "cell": 15579,
-      "level": "low",
-      "range": "Wuyi",
-      "spriteIndex": 3
+      "cell": 15565,
+      "level": "middle",
+      "range": "Xuefeng range",
+      "spriteIndex": 1
     },
     {
       "cell": 15580,
       "level": "low",
       "range": "Wuyi",
       "spriteIndex": 4
+    },
+    {
+      "cell": 15581,
+      "level": "low",
+      "range": "Wuyi",
+      "spriteIndex": 5
     },
     {
       "cell": 15586,
@@ -13658,9 +14312,15 @@
       "spriteIndex": 5
     },
     {
+      "cell": 15707,
+      "level": "middle",
+      "range": "Wumeng",
+      "spriteIndex": 2
+    },
+    {
       "cell": 15708,
-      "level": "hill",
-      "range": null,
+      "level": "low",
+      "range": "Wumeng",
       "spriteIndex": 3
     },
     {
@@ -13694,14 +14354,8 @@
       "spriteIndex": 4
     },
     {
-      "cell": 15736,
-      "level": "low",
-      "range": "Wuyi",
-      "spriteIndex": 1
-    },
-    {
       "cell": 15737,
-      "level": "middle",
+      "level": "low",
       "range": "Wuyi",
       "spriteIndex": 2
     },
@@ -13814,6 +14468,18 @@
       "spriteIndex": 5
     },
     {
+      "cell": 15864,
+      "level": "low",
+      "range": "Wumeng",
+      "spriteIndex": 0
+    },
+    {
+      "cell": 15865,
+      "level": "middle",
+      "range": "Wumeng",
+      "spriteIndex": 1
+    },
+    {
       "cell": 15868,
       "level": "hill",
       "range": null,
@@ -13857,25 +14523,19 @@
     },
     {
       "cell": 15880,
-      "level": "hill",
-      "range": null,
+      "level": "middle",
+      "range": "Xuefeng range",
       "spriteIndex": 4
     },
     {
-      "cell": 15881,
-      "level": "hill",
-      "range": null,
-      "spriteIndex": 5
-    },
-    {
       "cell": 15895,
-      "level": "middle",
+      "level": "low",
       "range": "Wuyi",
       "spriteIndex": 1
     },
     {
       "cell": 15896,
-      "level": "low",
+      "level": "middle",
       "range": "Wuyi",
       "spriteIndex": 2
     },
@@ -13970,6 +14630,18 @@
       "spriteIndex": 1
     },
     {
+      "cell": 16021,
+      "level": "low",
+      "range": "Wumeng",
+      "spriteIndex": 4
+    },
+    {
+      "cell": 16022,
+      "level": "low",
+      "range": "Wumeng",
+      "spriteIndex": 5
+    },
+    {
       "cell": 16026,
       "level": "hill",
       "range": null,
@@ -13994,16 +14666,10 @@
       "spriteIndex": 0
     },
     {
-      "cell": 16038,
-      "level": "hill",
-      "range": null,
-      "spriteIndex": 3
-    },
-    {
-      "cell": 16039,
-      "level": "hill",
-      "range": null,
-      "spriteIndex": 4
+      "cell": 16037,
+      "level": "middle",
+      "range": "Xuefeng range",
+      "spriteIndex": 2
     },
     {
       "cell": 16052,
@@ -14013,7 +14679,7 @@
     },
     {
       "cell": 16053,
-      "level": "low",
+      "level": "middle",
       "range": "Wuyi",
       "spriteIndex": 0
     },
@@ -14138,6 +14804,18 @@
       "spriteIndex": 1
     },
     {
+      "cell": 16179,
+      "level": "low",
+      "range": "Wumeng",
+      "spriteIndex": 3
+    },
+    {
+      "cell": 16180,
+      "level": "low",
+      "range": "Wumeng",
+      "spriteIndex": 4
+    },
+    {
       "cell": 16185,
       "level": "hill",
       "range": null,
@@ -14162,10 +14840,10 @@
       "spriteIndex": 0
     },
     {
-      "cell": 16198,
-      "level": "hill",
-      "range": null,
-      "spriteIndex": 4
+      "cell": 16195,
+      "level": "low",
+      "range": "Xuefeng range",
+      "spriteIndex": 1
     },
     {
       "cell": 16210,
@@ -14252,6 +14930,12 @@
       "spriteIndex": 5
     },
     {
+      "cell": 16337,
+      "level": "low",
+      "range": "Wumeng",
+      "spriteIndex": 2
+    },
+    {
       "cell": 16342,
       "level": "hill",
       "range": null,
@@ -14284,7 +14968,7 @@
     {
       "cell": 16352,
       "level": "low",
-      "range": "Yuecheng range",
+      "range": "Xuefeng range",
       "spriteIndex": 5
     },
     {
@@ -14577,15 +15261,9 @@
     },
     {
       "cell": 16683,
-      "level": "middle",
-      "range": "Wuyi",
-      "spriteIndex": 0
-    },
-    {
-      "cell": 16684,
       "level": "low",
       "range": "Wuyi",
-      "spriteIndex": 1
+      "spriteIndex": 0
     },
     {
       "cell": 16766,
@@ -14745,14 +15423,14 @@
     },
     {
       "cell": 16841,
-      "level": "low",
-      "range": "Wuyi",
+      "level": "hill",
+      "range": null,
       "spriteIndex": 5
     },
     {
       "cell": 16842,
-      "level": "low",
-      "range": "Wuyi",
+      "level": "hill",
+      "range": null,
       "spriteIndex": 0
     },
     {
@@ -14943,8 +15621,8 @@
     },
     {
       "cell": 16999,
-      "level": "low",
-      "range": "Wuyi",
+      "level": "hill",
+      "range": null,
       "spriteIndex": 4
     },
     {

@@ -5,7 +5,7 @@
       "map": "eastasia",
       "width": 158,
       "height": 136,
-      "baseTerrainSha256": "f70f36427ff30c33d1f0cb221f7789cad0339d62ee84adf336171bfdeaf8e275",
+      "baseTerrainSha256": "47289fa67d67022194e41c4ff3ba0a0d9edcca7e11c1bcc8456feb55caee86ea",
       "terrainOverrides": [
         {
           "column": 6,

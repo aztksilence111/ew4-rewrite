@@ -28,7 +28,7 @@ public sealed partial class ModStore
             catch (Exception e) when (Recoverable(e)) { progress = new("error", "上次Mod不可用，已回到原版: " + e.Message); }
         }
     }
-    private static bool Recoverable(Exception e) => e is IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException or JsonException or InvalidOperationException or FormatException or OverflowException or Ew4.Core.RuleViolation
+    internal static bool Recoverable(Exception e) => e is IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException or JsonException or InvalidOperationException or FormatException or OverflowException or Ew4.Core.RuleViolation
         or KeyNotFoundException or NullReferenceException or IndexOutOfRangeException or System.Xml.XmlException;
     private string Folder(string key)
     {
@@ -63,7 +63,8 @@ public sealed partial class ModStore
             code = e is Ew4.Core.RuleViolation rule ? rule.Code : "mod.failure", message = e.Message, error = e.Message }, ModFiles.Json); }
     }
     private ClientGame NewGame(string? key, ModManifest? manifest) => new(baseline.Content(p => ReadFrom(key, manifest, p), manifest?.Scenarios ?? baseline.Scenarios, showHiddenCampaigns: manifest == null),
-        manifest == null ? saves : ModFiles.Under(saves, $"mods/{manifest.Id}/{manifest.LogicRevision}"));
+        manifest == null ? baseline.SaveNamespace == null ? saves : ModFiles.Under(saves, baseline.SaveNamespace)
+            : ModFiles.Under(saves, $"mods/{manifest.Id}/{manifest.LogicRevision}"));
     public string Status()
     {
         lock (gate) return JsonSerializer.Serialize(new { active = activeKey, baseRevision = baseline.Revision, mods = List(), import = progress }, ModFiles.Json);
@@ -196,6 +197,7 @@ public sealed partial class ModStore
         var names = baseline.Files.Union(m.Files.Keys).Where(p => p.StartsWith("original/", StringComparison.Ordinal) || p.StartsWith("legacy/", StringComparison.Ordinal)
                 || p.StartsWith("rewrite/", StringComparison.Ordinal) && !p.EndsWith(".png", StringComparison.Ordinal)
                 || p == "client/countries.json" && m.Files.ContainsKey(p))
+            .Where(p => p != Ew4.Legacy.ArmyCapacityConfiguration.Path)
             .Where(p => !p.EndsWith(".btl", StringComparison.Ordinal) || m.Scenarios.Contains(Path.GetFileNameWithoutExtension(p))).Order(StringComparer.Ordinal);
         return ModFiles.Hash(System.Text.Encoding.UTF8.GetBytes(string.Join('\n', names.Select(p => p + ":" + ModFiles.Hash(read(p))))));
     }
@@ -217,25 +219,7 @@ public sealed partial class ModStore
         }
         byte[] Read(string p) => m.Files.ContainsKey(p) ? source.Read(p) : baseline.Read(p);
         if (LogicRevision(m, Read) != m.LogicRevision) throw new InvalidDataException("规则版本指纹不符");
-        var content = baseline.Content(Read, m.Scenarios);
-        var scenarioErrors = new List<string>();
-        Exception? firstScenarioError = null;
-        foreach (var scenario in content.Scenarios)
-        {
-            try
-            {
-                var battle = content.Battle(scenario.Id);
-                if (!content.Maps.ContainsKey(battle.MapId)) throw new InvalidDataException("剧本缺少地图");
-                if (scenario.Mode != 3)
-                {
-                    var started = content.Start(scenario.Id, scenario.Mode == 2 ? battle.Factions.First(f => f.Camp != 4).CountryId : null);
-                    foreach (var diagnostic in started.MapDiagnostics) diagnostics?.Add(new { scenario = scenario.Id, diagnostic.Code, diagnostic.Cell, diagnostic.Value });
-                }
-            }
-            catch (Exception e) when (Recoverable(e)) { firstScenarioError ??= e; scenarioErrors.Add(scenario.Id + ": " + e.Message); }
-        }
-        if (scenarioErrors.Count > 0) throw new InvalidDataException($"{scenarioErrors.Count} 个剧本无法启动:\n" + string.Join('\n', scenarioErrors), firstScenarioError);
-        ResourceValidation.Check(Read, m.Files.Keys.Union(baseline.Files).ToHashSet(StringComparer.Ordinal), content);
+        ContentValidation.Check(baseline, Read, m.Scenarios, m.Files.Keys.Union(baseline.Files).ToHashSet(StringComparer.Ordinal), diagnostics);
         return m;
     }
     public void Export(string key, string destination)

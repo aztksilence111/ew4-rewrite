@@ -52,6 +52,11 @@ def labels(runtime, mask, placements, facilities):
         for geometry, attrs in runtime.geo.read_shapes('lakes', extent):
             name = attrs.get('name_en') or attrs.get('name')
             lake_shapes[name] = runtime.to_source_geometry(geometry)
+        from shapely.geometry import shape
+        from shapely import transform as transform_geometry
+        for feature in json.loads((runtime.REPORT/'lake_additions.geojson').read_text(encoding='utf-8'))['features']:
+            geometry = transform_geometry(shape(feature['geometry']), runtime.geo.PROJ.xy, interleaved=False)
+            lake_shapes[feature['properties']['name_en']] = runtime.to_source_geometry(geometry)
     offsets = sorted(((dx, dy) for dx in range(-160, 161, 32) for dy in range(-160, 161, 32)),
                      key=lambda p: (math.hypot(*p), abs(p[1]), p))
     # Place lake names first because they have much less room than regional labels.

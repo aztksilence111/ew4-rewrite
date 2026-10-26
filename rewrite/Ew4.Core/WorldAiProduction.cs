@@ -89,6 +89,7 @@ public static partial class WorldAi
         var map = new HexMap(state.Width, state.Height);
         var owned = Enumerable.Range(0, state.Cells.Count).Where(i => state.Cells[i].Owner == faction.Id && state.Cells[i].Terrain.Active).ToArray();
         int armySize = state.Units.Count(u => u.Owner == faction.Id);
+        int? armyLimit = WorldArmyCapacity.Limit(state, faction.Id);
         var byCell = state.Units.GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => g.OrderBy(u => u.Id, StringComparer.Ordinal).ToArray());
         UnitState[] At(int cell) => byCell.TryGetValue(cell, out var units) ? units : Array.Empty<UnitState>();
         var camps = state.Factions.ToDictionary(f => f.Id, f => f.Camp, StringComparer.Ordinal);
@@ -113,7 +114,20 @@ public static partial class WorldAi
         }
         int[] Neighbors(int cell) => Enumerable.Range(0, 6).Select(d => map.Neighbor(cell, d)).Where(i => i >= 0).ToArray();
         bool Coastal(int cell) => Neighbors(cell).Any(i => state.Cells[i].Terrain.Active && state.Cells[i].Terrain.Sea);
-        bool EligibleOffer(RecruitmentOffer offer) => faction.Recruitment.ContainsKey(offer.Id) && CanPay(faction.Resources, offer.Cost)
+        var income = WorldTurns.FactionIncome(state, faction, turns);
+        long upkeep = WorldTurns.FactionUpkeep(state, faction.Id);
+        bool CanSupply(RecruitmentOffer offer)
+        {
+            if (faction.Shortage > 0) return false;
+            // Reserve the next owner turn's upkeep after paying the offer and applying the income cap.
+            decimal food = (decimal)faction.Resources.Food - offer.Cost.Food + income.Food;
+            if (turns.ResourceCap.HasValue) food = Math.Min(food, turns.ResourceCap.Value);
+            long added = offer.Support.Logistics || offer.Template!.Has(Ew4Combat.Skill(22)) ? 0 : offer.Support.FoodConsumption;
+            return food >= (decimal)upkeep + added;
+        }
+        bool EligibleOffer(RecruitmentOffer offer) => !(armySize >= armyLimit)
+            && faction.Recruitment.ContainsKey(offer.Id) && CanPay(faction.Resources, offer.Cost)
+            && CanSupply(offer)
             && (!offer.PerTurnLimit.HasValue || !faction.TurnUses.TryGetValue(offer.TurnGroup, out int count) || count < offer.PerTurnLimit);
 
         // Availability is derived from configured offers and legal world sites, never legacy byte slots.
@@ -141,8 +155,7 @@ public static partial class WorldAi
 
         if (task == "recruit" || task == "naval")
         {
-            var income = WorldTurns.FactionIncome(state, faction, turns);
-            if (AiProduction.AttemptRecruit(faction.Resources.Food, income.Food, WorldTurns.FactionUpkeep(state, faction.Id), random.Next(100), production.Recruit))
+            if (AiProduction.AttemptRecruit(faction.Resources.Food, income.Food, upkeep, random.Next(100), production.Recruit))
             {
                 var groups = production.Groups.Where(g => g.Naval == (task == "naval")).ToArray();
                 var projections = new Dictionary<int, (WorldState State, string? UnitId, int? Destination)>();
@@ -150,7 +163,7 @@ public static partial class WorldAi
                 foreach (int cell in owned)
                 {
                     if (!groups.SelectMany(g => g.HighestFirst).Any(id => EligibleOffer(production.Offers[id])
-                        && WorldActions.CanRecruitValidated(state, faction, cell, production.Offers[id], 0, armySize))) continue;
+                        && WorldActions.CanRecruitValidated(state, faction, cell, production.Offers[id], 0, armySize, armyLimit))) continue;
                     WorldState projected = state;
                     string? relocating = null;
                     int? destination = null;
@@ -169,7 +182,7 @@ public static partial class WorldAi
                     }
                     var offers = groups.SelectMany(g => g.HighestFirst).Where(id => EligibleOffer(production.Offers[id])
                         && WorldActions.CanRecruitValidated(projected, faction, cell, production.Offers[id],
-                            At(cell).Length - (relocating == null ? 0 : 1), armySize)).ToArray();
+                            At(cell).Length - (relocating == null ? 0 : 1), armySize, armyLimit)).ToArray();
                     if (offers.Length == 0) continue;
                     projections[cell] = (projected, relocating, destination);
                     legal[cell] = new HashSet<string>(offers, StringComparer.Ordinal);
@@ -219,7 +232,7 @@ public static partial class WorldAi
             var sites = owned.Select(cell =>
             {
                 var allowed = production.Fortresses.Where(p => EligibleOffer(p.Value)
-                    && WorldActions.CanRecruitValidated(state, faction, cell, p.Value, At(cell).Length, armySize)).Select(p => p.Key).ToArray();
+                    && WorldActions.CanRecruitValidated(state, faction, cell, p.Value, At(cell).Length, armySize, armyLimit)).Select(p => p.Key).ToArray();
                 bool eligible = !state.Cells[cell].Terrain.Sea && state.Cells[cell].Environment == 0 && state.Cells[cell].BuildingKind == null
                     && state.Cells[cell].InstallationKind == null && At(cell).Length == 0
                     && !Neighbors(cell).Any(i => At(i).Any(u => u.Combatant.Profile.Category == production.FortressCategory));

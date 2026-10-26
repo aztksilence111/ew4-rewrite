@@ -19,7 +19,15 @@ public sealed partial class ClientGame
                 var current = Require();
                 var world = current.Session.World;
                 var active = world.Factions.Single(f => f.Id == world.ActiveFaction);
-                if (active.Human || world.PendingDialogue != null || world.Phase == TurnPhase.Finished) break;
+                if (world.PendingDialogue != null || world.Phase == TurnPhase.Finished) break;
+                if (active.Human)
+                {
+                    if (active.Id != current.Session.PlayerFaction || !(PlayerAi.Pending(world) || PlayerAi.Automatic(world))) break;
+                    AdvancePlayerAi(presentation: false);
+                    steps++;
+                    if (Require().Session.World.ActiveFaction != before.World.ActiveFaction) break;
+                    continue;
+                }
                 var rules = current.Rules;
                 var production = rules.Production[active.Id];
                 var plan = WorldAi.PlanStep(world, rules.Ai, production, rules.Turns);

@@ -1,0 +1,8 @@
+{
+  "type": "FeatureCollection",
+  "description": "Historical natural lake corrections for the 42 km grid. Zaysan is mislabeled Reservoir in the modern source. Retain its southern natural basin at approximately 1800 square kilometres; omit the modern northward Bukhtarma reservoir extension. This is a generalized reconstruction, not a surveyed pre-dam shoreline.",
+  "sources": ["Natural Earth ne_10m_lakes: Zaysan", "https://en.wikipedia.org/wiki/Lake_Zaysan"],
+  "features": [
+    {"type":"Feature","properties":{"name":"Lake Zaysan","name_en":"Zaysan","featurecla":"Lake","historicalApproximation":true},"geometry":{"type":"Polygon","coordinates":[[[84.54388,47.94614],[84.56213,47.93084],[84.4647,47.9067],[84.43791,47.85342],[84.38404,47.83458],[84.37521,47.80485],[84.39081,47.77306],[84.3446,47.75922],[84.26983,47.77865],[84.23392,47.77306],[84.26071,47.75952],[84.27807,47.73214],[84.36373,47.73214],[84.25658,47.71801],[84.22067,47.7292],[84.09616,47.82074],[83.83623,47.88285],[83.78825,47.95115],[83.69876,47.97911],[83.64961,48.01944],[83.53098,48.02621],[83.41088,48.06124],[83.3258,48.04858],[83.19814,48.11],[84.01831,48.11],[84.07349,48.08214],[84.08968,48.03975],[84.15679,48.06889],[84.21802,48.04328],[84.34872,48.03327],[84.48118,47.95674],[84.54388,47.94614]]]}}
+  ]
+}

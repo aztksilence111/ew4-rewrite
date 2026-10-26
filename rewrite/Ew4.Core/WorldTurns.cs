@@ -81,6 +81,9 @@ public static class WorldTurns
             return state with { Outcome = BattleOutcome.Defeat, Phase = TurnPhase.Finished };
         }
         var next = state;
+        if (state.Factions.Single(f => f.Id == state.ActiveFaction).PlayerAi is { EndingTurn: true } control)
+            next = next with { Factions = next.Factions.Select(f => f.Id == state.ActiveFaction ? f with {
+                PlayerAi = control with { EndingTurn = false, Queue = Array.Empty<string>(), Steps = 0 } } : f).ToArray() };
         int current = next.Factions.ToList().FindIndex(f => f.Id == next.ActiveFaction), selected = current;
         bool wrapped = false;
         for (int step = 1; step <= next.Factions.Count; step++)
@@ -111,6 +114,17 @@ public static class WorldTurns
         return Commit(state, Continue(next, rules, notices), notices);
     }
 
+    public static WorldChange RecoverDefeatedFaction(WorldState state, WorldTurnRules rules)
+    {
+        if (state.Phase != TurnPhase.Active || !state.Factions.Single(f => f.Id == state.ActiveFaction).Defeated)
+            return new(state, Array.Empty<WorldNotice>());
+        state.Validate(); rules.Validate();
+        var notices = new List<WorldNotice>();
+        // The action has already settled; do not run this faction's end-turn effects again.
+        var next = state.Copy() with { Phase = TurnPhase.EndFactionEvents };
+        return Commit(state, Continue(next, rules, notices), notices);
+    }
+
     private static WorldChange Commit(WorldState before, WorldState next, List<WorldNotice> notices)
     {
         next = next with { Revision = checked(before.Revision + 1) };
@@ -131,7 +145,15 @@ public static class WorldTurns
         if (state.PendingDialogue != null || state.Phase == TurnPhase.Finished) return state;
         if (state.Phase == TurnPhase.EndFactionEvents)
         {
-            if (state.PendingDialogue != null) return state;
+            if (rules.PlayerCamp != null && state.Factions.Single(f => f.Id == state.ActiveFaction).Defeated)
+            {
+                state = WorldVictory.Resolve(state, rules.PlayerCamp, rules.Victory, rules.NeutralCamps);
+                if (state.Outcome != BattleOutcome.Continue)
+                {
+                    notices.Add(new("battle.finished", state.Outcome.ToString()));
+                    return state;
+                }
+            }
             state = Advance(state, notices);
             if (state.Phase == TurnPhase.Finished) return state;
             state = Events(state);
@@ -328,6 +350,7 @@ public static class WorldTurns
             {
                 RemainingMovement = refreshed.Movement, ExtensionMovementLimit = rules.Extensions == null ? null : refreshed.Movement,
                 Acted = refreshed.Acted, Morale = refreshed.Morale, LocalPenalty = local,
+                PlayerControl = unit.PlayerControl == null ? null : PlayerAi.Order(unit) with { ActionRound = 0 },
                 Behavior = refreshed.Behavior, BehaviorExpiry = refreshed.BehaviorExpiry,
                 Combatant = unit.Combatant with { Health = refreshed.Health, Morale = refreshed.Morale.Effective,
                     ConstructionTurns = refreshed.ConstructionTurns, AtSea = cells[unit.Cell].Terrain.Sea, BuildingKind = cells[unit.Cell].BuildingKind }

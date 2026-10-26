@@ -15,11 +15,41 @@ byte[] Read(string path) => File.ReadAllBytes(path.StartsWith("frontend/", Strin
 var files = new[] { "original", "legacy", "client", "rewrite" }.Where(part => Directory.Exists(Path.Combine(data, part))).SelectMany(part => Directory.EnumerateFiles(Path.Combine(data, part), "*", SearchOption.AllDirectories)
     .Where(p => part != "legacy" || Path.GetDirectoryName(p) == Path.Combine(data, part))
     .Select(p => Path.GetRelativePath(data, p).Replace('\\', '/'))).Concat(["frontend/conquest-pages.json", "frontend/city-names.json"]);
-var store = new ModStore(new ModBase(Read, files), builder.Configuration["mod-root"] ?? Path.Combine(saves, "content-mods"), saves);
+ModStore store = null!;
+Task StartGame() => Task.Run(() =>
+{
+    var prepared = StartupAssets.Prepare(new ModBase(Read, files), Path.Combine(saves, "startup-assets"),
+        p => System.Console.WriteLine(p.Message));
+    store = new ModStore(prepared.Content, builder.Configuration["mod-root"] ?? Path.Combine(saves, "content-mods"), saves);
+});
+Task startup = StartGame();
+object startupGate = new();
 var app = builder.Build();
 app.Use(async (context, next) =>
 {
     string path = context.Request.Path.Value ?? "/";
+    Task ready;
+    lock (startupGate)
+    {
+        if (startup.IsFaulted && path is "/" or "/index.html") startup = StartGame();
+        ready = startup;
+    }
+    try { await ready; }
+    catch (Exception error)
+    {
+        context.Response.StatusCode = 503;
+        context.Response.Headers.CacheControl = "no-store";
+        if (path.StartsWith("/api/", StringComparison.Ordinal))
+            await context.Response.WriteAsJsonAsync(new { ok = false, code = "startup.assets", message = error.Message });
+        else
+        {
+            context.Response.ContentType = "text/html; charset=utf-8";
+            await context.Response.WriteAsync("<!doctype html><html lang=\"zh-CN\"><meta charset=\"utf-8\"><title>游戏资源检查失败</title>"
+                + "<h1>游戏资源检查失败</h1><pre style=\"white-space:pre-wrap\">" + System.Net.WebUtility.HtmlEncode(error.Message)
+                + "</pre><button onclick=\"location.reload()\">重试</button></html>");
+        }
+        return;
+    }
     if (path.StartsWith("/api/", StringComparison.Ordinal))
     {
         if (context.Request.Headers["Sec-Fetch-Site"] == "cross-site" || context.Request.Headers.Origin.Count > 0

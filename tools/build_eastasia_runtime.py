@@ -88,6 +88,8 @@ def geography():
     land = unary_union([g for g,_ in geo.read_shapes("land", extent)])
     lakes = [g for g,a in geo.read_shapes("lakes", extent)
              if g.area > 25_000_000 and a.get("featurecla") != "Reservoir"]
+    for feature in json.loads((REPORT/'lake_additions.geojson').read_text(encoding='utf-8'))['features']:
+        lakes.append(transform_geometry(shape(feature['geometry']), geo.PROJ.xy, interleaved=False))
     land = to_source_geometry(land.difference(unary_union(lakes)))
     rivers = []
     for geometry, attrs in geo.read_shapes("rivers", extent):
@@ -129,6 +131,21 @@ def geography():
     return land, eastasia_hydrology.join_seams(sys.modules[__name__], rivers), regions
 
 
+def terrain_at(col, row, regions):
+    point = Point(*world_to_source(*center(col, row)))
+    for region, kind, configured_density in regions:
+        if not region.covers(point):
+            continue
+        if kind == 0:
+            break
+        seed = ((col*73856093)^(row*19349663))&0xffffffff
+        density = configured_density if configured_density is not None else {3:68,4:60,5:55,6:72,7:80,8:48,9:90}[kind]
+        if seed%100 < density:
+            return kind, (col*13+row*17)%(9 if kind == 7 else 6)
+        break
+    return 0, 255
+
+
 def make_terrain(land, regions):
     data = np.zeros((GRID_H,GRID_W,12),dtype=np.uint8)
     data[:,:,1] = 255
@@ -149,17 +166,7 @@ def make_terrain(land, regions):
                 data[row,col,0] = 1
                 data[row,col,1] = (col*13+row*7)%7
                 continue
-            point = Point(sx,sy)
-            for region,kind,configured_density in regions:
-                if region.covers(point):
-                    if kind == 0:
-                        break
-                    seed = ((col*73856093)^(row*19349663))&0xffffffff
-                    density = configured_density if configured_density is not None else {3:68,4:60,5:55,6:72,7:80,8:48,9:90}[kind]
-                    if seed%100 < density:
-                        data[row,col,0] = kind
-                        data[row,col,1] = (col*13+row*17)%(9 if kind==7 else 6)
-                    break
+            data[row,col,:2] = terrain_at(col, row, regions)
     return data,fractions,centres
 
 
@@ -347,7 +354,7 @@ def make_preview(data,placements,image,facilities,bridges):
     for city in placements:
         site=bytearray(16)
         struct.pack_into('<hh',site,0,city['cell'],city['city_id'])
-        site[4],site[5],site[8],site[9],site[11]=0,city['building_level'],255,255,255
+        site[4],site[5],site[8],site[9],site[11]=city.get('building_kind',0),city['building_level'],255,255,255
         site[7]=city['building_style']
         sites.append(site)
     for facility in facilities:

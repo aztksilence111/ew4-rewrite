@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self'; connect-src 'self'">
   <title>欧陆战争4</title>
-  <link rel="stylesheet" href="style.css?v=20261023.1">
+  <link rel="stylesheet" href="style.css?v=20261026.5">
+  <link rel="stylesheet" href="campaign-technology.css?v=20261026.1">
   <link rel="stylesheet" href="original-ui.css?v=20261025.2">
   <link rel="stylesheet" href="mods.css?v=20261020.4">
   <link rel="stylesheet" href="victory-ui.css?v=20261021.3">
@@ -14,6 +15,7 @@
   <link rel="stylesheet" href="screen-layout.css?v=20261024.1">
   <link rel="stylesheet" href="tutorial.css?v=20261025.1">
   <link rel="stylesheet" href="map-views.css?v=20261025.3">
+  <link rel="stylesheet" href="ai-control.css?v=20261026.3">
   <link rel="stylesheet" href="headquarters-ui.css?v=20261025.1">
   <link rel="stylesheet" href="pause-objectives.css?v=20261025.1">
   <link rel="stylesheet" href="runtime-compat.css?v=20261024.1">
@@ -62,6 +64,7 @@
       <span class="resource-item" data-resource="industry"><img src="content/ui/image_ui_hd/marker_industry.png" alt=""><span class="resource-value"></span></span>
       <span class="resource-item" data-resource="food"><img src="content/ui/image_ui_hd/marker_food.png" alt=""><span class="resource-value"></span></span>
     </div></div>
+    <output id="army-capacity" aria-label="部队上限" title="部队上限"><img class="army-capacity-icon" src="content/ui/army_capacity/unit.png" alt=""><span id="army-capacity-value"></span><img class="army-capacity-hourglass" src="content/ui/army_capacity/turn.png" alt=""><span id="army-capacity-round"></span></output>
     <button id="menu-button" class="corner-button" title="暂停" aria-label="暂停"><span class="pause-symbol"></span></button>
     <div id="map-view-controls" data-map-mode="normal">
       <button id="map-mode" class="map-mode-button" type="button" title="普通地图" aria-label="普通地图" aria-haspopup="menu" aria-controls="map-mode-options" aria-expanded="false"><img src="map-normal.png" alt=""><span class="map-mode-arrow" aria-hidden="true"></span><span class="map-mode-tip">普通地图</span></button>
@@ -124,20 +127,22 @@
   <script src="original-ui.js?v=20261025.1"></script>
   <script src="menu-art.js?v=20261023.1"></script>
   <script src="effects.js?v=20261023.4"></script>
-  <script src="native-layout.js?v=20261023.1"></script>
+  <script src="native-layout.js?v=20261026.1"></script>
   <script src="menus.js?v=20261025.1"></script>
+  <script src="campaign-technology.js?v=20261026.1"></script>
   <script src="music.js?v=20261023.2"></script>
   <script src="commander-workflows.js?v=20261023.1"></script>
   <script src="headquarters-ui.js?v=20261025.1"></script>
   <script src="tutorial.js"></script>
   <script src="skill-ui.js?v=20261020.3"></script>
   <script src="victory-ui.js?v=20261021.4"></script>
-  <script src="pause-objectives.js?v=20261025.1"></script>
+  <script src="pause-objectives.js?v=20261026.2"></script>
+  <script src="ai-control.js?v=20261026.3"></script>
   <script src="local-multiplayer.js?v=20261021.3"></script>
   <script src="unit-navigation.js?v=20261023.3"></script>
   <script src="screen-layout.js?v=20261024.1"></script>
   <script src="performance.js"></script>
-  <script src="app.js?v=20261025.1"></script>
+  <script src="app.js?v=20261026.1"></script>
   <script src="mods.js?v=20261020.4"></script>
 </body>
 </html>

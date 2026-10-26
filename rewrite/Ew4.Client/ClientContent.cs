@@ -14,6 +14,7 @@ public sealed class ClientContent
     private readonly Func<string, byte[]> read;
     public LegacyScenarioCatalogs Catalogs { get; }
     public ExtensionLoader Extensions { get; }
+    public ArmyCapacityConfiguration ArmyCapacity { get; }
     public CountryCatalog Countries { get; }
     public IReadOnlyDictionary<int, LegacyTerrainMap> Maps { get; }
     public IReadOnlyDictionary<int, string> MapNames { get; }
@@ -23,6 +24,7 @@ public sealed class ClientContent
     public IReadOnlyList<CampaignChapter> Chapters { get; }
     public IReadOnlyDictionary<string, ScenarioPresentation> Presentations { get; }
     public IReadOnlyList<XElement> ItemDefinitions { get; }
+    public IReadOnlyList<string> TechnologyUnitNames { get; }
     public IReadOnlyList<XElement> PrincessDefinitions { get; }
     public bool CorrectOriginalEquipment { get; }
     private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<int, string>> scenarioCityNames;
@@ -43,6 +45,7 @@ public sealed class ClientContent
         }
         Countries = CountryCatalog.Load(read);
         Extensions = ExtensionLoader.Load(read, Countries);
+        ArmyCapacity = ArmyCapacityConfiguration.Read(read);
         var runtime = LegacyRuntimeCatalog.FromJson(Extensions.PatchCatalog(definitionsBundle.Catalog.ToJsonString()),
             correctItems, Extensions.LegacySkills, Extensions.ConfigureItem);
         CorrectOriginalEquipment = correctItems && LegacyEquipmentCorrections.IsOriginal(runtime.SourceHashes["def_item.xml"]);
@@ -57,6 +60,8 @@ public sealed class ClientContent
         Catalogs = new(runtime, LegacyTerrainRules.FromXml(Text("def_mapterrain.xml"), Text("def_terraintype.xml")), buildings,
             LegacyRecruitmentCatalog.Read(Text("def_card.xml")), combat, accounts, LegacyItemTradingCatalog.Read(Text("def_item.xml"), correctItems, runtime.Items),
             LegacyWarzoneTechnology.Read(Text("def_warzonetech.xml")), LegacyDialogueCatalog.Read(Text("def_dialogues.xml"), Text("stringtable_cn.ini")));
+        TechnologyUnitNames = XDocument.Parse(Text("def_army.xml")).Root!.Elements("country").First().Elements("army")
+            .Where(a => (int?)a.Attribute("grade") == 0).Select(a => (string)a.Attribute("name")!).ToArray();
         var definitions = XDocument.Parse(Text("def_map.xml")).Root!.Elements("map").ToArray();
         Maps = definitions.ToDictionary(e => (int)e.Attribute("id")!, e => LegacyTerrainMap.Read(read("original/" + (string)e.Attribute("file")!)));
         MapNames = definitions.ToDictionary(e => (int)e.Attribute("id")!, e => (string)e.Attribute("name")!);
@@ -138,6 +143,8 @@ public sealed class ClientContent
             throw new RuleViolation("extension.pause_objectives", "Pause objectives references an unknown scenario");
         if (Extensions.MapColors.Keys.Any(id => id != "*" && !Scenarios.Any(s => s.Id == id)))
             throw new RuleViolation("extension.map_colors", "Map colors reference an unknown scenario");
+        if (ArmyCapacity.FactionBases.Keys.Any(id => id != "*" && !Scenarios.Any(s => s.Id == id)))
+            throw new RuleViolation("army.capacity_configuration", "Army capacity references an unknown scenario");
         if (Extensions.Metagame.ShopSlots?.Any(s => s.Items?.Any(id => !Catalogs.Items.Rules().Definitions.ContainsKey(id)
                 || s.Pool == "consumable" && !Catalogs.Items.Rules().Definitions[id].Equipment.Consumable
                 || s.Pool == "equipment" && Catalogs.Items.Rules().Definitions[id].Equipment.Consumable) == true) == true)
@@ -174,7 +181,8 @@ public sealed class ClientContent
             throw new RuleViolation("country.reference", "CNTR references an unregistered global country in " + id);
         return battle;
     }
-    public LegacyScenarioStart Start(string id, string? country, PlayerAccount? account = null, IReadOnlyList<string>? localPlayers = null)
+    public LegacyScenarioStart Start(string id, string? country, PlayerAccount? account = null, IReadOnlyList<string>? localPlayers = null,
+        IReadOnlyList<int>? technologySnapshot = null)
     {
         var choice = Scenarios.Single(s => s.Id == id);
         if (choice.Mode == 3) throw new RuleViolation("client.mode", "Multiplayer requires a multiplayer session host");
@@ -189,11 +197,13 @@ public sealed class ClientContent
         var baseMap = LegacyMapDefinitions.Import(Maps[battle.MapId], Catalogs.Terrain,
             "legacy.map." + battle.MapId, "Legacy map " + battle.MapId);
         baseMap = Extensions.Geography.Apply(MapNames[battle.MapId], baseMap, Catalogs.Terrain.MovementCosts["mountain"]);
+        int warzone = Presentations.Values.FirstOrDefault(p => p.Id == id || p.Alternate == id)?.Chapter is int chapter && chapter > 0 ? chapter - 1 : 0;
         var started = LegacyScenarioHost.Start(battle, baseMap, Catalogs, new LegacyScenarioRequest
         {
             Id = id, Mode = choice.Mode, SelectedCountry = selectedCountry, LocalPlayers = localPlayers,
             CityNames = scenarioCityNames.TryGetValue(id, out var names) ? names : Cities,
-            Warzone = Presentations.Values.FirstOrDefault(p => p.Id == id || p.Alternate == id)?.Chapter is int chapter && chapter > 0 ? chapter - 1 : 0,
+            Warzone = warzone,
+            TechnologySnapshot = choice.Mode == 1 ? technologySnapshot ?? Catalogs.Technology.Snapshot(account, warzone) : null,
             CountryNames = battle.Factions.Select(f => f.CountryId).Distinct().ToDictionary(c => c, CountryName),
             CountryUnitVariants = battle.Factions.Where(f => Country(f.CountryId)?.UnitVariant is string variant && variant != f.Variant
                 && !(variant == "others" && !Catalogs.Runtime.Variants.ContainsKey(f.Variant)))
@@ -293,6 +303,17 @@ public sealed class ClientContent
         if (localPlayers != null)
             started = started with { Session = SessionActions.SyncPlayer(started.Session with {
                 World = LocalMultiplayerGame.Resolve(started.Session.World, started.Rules.Turns.Victory) }) };
+        // Apply the current capacity policy after content fingerprints, including when upgrading older saves.
+        var capacityCountries = battle.Factions.Select((f, i) => new {
+            Id = LegacyScenarioInitialization.FactionId(id, i, f), Country = Countries.Canonical(f.CountryId)
+        }).ToDictionary(f => f.Id, f => f.Country, StringComparer.Ordinal);
+        foreach (var creation in ScenarioFactions.Creations(started.Session.World.ScenarioEvents))
+            capacityCountries[creation.Faction] = creation.Country ?? (ScenarioFactions.Template(started.Session.World, creation) is string template
+                ? capacityCountries.GetValueOrDefault(template) ?? creation.Faction : creation.Faction);
+        var capacities = ArmyCapacity.Resolve(id, capacityCountries);
+        var capacityWorld = started.Session.World with { ArmyCapacity = capacities };
+        foreach (var cell in capacityWorld.Cells) WorldArmyCapacity.BuildingCapacity(capacityWorld, cell);
+        started = started with { Session = started.Session with { World = capacityWorld } };
         return started;
     }
     private static void ValidateVictoryTargets(ExtensionVictoryRules rules, WorldState world)

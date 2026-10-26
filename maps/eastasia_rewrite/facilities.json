@@ -1394,6 +1394,28 @@
     "owner": null
   },
   {
+    "id": "province-310000-stable",
+    "kind": "stable",
+    "building_kind": 2,
+    "level": 1,
+    "building_style": 2,
+    "anchor_city": "上海",
+    "anchor_city_id": "city-c3804a966330",
+    "anchor_cell": 13534,
+    "cell": 13377,
+    "col": 105,
+    "row": 84,
+    "world_pixel": [
+      6720,
+      4518
+    ],
+    "distance_hexes": 1,
+    "placement": "regional",
+    "land_path_hexes": 1,
+    "reason": "由回收的北方过密马厩配额补入市域基本骑兵与驮运补给",
+    "owner": null
+  },
+  {
     "id": "regional-jhansi-stable",
     "kind": "stable",
     "building_kind": 2,
@@ -1416,6 +1438,28 @@
     "owner": null
   },
   {
+    "id": "province-110000-stable",
+    "kind": "stable",
+    "building_kind": 2,
+    "level": 1,
+    "building_style": 2,
+    "anchor_city": "北京",
+    "anchor_city_id": "city-372d723d500e",
+    "anchor_cell": 9572,
+    "cell": 9729,
+    "col": 91,
+    "row": 61,
+    "world_pixel": [
+      5856,
+      3276
+    ],
+    "distance_hexes": 1,
+    "placement": "regional",
+    "land_path_hexes": 1,
+    "reason": "由回收的北方过密马厩配额补入市域基本骑兵与驮运补给",
+    "owner": null
+  },
+  {
     "id": "regional-matsumoto-stable",
     "kind": "stable",
     "building_kind": 2,
@@ -1435,6 +1479,50 @@
     "placement": "regional",
     "land_path_hexes": 4,
     "reason": "填充本州内陆松本地区驮运节点",
+    "owner": null
+  },
+  {
+    "id": "province-120000-stable",
+    "kind": "stable",
+    "building_kind": 2,
+    "level": 1,
+    "building_style": 2,
+    "anchor_city": "天津",
+    "anchor_city_id": "city-af22ce74387d",
+    "anchor_cell": 9890,
+    "cell": 9731,
+    "col": 93,
+    "row": 61,
+    "world_pixel": [
+      5984,
+      3276
+    ],
+    "distance_hexes": 1,
+    "placement": "regional",
+    "land_path_hexes": 1,
+    "reason": "由回收的北方过密马厩配额补入市域基本骑兵与驮运补给",
+    "owner": null
+  },
+  {
+    "id": "province-500000-stable",
+    "kind": "stable",
+    "building_kind": 2,
+    "level": 1,
+    "building_style": 2,
+    "anchor_city": "重庆",
+    "anchor_city_id": "city-d53703607154",
+    "anchor_cell": 14607,
+    "cell": 14453,
+    "col": 75,
+    "row": 91,
+    "world_pixel": [
+      4832,
+      4896
+    ],
+    "distance_hexes": 5,
+    "placement": "regional",
+    "land_path_hexes": 5,
+    "reason": "由回收的北方过密马厩配额补入市域基本骑兵与驮运补给",
     "owner": null
   },
   {
@@ -1853,28 +1941,6 @@
     "placement": "regional",
     "land_path_hexes": 4,
     "reason": "填充平原河谷及岛内空白的分散农业节点",
-    "owner": null
-  },
-  {
-    "id": "city-89706499f78d-farmland",
-    "kind": "farmland",
-    "building_kind": 4,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "兰州",
-    "anchor_city_id": "city-89706499f78d",
-    "anchor_cell": 11442,
-    "cell": 11761,
-    "col": 69,
-    "row": 74,
-    "world_pixel": [
-      4416,
-      3978
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方盆地、绿洲和河谷补给",
     "owner": null
   },
   {
@@ -2824,28 +2890,6 @@
     "owner": null
   },
   {
-    "id": "city-b9e072efeaae-farmland",
-    "kind": "farmland",
-    "building_kind": 4,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "拉萨",
-    "anchor_city_id": "city-b9e072efeaae",
-    "anchor_cell": 13782,
-    "cell": 13148,
-    "col": 34,
-    "row": 83,
-    "world_pixel": [
-      2208,
-      4464
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方盆地、绿洲和河谷补给",
-    "owner": null
-  },
-  {
     "id": "city-7be1fd2ccdb4-farmland",
     "kind": "farmland",
     "building_kind": 4,
@@ -3238,28 +3282,6 @@
     "distance_hexes": 3,
     "placement": "regional",
     "land_path_hexes": 3,
-    "reason": "平原、盆地及主要河谷农业区",
-    "owner": null
-  },
-  {
-    "id": "city-5627eb743bfd-farmland",
-    "kind": "farmland",
-    "building_kind": 4,
-    "level": 2,
-    "building_style": 2,
-    "anchor_city": "海口",
-    "anchor_city_id": "city-5627eb743bfd",
-    "anchor_cell": 19356,
-    "cell": 19514,
-    "col": 80,
-    "row": 123,
-    "world_pixel": [
-      5152,
-      6624
-    ],
-    "distance_hexes": 1,
-    "placement": "regional",
-    "land_path_hexes": 1,
     "reason": "平原、盆地及主要河谷农业区",
     "owner": null
   },
@@ -3660,28 +3682,6 @@
     "owner": null
   },
   {
-    "id": "city-7c5c3842ac1d-farmland",
-    "kind": "farmland",
-    "building_kind": 4,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "西宁",
-    "anchor_city_id": "city-7c5c3842ac1d",
-    "anchor_cell": 11122,
-    "cell": 10492,
-    "col": 64,
-    "row": 66,
-    "world_pixel": [
-      4096,
-      3546
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方盆地、绿洲和河谷补给",
-    "owner": null
-  },
-  {
     "id": "city-6ca40a5727cf-farmland",
     "kind": "farmland",
     "building_kind": 4,
@@ -3770,28 +3770,6 @@
     "owner": null
   },
   {
-    "id": "city-60ec43d74d74-farmland",
-    "kind": "farmland",
-    "building_kind": 4,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "迪化",
-    "anchor_city_id": "city-60ec43d74d74",
-    "anchor_cell": 6831,
-    "cell": 6199,
-    "col": 37,
-    "row": 39,
-    "world_pixel": [
-      2400,
-      2088
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方盆地、绿洲和河谷补给",
-    "owner": null
-  },
-  {
     "id": "city-1dc17aec2678-farmland",
     "kind": "farmland",
     "building_kind": 4,
@@ -3855,28 +3833,6 @@
     "placement": "regional",
     "land_path_hexes": 4,
     "reason": "填充平原河谷及岛内空白的分散农业节点",
-    "owner": null
-  },
-  {
-    "id": "city-c715ce54c123-farmland",
-    "kind": "farmland",
-    "building_kind": 4,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "银川",
-    "anchor_city_id": "city-c715ce54c123",
-    "anchor_cell": 10341,
-    "cell": 10345,
-    "col": 75,
-    "row": 65,
-    "world_pixel": [
-      4832,
-      3492
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方盆地、绿洲和河谷补给",
     "owner": null
   },
   {
@@ -4064,16 +4020,16 @@
     "anchor_city": "上海",
     "anchor_city_id": "city-c3804a966330",
     "anchor_cell": 13534,
-    "cell": 13689,
-    "col": 101,
-    "row": 86,
+    "cell": 13376,
+    "col": 104,
+    "row": 84,
     "world_pixel": [
-      6464,
-      4626
+      6656,
+      4518
     ],
-    "distance_hexes": 4,
+    "distance_hexes": 1,
     "placement": "regional",
-    "land_path_hexes": 4,
+    "land_path_hexes": 1,
     "reason": "主要工业和兵工中心",
     "owner": null
   },
@@ -4166,28 +4122,6 @@
     "owner": null
   },
   {
-    "id": "city-86b4449d324f-industry",
-    "kind": "industry",
-    "building_kind": 1,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "佳木斯",
-    "anchor_city_id": "city-86b4449d324f",
-    "anchor_cell": 5645,
-    "cell": 5011,
-    "col": 113,
-    "row": 31,
-    "world_pixel": [
-      7264,
-      1656
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "稀疏区域的修造、林矿加工及交通补给节点",
-    "owner": null
-  },
-  {
     "id": "city-cbef0b38f596-industry",
     "kind": "industry",
     "building_kind": 1,
@@ -4207,6 +4141,28 @@
     "placement": "regional",
     "land_path_hexes": 4,
     "reason": "区域工业、矿冶和铁路制造",
+    "owner": null
+  },
+  {
+    "id": "city-89706499f78d-industry",
+    "kind": "industry",
+    "building_kind": 1,
+    "level": 1,
+    "building_style": 2,
+    "anchor_city": "兰州",
+    "anchor_city_id": "city-89706499f78d",
+    "anchor_cell": 11442,
+    "cell": 11761,
+    "col": 69,
+    "row": 74,
+    "world_pixel": [
+      4416,
+      3978
+    ],
+    "distance_hexes": 4,
+    "placement": "regional",
+    "land_path_hexes": 4,
+    "reason": "由现有农业节点改作地方修械、加工及维修能力，保证省内基本工业招募；不代表重工业规模",
     "owner": null
   },
   {
@@ -4232,28 +4188,6 @@
     "owner": null
   },
   {
-    "id": "city-a584c3997fa9-industry",
-    "kind": "industry",
-    "building_kind": 1,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "包头",
-    "anchor_city_id": "city-a584c3997fa9",
-    "anchor_cell": 9243,
-    "cell": 8611,
-    "col": 79,
-    "row": 54,
-    "world_pixel": [
-      5056,
-      2898
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "区域工矿、修造和兵工据点",
-    "owner": null
-  },
-  {
     "id": "city-372d723d500e-industry",
     "kind": "industry",
     "building_kind": 1,
@@ -4262,16 +4196,16 @@
     "anchor_city": "北京",
     "anchor_city_id": "city-372d723d500e",
     "anchor_cell": 9572,
-    "cell": 10204,
-    "col": 92,
-    "row": 64,
+    "cell": 9728,
+    "col": 90,
+    "row": 61,
     "world_pixel": [
-      5888,
-      3438
+      5792,
+      3276
     ],
-    "distance_hexes": 4,
+    "distance_hexes": 2,
     "placement": "regional",
-    "land_path_hexes": 4,
+    "land_path_hexes": 2,
     "reason": "区域工业、矿冶和铁路制造",
     "owner": null
   },
@@ -4284,16 +4218,16 @@
     "anchor_city": "南京",
     "anchor_city_id": "city-327f7f177de5",
     "anchor_cell": 13212,
-    "cell": 13684,
-    "col": 96,
-    "row": 86,
+    "cell": 12737,
+    "col": 97,
+    "row": 80,
     "world_pixel": [
-      6144,
-      4626
+      6208,
+      4302
     ],
-    "distance_hexes": 4,
+    "distance_hexes": 3,
     "placement": "regional",
-    "land_path_hexes": 4,
+    "land_path_hexes": 3,
     "reason": "区域工业、矿冶和铁路制造",
     "owner": null
   },
@@ -4408,28 +4342,6 @@
     "owner": null
   },
   {
-    "id": "city-46d81c4d585a-industry",
-    "kind": "industry",
-    "building_kind": 1,
-    "level": 2,
-    "building_style": 2,
-    "anchor_city": "唐山",
-    "anchor_city_id": "city-46d81c4d585a",
-    "anchor_cell": 9733,
-    "cell": 8786,
-    "col": 96,
-    "row": 55,
-    "world_pixel": [
-      6176,
-      2952
-    ],
-    "distance_hexes": 6,
-    "placement": "regional",
-    "land_path_hexes": 6,
-    "reason": "区域工业、矿冶和铁路制造",
-    "owner": null
-  },
-  {
     "id": "city-c5d5626f3d6b-industry",
     "kind": "industry",
     "building_kind": 1,
@@ -4482,16 +4394,16 @@
     "anchor_city": "天津",
     "anchor_city_id": "city-af22ce74387d",
     "anchor_cell": 9890,
-    "cell": 10680,
+    "cell": 10206,
     "col": 94,
-    "row": 67,
+    "row": 64,
     "world_pixel": [
-      6048,
-      3600
+      6016,
+      3438
     ],
-    "distance_hexes": 5,
+    "distance_hexes": 2,
     "placement": "regional",
-    "land_path_hexes": 5,
+    "land_path_hexes": 2,
     "reason": "区域工业、矿冶和铁路制造",
     "owner": null
   },
@@ -4672,6 +4584,28 @@
     "owner": null
   },
   {
+    "id": "city-b9e072efeaae-industry",
+    "kind": "industry",
+    "building_kind": 1,
+    "level": 1,
+    "building_style": 2,
+    "anchor_city": "拉萨",
+    "anchor_city_id": "city-b9e072efeaae",
+    "anchor_cell": 13782,
+    "cell": 13148,
+    "col": 34,
+    "row": 83,
+    "world_pixel": [
+      2208,
+      4464
+    ],
+    "distance_hexes": 4,
+    "placement": "regional",
+    "land_path_hexes": 4,
+    "reason": "由现有农业节点改作地方修械、加工及维修能力，保证省内基本工业招募；不代表重工业规模",
+    "owner": null
+  },
+  {
     "id": "city-768242a77b7c-industry",
     "kind": "industry",
     "building_kind": 1,
@@ -4730,28 +4664,6 @@
     "world_pixel": [
       6624,
       5004
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "区域工矿、修造和兵工据点",
-    "owner": null
-  },
-  {
-    "id": "city-fa7e66a8e981-industry",
-    "kind": "industry",
-    "building_kind": 1,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "柳州",
-    "anchor_city_id": "city-fa7e66a8e981",
-    "anchor_cell": 17142,
-    "cell": 17775,
-    "col": 79,
-    "row": 112,
-    "world_pixel": [
-      5056,
-      6030
     ],
     "distance_hexes": 4,
     "placement": "regional",
@@ -4848,6 +4760,28 @@
     "owner": null
   },
   {
+    "id": "city-5627eb743bfd-industry",
+    "kind": "industry",
+    "building_kind": 1,
+    "level": 1,
+    "building_style": 2,
+    "anchor_city": "海口",
+    "anchor_city_id": "city-5627eb743bfd",
+    "anchor_cell": 19356,
+    "cell": 19514,
+    "col": 80,
+    "row": 123,
+    "world_pixel": [
+      5152,
+      6624
+    ],
+    "distance_hexes": 1,
+    "placement": "regional",
+    "land_path_hexes": 1,
+    "reason": "由现有农业节点改作地方修械、加工及维修能力，保证省内基本工业招募；不代表重工业规模",
+    "owner": null
+  },
+  {
     "id": "city-86f57f979f6e-industry",
     "kind": "industry",
     "building_kind": 1,
@@ -4867,50 +4801,6 @@
     "placement": "regional",
     "land_path_hexes": 5,
     "reason": "区域工业、矿冶和铁路制造",
-    "owner": null
-  },
-  {
-    "id": "city-855a1b0a8e38-industry",
-    "kind": "industry",
-    "building_kind": 1,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "牡丹江",
-    "anchor_city_id": "city-855a1b0a8e38",
-    "anchor_cell": 6751,
-    "cell": 6276,
-    "col": 114,
-    "row": 39,
-    "world_pixel": [
-      7328,
-      2088
-    ],
-    "distance_hexes": 3,
-    "placement": "regional",
-    "land_path_hexes": 3,
-    "reason": "稀疏区域的修造、林矿加工及交通补给节点",
-    "owner": null
-  },
-  {
-    "id": "city-5908713e7c1a-industry",
-    "kind": "industry",
-    "building_kind": 1,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "石家庄",
-    "anchor_city_id": "city-5908713e7c1a",
-    "anchor_cell": 10516,
-    "cell": 10520,
-    "col": 92,
-    "row": 66,
-    "world_pixel": [
-      5888,
-      3546
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "区域工矿、修造和兵工据点",
     "owner": null
   },
   {
@@ -4980,6 +4870,28 @@
     "owner": null
   },
   {
+    "id": "city-7c5c3842ac1d-industry",
+    "kind": "industry",
+    "building_kind": 1,
+    "level": 1,
+    "building_style": 2,
+    "anchor_city": "西宁",
+    "anchor_city_id": "city-7c5c3842ac1d",
+    "anchor_cell": 11122,
+    "cell": 10806,
+    "col": 62,
+    "row": 68,
+    "world_pixel": [
+      3968,
+      3654
+    ],
+    "distance_hexes": 2,
+    "placement": "regional",
+    "land_path_hexes": 2,
+    "reason": "由现有农业节点改作地方修械、加工及维修能力，保证省内基本工业招募；不代表重工业规模",
+    "owner": null
+  },
+  {
     "id": "city-6ca40a5727cf-industry",
     "kind": "industry",
     "building_kind": 1,
@@ -4999,6 +4911,28 @@
     "placement": "regional",
     "land_path_hexes": 4,
     "reason": "区域工矿、修造和兵工据点",
+    "owner": null
+  },
+  {
+    "id": "city-60ec43d74d74-industry",
+    "kind": "industry",
+    "building_kind": 1,
+    "level": 1,
+    "building_style": 2,
+    "anchor_city": "迪化",
+    "anchor_city_id": "city-60ec43d74d74",
+    "anchor_cell": 6831,
+    "cell": 6199,
+    "col": 37,
+    "row": 39,
+    "world_pixel": [
+      2400,
+      2088
+    ],
+    "distance_hexes": 4,
+    "placement": "regional",
+    "land_path_hexes": 4,
+    "reason": "由现有农业节点改作地方修械、加工及维修能力，保证省内基本工业招募；不代表重工业规模",
     "owner": null
   },
   {
@@ -5068,6 +5002,28 @@
     "owner": null
   },
   {
+    "id": "city-c715ce54c123-industry",
+    "kind": "industry",
+    "building_kind": 1,
+    "level": 1,
+    "building_style": 2,
+    "anchor_city": "银川",
+    "anchor_city_id": "city-c715ce54c123",
+    "anchor_cell": 10341,
+    "cell": 10815,
+    "col": 71,
+    "row": 68,
+    "world_pixel": [
+      4544,
+      3654
+    ],
+    "distance_hexes": 3,
+    "placement": "regional",
+    "land_path_hexes": 3,
+    "reason": "由现有农业节点改作地方修械、加工及维修能力，保证省内基本工业招募；不代表重工业规模",
+    "owner": null
+  },
+  {
     "id": "city-dcb3696171b3-industry",
     "kind": "industry",
     "building_kind": 1,
@@ -5098,16 +5054,16 @@
     "anchor_city": "长春",
     "anchor_city_id": "city-f12b88f79bc8",
     "anchor_cell": 7376,
-    "cell": 8008,
-    "col": 108,
-    "row": 50,
+    "cell": 6900,
+    "col": 106,
+    "row": 43,
     "world_pixel": [
-      6912,
-      2682
+      6816,
+      2304
     ],
-    "distance_hexes": 4,
+    "distance_hexes": 3,
     "placement": "regional",
-    "land_path_hexes": 4,
+    "land_path_hexes": 3,
     "reason": "区域工业、矿冶和铁路制造",
     "owner": null
   },
@@ -5156,28 +5112,6 @@
     "owner": null
   },
   {
-    "id": "city-74ae6717967a-industry",
-    "kind": "industry",
-    "building_kind": 1,
-    "level": 2,
-    "building_style": 2,
-    "anchor_city": "青岛",
-    "anchor_city_id": "city-74ae6717967a",
-    "anchor_cell": 11161,
-    "cell": 11475,
-    "col": 99,
-    "row": 72,
-    "world_pixel": [
-      6336,
-      3870
-    ],
-    "distance_hexes": 3,
-    "placement": "regional",
-    "land_path_hexes": 3,
-    "reason": "区域工业、矿冶和铁路制造",
-    "owner": null
-  },
-  {
     "id": "city-e588b59b993c-industry",
     "kind": "industry",
     "building_kind": 1,
@@ -5219,50 +5153,6 @@
     "placement": "regional",
     "land_path_hexes": 4,
     "reason": "区域工业、矿冶和铁路制造",
-    "owner": null
-  },
-  {
-    "id": "city-563a3baa5c3e-industry",
-    "kind": "industry",
-    "building_kind": 1,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "黑河",
-    "anchor_city_id": "city-563a3baa5c3e",
-    "anchor_cell": 4217,
-    "cell": 3745,
-    "col": 111,
-    "row": 23,
-    "world_pixel": [
-      7136,
-      1224
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "稀疏区域的修造、林矿加工及交通补给节点",
-    "owner": null
-  },
-  {
-    "id": "city-ed690c5f5d8b-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "东胜",
-    "anchor_city_id": "city-ed690c5f5d8b",
-    "anchor_cell": 9717,
-    "cell": 9556,
-    "col": 76,
-    "row": 60,
-    "world_pixel": [
-      4864,
-      3222
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "稀疏地区军马、驮运和交通补给节点",
     "owner": null
   },
   {
@@ -5332,50 +5222,6 @@
     "owner": null
   },
   {
-    "id": "city-47e7bed5c262-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "五原",
-    "anchor_city_id": "city-47e7bed5c262",
-    "anchor_cell": 9081,
-    "cell": 9077,
-    "col": 71,
-    "row": 57,
-    "world_pixel": [
-      4576,
-      3060
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方骑兵、驮运及军马补给",
-    "owner": null
-  },
-  {
-    "id": "city-e9ebf79a8876-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 2,
-    "building_style": 2,
-    "anchor_city": "伊宁",
-    "anchor_city_id": "city-e9ebf79a8876",
-    "anchor_cell": 6188,
-    "cell": 6507,
-    "col": 29,
-    "row": 41,
-    "world_pixel": [
-      1888,
-      2196
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "北方及西北主要马源与骑兵基地",
-    "owner": null
-  },
-  {
     "id": "city-e8d1cd86dd47-stable",
     "kind": "stable",
     "building_kind": 2,
@@ -5420,72 +5266,6 @@
     "owner": null
   },
   {
-    "id": "city-a584c3997fa9-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 2,
-    "building_style": 2,
-    "anchor_city": "包头",
-    "anchor_city_id": "city-a584c3997fa9",
-    "anchor_cell": 9243,
-    "cell": 8771,
-    "col": 81,
-    "row": 55,
-    "world_pixel": [
-      5216,
-      2952
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "北方及西北主要马源与骑兵基地",
-    "owner": null
-  },
-  {
-    "id": "city-d07a57873942-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "和田",
-    "anchor_city_id": "city-d07a57873942",
-    "anchor_cell": 9182,
-    "cell": 8705,
-    "col": 15,
-    "row": 55,
-    "world_pixel": [
-      992,
-      2952
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "稀疏地区军马、驮运和交通补给节点",
-    "owner": null
-  },
-  {
-    "id": "city-2873ebdd0d87-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "哈密",
-    "anchor_city_id": "city-2873ebdd0d87",
-    "anchor_cell": 7632,
-    "cell": 7786,
-    "col": 44,
-    "row": 49,
-    "world_pixel": [
-      2848,
-      2628
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方骑兵、驮运及军马补给",
-    "owner": null
-  },
-  {
     "id": "city-e77d5c6fa736-stable",
     "kind": "stable",
     "building_kind": 2,
@@ -5500,50 +5280,6 @@
     "world_pixel": [
       1024,
       2466
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方骑兵、驮运及军马补给",
-    "owner": null
-  },
-  {
-    "id": "city-7db317d93e0d-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "围场",
-    "anchor_city_id": "city-7db317d93e0d",
-    "anchor_cell": 8626,
-    "cell": 7992,
-    "col": 92,
-    "row": 50,
-    "world_pixel": [
-      5888,
-      2682
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "稀疏地区军马、驮运和交通补给节点",
-    "owner": null
-  },
-  {
-    "id": "city-ef54a9919456-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "塔城",
-    "anchor_city_id": "city-ef54a9919456",
-    "anchor_cell": 5087,
-    "cell": 5400,
-    "col": 28,
-    "row": 34,
-    "world_pixel": [
-      1792,
-      1818
     ],
     "distance_hexes": 4,
     "placement": "regional",
@@ -5574,94 +5310,6 @@
     "owner": null
   },
   {
-    "id": "city-5a3c9502b11f-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "多伦",
-    "anchor_city_id": "city-5a3c9502b11f",
-    "anchor_cell": 8465,
-    "cell": 8146,
-    "col": 88,
-    "row": 51,
-    "world_pixel": [
-      5664,
-      2736
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方骑兵、驮运及军马补给",
-    "owner": null
-  },
-  {
-    "id": "city-d42a5fa88956-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "大同",
-    "anchor_city_id": "city-d42a5fa88956",
-    "anchor_cell": 9566,
-    "cell": 8618,
-    "col": 86,
-    "row": 54,
-    "world_pixel": [
-      5504,
-      2898
-    ],
-    "distance_hexes": 6,
-    "placement": "regional",
-    "land_path_hexes": 6,
-    "reason": "地方骑兵、驮运及军马补给",
-    "owner": null
-  },
-  {
-    "id": "city-0acd10670844-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "大理",
-    "anchor_city_id": "city-0acd10670844",
-    "anchor_cell": 16329,
-    "cell": 16961,
-    "col": 55,
-    "row": 107,
-    "world_pixel": [
-      3552,
-      5760
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方骑兵、驮运及军马补给",
-    "owner": null
-  },
-  {
-    "id": "city-b148ac98e592-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "平凉",
-    "anchor_city_id": "city-b148ac98e592",
-    "anchor_cell": 11764,
-    "cell": 11451,
-    "col": 75,
-    "row": 72,
-    "world_pixel": [
-      4800,
-      3870
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方骑兵、驮运及军马补给",
-    "owner": null
-  },
-  {
     "id": "city-0ebb4dcc452b-stable",
     "kind": "stable",
     "building_kind": 2,
@@ -5684,72 +5332,6 @@
     "owner": null
   },
   {
-    "id": "city-36db6e0b1551-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "张北",
-    "anchor_city_id": "city-36db6e0b1551",
-    "anchor_cell": 9094,
-    "cell": 8143,
-    "col": 85,
-    "row": 51,
-    "world_pixel": [
-      5472,
-      2736
-    ],
-    "distance_hexes": 6,
-    "placement": "regional",
-    "land_path_hexes": 6,
-    "reason": "地方骑兵、驮运及军马补给",
-    "owner": null
-  },
-  {
-    "id": "city-3334421179c4-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "张掖",
-    "anchor_city_id": "city-3334421179c4",
-    "anchor_cell": 9856,
-    "cell": 9384,
-    "col": 62,
-    "row": 59,
-    "world_pixel": [
-      4000,
-      3168
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方骑兵、驮运及军马补给",
-    "owner": null
-  },
-  {
-    "id": "city-656ec5661b36-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 2,
-    "building_style": 2,
-    "anchor_city": "归绥",
-    "anchor_city_id": "city-656ec5661b36",
-    "anchor_cell": 9246,
-    "cell": 10035,
-    "col": 81,
-    "row": 63,
-    "world_pixel": [
-      5216,
-      3384
-    ],
-    "distance_hexes": 5,
-    "placement": "regional",
-    "land_path_hexes": 5,
-    "reason": "北方及西北主要马源与骑兵基地",
-    "owner": null
-  },
-  {
     "id": "city-3bf408d0ca19-stable",
     "kind": "stable",
     "building_kind": 2,
@@ -5764,72 +5346,6 @@
     "world_pixel": [
       4608,
       1710
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "稀疏地区军马、驮运和交通补给节点",
-    "owner": null
-  },
-  {
-    "id": "city-953740bc7ffa-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "日喀则",
-    "anchor_city_id": "city-953740bc7ffa",
-    "anchor_cell": 13777,
-    "cell": 13301,
-    "col": 29,
-    "row": 84,
-    "world_pixel": [
-      1856,
-      4518
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方骑兵、驮运及军马补给",
-    "owner": null
-  },
-  {
-    "id": "city-b86fd3d90a9a-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "榆林",
-    "anchor_city_id": "city-b86fd3d90a9a",
-    "anchor_cell": 10348,
-    "cell": 10820,
-    "col": 76,
-    "row": 68,
-    "world_pixel": [
-      4864,
-      3654
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方骑兵、驮运及军马补给",
-    "owner": null
-  },
-  {
-    "id": "city-ad3976564dc8-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "江孜",
-    "anchor_city_id": "city-ad3976564dc8",
-    "anchor_cell": 13937,
-    "cell": 14091,
-    "col": 29,
-    "row": 89,
-    "world_pixel": [
-      1888,
-      4788
     ],
     "distance_hexes": 4,
     "placement": "regional",
@@ -5857,72 +5373,6 @@
     "placement": "regional",
     "land_path_hexes": 4,
     "reason": "北方及西北主要马源与骑兵基地",
-    "owner": null
-  },
-  {
-    "id": "city-f0fae932a71d-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "满洲里",
-    "anchor_city_id": "city-f0fae932a71d",
-    "anchor_cell": 4832,
-    "cell": 4202,
-    "col": 94,
-    "row": 26,
-    "world_pixel": [
-      6016,
-      1386
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "稀疏地区军马、驮运和交通补给节点",
-    "owner": null
-  },
-  {
-    "id": "city-dd9d36a53b8d-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "玉树",
-    "anchor_city_id": "city-dd9d36a53b8d",
-    "anchor_cell": 12691,
-    "cell": 12529,
-    "col": 47,
-    "row": 79,
-    "world_pixel": [
-      3040,
-      4248
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "稀疏地区军马、驮运和交通补给节点",
-    "owner": null
-  },
-  {
-    "id": "city-5f0b5fddc549-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "白城",
-    "anchor_city_id": "city-5f0b5fddc549",
-    "anchor_cell": 6580,
-    "cell": 5946,
-    "col": 100,
-    "row": 37,
-    "world_pixel": [
-      6432,
-      1980
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "稀疏地区军马、驮运和交通补给节点",
     "owner": null
   },
   {
@@ -5967,28 +5417,6 @@
     "placement": "regional",
     "land_path_hexes": 4,
     "reason": "北方及西北主要马源与骑兵基地",
-    "owner": null
-  },
-  {
-    "id": "city-8f2d60cf633f-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "西昌",
-    "anchor_city_id": "city-8f2d60cf633f",
-    "anchor_cell": 15387,
-    "cell": 15068,
-    "col": 58,
-    "row": 95,
-    "world_pixel": [
-      3744,
-      5112
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方骑兵、驮运及军马补给",
     "owner": null
   },
   {
@@ -6058,94 +5486,6 @@
     "owner": null
   },
   {
-    "id": "city-e63dbc329f5d-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "通辽",
-    "anchor_city_id": "city-e63dbc329f5d",
-    "anchor_cell": 7528,
-    "cell": 7841,
-    "col": 99,
-    "row": 49,
-    "world_pixel": [
-      6368,
-      2628
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方骑兵、驮运及军马补给",
-    "owner": null
-  },
-  {
-    "id": "city-16afd343433d-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "那曲",
-    "anchor_city_id": "city-16afd343433d",
-    "anchor_cell": 12996,
-    "cell": 13629,
-    "col": 41,
-    "row": 86,
-    "world_pixel": [
-      2624,
-      4626
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方骑兵、驮运及军马补给",
-    "owner": null
-  },
-  {
-    "id": "city-4c14d5d868a7-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "酒泉",
-    "anchor_city_id": "city-4c14d5d868a7",
-    "anchor_cell": 9378,
-    "cell": 8746,
-    "col": 56,
-    "row": 55,
-    "world_pixel": [
-      3616,
-      2952
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方骑兵、驮运及军马补给",
-    "owner": null
-  },
-  {
-    "id": "city-c715ce54c123-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 2,
-    "building_style": 2,
-    "anchor_city": "银川",
-    "anchor_city_id": "city-c715ce54c123",
-    "anchor_cell": 10341,
-    "cell": 11133,
-    "col": 73,
-    "row": 70,
-    "world_pixel": [
-      4672,
-      3762
-    ],
-    "distance_hexes": 5,
-    "placement": "regional",
-    "land_path_hexes": 5,
-    "reason": "北方及西北主要马源与骑兵基地",
-    "owner": null
-  },
-  {
     "id": "city-8821213d2520-stable",
     "kind": "stable",
     "building_kind": 2,
@@ -6187,28 +5527,6 @@
     "placement": "regional",
     "land_path_hexes": 4,
     "reason": "北方及西北主要马源与骑兵基地",
-    "owner": null
-  },
-  {
-    "id": "city-059725ba724c-stable",
-    "kind": "stable",
-    "building_kind": 2,
-    "level": 1,
-    "building_style": 2,
-    "anchor_city": "集宁",
-    "anchor_city_id": "city-059725ba724c",
-    "anchor_cell": 9091,
-    "cell": 8457,
-    "col": 83,
-    "row": 53,
-    "world_pixel": [
-      5344,
-      2844
-    ],
-    "distance_hexes": 4,
-    "placement": "regional",
-    "land_path_hexes": 4,
-    "reason": "地方骑兵、驮运及军马补给",
     "owner": null
   },
   {

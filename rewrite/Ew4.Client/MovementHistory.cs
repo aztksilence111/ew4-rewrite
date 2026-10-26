@@ -4,7 +4,7 @@ namespace Ew4.Client;
 
 public sealed record MovementOwnerChange(int Cell, string? Before, string? After);
 public sealed record MovementCheckpoint(string Unit, int Origin, int Destination, int Remaining, int[] Path,
-    MovementOwnerChange[] Owners, UnitState[] Removed, string[] Defeated, string[] Withdrawn);
+    MovementOwnerChange[] Owners, UnitState[] Removed, string[] Defeated, string[] Withdrawn, int PlayerActionRound = 0);
 public sealed record MovementHistoryState(int Round, string Faction, MovementCheckpoint[] Moves, string[] Attackers);
 
 // Only movement is reversible. Purchases, training, combat and RNG are never restored from a world snapshot.
@@ -43,7 +43,7 @@ public sealed class MovementHistory
             before.Cells.Select((c,i) => new MovementOwnerChange(i,c.Owner,after.Cells[i].Owner)).Where(c => c.Before != c.After).ToArray(),
             before.Units.Where(u => !after.Units.Any(n => n.Id == u.Id)).ToArray(),
             before.Factions.Where(f => !f.Defeated && after.Factions.Single(n => n.Id == f.Id).Defeated).Select(f => f.Id).ToArray(),
-            before.Commanders.Where(c => !c.Withdrawn && after.Commanders.Single(n => n.Id == c.Id).Withdrawn).Select(c => c.Id).ToArray()));
+            before.Commanders.Where(c => !c.Withdrawn && after.Commanders.Single(n => n.Id == c.Id).Withdrawn).Select(c => c.Id).ToArray(), PlayerAi.Order(unit).ActionRound));
     }
     public MovementCheckpoint? Available(WorldState world, string? unit = null)
     {
@@ -72,6 +72,7 @@ public sealed class MovementHistory
             Units = world.Units.Select(u => u.Id != entry.Unit ? u : u with
             {
                 Cell = entry.Origin, RemainingMovement = entry.Remaining,
+                PlayerControl = PlayerAi.Order(u) with { ActionRound = entry.PlayerActionRound },
                 Combatant = u.Combatant with { AtSea = world.Cells[entry.Origin].Terrain.Sea, BuildingKind = world.Cells[entry.Origin].BuildingKind }
             }).Concat(entry.Removed).ToArray(),
             Cells = world.Cells.Select((c,i) => owners.TryGetValue(i,out var owner) ? c with { Owner = owner.Before } : c).ToArray(),

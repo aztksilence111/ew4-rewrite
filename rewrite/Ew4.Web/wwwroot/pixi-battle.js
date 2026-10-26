@@ -85,7 +85,9 @@
     cachedLayer(signature,rect,paint){
       const layer=this.object('layer'),m=this.matrix;
       layer.transform.setFromMatrix(this.quadMatrix.set(m.a,m.b,m.c,m.d,m.e,m.f));
-      if(layer.signature!==signature||layer.rect!==rect){
+      let missingSource=false;
+      for(const source of layer.sources||[])if(!this.sources.has(source)){missingSource=true;break;}
+      if(layer.signature!==signature||layer.rect!==rect||missingSource){
         const keys=['stage','pool','cursor','lastObject','matrix','stack','globalAlpha','globalCompositeOperation','tint','fillStyle','strokeStyle','lineWidth','captureSources'];
         const saved=keys.map(key=>this[key]);
         this.stage=layer;this.pool=layer.drawPool||(layer.drawPool=[]);this.cursor=0;this.lastObject=null;

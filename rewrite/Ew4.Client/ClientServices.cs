@@ -65,11 +65,13 @@ public sealed partial class ClientGame
     }
 
     private object? AiCombat(WorldState world, AiStepPlan plan)
+        => AiCombat(world, plan.Unit);
+    private object? AiCombat(WorldState world, AiUnitPlan? plan)
     {
-        if (plan.Unit == null) return null;
-        int best = AiPlanning.Best(plan.Unit.Candidates);
+        if (plan == null) return null;
+        int best = AiPlanning.Best(plan.Candidates);
         if (best < 0) return null;
-        var command = plan.Unit.Candidates[best].Action;
+        var command = plan.Candidates[best].Action;
         string? target = command switch { AiStrikeCommand strike => strike.TargetId, AiMoveCommand move => move.TargetId, _ => null };
         if (target == null) return null;
         var movedChange = command is AiMoveCommand movement

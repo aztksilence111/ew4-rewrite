@@ -241,7 +241,7 @@
       this.animated=arrowActive||!!this.selection||this.visibleUnits.some(u=>badgeAlpha(u,this.state,300)!==1||!this.badgeOnly&&(this.unitMotions.get(u.id)?.playing||u.burning>0||u.category==='fort'&&u.health>0&&u.maxHealth-u.health>=80||flagAnimated(u,this.state)&&this.factions.get(u.owner)?.flag&&!this.factions.get(u.owner)?.flagImage))||
         this.visibleCells.some(({site,cell})=>site.active&&(objectiveMarker(site,this.stationed.get(cell))||!this.badgeOnly&&facilityFlagAnimated(site,this.state)&&this.factions.get(site.owner)?.flag&&!this.factions.get(site.owner)?.flagImage&&!this.stationed.has(cell)));
       // Grid covers the ground/buildings, while units, flags and portraits stay above it.
-      this.staticGround();this.grid();this.objectives();this.units();this.flags();this.unitMarkers();this.labels();this.highlights();this.tutorialArrow();this.scheduleCityLabels();
+      this.staticGround();this.grid();this.objectives();this.units();this.flags();this.unitMarkers();this.labels();this.highlights();this.playerOrders();this.tutorialArrow();this.scheduleCityLabels();
     }
     async prewarm(state,map,rect){
       const surface=new Ew4MapSurface.Surface(),factions=new Map(state.factions.map(f=>[f.id,f]));
@@ -582,7 +582,54 @@
       this.api.sprite('buildings','mark_unit_'+profile.unitIndex+'.png',p.x,p.y);
       const camp=!this.badgeOnly&&this.campMark(unit.owner);
       if(camp){const height=10,width=Math.min(12,camp.width/camp.height*height);draw.drawImage(camp,p.x+9-width,p.y,width,height);}
+      if(unit.aiControlled&&!death){
+        const config=this.state.aiPresentation||{},badge=config.badgeImage?this.api.image(config.badgeImage.replace(/^client\//,'')):this.aiBadge();
+        if(badge instanceof HTMLCanvasElement||badge.complete&&badge.naturalWidth)draw.drawImage(badge,p.x+(config.badgeX??-10),p.y+(config.badgeY??-27),config.badgeWidth||20,config.badgeHeight||12);
+      }
       draw.restore();
+    }
+    aiBadge(){
+      const p=this.state.aiPresentation||{},key=JSON.stringify([p.badgeText,p.badgeColor,p.badgeTextColor,p.badgeBorderColor]);
+      if(!this.aiBadgeCanvas||this.aiBadgeKey!==key){this.draw.release?.(this.aiBadgeCanvas);const canvas=document.createElement('canvas');canvas.width=80;canvas.height=48;const draw=canvas.getContext('2d');
+        draw.fillStyle=p.badgeColor||'#343e38';draw.fillRect(0,0,80,48);draw.strokeStyle=p.badgeBorderColor||'#d8d0a2';draw.lineWidth=4;draw.strokeRect(2,2,76,44);
+        const text=p.badgeText||'AI';draw.font='bold 36px sans-serif';const size=Math.min(36,36*72/Math.max(1,draw.measureText(text).width));draw.font='bold '+size+'px sans-serif';
+        draw.textAlign='center';draw.textBaseline='middle';draw.fillStyle=p.badgeTextColor||'#fff4c5';draw.fillText(text,40,25);this.aiBadgeCanvas=canvas;this.aiBadgeKey=key;}
+      return this.aiBadgeCanvas;
+    }
+    playerOrders(){
+      const overlay=this.aiOverlay,config=this.state.aiPresentation||{},draw=this.draw;
+      const ids=overlay?.units||[],selected=new Set(ids);
+      let targets=overlay?(overlay.goals||[overlay.goal]):this.selected?.aiControlled?(this.selected.aiGoals||[this.selected.aiGoal]):[];
+      targets=targets.filter(target=>Number.isInteger(target)&&this.state.cells[target]?.active);
+      draw.save();
+      for(const unit of this.visibleUnits)if(selected.has(unit.id)){const p=point(unit.cell,this.state.width);hex(draw,p.x,p.y);draw.fillStyle=(config.selectionColor||'#ffe995')+'33';draw.fill();draw.strokeStyle=config.selectionColor||'#ffe995';draw.lineWidth=2/this.zoom;draw.stroke();}
+      for(let index=0;index<targets.length;index++){
+        const target=targets[index];
+        const end=point(target,this.state.width),units=overlay?this.state.units.filter(u=>selected.has(u.id)):this.selected?[this.selected]:[];
+        draw.strokeStyle=config.lineColor||'#ffdb65';draw.lineWidth=(config.lineWidth||2)/this.zoom;
+        // Draw separate segments: the Pixi adapter does not implement Canvas line dashes.
+        const dash=(config.dashLength||8)/this.zoom;
+        const starts=index?[point(targets[index-1],this.state.width)]:units.map(unit=>point(unit.cell,this.state.width));
+        for(const start of starts){const dx=end.x-start.x,dy=end.y-start.y,length=Math.hypot(dx,dy);if(length<1)continue;
+          draw.beginPath();for(let d=0;d<length;d+=dash*2){const until=Math.min(length,d+dash);draw.moveTo(start.x+dx*d/length,start.y+dy*d/length);draw.lineTo(start.x+dx*until/length,start.y+dy*until/length);}draw.stroke();}
+        const offset=Math.sin(this.time/220)*5;
+        this.api.sprite('buildings','arrow_shadow.png',end.x,end.y+5,.7,draw);
+        this.api.sprite('buildings',config.arrowImage||'arrow_red.png',end.x,end.y+offset,1,draw);
+        if(targets.length>1)draw.drawImage(this.aiGoalNumber(index+1,config),end.x+10,end.y-28,18,18);
+        this.animated=true;
+      }
+      draw.restore();
+    }
+    aiGoalNumber(number,config){
+      this.aiGoalNumbers??=new Map();
+      const key=JSON.stringify([config.badgeColor,config.badgeTextColor]);
+      if(this.aiGoalNumberStyle!==key){for(const canvas of this.aiGoalNumbers.values())this.draw.release?.(canvas);this.aiGoalNumbers.clear();this.aiGoalNumberStyle=key;}
+      if(!this.aiGoalNumbers.has(number)){
+        const canvas=document.createElement('canvas');canvas.width=48;canvas.height=48;const draw=canvas.getContext('2d');
+        draw.fillStyle=config.badgeColor||'#343e38';draw.fillRect(0,0,48,48);draw.fillStyle=config.badgeTextColor||'#fff4c5';draw.font='bold 32px sans-serif';draw.textAlign='center';draw.textBaseline='middle';draw.fillText(String(number),24,25);
+        this.aiGoalNumbers.set(number,canvas);
+      }
+      return this.aiGoalNumbers.get(number);
     }
     campMark(owner){
       const text=this.projection?.abbreviation(owner);if(!text)return null;
@@ -669,6 +716,7 @@
     labels() {
       const {draw,state}=this;
       const scale=Math.max(1,this.markerScale),density=Math.max(1,Math.min(4,Math.ceil(draw.getTransform().a*scale/2)));
+      const bounds=cameraBounds(state,this.map);
       const wanted=new Set();this.pendingCityLabels??=new Map();
       for(const {site:c,cell:i,p} of this.visibleCells){if(!c.active||!c.name)continue;
         const key=i+':'+c.name+':'+density;
@@ -678,7 +726,10 @@
           this.cacheCityLabel(key,c.name,i,density);
         }
         const label=this.cityLabels.get(key),width=label.width/density/2*scale,height=label.height/density/2*scale;
-        draw.drawImage(label,p.x-width/2,p.y+29*scale,width,height);}
+        // Text stays legible at distance, but its anchor stays on the building.
+        const x=Math.max(bounds.left,Math.min(bounds.left+bounds.width-width,p.x-width/2));
+        const y=p.y+29+height<=bounds.top+bounds.height?p.y+29:Math.max(bounds.top,p.y-29-height);
+        draw.drawImage(label,x,y,width,height);}
       for(const key of this.pendingCityLabels.keys())if(!wanted.has(key))this.pendingCityLabels.delete(key);
     }
     cacheCityLabel(key,name,cell,density){

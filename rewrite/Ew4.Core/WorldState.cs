@@ -23,6 +23,7 @@ public sealed record FactionState
     public FactionAppearance? Appearance { get; init; }
     public string Camp { get; init; } = "";
     public bool Human { get; init; }
+    public PlayerAiControl? PlayerAi { get; init; }
     public bool Defeated { get; init; }
     public bool DiplomacyWarned { get; init; }
     public Resources Resources { get; init; } = new(0, 0, 0);
@@ -79,6 +80,7 @@ public sealed record UnitState
     public int RemainingMovement { get; init; }
     public int? ExtensionMovementLimit { get; init; }
     public bool Acted { get; init; }
+    public PlayerUnitControl? PlayerControl { get; init; }
     public bool Objective { get; init; }
     public long Experience { get; init; }
     public string Veterancy { get; init; } = "0";
@@ -159,6 +161,7 @@ public sealed record WorldState
     public ulong AiRandomState { get; init; }
     public IReadOnlyDictionary<string, long> ExtensionState { get; init; } = new Dictionary<string, long>();
     public WorldLimits Limits { get; init; } = new();
+    public ArmyCapacityRules? ArmyCapacity { get; init; }
     public IReadOnlyList<FactionState> Factions { get; init; } = Array.Empty<FactionState>();
     public IReadOnlyList<CellState> Cells { get; init; } = Array.Empty<CellState>();
     public TerritorialJurisdictions? Jurisdictions { get; init; }
@@ -191,6 +194,7 @@ public sealed record WorldState
     private void ValidateCore()
     {
         Limits.Validate();
+        ArmyCapacity?.Validate();
         if (ExtensionState.Count > 100_000 || ExtensionState.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Key.Length > 512))
             throw new RuleViolation("extension.state", "Invalid extension save state");
         Jurisdictions?.Validate(this);
@@ -214,6 +218,7 @@ public sealed record WorldState
             || provocations.CombatantCamps.Distinct().Count() != provocations.CombatantCamps.Count))
             throw new RuleViolation("world.diplomacy", "Invalid provocation policy");
         LocalMultiplayerGame.Validate(this);
+        PlayerAi.Validate(this);
         var factionIndex = Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
         if (DiplomaticRelations == null || DiplomacyNeutralCamps == null
             || DiplomacyNeutralCamps.Any(string.IsNullOrWhiteSpace) || DiplomacyNeutralCamps.Distinct().Count() != DiplomacyNeutralCamps.Count
@@ -261,6 +266,7 @@ public sealed record WorldState
         }
         foreach (var cell in Cells)
         {
+            if (ArmyCapacity != null) WorldArmyCapacity.BuildingCapacity(this, cell);
             if (cell.Terrain.Barrier != TerrainBarrier.None || cell.Terrain.MinimumEntryCost != 0) Geography.Validate(cell);
             cell.IncomeOverride?.Validate();
             if ((cell.Owner != null && !factionIds.Contains(cell.Owner)) || cell.Environment < 0 || cell.Terrain.TerrainCost <= 0 || cell.BuildingLevel < 0
@@ -370,11 +376,13 @@ public sealed record WorldState
 
     public WorldState Copy() => this with
     {
+        ArmyCapacity = ArmyCapacity?.Copy(),
         ExtensionState = ExtensionState.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal),
         Factions = Factions.Select(f => f with
         {
             Recruitment = f.Recruitment.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal),
             TurnUses = f.TurnUses.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal),
+            PlayerAi = f.PlayerAi?.Copy(),
             Kills = f.Kills.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal),
             Survival = f.Survival with { ExcludedBuildings = f.Survival.ExcludedBuildings.ToArray() }
         }).ToArray(),
@@ -386,6 +394,7 @@ public sealed record WorldState
         NeutralHostilities = NeutralHostilities.ToArray(),
         DiplomaticRelations = DiplomaticRelations.ToArray(), DiplomacyNeutralCamps = DiplomacyNeutralCamps.ToArray(),
         Units = Units.Select(u => u with { Combatant = CopyCombatant(u.Combatant),
+            PlayerControl = u.PlayerControl == null ? null : u.PlayerControl with { Goals = u.PlayerControl.Goals?.ToArray() },
             CommanderBase = u.CommanderBase == null ? null : u.CommanderBase with { Combatant = CopyCombatant(u.CommanderBase.Combatant) } }).ToArray(),
         Commanders = Commanders.ToArray(), CommanderOffers = CommanderOffers.ToArray(),
         Events = Events.Select(e => e with { Rules = e.Rules.ToArray() }).ToArray(),

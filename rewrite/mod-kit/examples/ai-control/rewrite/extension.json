@@ -1,0 +1,5 @@
+{
+  "schema": 1,
+  "apiVersion": 3,
+  "aiControl": "rewrite/ai-control.json"
+}

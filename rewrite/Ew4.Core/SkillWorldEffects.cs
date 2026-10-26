@@ -64,7 +64,7 @@ public sealed partial class RuleEventBus
             if (effect.Operation == "teleport" && (cell == source.Cell || !CanPlace(world, source.Combatant.Profile, source.Transport, source.Owner, cell))) return false;
             if (effect.Operation == "summon" && (effect.Profile == null || !UnitTemplates.TryGetValue(effect.Profile, out var template)
                 || !CanPlace(world, template.Profile, false, source.Owner, cell)
-                || world.Units.Count(u => u.Owner == source.Owner) >= world.Limits.UnitsPerFaction)) return false;
+                || !WorldArmyCapacity.CanAdd(world, source.Owner))) return false;
         }
         return true;
     }
@@ -87,7 +87,7 @@ public sealed partial class RuleEventBus
         {
             if (amount != 1 || effect.Profile == null || !UnitTemplates.TryGetValue(effect.Profile, out var template)
                 || !CanPlace(world, template.Profile, false, source.Owner, cell)
-                || world.Units.Count(u => u.Owner == source.Owner) >= world.Limits.UnitsPerFaction)
+                || !WorldArmyCapacity.CanAdd(world, source.Owner))
                 throw new RuleViolation("skill.summon", "Summoning requires one valid unit and a legal free cell");
             string id = "summon." + world.Revision + "." + cell;
             int serial = 0;

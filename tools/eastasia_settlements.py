@@ -76,6 +76,12 @@ def build(plan_path, placements, data, visible_land_mask):
             overrides[name] = int(level)
     for source_name,city in by_name.items():
         city['building_level'] = overrides.get(source_name, plan['cityLevelByTier'][str(city['tier'])])
+        site = plan.get('namedBuildingOverrides', {}).get(source_name, {})
+        city['kind'] = site.get('kind', 'city')
+        city['building_kind'] = KINDS[city['kind']]
+        if site:
+            city['building_level'] = site['level']
+            city['building_reason'] = site['reason']
         city['building_style'] = 2
         if source_name in plan.get('baseNames', {}):
             city['source_name'] = source_name

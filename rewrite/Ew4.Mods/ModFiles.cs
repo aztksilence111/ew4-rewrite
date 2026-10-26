@@ -16,8 +16,9 @@ public sealed record ModInfo(string Key, string Id, string Name, string Version,
     long Bytes, int Files, string[] Warnings, bool Active = false);
 public sealed record ImportProgress(string Status, string Message, int Completed = 0, int Total = 0, string? Key = null);
 
-public sealed class ModBase(Func<string, byte[]> read, IEnumerable<string> files)
+public sealed class ModBase(Func<string, byte[]> read, IEnumerable<string> files, string? saveNamespace = null)
 {
+    public string? SaveNamespace { get; } = saveNamespace == null ? null : ModFiles.PathName(saveNamespace);
     public string[] Files { get; } = files.Select(ModFiles.PathName).Where(ModFiles.RuntimePath).Order(StringComparer.Ordinal).ToArray();
     public byte[] Read(string path) => read(ModFiles.PathName(path));
     public System.Text.Json.Nodes.JsonObject Catalog() => LegacyCatalogFiles.Load(p => Read(

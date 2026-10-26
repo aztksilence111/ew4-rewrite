@@ -104,11 +104,26 @@ var siteCells = new HashSet<int>();
 foreach (var city in cityDocument.RootElement.EnumerateArray())
 {
     int cell = city.GetProperty("cell").GetInt32(), level = city.GetProperty("building_level").GetInt32();
+    string expectedKind = city.TryGetProperty("kind", out var namedKind) ? namedKind.GetString()! : "city";
+    int buildingKind = city.TryGetProperty("building_kind", out var namedBuilding) ? namedBuilding.GetInt32() : 0;
     Check(siteCells.Add(cell), "Unique city cell");
     Check(world.Cells[cell].Name == city.GetProperty("name").GetString()
-        && world.Cells[cell].BuildingKind == "city" && world.Cells[cell].BuildingLevel == level,
+        && world.Cells[cell].BuildingKind == expectedKind && world.Cells[cell].BuildingLevel == level,
         "Actual city name and initial level: " + city.GetProperty("name").GetString());
-    Check(level >= 1 && level <= content.Catalogs.Buildings.Definitions[0].Levels.Count, "City level has native rules and artwork");
+    Check(level >= 1 && level <= content.Catalogs.Buildings.Definitions[buildingKind].Levels.Count, "Named site level has native rules and artwork: " + city.GetProperty("name").GetString());
+    Check(TerritorialJurisdictions.IsCenter(world.Cells[cell]), "Named site remains a jurisdiction center");
+    if (expectedKind is "industry" or "stable")
+        Check(content.Catalogs.Buildings.Level(buildingKind, level)!.Recruitment.Count > 0, "Named factory or stable provides actual recruitment");
+}
+int magdagachi = cityDocument.RootElement.EnumerateArray().Single(c => c.GetProperty("name").GetString() == "马格达加奇").GetProperty("cell").GetInt32();
+var districtWorld = world with { Cells = world.Cells.Select(c => c with { Owner = c.Terrain.Sea ? null : "fra" }).ToArray() };
+var districts = TerritorialJurisdictions.Create(districtWorld);
+Check(districts.CellCenters[magdagachi] == magdagachi && districts.CellCenters.Count(c => c == magdagachi) > 10,
+    "Magdagachi forms a nontrivial northern district in a unified ownership fixture");
+foreach (var site in cityDocument.RootElement.EnumerateArray())
+{
+    int cell = site.GetProperty("cell").GetInt32();
+    Check(districts.CellCenters[cell] == cell, "Converted named site retains its own district");
 }
 Check(world.Cells.Any(c => c.BuildingKind == "city" && c.BuildingLevel == content.Catalogs.Buildings.Definitions[0].Levels.Count),
     "Include starting maximum-level cities like native Europe");

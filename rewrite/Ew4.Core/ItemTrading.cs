@@ -39,12 +39,17 @@ public sealed record PlayerAccount
     public IReadOnlyDictionary<string, ObjectiveBattleProgress> ObjectiveBattles { get; init; } = new Dictionary<string, ObjectiveBattleProgress>();
     public IReadOnlyList<string> UnlockedCampaigns { get; init; } = Array.Empty<string>();
     public IReadOnlyDictionary<string, int> CampaignStars { get; init; } = new Dictionary<string, int>();
+    public int? TechnologyStars { get; init; }
+    public IReadOnlyDictionary<int, IReadOnlyDictionary<int, int>> CampaignTechnology { get; init; } = new Dictionary<int, IReadOnlyDictionary<int, int>>();
     public IReadOnlyDictionary<string, BattleResult> BattleResults { get; init; } = new Dictionary<string, BattleResult>();
     public IReadOnlyDictionary<string, long> CollectedMedalReceipts { get; init; } = new Dictionary<string, long>();
     public ItemMarket? HeadquartersStock { get; init; }
     public IReadOnlyDictionary<string, RefreshBalance> RefreshBalances { get; init; } = new Dictionary<string, RefreshBalance>();
     public void Validate()
     {
+        if (TechnologyStars is < 0 or > 999 || CampaignTechnology == null
+            || CampaignTechnology.Any(z => z.Key < 0 || z.Value == null || z.Value.Any(t => t.Key < 0 || t.Key >= 26 || t.Value < -1)))
+            throw new RuleViolation("account.technology", "Invalid campaign technology account");
         if (CompletedObjectives == null || CompletedObjectives.Any(string.IsNullOrWhiteSpace)
             || CompletedObjectives.Distinct(StringComparer.Ordinal).Count() != CompletedObjectives.Count || ObjectiveBattles == null
             || ObjectiveBattles.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Value == null || string.IsNullOrWhiteSpace(p.Value.Scenario)
@@ -86,6 +91,7 @@ public sealed record PlayerAccount
         CompletedObjectives = CompletedObjectives.ToArray(), ObjectiveBattles = ObjectiveBattles.ToDictionary(p => p.Key, p => p.Value with { CapturedCities = p.Value.CapturedCities.ToArray() }),
         CommanderOffers = CommanderOffers.ToDictionary(p => p.Key, p => (IReadOnlyList<string>)p.Value.ToArray()), ClaimedRewards = ClaimedRewards.ToArray(), UnlockedCampaigns = UnlockedCampaigns.ToArray(),
         CampaignStars = CampaignStars.ToDictionary(p => p.Key, p => p.Value), BattleResults = BattleResults.ToDictionary(p => p.Key, p => p.Value),
+        CampaignTechnology = CampaignTechnology.ToDictionary(z => z.Key, z => (IReadOnlyDictionary<int, int>)z.Value.ToDictionary(t => t.Key, t => t.Value)),
         CollectedMedalReceipts = CollectedMedalReceipts.ToDictionary(p => p.Key, p => p.Value),
         RefreshBalances = RefreshBalances.ToDictionary(p => p.Key, p => p.Value),
         HeadquartersStock = HeadquartersStock == null ? null : HeadquartersStock with { Offers = HeadquartersStock.Offers.ToArray() } };

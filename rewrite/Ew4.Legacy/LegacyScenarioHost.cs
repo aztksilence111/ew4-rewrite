@@ -41,6 +41,7 @@ public sealed record LegacyScenarioRules(WorldTurnRules Turns, WorldMoveRules Mo
 public sealed record LegacyScenarioStart(GameSession Session, LegacyScenarioRules Rules, IReadOnlyList<WorldNotice> Notices, WorldMapDefinition Map)
 {
     public IReadOnlyList<LegacyMapDiagnostic> MapDiagnostics { get; init; } = [];
+    public IReadOnlyList<int>? TechnologySnapshot { get; init; }
 }
 
 public static class LegacyScenarioHost
@@ -175,7 +176,8 @@ public static class LegacyScenarioHost
                 : initialized.TurnOrder.Where(i => request.LocalPlayers.Contains(ids[i]))
                     .Select(i => new RosterDeploymentState(ids[i], initialized.Records[i].Count172, Array.Empty<string>())).ToArray() };
         session.Validate();
-        return new(session.Copy(), rules, entered.Notices.ToArray(), map) { MapDiagnostics = importedMap.Diagnostics };
+        return new(session.Copy(), rules, entered.Notices.ToArray(), map) { MapDiagnostics = importedMap.Diagnostics,
+            TechnologySnapshot = request.Mode == 1 ? initialized.Records[initialized.PlayerIndex].Values68.ToArray() : null };
     }
 
     private static string Fingerprint<T>(T value)
@@ -195,6 +197,7 @@ public static class LegacyScenarioHost
                     // Optional runtime districts must not change the pre-existing source-content binding.
                     if (property.Name == nameof(LocalMultiplayerState.ShareAlliedVictory)) continue;
                     if (property.Name == nameof(WorldState.Jurisdictions) && property.Value.ValueKind == JsonValueKind.Null) continue;
+                    if (property.Name == nameof(WorldState.ArmyCapacity) && property.Value.ValueKind == JsonValueKind.Null) continue;
                     if (property.Name == nameof(FactionState.Appearance) && property.Value.ValueKind == JsonValueKind.Null) continue;
                     if (property.Name == nameof(FactionState.DiplomacyWarned) && property.Value.ValueKind == JsonValueKind.False) continue;
                     if (property.Name == nameof(WorldState.Provocations) && property.Value.ValueKind == JsonValueKind.Null) continue;

@@ -82,4 +82,6 @@ def_battleline.xml的line顺序决定章号，第七条对应campaign7_XX。def_
 
 ## 发布前实测
 
+玩家 AI 设定的最小源码见 [ai-control](ai-control/README.md)，包含文字确认键和全部呈现配置，不含导出包。
+
 核对将领、进入征服/战役、实际移动/攻击/招募/回合、保存重载、切回原版看原档。导入完成不等于长期玩法兼容；不要删掉失败剧本或回退原图后仍称原Mod完整兼容。错误定位见[排错表](../docs/TROUBLESHOOTING.md)。

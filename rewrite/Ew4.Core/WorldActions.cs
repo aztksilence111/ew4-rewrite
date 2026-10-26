@@ -77,7 +77,7 @@ public static class WorldActions
     }
 
     internal static bool CanRecruitValidated(WorldState state, FactionState faction, int cell, RecruitmentOffer offer,
-        int? occupants = null, int? armySize = null)
+        int? occupants = null, int? armySize = null, int? armyLimit = null)
     {
         if (cell < 0 || cell >= state.Cells.Count || state.PendingDialogue != null || state.Phase != TurnPhase.Active) return false;
         var site = state.Cells[cell];
@@ -92,7 +92,7 @@ public static class WorldActions
                 || !offer.AllowedBuildingLevels.TryGetValue(site.BuildingKind, out var levels) || !levels.Contains(site.BuildingLevel)))
             || (faction.TurnUses.TryGetValue(offer.TurnGroup, out int used) && used >= offer.PerTurnLimit)) return false;
         if ((occupants ?? state.Units.Count(u => u.Cell == cell)) >= state.Limits.UnitsPerCell
-            || (armySize ?? state.Units.Count(u => u.Owner == faction.Id)) >= state.Limits.UnitsPerFaction) return false;
+            || !WorldArmyCapacity.CanAdd(state, faction.Id, armySize, armyLimit)) return false;
         return true;
     }
 
@@ -101,6 +101,8 @@ public static class WorldActions
         var faction = Ready(state, expectedRevision);
         if (string.IsNullOrWhiteSpace(unitId) || state.Units.Any(u => u.Id == unitId))
             throw new RuleViolation("recruit.identity", "Recruitment requires a new unit ID");
+        if (state.ArmyCapacity != null && !WorldArmyCapacity.CanAdd(state, faction.Id))
+            throw new RuleViolation("recruit.capacity", "Faction army capacity has been reached");
         if (!CanRecruit(state, cell, offer)) throw new RuleViolation("recruit.site", "Recruitment is not permitted at this site");
         if (faction.Resources.Money < offer.Cost.Money || faction.Resources.Industry < offer.Cost.Industry || faction.Resources.Food < offer.Cost.Food)
             throw new RuleViolation("recruit.resources", "Insufficient recruitment resources");

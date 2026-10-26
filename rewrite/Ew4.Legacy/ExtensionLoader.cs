@@ -26,6 +26,7 @@ public sealed partial class ExtensionLoader
     public int ApiVersion { get; private set; } = 1;
     public GeographyCatalog Geography { get; private init; } = GeographyCatalog.Empty;
     public IReadOnlyDictionary<string, MapColorsPresentation> MapColors { get; private init; } = new Dictionary<string, MapColorsPresentation>();
+    public AiControlPresentation AiControl { get; private init; } = new();
     public LegacySkillParameters? LegacySkills { get; private init; }
     public IReadOnlyDictionary<string, int?> DeploymentLimits { get; private init; } = new Dictionary<string, int?>();
     public IReadOnlyDictionary<string, int> FormationCounts { get; private init; } = new Dictionary<string, int>();
@@ -43,7 +44,7 @@ public sealed partial class ExtensionLoader
         string? ScenarioEvents = null, string[]? Statuses = null, string? VictoryPresentation = null, string? LegacySkillParameters = null,
         string? CommanderDialogues = null, string? ItemBindings = null, string? DeploymentLimits = null, string? Metagame = null,
         string? StageIntroPresentation = null, string? FormationCounts = null, string? CampaignVisibility = null,
-        string? Geography = null, string? PauseObjectivesPresentation = null, string? MapColors = null);
+        string? Geography = null, string? PauseObjectivesPresentation = null, string? MapColors = null, string? AiControl = null);
     private sealed record CampaignVisibilityFile(int Schema, Dictionary<string, string>? Visibility);
     private sealed record LegacySkillFile(int Schema, Dictionary<string, Dictionary<string, double>> Skills);
     private sealed record DeploymentLimitFile([property: JsonNumberHandling(JsonNumberHandling.Strict)] int Schema,
@@ -85,6 +86,9 @@ public sealed partial class ExtensionLoader
         if (m.MapColors != null && m.ApiVersion < 3) throw new RuleViolation("extension.version", "Map colors require API 3");
         var mapColors = m.MapColors == null ? new Dictionary<string, MapColorsPresentation>() : Read<Dictionary<string, MapColorsPresentation>>(m.MapColors);
         MapColorsPresentation.Validate(mapColors);
+        if (m.AiControl != null && m.ApiVersion < 3) throw new RuleViolation("extension.version", "AI control presentation requires API 3");
+        var aiControl = m.AiControl == null ? new AiControlPresentation() : Read<AiControlPresentation>(m.AiControl);
+        if (m.AiControl != null) AiControlPresentation.Validate(aiControl, read);
         if (m.ApiVersion == 1 && m.Statuses != null) throw new RuleViolation("extension.version", "Statuses require API 2");
         var deploymentLimits = new Dictionary<string, int?>();
         var formationCounts = new Dictionary<string, int>();
@@ -254,7 +258,7 @@ public sealed partial class ExtensionLoader
             { ApiVersion = m.ApiVersion, VictoryPresentations = victoryScreens, LegacySkills = legacySkills, CommanderDialogues = commanderDialogues,
                 ItemBindings = items, DeploymentLimits = deploymentLimits, FormationCounts = formationCounts, CampaignVisibility = campaignVisibility,
                 Metagame = metagame, StageIntroPresentations = introScreens, PauseObjectivesPresentations = pauseScreens, Geography = geography,
-                MapColors = mapColors };
+                MapColors = mapColors, AiControl = aiControl };
         bool Known(string id) => skills.ContainsKey(id) || id.StartsWith("ew4.skill.", StringComparison.Ordinal)
             && int.TryParse(id[10..], out int value) && value is >= 0 and < 40 || BuiltinTraits.Contains(id);
     }

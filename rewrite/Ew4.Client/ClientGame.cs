@@ -8,9 +8,10 @@ namespace Ew4.Client;
 public sealed record ClientCommand(string Op = "", long Revision = -1, string? Scenario = null, string? Country = null,
     string? Unit = null, string? Target = null, int Cell = -1, string? Offer = null, string? Commander = null, string? Item = null, JsonElement? Tutorial = null, int Group = 0, int Slot = 0, int Mode = 0,
     IReadOnlyList<string>? LocalPlayers = null, string? Tag = null, IReadOnlyList<string>? TaggedCommanders = null, bool Delta = false,
-    string? KnownVersion = null);
+    string? KnownVersion = null, string[]? Units = null, string? Policy = null, bool? AutoBattle = null, int[]? Goals = null);
 public sealed record ClientSlot(string Scenario, string? Country, byte[] Session, MovementHistoryState? MovementHistory = null, JsonElement? Tutorial = null,
-    int Round = 0, DateTimeOffset? SavedAt = null, IReadOnlyList<string>? LocalPlayers = null, string? DisplayCountry = null);
+    int Round = 0, DateTimeOffset? SavedAt = null, IReadOnlyList<string>? LocalPlayers = null, string? DisplayCountry = null,
+    IReadOnlyList<int>? TechnologySnapshot = null);
 
 // Both hosts serialize commands here, so rendering cannot bypass turn ownership or stale-state checks.
 public sealed partial class ClientGame(ClientContent content, string saveDirectory, Func<DateTimeOffset>? clock = null)
@@ -68,6 +69,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                     "/api/countries" => Countries(Command(body)),
                     "/api/local-players" => LocalPlayers(Command(body)),
                     "/api/headquarters" => Headquarters(),
+                    "/api/technology" => Technology(Command(body)),
                     "/api/objectives" => Objectives(Command(body)),
                     "/api/pause-objectives" => PauseObjectives(Command(body)),
                     "/api/deployment" => Deployment(Command(body)),
@@ -127,7 +129,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
     private object Load(ClientCommand command)
     {
         var slot = ReadSlot(SavePath(command.Slot, command.Mode, true));
-        var start = content.Start(slot.Scenario, slot.Country, localPlayers: slot.LocalPlayers);
+        var start = content.Start(slot.Scenario, slot.Country, localPlayers: slot.LocalPlayers, technologySnapshot: slot.TechnologySnapshot);
         GameSession state;
         bool upgradedEquipment = false;
         try
@@ -136,12 +138,15 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         }
         catch (RuleViolation error) when (error.Code == "save.content_revision" && content.CorrectOriginalEquipment)
         {
-            var prior = content.WithoutEquipmentCorrections().Start(slot.Scenario, slot.Country, localPlayers: slot.LocalPlayers);
+            var prior = content.WithoutEquipmentCorrections().Start(slot.Scenario, slot.Country, localPlayers: slot.LocalPlayers, technologySnapshot: slot.TechnologySnapshot);
             // Authenticate the old content binding before upgrading resolved bonuses.
             state = SessionSave.Decode(slot.Session, new(prior.Session.ContentRevision, prior.Session.World.ContentRevision, prior.Session.Account.ContentRevision));
             state = UpgradeEquipment(state, prior, start);
             upgradedEquipment = true;
         }
+        bool upgradedCapacity = JsonSerializer.Serialize(state.World.ArmyCapacity, Json)
+            != JsonSerializer.Serialize(start.Session.World.ArmyCapacity, Json);
+        state = state with { World = state.World with { ArmyCapacity = start.Session.World.ArmyCapacity?.Copy() } };
         if (start.Session.World.Jurisdictions != null)
         {
             if (state.World.Jurisdictions == null)
@@ -159,6 +164,9 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                 InitialObjectiveOwner = local.InitialObjectiveOwner == null ? null : start.Session.World.LocalMultiplayer.InitialObjectiveOwner } } };
             state = state with { World = LocalMultiplayerGame.Resolve(state.World, start.Rules.Turns.Victory) };
         }
+        var recovery = WorldTurns.RecoverDefeatedFaction(state.World, start.Rules.Turns);
+        bool recovered = !ReferenceEquals(recovery.State, state.World);
+        if (recovered) state = SessionActions.CommitWorld(state, state.Revision, recovery).State;
         var profile = Account();
         var unlocks = profile.UnlockedCampaigns.Union(state.Account.UnlockedCampaigns, StringComparer.Ordinal).ToArray();
         if (profile.Revision > state.Account.Revision) state = state with { Account = profile };
@@ -167,9 +175,9 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         state = SettleBattle(state);
         state.Validate();
         StoreAccount(state.Account);
-        game = start with { Session = state }; country = slot.Country;
+        game = start with { Session = state, Notices = recovered ? recovery.Notices : start.Notices }; country = slot.Country;
         tutorialCheckpoint = slot.Tutorial;
-        if (upgradedEquipment) movementHistory.Reset(state.World);
+        if (upgradedEquipment || recovered || upgradedCapacity) movementHistory.Reset(state.World);
         else movementHistory.Load(slot.MovementHistory, state.World);
         AutoSave();
         return View();
@@ -184,7 +192,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         tutorialCheckpoint = command.Tutorial;
         var slot = new ClientSlot(current.Session.World.ScenarioId, country, SessionSave.Encode(current.Session), movementHistory.Save(), tutorialCheckpoint,
             current.Session.World.Round, DateTimeOffset.Now, current.Session.World.LocalMultiplayer?.HumanFactions,
-            FactionCountries(current.Session.World).GetValueOrDefault(current.Session.PlayerFaction));
+            FactionCountries(current.Session.World).GetValueOrDefault(current.Session.PlayerFaction), current.TechnologySnapshot);
         string temporary = path + ".tmp";
         using (var stream = new FileStream(temporary, FileMode.Create, FileAccess.Write, FileShare.None)) { JsonSerializer.Serialize(stream, slot, Json); stream.Flush(true); }
         if (File.Exists(path)) File.Replace(temporary, path, path + ".bak"); else File.Move(temporary, path);
@@ -198,6 +206,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         if (command.Revision != session.Revision) throw new RuleViolation("client.stale", "State changed; refresh the command");
         if (command.Op == "ai_batch") return AiBatch();
         var active = world.Factions.Single(f => f.Id == world.ActiveFaction);
+        if (command.Op.StartsWith("player_ai_", StringComparison.Ordinal)) return PlayerAiAction(command);
         if (command.Op == "select") return Selection(command.Cell);
         if (command.Op == "event_choice")
         {
@@ -219,6 +228,11 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         }
         if (command.Op == "ai")
         {
+            if (active.Human && active.Id == session.PlayerFaction && (PlayerAi.Pending(world) || PlayerAi.Automatic(world)))
+            {
+                var combatView = AdvancePlayerAi();
+                return View(world, combat: combatView);
+            }
             if (active.Human || world.PendingDialogue != null) throw new RuleViolation("client.ai_turn", "AI does not own the active turn");
             var production = rules.Production[active.Id];
             var plan = WorldAi.PlanStep(world, rules.Ai, production, rules.Turns);
@@ -226,11 +240,12 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             Commit(WorldAi.ExecuteStep(world, plan, rules.Ai, production, rules.Turns, rules.Battle)); return View(world, combat: combat);
         }
         if (active.Id != session.PlayerFaction || !active.Human) throw new RuleViolation("client.player_turn", "Player does not own the active turn");
+        if (PlayerAi.Pending(world)) throw new RuleViolation("player_ai.ending", "请先停止执行再操作单位");
         if (command.Op == "use_item")
         {
             var itemRules = content.Catalogs.Items.Rules();
             var change = ConsumableItems.Use(session, session.Revision, command.Unit!, command.Item!, itemRules, rules.Training, content.Extensions.Bus);
-            CommitSession(change);
+            CommitSession(change, command.Unit);
             movementHistory.Reset(game!.Session.World);
             AutoSave();
             return View(suppliedUnit: itemRules.Definitions[command.Item!].Equipment.Effect == "ew4.item_effect.8" ? command.Unit : null);
@@ -245,14 +260,14 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         if (command.Op == "deploy")
         {
             var change = RosterDeployment.Deploy(session, session.Revision, command.Unit!, command.Commander!, rules.Roster);
-            CommitSession(change);
+            CommitSession(change, command.Unit);
             AutoSave();
             return View();
         }
         if (command.Op == "hire")
         {
             var hired = SessionActions.DeployTavern(session, session.Revision, command.Unit!, command.Offer!, rules.Tavern);
-            CommitSession(hired);
+            CommitSession(hired, command.Unit);
             AutoSave();
             return View();
         }
@@ -264,7 +279,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             "move" => WorldActions.Move(world, world.Revision, command.Unit!, command.Cell, rules.Movement),
             "disband" => WorldDisband.Execute(world, world.Revision, command.Unit!, DisbandConfiguration()),
             "attack" => WorldBattle.Attack(world, world.Revision, command.Unit!, command.Target!, rules.Battle),
-            "end" => WorldTurns.EndTurn(world, world.Revision, rules.Turns),
+            "end" => PlayerAi.BeginEnd(world, world.Revision, rules.Turns),
             "train" => WorldImprovements.Train(world, world.Revision, command.Unit!, rules.Training),
             "upgrade" => WorldImprovements.UpgradeBuilding(world, world.Revision, command.Cell, rules.Upgrades),
             "transport" => WorldSupportActions.BuyTransport(world, world.Revision, command.Unit!, rules.Transport),
@@ -273,6 +288,8 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             _ => throw new RuleViolation("client.command", "Unknown action")
         };
         int[]? movedPath = command.Op == "move" ? action.Movements.Single(m => m.Unit == command.Unit).Path.ToArray() : null;
+        if (command.Op != "end") action = action with { State = PlayerAi.MarkAction(action.State,
+            command.Unit ?? world.Units.FirstOrDefault(u => u.Owner == active.Id && u.Cell == command.Cell)?.Id) };
         Commit(action);
         if (movedPath != null)
             movementHistory.Record(world, game!.Session.World, command.Unit!, movedPath, game.Notices);
@@ -312,7 +329,10 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             }
             change = change with { State = world };
         }
-        return change with { State = LocalMultiplayerGame.Resolve(change.State, current.Rules.Turns.Victory)
+        var recovery = WorldTurns.RecoverDefeatedFaction(change.State, current.Rules.Turns);
+        if (!ReferenceEquals(recovery.State, change.State))
+            change = change with { State = recovery.State, Notices = change.Notices.Concat(recovery.Notices).ToArray() };
+        return change with { State = PlayerAi.Reconcile(LocalMultiplayerGame.Resolve(change.State, current.Rules.Turns.Victory))
             with { Revision = checked(current.Session.World.Revision + 1) } };
     }
     private void Commit(WorldChange change)
@@ -323,9 +343,10 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         var session = SessionActions.CommitWorld(current.Session, current.Session.Revision, change);
         InstallSession(current, session.State, change.Notices);
     }
-    private void CommitSession(SessionChange change)
+    private void CommitSession(SessionChange change, string? playerUnit = null)
     {
         var current = Require();
+        if (playerUnit != null) change = change with { State = change.State with { World = PlayerAi.MarkAction(change.State.World, playerUnit) } };
         var world = PrepareChange(new(change.State.World, change.Notices));
         var next = SessionActions.SyncPlayer(change.State with { World = world.State });
         next.Validate();
@@ -454,7 +475,8 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             var level = definition?.Levels.ElementAtOrDefault(Math.Max(0, cell.BuildingLevel - 1));
             var income = WorldTurns.SiteIncome(cell, index, current.Rules.Turns, economicCommanders.GetValueOrDefault(index));
             content.Catalogs.Combat.Context.TerrainDefense.TryGetValue(cell.DefenseTerrain, out var penalties);
-            return new { income, defense = level?.DefensePercent ?? 0, penalties };
+            return new { income, defense = level?.DefensePercent ?? 0, penalties,
+                armyCapacity = WorldArmyCapacity.BuildingCapacity(world, cell) };
         }
         var navigationMoves = world.Phase == TurnPhase.Active && world.ActiveFaction == session.PlayerFaction
             && world.PendingDialogue == null
@@ -498,6 +520,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             skills = SkillViews(u.Combatant), statuses = StatusViews(u.Combatant), traits = u.Combatant.Profile.Traits.Where(content.Extensions.Bus.Skills.ContainsKey)
                 .Select(id => SkillView(new SkillSlot(id, "trait." + id))).ToArray(),
             health = u.Combatant.Health, maxHealth = u.Combatant.Profile.MaxHealth, u.Combatant.ConstructionTurns, u.RemainingMovement, u.Acted, u.CommanderId, u.Transport, u.Burning, u.Objective,
+            aiControlled = PlayerAi.Managed(world, u), aiPolicy = PlayerAi.Order(u).Policy, aiGoal = PlayerAi.Order(u).Goal, aiGoals = PlayerAi.Targets(PlayerAi.Order(u)),
             objectiveMarker = u.Objective ? 1 : originalUnits.TryGetValue(u.Id, out var markedUnit) && markedUnit.Objective == 2 ? 2 : 0,
             canMove = u.Combatant.Profile.Category != "fort" && u.RemainingMovement > 0 && u.Morale.Effective != -3 && u.Combatant.ConstructionTurns == 0,
             canAttack = CanAttack(u), canNavigateMove = navigationMoves.Contains(u.Id), veterancy = u.Veterancy, morale = u.Morale.Effective,
@@ -531,8 +554,11 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             dialoguePresentation = DialoguePresentation(),
             scenarioPopup = ScenarioPopupView(world),
             mapColors = MapColorsPresentation.Resolve(content.Extensions.MapColors, world.ScenarioId),
+            playerAi = world.Factions.Single(f => f.Id == session.PlayerFaction).PlayerAi ?? new PlayerAiControl(),
+            aiPresentation = content.Extensions.AiControl,
             medals = session.Account.Medals,
             factions = world.Factions.Select(f => new { f.Id, f.Name, f.Camp, f.Human, f.Defeated, f.Resources,
+                unitCount = world.Units.Count(u => u.Owner == f.Id), unitLimit = WorldArmyCapacity.Limit(world, f.Id),
                 relation = WorldDiplomacy.Relation(world, session.PlayerFaction, f.Id, current.Rules.Turns.NeutralCamps),
                 neutral = WorldDiplomacy.NeutralTo(world, f.Id, session.PlayerFaction, current.Rules.Turns.NeutralCamps),
                 country = countryIds.GetValueOrDefault(f.Id) ?? f.Id,

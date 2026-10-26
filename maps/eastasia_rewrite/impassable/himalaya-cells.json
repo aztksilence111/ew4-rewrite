@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "map": "eastasia",
-  "baseTerrainSha256": "6ebcf0455bccb60553d1aab624d641ec6e69c223dfd3fd5c5ccce2b6312c5883",
+  "baseTerrainSha256": "47289fa67d67022194e41c4ff3ba0a0d9edcca7e11c1bcc8456feb55caee86ea",
   "blockedCells": [
     9328,
     9486,

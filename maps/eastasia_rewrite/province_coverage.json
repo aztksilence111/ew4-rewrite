@@ -1,0 +1,415 @@
+{
+  "provinces": [
+    {
+      "code": "110000",
+      "name": "北京市",
+      "industry": [
+        9728
+      ],
+      "stable": [
+        9729
+      ],
+      "cities": 1
+    },
+    {
+      "code": "120000",
+      "name": "天津市",
+      "industry": [
+        10206
+      ],
+      "stable": [
+        9731
+      ],
+      "cities": 1
+    },
+    {
+      "code": "130000",
+      "name": "河北省",
+      "industry": [
+        9733
+      ],
+      "stable": [
+        9094
+      ],
+      "cities": 8
+    },
+    {
+      "code": "140000",
+      "name": "山西省",
+      "industry": [
+        10825
+      ],
+      "stable": [
+        9566
+      ],
+      "cities": 5
+    },
+    {
+      "code": "150000",
+      "name": "内蒙古自治区",
+      "industry": [
+        9243
+      ],
+      "stable": [
+        9081,
+        5625,
+        7681
+      ],
+      "cities": 10
+    },
+    {
+      "code": "210000",
+      "name": "辽宁省",
+      "industry": [
+        9426,
+        8003
+      ],
+      "stable": [
+        8631
+      ],
+      "cities": 7
+    },
+    {
+      "code": "220000",
+      "name": "吉林省",
+      "industry": [
+        6900
+      ],
+      "stable": [
+        6580
+      ],
+      "cities": 4
+    },
+    {
+      "code": "230000",
+      "name": "黑龙江省",
+      "industry": [
+        5638,
+        5019,
+        6911
+      ],
+      "stable": [
+        5320
+      ],
+      "cities": 5
+    },
+    {
+      "code": "310000",
+      "name": "上海市",
+      "industry": [
+        13376
+      ],
+      "stable": [
+        13377
+      ],
+      "cities": 1
+    },
+    {
+      "code": "320000",
+      "name": "江苏省",
+      "industry": [
+        12737
+      ],
+      "stable": [
+        12260
+      ],
+      "cities": 5
+    },
+    {
+      "code": "330000",
+      "name": "浙江省",
+      "industry": [
+        14797
+      ],
+      "stable": [
+        14793
+      ],
+      "cities": 5
+    },
+    {
+      "code": "340000",
+      "name": "安徽省",
+      "industry": [
+        12893
+      ],
+      "stable": [
+        13048
+      ],
+      "cities": 4
+    },
+    {
+      "code": "350000",
+      "name": "福建省",
+      "industry": [
+        15587
+      ],
+      "stable": [
+        15898
+      ],
+      "cities": 5
+    },
+    {
+      "code": "360000",
+      "name": "江西省",
+      "industry": [
+        15572
+      ],
+      "stable": [
+        15891
+      ],
+      "cities": 4
+    },
+    {
+      "code": "370000",
+      "name": "山东省",
+      "industry": [
+        11161,
+        10843
+      ],
+      "stable": [
+        10836
+      ],
+      "cities": 4
+    },
+    {
+      "code": "410000",
+      "name": "河南省",
+      "industry": [
+        12414
+      ],
+      "stable": [
+        13041
+      ],
+      "cities": 6
+    },
+    {
+      "code": "420000",
+      "name": "湖北省",
+      "industry": [
+        14463
+      ],
+      "stable": [
+        13513
+      ],
+      "cities": 6
+    },
+    {
+      "code": "430000",
+      "name": "湖南省",
+      "industry": [
+        15885,
+        16989,
+        15723
+      ],
+      "stable": [
+        15720
+      ],
+      "cities": 4
+    },
+    {
+      "code": "440000",
+      "name": "广东省",
+      "industry": [
+        17626
+      ],
+      "stable": [
+        18409
+      ],
+      "cities": 8
+    },
+    {
+      "code": "450000",
+      "name": "广西壮族自治区",
+      "industry": [
+        17142
+      ],
+      "stable": [
+        17451
+      ],
+      "cities": 4
+    },
+    {
+      "code": "460000",
+      "name": "海南省",
+      "industry": [
+        19514
+      ],
+      "stable": [
+        19670
+      ],
+      "cities": 4
+    },
+    {
+      "code": "500000",
+      "name": "重庆市",
+      "industry": [
+        14768
+      ],
+      "stable": [
+        14453
+      ],
+      "cities": 2
+    },
+    {
+      "code": "510000",
+      "name": "四川省",
+      "industry": [
+        14919,
+        14601
+      ],
+      "stable": [
+        15387
+      ],
+      "cities": 7
+    },
+    {
+      "code": "520000",
+      "name": "贵州省",
+      "industry": [
+        15556
+      ],
+      "stable": [
+        15876
+      ],
+      "cities": 4
+    },
+    {
+      "code": "530000",
+      "name": "云南省",
+      "industry": [
+        16957,
+        16333
+      ],
+      "stable": [
+        16329
+      ],
+      "cities": 6
+    },
+    {
+      "code": "540000",
+      "name": "西藏自治区",
+      "industry": [
+        13148
+      ],
+      "stable": [
+        12996
+      ],
+      "cities": 10
+    },
+    {
+      "code": "610000",
+      "name": "陕西省",
+      "industry": [
+        12873,
+        13034
+      ],
+      "stable": [
+        10348
+      ],
+      "cities": 5
+    },
+    {
+      "code": "620000",
+      "name": "甘肃省",
+      "industry": [
+        11761
+      ],
+      "stable": [
+        11764,
+        12075
+      ],
+      "cities": 5
+    },
+    {
+      "code": "630000",
+      "name": "青海省",
+      "industry": [
+        10806
+      ],
+      "stable": [
+        12691,
+        11754
+      ],
+      "cities": 5
+    },
+    {
+      "code": "640000",
+      "name": "宁夏回族自治区",
+      "industry": [
+        10815
+      ],
+      "stable": [
+        10813
+      ],
+      "cities": 4
+    },
+    {
+      "code": "650000",
+      "name": "新疆维吾尔自治区",
+      "industry": [
+        6199
+      ],
+      "stable": [
+        6188,
+        7284,
+        6512
+      ],
+      "cities": 8
+    },
+    {
+      "code": "710000",
+      "name": "台湾省",
+      "industry": [
+        17170
+      ],
+      "stable": [
+        17010
+      ],
+      "cities": 5
+    }
+  ],
+  "sourceUrl": "https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json",
+  "sourceSha256": "99adfeded5223848bbe37a0a12f8023e11ee12161c7800521c27db42fdeac275",
+  "counts": {
+    "city": 245,
+    "industry": 62,
+    "stable": 51,
+    "port": 50,
+    "farmland": 113
+  },
+  "named": {
+    "city": 245,
+    "industry": 8,
+    "stable": 27
+  },
+  "sitesBefore": 551,
+  "sitesAfter": 521,
+  "addedTown": {
+    "name": "马格达加奇",
+    "lon": 125.8,
+    "lat": 53.45,
+    "tier": 3,
+    "group": "俄国远东",
+    "reason": "1910年前后形成的铁路节点，补充外兴安岭南侧、布拉戈维申斯克以北的辖区中心",
+    "id": "city-f5c7a1f97e30",
+    "city_id": 10279,
+    "x": 3347.389,
+    "y": 419.0,
+    "cell": 2633,
+    "col": 105,
+    "row": 16,
+    "world_pixel": [
+      6720,
+      846
+    ],
+    "generalized_land": false,
+    "displacement_km": 17.49,
+    "addition": true,
+    "building_level": 1,
+    "kind": "city",
+    "building_kind": 0,
+    "building_style": 2
+  },
+  "note": "港澳没有陆地格心，以珠三角区域补给；本表按格心而非锚点城市归省。",
+  "errors": 0
+}

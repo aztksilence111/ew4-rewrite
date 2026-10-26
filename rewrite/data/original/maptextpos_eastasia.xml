@@ -4,7 +4,7 @@
   <Element index="51" libName="eastasia_lake_balkhash" colorAlphaPercent="100" tx="1019.116" ty="1442.934" left="816.543" top="1366.167" width="402.884" height="107.993" />
   <Element index="52" libName="eastasia_issyk_kul" colorAlphaPercent="100" tx="1135.706" ty="2161.73" left="1072.659" top="2145.29" width="126.094" height="36.744" />
   <Element index="53" libName="eastasia_lake_alakol" colorAlphaPercent="100" tx="1832.681" ty="1692.873" left="1791.209" top="1617.954" width="91.821" height="150.621" />
-  <Element index="54" libName="eastasia_lake_zaysan" colorAlphaPercent="100" tx="2174.454" ty="1522.335" left="2088.099" top="1498.311" width="169.86" height="60.904" />
+  <Element index="54" libName="eastasia_lake_zaysan" colorAlphaPercent="100" tx="2173.8" ty="1517.35" left="2139.095" top="1485.445" width="69.41" height="63.81" />
   <Element index="55" libName="eastasia_lake_uvs" colorAlphaPercent="100" tx="3193.456" ty="1344.907" left="3137.782" top="1329.507" width="111.348" height="33.709" />
   <Element index="56" libName="eastasia_lake_khovsgol" colorAlphaPercent="100" tx="4036.923" ty="1333.447" left="4005.875" top="1242.294" width="52.573" height="184.375" />
   <Element index="57" libName="eastasia_lake_khyargas" colorAlphaPercent="100" tx="3224.271" ty="1549.077" left="3140.305" top="1529.819" width="167.932" height="33.618" />
@@ -23,13 +23,13 @@
   <Element index="70" libName="eastasia_lake_tengiz" colorAlphaPercent="100" tx="740.045" ty="565.779" left="667.738" top="546.474" width="144.614" height="34.705" />
   <Element index="0" libName="eastasia_west_siberian_plain" colorAlphaPercent="100" tx="2115.135" ty="95" left="1264.079" top="30.01" width="1702.112" height="121.99" />
   <Element index="1" libName="eastasia_central_siberian_plateau" colorAlphaPercent="100" tx="4403.574" ty="260" left="3348.922" top="197.8" width="2109.304" height="164.226" />
-  <Element index="2" libName="eastasia_altai_mountains" colorAlphaPercent="100" tx="2635.151" ty="1570.318" left="2299.407" top="1344.768" width="674.75" height="448.971" />
+  <Element index="2" libName="eastasia_altai_mountains" colorAlphaPercent="100" tx="2554.414" ty="1437.8" left="2186.374" top="1109.853" width="742.59" height="647.544" />
   <Element index="3" libName="eastasia_tian_shan" colorAlphaPercent="100" tx="2039.866" ty="2414.195" left="1425.959" top="2297.806" width="1236.337" height="231.701" />
   <Element index="4" libName="eastasia_junggar_basin" colorAlphaPercent="100" tx="2380.281" ty="1966.429" left="1946.977" top="1881.749" width="866.608" height="128.16" />
   <Element index="5" libName="eastasia_tarim_basin" colorAlphaPercent="100" tx="1719.4" ty="2892.925" left="959.099" top="2766.864" width="1520.602" height="183.061" />
   <Element index="6" libName="eastasia_pamirs" colorAlphaPercent="100" tx="554.943" ty="2644.905" left="408.908" top="2429.357" width="352.785" height="464.138" />
   <Element index="7" libName="eastasia_kunlun_mountains" colorAlphaPercent="100" tx="1866.408" ty="3418.331" left="531.538" top="2871.799" width="2664.08" height="1095.643" />
-  <Element index="8" libName="eastasia_tibetan_plateau" colorAlphaPercent="100" tx="2129.597" ty="4171.228" left="1170.946" top="4106.428" width="1917.302" height="194.02" />
+  <Element index="8" libName="eastasia_tibetan_plateau" colorAlphaPercent="100" tx="2000" ty="3850" left="1316.32" top="3803.4" width="1367.36" height="157.384" />
   <Element index="9" libName="eastasia_himalayas" colorAlphaPercent="100" tx="1851.586" ty="4481.215" left="787.803" top="3961.873" width="2108.181" height="1054.193" />
   <Element index="10" libName="eastasia_qaidam_basin" colorAlphaPercent="100" tx="3014.863" ty="3517.635" left="2656.644" top="3441.184" width="716.438" height="115.771" />
   <Element index="11" libName="eastasia_qilian_mountains" colorAlphaPercent="100" tx="3660.334" ty="3395.901" left="3151.035" top="3063.616" width="1009.151" height="670.388" />
@@ -43,15 +43,15 @@
   <Element index="19" libName="eastasia_sikhote_alin" colorAlphaPercent="100" tx="8060.753" ty="1835.657" left="7730.808" top="1361.224" width="555.508" height="898.073" />
   <Element index="20" libName="eastasia_yanshan_mountains" colorAlphaPercent="100" tx="6030.756" ty="3120.173" left="5744.411" top="3067.56" width="572.69" height="105.226" />
   <Element index="21" libName="eastasia_north_china_plain" colorAlphaPercent="100" tx="5882.066" ty="3909.069" left="5626.914" top="3453.699" width="596.993" height="950.891" />
-  <Element index="22" libName="eastasia_loess_plateau" colorAlphaPercent="100" tx="4867.164" ty="3749.815" left="4432.654" top="3703.215" width="869.02" height="137.219" />
+  <Element index="22" libName="eastasia_loess_plateau" colorAlphaPercent="100" tx="4740" ty="3750" left="4404.112" top="3708.6" width="671.776" height="126.343" />
   <Element index="23" libName="eastasia_taihang_mountains" colorAlphaPercent="100" tx="5457.443" ty="3644.567" left="5312.172" top="3221.356" width="291.691" height="850.287" />
   <Element index="24" libName="eastasia_qinling_mountains" colorAlphaPercent="100" tx="4796.579" ty="4298.021" left="4245.674" top="4169.969" width="1110.2" height="254.696" />
   <Element index="25" libName="eastasia_sichuan_basin" colorAlphaPercent="100" tx="4282.585" ty="4722.675" left="3922.812" top="4639.241" width="719.546" height="127.954" />
   <Element index="26" libName="eastasia_hengduan_mountains" colorAlphaPercent="100" tx="3359.663" ty="4951.698" left="3215.144" top="4424.016" width="269.003" height="1045.454" />
-  <Element index="27" libName="eastasia_yunnan_guizhou_plateau" colorAlphaPercent="100" tx="4083.92" ty="5546.286" left="3551.608" top="5455.832" width="1064.624" height="126.654" />
-  <Element index="28" libName="eastasia_middle_yangtze_plain" colorAlphaPercent="100" tx="5550" ty="4830" left="5020.424" top="4760.139" width="1059.152" height="105.021" />
-  <Element index="29" libName="eastasia_nanling_mountains" colorAlphaPercent="100" tx="5373.587" ty="5692.241" left="4941.19" top="5662.281" width="864.794" height="113.993" />
-  <Element index="30" libName="eastasia_wuyi_mountains" colorAlphaPercent="100" tx="6046.896" ty="5360.274" left="5955.824" top="5019.395" width="173.806" height="689.73" />
+  <Element index="27" libName="eastasia_yunnan_guizhou_plateau" colorAlphaPercent="100" tx="4420" ty="5650" left="3987.09" top="5563.952" width="865.82" height="118.088" />
+  <Element index="28" libName="eastasia_middle_yangtze_plain" colorAlphaPercent="100" tx="5640" ty="4830" left="5185.15" top="4763.329" width="909.7" height="98.711" />
+  <Element index="29" libName="eastasia_nanling_mountains" colorAlphaPercent="100" tx="5481.068" ty="5673.902" left="5064.784" top="5580.043" width="830.819" height="187.895" />
+  <Element index="30" libName="eastasia_wuyi_mountains" colorAlphaPercent="100" tx="6150.833" ty="5334.008" left="5967.877" top="5038.126" width="365.233" height="590.657" />
   <Element index="31" libName="eastasia_south_china_hills" colorAlphaPercent="100" tx="5348.558" ty="6125.812" left="4917.342" top="6091.692" width="862.432" height="107.669" />
   <Element index="32" libName="eastasia_ganges_plain" colorAlphaPercent="100" tx="1312.589" ty="5180" left="600.828" top="5040.984" width="1423.522" height="184.576" />
   <Element index="33" libName="eastasia_deccan_plateau" colorAlphaPercent="100" tx="497.41" ty="5606.252" left="112.477" top="5500.726" width="774.469" height="280.426" />
@@ -72,4 +72,19 @@
   <Element index="48" libName="eastasia_gulf_of_tonkin" colorAlphaPercent="100" tx="4712.776" ty="6623.929" left="4542.191" top="6419.011" width="385.101" height="443.279" />
   <Element index="49" libName="eastasia_taiwan_strait" colorAlphaPercent="100" tx="6482.394" ty="5744.834" left="6303.751" top="5488.808" width="317.445" height="495.046" />
   <Element index="71" libName="eastasia_seto_inland_sea" colorAlphaPercent="100" tx="8392" ty="3711" left="8330.593" top="3696.64" width="122.814" height="31.651" />
+  <Element index="72" libName="eastasia_yinshan_mountains" colorAlphaPercent="100" tx="5029.84" ty="3074.904" left="4650.215" top="3012.537" width="763.724" height="125.977" />
+  <Element index="73" libName="eastasia_altyn_tagh" colorAlphaPercent="100" tx="2471.306" ty="3186.881" left="1974.469" top="3084.099" width="998.359" height="212.111" />
+  <Element index="74" libName="eastasia_helan_mountains" colorAlphaPercent="100" tx="4553.24" ty="3425.881" left="4503.342" top="3304.797" width="99.957" height="242.632" />
+  <Element index="75" libName="eastasia_liupan_mountains" colorAlphaPercent="100" tx="4525.468" ty="3937.271" left="4473.397" top="3864.817" width="105.678" height="147.665" />
+  <Element index="76" libName="eastasia_luliang_mountains" colorAlphaPercent="100" tx="5237.589" ty="3666.474" left="5142.957" top="3397.017" width="189.993" height="541.571" />
+  <Element index="77" libName="eastasia_wushan_mountains" colorAlphaPercent="100" tx="5032.731" ty="4750.894" left="4979.367" top="4618.909" width="102.598" height="265.16" />
+  <Element index="78" libName="eastasia_wumeng_mountains" colorAlphaPercent="100" tx="4164.905" ty="5388.367" left="4012.01" top="5236.339" width="300.407" height="298.935" />
+  <Element index="79" libName="eastasia_dalou_mountains" colorAlphaPercent="100" tx="4634.083" ty="5200.948" left="4482.888" top="5118.399" width="297.312" height="163.267" />
+  <Element index="80" libName="eastasia_gangdise_mountains" colorAlphaPercent="100" tx="1536.597" ty="4274.124" left="1135.981" top="4077.99" width="807.917" height="390.405" />
+  <Element index="81" libName="eastasia_nyainqentanglha_mountains" colorAlphaPercent="100" tx="2519.417" ty="4632.252" left="2093.04" top="4493.488" width="857.883" height="291.334" />
+  <Element index="82" libName="eastasia_tanggula_mountains" colorAlphaPercent="100" tx="2512.625" ty="4179.231" left="1973.216" top="3995.139" width="1082.694" height="372.693" />
+  <Element index="83" libName="eastasia_bayan_har_mountains" colorAlphaPercent="100" tx="3387.861" ty="4151.916" left="3066.22" top="3943.145" width="642.833" height="417.846" />
+  <Element index="84" libName="eastasia_daba_mountains" colorAlphaPercent="100" tx="4733.567" ty="4537.51" left="4503.729" top="4445.494" width="459.219" height="184.177" />
+  <Element index="85" libName="eastasia_dabie_mountains" colorAlphaPercent="100" tx="5834.487" ty="4670.648" left="5670.96" top="4608.636" width="327.905" height="123.802" />
+  <Element index="86" libName="eastasia_xuefeng_mountains" colorAlphaPercent="100" tx="5152.705" ty="5370.609" left="5019.953" top="5168.388" width="262.561" height="399.953" />
 </Elements>

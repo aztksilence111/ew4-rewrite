@@ -7,9 +7,9 @@
 *{box-sizing:border-box}body{margin:0;overflow:hidden}button{font:inherit;color:inherit;cursor:pointer;border:0;border-radius:0;padding:0;background:transparent}button:hover{filter:brightness(1.12)}button:active{filter:brightness(.85)}button:disabled{opacity:.5;cursor:default}button:focus-visible{outline:2px solid #fff;outline-offset:2px}[hidden]{display:none!important}h1,h2,p{margin:0}
 #country-list{overflow-x:hidden;scrollbar-width:none}
 #country-list::-webkit-scrollbar{display:none}
-#countries #country-list{width:180px}
+#countries #country-list{width:160px}
 #countries .country-entry{transform:translateX(20px);width:160px}
-#countries .country-entry[aria-pressed=true]{transform:none;width:180px}
+#countries .country-entry[aria-pressed=true]{transform:none;width:160px}
 #countries #confirm-country{background-image:url("content/ui/image_newgame_hd/new_confirm.png")}
 #campaign-battles.country-sidebar .country-entry{background-image:var(--chapter-entry-image);padding:0 12px;justify-content:center}
 #menu,#play,#map{position:fixed;inset:0;width:100%;height:100%}#menu{background:#222}#menu-stage{position:absolute;width:568px;height:320px;left:50%;top:50%;transform:translate(-50%,-50%) scale(var(--ui-scale));overflow:hidden}
@@ -44,6 +44,14 @@
 #terrain-info .original-text{position:static;display:inline-flex;height:auto;gap:0;align-items:center}
 #terrain-info img{width:18px;height:18px;flex:none}
 #play{isolation:isolate}
+#army-capacity{position:absolute;z-index:2;left:50%;top:env(safe-area-inset-top,0px);width:144px;height:28px;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 16px 5px;background:transparent;color:#fff;transform:translateX(-50%) scale(var(--battle-hud-scale));transform-origin:top center;white-space:nowrap;letter-spacing:0}
+#army-capacity::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(to bottom,rgba(35,31,32,.38),rgba(35,31,32,.3) 55%,rgba(35,31,32,0));clip-path:polygon(0 0,100% 0,92% 100%,8% 100%);pointer-events:none}
+#army-capacity .army-capacity-icon{width:12px;height:18px;object-fit:contain;flex:none}
+#army-capacity .army-capacity-hourglass{width:16px;height:19px;object-fit:contain;flex:none}
+#army-capacity-value,#army-capacity-round{min-width:0;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none}
+#army-capacity-value{width:48px}
+#army-capacity-round{width:20px}
+#army-capacity .original-text{position:static;display:inline-flex;flex:none}
 .battle-resources{z-index:1;pointer-events:none;top:env(safe-area-inset-top,0px);left:env(safe-area-inset-left,0px)}
 #pause{z-index:7}
 #terrain-info{left:env(safe-area-inset-left,0px);top:calc(env(safe-area-inset-top,0px) + 31px * var(--battle-scale))}

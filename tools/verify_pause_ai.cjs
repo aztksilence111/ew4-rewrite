@@ -61,13 +61,18 @@ const deferred=()=>{let resolve;const promise=new Promise(r=>{resolve=r;});retur
     // Allow behavior-only regression when the existing mobile pause layout is tracked separately.
     for(const [name,width,height] of (process.argv.includes('--desktop-only')?[]:[['landscape',844,390],['portrait',390,844]])){
       await page.setViewportSize({width,height});
+      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
       check(await page.locator('#restart').isVisible()&&await page.locator('#return-menu').isVisible(),name+' restart and exit remain reachable');
       check(await page.locator('#pause .dialog').evaluate(el=>{const b=el.getBoundingClientRect();return b.left>=0&&b.top>=0&&b.right<=innerWidth&&b.bottom<=innerHeight;}),name+' pause fits viewport');
       await shot(name+'-paused');
     }
     await page.setViewportSize({width:1280,height:720});
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
     gate=hold(['ai']);await page.locator('#resume').click();await waitHeld(gate);
-    await page.locator('#menu-button').click();await page.locator('#restart').click();
+    await page.locator('#menu-button').click();
+    check(await page.locator('#restart').evaluate(el=>{const r=el.getBoundingClientRect();return r.left>=0&&r.top>=0&&r.right<=innerWidth&&r.bottom<=innerHeight;}),
+      'restart inside viewport: '+JSON.stringify(await page.evaluate(()=>({viewport:[innerWidth,innerHeight],pause:$('pause').className,menu:document.querySelector('#pause>.pause-dialog').getBoundingClientRect().toJSON(),style:document.querySelector('#pause>.pause-dialog').getAttribute('style'),restart:$('restart').getBoundingClientRect().toJSON()}))));
+    await page.locator('#restart').click();
     check(await page.evaluate(()=>sessionTransition&&aiStopRequested),'restart immediately requests AI interruption');
     const restartCalls=aiCalls;gate.release.resolve();await idle();
     check(await page.evaluate(()=>state.round===1&&state.activeFaction===state.playerFaction&&state.startCountry==='fra'&&$('pause').hidden),'restart resets the battle and preserves country');

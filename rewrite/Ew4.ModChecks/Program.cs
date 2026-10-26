@@ -5,6 +5,16 @@ using System.Text.Json.Nodes;
 using System.Xml.Linq;
 using Ew4.Mods;
 
+if (args.ElementAtOrDefault(1) == "--army-capacity-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { armyCapacityModChecks = ArmyCapacityModChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--startup-assets-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { startupAssetChecks = StartupAssetChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
 if (args.ElementAtOrDefault(1) == "--map-text-paths-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { mapTextPathChecks = MapTextPathChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;

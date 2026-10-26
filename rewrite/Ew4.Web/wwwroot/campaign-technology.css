@@ -1,0 +1,21 @@
+#campaign-upgrade{position:absolute;right:-1px;top:-1px;width:80px;height:22.5px;display:flex;align-items:center;justify-content:center;padding-left:20px;background:url('content/ui/image_ui_hd/button_upgrade.png') center/100% 100% no-repeat}
+#campaign-screen .menu-bar::after{right:84px}
+#campaign-screen .menu-bar h1{max-width:calc(100% - 180px);overflow:hidden}
+.campaign-technology [data-native-id=group_buttons]{display:grid;grid-template-columns:repeat(5,50px);grid-template-rows:27px;height:27px!important}
+.technology-tab{display:flex;align-items:center;justify-content:center;width:49px;height:27px;background:url('content/ui/image_ui_hd/upgrade_tag.png') center/100% 100% no-repeat}
+.technology-tab[aria-selected=true]{background-image:url('content/ui/image_ui_hd/upgrade_tag_selected.png')}
+.technology-tab img{max-width:42px;max-height:23px;object-fit:contain}
+.campaign-technology [data-native-id=grid_units]{display:grid;grid-template-columns:repeat(6,50px)!important;grid-template-rows:repeat(4,40px);grid-auto-rows:40px!important;gap:10px 0!important;overflow:visible}
+.technology-cell{position:relative;width:50px;height:40px;display:flex;align-items:center;justify-content:center}
+.technology-cell>img{position:absolute;left:5px;top:0;pointer-events:none;object-fit:contain}
+.technology-cell>img:first-child{width:40px;height:40.5px}
+.technology-level{position:absolute;top:29px;left:5px;width:40px;height:11px;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.campaign-technology [data-native-id=image_selbox]{z-index:3}
+.campaign-technology [data-native-id=image_verbar]{box-sizing:border-box;border-style:solid;border-color:transparent;border-width:13.5px .5px 3.5px;border-image:url('content/ui/image_ui_hd/upgrade_back.png') 27 1 7 1 fill stretch}
+.campaign-technology [data-native-id=image_unit]{display:flex;align-items:center;justify-content:center}
+.campaign-technology [data-native-id=image_unit]>img{max-width:100%;max-height:100%;object-fit:contain}
+.campaign-technology [data-native-id=intitle]{overflow:hidden}
+.campaign-technology [data-native-id=intitle]::after{content:'';position:absolute;left:0;right:0;bottom:0;border-bottom:1px solid #777571}
+.campaign-technology [data-native-id=btn_upgrade]{opacity:1}
+.campaign-technology [data-native-id=btn_upgrade]:disabled{filter:none;opacity:1}
+.campaign-technology [data-native-id=btn_upgrade].technology-maximum{filter:grayscale(.75);opacity:.65}

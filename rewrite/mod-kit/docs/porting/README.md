@@ -1,5 +1,9 @@
 # 原版 Mod 移植到 rewrite
 
+势力总部队上限的基础额度、逐势力覆盖和建筑等级容量表见[部队容量配置](ARMY_CAPACITY.md)，玩家与 AI 共用，支持旧档载入。
+
+玩家 AI 设定的文字确认键、右栏、兵牌、箭头及连线均有呈现配置，见 [AI 设定接口](AI_CONTROL.md) 与 [最小配置源码](../../examples/ai-control/README.md)。
+
 地理名称可按单字或字母沿地形曲线排列，地图字段与示例见[曲线地理文字](MAP_TEXT_PATHS.md)。
 
 将领、技能文字、兵种、装备、建筑及成长等可直接编辑独立 JSON，见[文件与字段](SPLIT_CATALOG.md)。

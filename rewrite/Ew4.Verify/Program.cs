@@ -1,6 +1,36 @@
 using System.Text.Json;
 using Ew4.Core;
 
+if (args.ElementAtOrDefault(1) == "--campaign-technology-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { campaignTechnologyChecks = CampaignTechnologyChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--army-capacity-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { armyCapacityChecks = ArmyCapacityChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--player-ai-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { playerAiChecks = PlayerAiChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--food-supply-only")
+{
+    string supplyRoot = Path.GetFullPath(args[0]);
+    Console.WriteLine(JsonSerializer.Serialize(new { productionChecks = AiWorldProductionChecks.Run(supplyRoot),
+        nativeProductionChecks = AiProductionChecks.Run(supplyRoot), turnChecks = WorldTurnChecks.Run(supplyRoot),
+        lifecycleChecks = LifecycleChecks.Run(supplyRoot), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--defeated-faction-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { defeatedFactionChecks = DefeatedFactionChecks.Run(Path.GetFullPath(args[0])),
+        turnChecks = WorldTurnChecks.Run(Path.GetFullPath(args[0])), entryChecks = WorldTurnEntryChecks.Run(Path.GetFullPath(args[0])),
+        hazardChecks = HazardDeathChecks.Run(Path.GetFullPath(args[0])), battleChecks = BattleCommitChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
 if (args.ElementAtOrDefault(1) == "--map-colors-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { mapColorChecks = MapColorChecks.Run(Path.GetFullPath(args[0])),
@@ -227,6 +257,7 @@ int movementCommitChecks = MovementCommitChecks.Run(root);
 movementCommitChecks += RFeedbackChecks.Run(root);
 int turnSettlementChecks = TurnSettlementChecks.Run(root);
 int worldTurnChecks = WorldTurnChecks.Run(root);
+worldTurnChecks += DefeatedFactionChecks.Run(root);
 int battleCommitChecks = BattleCommitChecks.Run(root);
 int battleChainChecks = BattleChainChecks.Run(root);
 int combatContextChecks = CombatContextChecks.Run(root);
@@ -242,6 +273,7 @@ int aiProductionChecks = AiProductionChecks.Run(root);
 int aiOfferPoolChecks = AiOfferPoolChecks.Run(root);
 int aiConstructionChecks = AiConstructionChecks.Run(root);
 int aiWorldProductionChecks = AiWorldProductionChecks.Run(root);
+int armyCapacityChecks = ArmyCapacityChecks.Run(root);
 int commanderDeploymentChecks = CommanderDeploymentChecks.Run(root);
 int hazardDeathChecks = HazardDeathChecks.Run(root);
 int legacyImportChecks = LegacyImportChecks.Run(root);
@@ -270,8 +302,9 @@ int legacySkillParameterChecks = LegacySkillParameterChecks.Run(root);
 int scenarioRuleChecks = ScenarioRuleChecks.Run(root);
 int mapColorChecks = MapColorChecks.Run(root);
 int objectiveChecks = ObjectiveChecks.Run(root);
+int playerAiChecks = PlayerAiChecks.Run(root);
 var report = new { combatVectors = cases, ruleChecks = contracts, commanderChecks, animationChecks, catalogChecks, worldChecks, progressionChecks, aiChecks, lifecycleChecks, actionChecks, movementCommitChecks, turnSettlementChecks, worldTurnChecks, battleCommitChecks, battleChainChecks, combatContextChecks, improvementChecks, aiTacticalChecks, splashChecks, supportActionChecks, aiMovementChecks, aiStrategyChecks, aiStrategySelectionChecks, aiUnitChecks, aiProductionChecks, aiOfferPoolChecks, aiConstructionChecks, aiWorldProductionChecks, commanderDeploymentChecks, hazardDeathChecks, legacyImportChecks, legacyArmyImportChecks, legacyEventChecks, legacyBuildingChecks, legacyFactionChecks, legacyCombatChecks, legacyActionAiChecks, legacyCommerceChecks, sessionAccountChecks, rosterDeploymentChecks, legacyTechnologyChecks, legacyStartupChecks, worldTurnEntryChecks, mapCatalogChecks, legacyHostChecks, jurisdictionChecks, errors = 0,
-    objectiveChecks, autoJurisdictionChecks, extensionChecks, commanderDialogueChecks, commonSkillChecks, legacySkillParameterChecks, scenarioRuleChecks, mapColorChecks, limitations = new[] { "Headless scenario/session startup and core rules; rendering and Android require separate integration checks.",
+    armyCapacityChecks, objectiveChecks, playerAiChecks, autoJurisdictionChecks, extensionChecks, commanderDialogueChecks, commonSkillChecks, legacySkillParameterChecks, scenarioRuleChecks, mapColorChecks, limitations = new[] { "Headless scenario/session startup and core rules; rendering and Android require separate integration checks.",
         "Native profile migration, commander purchase/cultivation, session tavern AI, tutorial controller, merge flows, full playthroughs and display/Android integration remain incomplete." } };
 Directory.CreateDirectory(Path.Combine(root, "rewrite/reports"));
 File.WriteAllText(Path.Combine(root, "rewrite/reports/core_validation.json"), JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true }) + "\n");
