@@ -1414,6 +1414,7 @@ $('restart').onclick=async()=>{
 };
 $('return-menu').onclick=()=>{if(busy&&!aiRunning){notice('请等待当前行动完成');return;}return showMain();};
 window.ew4Back=()=>{
+  if(aiControl.closeMission(true))return 'handled';
   if(mapViews.close())return 'handled';
   if(pendingAction){closeSingleAction();return 'handled';}
   const visible=id=>!$(id).hidden;

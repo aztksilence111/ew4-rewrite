@@ -17,6 +17,7 @@ const base=process.argv[2]||'http://127.0.0.1:5583',folder=path.resolve(process.
   const policy=async()=>{await page.locator('#ai-policy').click();await page.locator('[data-policy="free"]').click();await page.locator('#ai-policy-confirm').click();await idle();};
   const units=async cell=>{await page.locator('#ai-units').click();await clickCell(cell);await page.locator('#ai-map-confirm').click();await idle();};
   const goal=async cell=>{await page.locator('#ai-goal').click();await clickCell(cell);await page.locator('#ai-map-confirm').click();await idle();};
+  const mission=async kind=>{await page.locator('#ai-mission').click();await page.locator('#ai-mission-options [data-kind="'+kind+'"]').click();await idle();};
   try{
     await page.goto(base+(renderer==='canvas'?'/?renderer=canvas':''));await page.waitForFunction(()=>startupReady,null,{timeout:90000});
     await page.evaluate(()=>start('conquest1','fra'));await idle();
@@ -29,13 +30,13 @@ const base=process.argv[2]||'http://127.0.0.1:5583',folder=path.resolve(process.
     await policy();await units(own[0].cell);await goal(own[0].cell);await page.locator('#ai-execute').click();await idle();
     await page.locator('#ai-task-add').click();await idle();
     check(await text('#ai-task-label')==='任务2 (2/2)'&&await page.evaluate(()=>state.playerAi.tasks[0].enabled),'add preserves running first task');
-    await page.locator('#ai-mission').selectOption('defend');await idle();await policy();await units(own[1].cell);await goal(own[1].cell);
+    await mission('defend');await policy();await units(own[1].cell);await goal(own[1].cell);
     check(await page.evaluate(()=>aiControl.overlay().tasks[0].color!==aiControl.overlay().tasks[1].color),'tasks have distinct map colors');
     await page.locator('#ai-execute').click();await idle();
     check(await page.evaluate(()=>state.playerAi.tasks.every(t=>t.enabled)),'two independently running tasks');
     check(await page.evaluate(()=>Object.keys(state.playerAi.tasks[1].stations).length===1),'defense station preview assigned');
     await page.locator('#ai-task-prev').click();await idle();
-    check(await page.locator('#ai-mission').inputValue()==='attack'&&await text('#ai-execute')==='停止执行','previous arrow restores running attack task');
+    check(await page.locator('#ai-mission').getAttribute('value')==='attack'&&await text('#ai-execute')==='停止执行','previous arrow restores running attack task');
     await page.locator('#ai-execute').click();await idle();
     check(await page.evaluate(()=>state.playerAi.enabled&&!state.playerAi.tasks[0].enabled&&state.playerAi.tasks[1].enabled),'stopping first preserves second');
     await page.locator('#ai-task-next').click();await idle();await page.locator('#ai-execute').click();await idle();
@@ -46,7 +47,7 @@ const base=process.argv[2]||'http://127.0.0.1:5583',folder=path.resolve(process.
     check(await page.evaluate(()=>state.playerAi.tasks[0].draft.units.length===0&&state.playerAi.tasks[1].draft.units.length===2),'selection transfers units from donor');
     check((await text('#notice')).includes('已转入1支部队'),'transfer count notice');
     await page.locator('#ai-task-add').click();await idle();
-    await page.locator('#ai-mission').selectOption('line_defend');await idle();await policy();await units(own[2].cell);
+    await mission('line_defend');await policy();await units(own[2].cell);
     check(await page.locator('#ai-goal').isHidden()&&await page.locator('#ai-line').isVisible(),'line defense uses line instead of point target');
     await page.locator('#ai-line').click();
     check(await page.locator('#ai-map-confirm').isDisabled(),'line requires two fold points');
@@ -59,7 +60,7 @@ const base=process.argv[2]||'http://127.0.0.1:5583',folder=path.resolve(process.
     await page.evaluate(async()=>{await rpc('save',{slot:3,mode:2});await installState(await rpc('load',{slot:3,mode:2}));});await idle();
     check(await page.evaluate(()=>state.playerAi.tasks.length===3&&state.playerAi.activeTask===3&&state.playerAi.tasks[2].enabled),'save restores tasks selection and state');
     await page.locator('#ai-execute').click();await idle();
-    await page.locator('#ai-mission').selectOption('line_attack');await idle();
+    await mission('line_attack');
     await page.locator('#ai-line').click();await clickCell(own[2].cell);await clickCell(end);await page.locator('#ai-map-confirm').click();await idle();
     check(await page.locator('#ai-execute').isDisabled(),'line attack requires attack objective');
     await goal(own[2].cell);await page.locator('#ai-deploy-first').uncheck();await idle();
@@ -86,7 +87,7 @@ const base=process.argv[2]||'http://127.0.0.1:5583',folder=path.resolve(process.
     await mobile.evaluate(()=>start('conquest1','fra'));await mobile.waitForFunction(()=>!busy&&!aiRunning&&!sessionTransition);
     await mobile.locator('#menu-button').tap();await mobile.waitForTimeout(350);
     if(await mobile.evaluate(()=>$('pause').classList.contains('ai-compact')&&!$('pause').classList.contains('ai-sidebar-expanded')))await mobile.locator('.ai-control-title').tap();
-    await mobile.locator('#ai-mission').selectOption('line_defend');await mobile.waitForFunction(()=>!busy);
+    await mobile.locator('#ai-mission').tap();await mobile.locator('#ai-mission-options [data-kind="line_defend"]').tap();await mobile.waitForFunction(()=>!busy);
     await mobile.locator('#ai-policy').tap();await mobile.locator('[data-policy="free"]').tap();await mobile.locator('#ai-policy-confirm').tap();await mobile.waitForFunction(()=>!busy);
     const touchUnit=await mobile.evaluate(()=>state.units.find(u=>u.owner===state.playerFaction&&u.canMove&&u.category!=='naval'));
     const tapCell=async cell=>{const p=await mobile.evaluate(cell=>{const p=point(cell);view.x=p.x;view.y=p.y;view.zoom=1.2;clampView();requestRender();return {x:(p.x-view.x)*view.zoom+viewport.w/2,y:(p.y-view.y)*view.zoom+viewport.h/2};},cell);await mobile.touchscreen.tap(p.x,p.y);};

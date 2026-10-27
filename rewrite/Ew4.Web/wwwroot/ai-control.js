@@ -10,10 +10,24 @@
     constructor(api){
       this.api=api;this.mode=null;this.chosen=new Set();this.targets=[];this.pointers=new Map();
       this.panel=element('aside','ai-control');this.panel.id='ai-control';this.panel.setAttribute('aria-label','AI设定');
-      this.title=element('button','ai-control-title','AI设定');this.title.type='button';this.title.onclick=()=>{$('pause').classList.toggle('ai-sidebar-expanded');this.fit();this.api.fitObjectives();};
+      this.title=element('button','ai-control-title','AI设定');this.title.type='button';this.title.onclick=()=>{this.closeMission();$('pause').classList.toggle('ai-sidebar-expanded');this.fit();this.api.fitObjectives();};
       this.body=element('div','ai-control-body');this.status=element('p','ai-control-status');this.buttons=[];
-      this.mission=element('select','ai-mission');this.mission.id='ai-mission';this.mission.setAttribute('aria-label','任务类型');
-      this.mission.onchange=()=>this.configure('mission',{kind:this.mission.value});this.body.append(this.mission);
+      this.missionPicker=element('div','ai-mission-picker');this.mission=element('button','ai-mission');this.mission.type='button';this.mission.id='ai-mission';this.mission.setAttribute('aria-label','任务类型');
+      this.mission.setAttribute('role','combobox');this.mission.setAttribute('aria-haspopup','listbox');this.mission.setAttribute('aria-controls','ai-mission-options');this.mission.setAttribute('aria-expanded','false');
+      this.missionText=element('span','ai-mission-text');const missionArrow=element('span','ai-mission-arrow');missionArrow.setAttribute('aria-hidden','true');this.mission.append(this.missionText,missionArrow);
+      this.missionOptions=element('div','ai-mission-options');this.missionOptions.id='ai-mission-options';this.missionOptions.hidden=true;this.missionOptions.setAttribute('role','listbox');this.missionOptions.setAttribute('aria-label','任务类型');
+      this.missionChoices=kinds.map(kind=>{const option=element('button','ai-mission-option');option.type='button';option.dataset.kind=kind;option.id='ai-mission-'+kind;option.setAttribute('role','option');option.tabIndex=-1;
+        option.onclick=event=>{this.closeMission(event.detail===0);if(kind!==(this.draft.kind||'attack'))void this.configure('mission',{kind});};this.missionOptions.append(option);return option;});
+      this.mission.onclick=()=>this.setMissionOpen(this.missionOptions.hidden);this.missionPicker.append(this.mission,this.missionOptions);this.body.append(this.missionPicker);
+      for(const event of ['pointerdown','pointerup','click'])this.missionPicker.addEventListener(event,e=>e.stopPropagation());
+      document.addEventListener('pointerdown',e=>{if(!this.missionPicker.contains(e.target))this.closeMission();},true);
+      this.missionPicker.addEventListener('focusout',()=>setTimeout(()=>{if(!this.missionPicker.contains(document.activeElement))this.closeMission();},0));
+      document.addEventListener('keydown',e=>{
+        if(e.key==='Escape'&&this.closeMission(true)){e.preventDefault();e.stopImmediatePropagation();return;}
+        if(!this.missionPicker.contains(e.target)||!['ArrowDown','ArrowUp','Home','End'].includes(e.key)||this.mission.disabled)return;
+        this.setMissionOpen(true);const index=this.missionChoices.indexOf(document.activeElement),current=kinds.indexOf(this.mission.value);
+        this.missionChoices[e.key==='Home'?0:e.key==='End'?kinds.length-1:index<0?current:(index+(e.key==='ArrowDown'?1:-1)+kinds.length)%kinds.length].focus();e.preventDefault();
+      },true);
       this.radiusLabel=element('label','ai-radius');this.radiusText=element('span','','防守范围');this.radius=element('input','');this.radius.type='number';this.radius.min='0';this.radius.max='6';this.radius.step='1';this.radius.id='ai-radius';
       this.radius.onchange=()=>this.configure('radius',{radius:Number(this.radius.value)});this.radiusLabel.append(this.radiusText,this.radius);this.body.append(this.radiusLabel);
       for(let i=0;i<4;i++){const b=element('button','native-command ai-control-command');b.type='button';b.id=['ai-policy','ai-units','ai-goal','ai-execute'][i];this.buttons.push(b);this.body.append(b);}
@@ -49,7 +63,7 @@
       this.goalEditor=element('section','ai-goal-editor');this.goalEditor.id='ai-goal-editor';this.goalEditor.hidden=true;
       this.goalHeader=element('h3','','目标优先顺序');this.goalList=element('ol','ai-goal-list');this.goalEditor.append(this.goalHeader,this.goalList);$('play').append(this.goalEditor);
       this.box=element('div','ai-pick-box');this.box.id='ai-pick-box';this.box.hidden=true;$('play').append(this.box);
-      addEventListener('resize',()=>{if(this.mode)this.resetGesture();this.fit();});addEventListener('blur',()=>this.resetGesture());
+      addEventListener('resize',()=>{this.closeMission();if(this.mode)this.resetGesture();this.fit();});addEventListener('blur',()=>{this.closeMission();this.resetGesture();});
       document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(this.mode)this.leavePick();else this.modal.hidden=true;}});
     }
     get state(){return this.api.state();}
@@ -64,6 +78,13 @@
     liveUnits(ids){const own=new Set(this.state?.units.filter(u=>u.owner===this.state.playerFaction).map(u=>u.id)||[]);return [...new Set(ids||[])].filter(id=>own.has(id));}
     get selectable(){const s=this.state;return s&&s.phase==='Active'&&s.activeFaction===s.playerFaction&&!s.dialogue&&!s.scenarioPopup&&!this.api.busy();}
     get editable(){return this.selectable&&!this.control.endingTurn&&!this.taskEnabled;}
+    setMissionOpen(open){
+      open=!!open&&this.editable&&!$('pause').hidden;
+      this.missionOptions.hidden=!open;this.mission.setAttribute('aria-expanded',String(open));
+      for(const option of this.missionChoices)option.tabIndex=open?0:-1;
+      if(open)this.missionOptions.scrollTop=this.missionChoices[kinds.indexOf(this.mission.value)]?.offsetTop||0;
+    }
+    closeMission(focus=false){const open=!this.missionOptions.hidden;if(open){this.setMissionOpen(false);if(focus&&!this.mission.disabled)this.mission.focus();}return open;}
     switchTask(delta){const index=this.tasks.findIndex(t=>t.id===this.task.id),next=this.tasks[index+delta];if(next)this.configure('task_select',{taskId:next.id});}
     async configure(step,extra={}){
       if(!(step.startsWith('task_')?this.selectable:this.editable))return false;
@@ -78,7 +99,9 @@
       const labels=p.buttons||['指定战斗方针','框选单位','指定行动目标','开始执行','停止执行'];
       const kind=this.draft.kind||'attack',lineMode=kind.startsWith('line_');
       const kindNames=p.taskKinds||['进攻地点','防守地点','沿线进攻','沿线防守'];
-      this.mission.replaceChildren(...kinds.map((value,i)=>{const o=element('option','',kindNames[i]);o.value=value;return o;}));this.mission.value=kind;this.mission.disabled=!this.editable;
+      this.mission.value=kind;this.mission.disabled=!this.editable;set(this.missionText,kindNames[kinds.indexOf(kind)]||kindNames[0]);
+      this.missionChoices.forEach((option,i)=>{set(option,kindNames[i]);option.setAttribute('aria-selected',String(kinds[i]===kind));});
+      if(!this.editable||$('pause').hidden||this.missionTask!==this.task.id)this.closeMission();this.missionTask=this.task.id;
       this.radiusLabel.hidden=kind==='attack';this.radius.value=String(this.draft.radius??2);this.radius.disabled=!this.editable;set(this.radiusText,p.radiusText||'防守范围');
       this.lineButton.hidden=!lineMode;this.lineButton.disabled=!this.editable;set(this.lineButton,p.lineText||'绘制部署线');this.lineButton.dataset.complete=String((this.draft.line||[]).length>=2);
       this.deployLabel.hidden=kind!=='line_attack';this.deploy.checked=this.pendingDeploy??this.draft.deployFirst!==false;this.deploy.disabled=!this.editable;set(this.deployText,p.deployFirstText||'部署完成后进攻');
@@ -115,6 +138,7 @@
     }
     fit(){if(!this.state)return;const menu=document.querySelector('#pause>.pause-dialog');const compact=innerWidth<760||innerWidth-menu.getBoundingClientRect().right<160;$('pause').classList.toggle('ai-compact',compact);}
     openPause(){
+      this.closeMission();
       const pause=$('pause');pause.classList.remove('pause-sidebars-enter');pause.classList.add('pause-sidebars-pending');pause.hidden=false;
       this.sync();void this.panel.offsetWidth;this.api.pauseSync();
     }
@@ -199,7 +223,7 @@
       if(this.taskEnabled){try{await this.api.stop();}catch(e){this.api.notice(e.message);}return;}
       if(!this.editable)return;try{await this.api.action('player_ai_start');}catch(e){this.api.notice(e.message);}
     }
-    reset(){this.mode=null;this.resetGesture();this.modal.hidden=true;this.tools.hidden=true;this.goalEditor.hidden=true;$('play').classList.remove('ai-picking');$('pause').classList.remove('ai-sidebar-expanded');}
+    reset(){this.closeMission();this.mode=null;this.resetGesture();this.modal.hidden=true;this.tools.hidden=true;this.goalEditor.hidden=true;$('play').classList.remove('ai-picking');$('pause').classList.remove('ai-sidebar-expanded');}
   }
   root.Ew4AiControl={Panel};
 })(globalThis);
