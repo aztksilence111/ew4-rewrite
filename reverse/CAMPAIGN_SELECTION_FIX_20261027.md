@@ -32,4 +32,4 @@
 - `Ew4.ModChecks --legacy-map-extensions-only`：8 项通过，完整包／地图覆盖包不继承无关扩展、显式配置优先、导出重导入、纯资源覆盖及返回内置规则正常；未重新导入大鏖战。
 - Web 构建 0 警告／0 错误；Chrome 70 兼容前端 47 文件通过，修改脚本语法及本轮差异空白检查通过。
 
-预览复用现有 <http://127.0.0.1:5588> 的共享前端，刷新可见。没有新 APK、正式发行或 Android 真机验收。独立 5589 及本轮账户、截图、日志、夹具和重复编译在测试结束后清理，必要摘要见 `build/maintenance-20261027/campaign-selection-cleanup.json`。
+预览 <http://127.0.0.1:5588> 刷新可见。后续按用户要求已纳入0.2.24双端正式发行，实际发行Web同样通过257项；Android真机未验收。独立5589及本轮账户、截图、日志、夹具和重复编译已清理；早期清理见 `build/maintenance-20261027/campaign-selection-cleanup.json`，本轮见 `build/release-0.2.24-20261027/cleanup.json`，发布见[发行记录](../rewrite/RELEASE_PROGRESS_0.2.24_20261027.md)。
