@@ -17,7 +17,9 @@ const base=process.argv[2]||'http://127.0.0.1:5586',folder=path.resolve(process.
       if(await page.evaluate(()=>$('pause').classList.contains('ai-compact')&&!$('pause').classList.contains('ai-sidebar-expanded')))await press('.ai-control-title');
       check(await page.locator('#ai-mission').evaluate(e=>e.tagName==='BUTTON'),'in-page selector, no native picker');
       check(await page.locator('.ai-mission-picker select').count()===0,'no select invokes Android chooser');
-      const before=await page.locator('#ai-policy').boundingBox();await press('#ai-mission');
+      await page.locator('#ai-mission').scrollIntoViewIfNeeded();
+      const layout=()=>page.evaluate(()=>({top:$('ai-policy').offsetTop,height:$('ai-control').offsetHeight}));
+      const before=await layout();await press('#ai-mission');
       check(await page.locator('#ai-mission-options').isVisible(),'opens with pointer '+width);
       check(await page.locator('#ai-mission').getAttribute('aria-expanded')==='true','expanded accessibility state');
       const geometry=await page.evaluate(()=>{
@@ -25,7 +27,7 @@ const base=process.argv[2]||'http://127.0.0.1:5586',folder=path.resolve(process.
         return {below:list.top>=trigger.bottom-1,width:Math.abs(list.width-trigger.width)<1,left:Math.abs(list.left-trigger.left)<1,
           allClickable:options.every(o=>{const r=o.getBoundingClientRect();return o.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));})};
       });check(geometry.below&&geometry.width&&geometry.left&&geometry.allClickable,'anchored below, all four options reachable '+JSON.stringify(geometry));
-      const after=await page.locator('#ai-policy').boundingBox();check(Math.abs(before.y-after.y)<1,'menu does not push controls');
+      const after=await layout();check(before.top===after.top&&before.height===after.height,'menu does not push controls '+JSON.stringify({before,after}));
       await page.evaluate(()=>{window.dropdownFirstOption=$('ai-mission-options').firstElementChild;aiControl.sync();});
       check(await page.evaluate(()=>!$('ai-mission-options').hidden&&window.dropdownFirstOption===$('ai-mission-options').firstElementChild),'sync retains menu and option elements');
       await page.screenshot({path:path.join(folder,'dropdown-'+width+'x'+height+'.png')});
