@@ -41,7 +41,7 @@
   }
   class Controls {
     constructor(host,onChange){
-      this.host=host;this.onChange=onChange;this.mode='normal';this.open=false;
+      this.host=host;this.onChange=onChange;this.mode='normal';this.open=false;this.optionButtons=new Map();
       this.main=host.querySelector('#map-mode');this.options=host.querySelector('#map-mode-options');
       this.main.onclick=()=>this.setOpen(!this.open);
       for(const event of ['pointerdown','pointerup','click','wheel'])host.addEventListener(event,e=>e.stopPropagation());
@@ -60,32 +60,37 @@
     renderMain(){
       const mode=modes.find(m=>m.id===this.mode);
       this.main.title=mode.name;this.main.setAttribute('aria-label',mode.name);
-      this.main.querySelector('img').src='map-'+mode.id+'.png';
+      const image=this.main.querySelector('img'),source='map-'+mode.id+'.png';
+      if(image.getAttribute('src')!==source)image.src=source;
       this.main.querySelector('.map-mode-tip').textContent=mode.name;
       this.host.dataset.mapMode=mode.id;
     }
     renderOptions(){
       this.optionsStale=false;
-      this.options.replaceChildren(...modes.filter(m=>m.id!==this.mode).map(mode=>{
+      const buttons=modes.filter(m=>m.id!==this.mode).map(mode=>{
+        if(this.optionButtons.has(mode.id))return this.optionButtons.get(mode.id);
         const button=document.createElement('button');button.type='button';button.className='map-mode-button';
         button.setAttribute('role','menuitemradio');button.setAttribute('aria-checked','false');button.setAttribute('aria-label',mode.name);button.title=mode.name;button.tabIndex=this.open?0:-1;
         const image=document.createElement('img');image.src='map-'+mode.id+'.png';image.alt='';
         const tip=document.createElement('span');tip.className='map-mode-tip';tip.textContent=mode.name;button.append(image,tip);
-        button.onclick=()=>{this.select(mode.id);this.main.focus();};return button;
-      }));
+        button.onclick=event=>{this.select(mode.id);if(event.detail===0)this.main.focus();};
+        this.optionButtons.set(mode.id,button);return button;
+      });
+      if(buttons.some((button,index)=>this.options.children[index]!==button))this.options.replaceChildren(...buttons);
     }
     select(mode){
       if(!modes.some(m=>m.id===mode))return;
-      const changed=this.mode!==mode;this.mode=mode;this.optionsStale=true;this.close();this.renderMain();
+      const changed=this.mode!==mode;this.mode=mode;this.optionsStale=changed||this.optionsStale;this.close();if(changed)this.renderMain();
       if(this.options.hidden)this.renderOptions();
       if(changed)this.onChange(mode);
     }
     setOpen(open){
+      if(this.open===open)return;
       clearTimeout(this.timer);this.open=open;
       if(open){if(this.options.hidden||this.optionsStale)this.renderOptions();this.options.hidden=false;getComputedStyle(this.options.firstElementChild).transform;}
       this.host.classList.toggle('open',open);this.main.setAttribute('aria-expanded',String(open));this.options.setAttribute('aria-hidden',String(!open));
       for(const button of this.options.children)button.tabIndex=open?0:-1;
-      if(!open)this.timer=setTimeout(()=>{this.options.hidden=true;this.renderOptions();},280);
+      if(!open)this.timer=setTimeout(()=>{this.options.hidden=true;if(this.optionsStale)this.renderOptions();},280);
     }
     close(){if(!this.open)return false;this.setOpen(false);return true;}
     reset(){this.close();this.select('normal');}

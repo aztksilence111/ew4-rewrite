@@ -1,0 +1,100 @@
+{
+  "checks": 1193,
+  "errors": 0,
+  "plainCoreWindows": [
+    {
+      "name": "关东平原",
+      "coreCells": 76,
+      "plainCells": 76,
+      "mountainEdgeCells": 0,
+      "largestPlainComponent": 76
+    },
+    {
+      "name": "浓尾平原",
+      "coreCells": 13,
+      "plainCells": 13,
+      "mountainEdgeCells": 0,
+      "largestPlainComponent": 13
+    },
+    {
+      "name": "大阪平原",
+      "coreCells": 15,
+      "plainCells": 15,
+      "mountainEdgeCells": 0,
+      "largestPlainComponent": 15
+    },
+    {
+      "name": "石狩平原",
+      "coreCells": 26,
+      "plainCells": 26,
+      "mountainEdgeCells": 0,
+      "largestPlainComponent": 26
+    },
+    {
+      "name": "仙台平原",
+      "coreCells": 9,
+      "plainCells": 9,
+      "mountainEdgeCells": 0,
+      "largestPlainComponent": 9
+    },
+    {
+      "name": "新潟平原",
+      "coreCells": 17,
+      "plainCells": 17,
+      "mountainEdgeCells": 0,
+      "largestPlainComponent": 17
+    },
+    {
+      "name": "甲府盆地",
+      "coreCells": 4,
+      "plainCells": 3,
+      "mountainEdgeCells": 1,
+      "largestPlainComponent": 3
+    },
+    {
+      "name": "松本谷地",
+      "coreCells": 7,
+      "plainCells": 3,
+      "mountainEdgeCells": 0,
+      "largestPlainComponent": 3
+    }
+  ],
+  "terrainCounts": {
+    "0": 5457,
+    "8": 6548,
+    "9": 1962,
+    "1": 43972
+  },
+  "detailSprites": 8510,
+  "overviewSprites": 3111,
+  "medianSurfaceBrightness": {
+    "0": 154.0,
+    "8": 154.33333333333334,
+    "9": 154.66666666666666
+  },
+  "renderedBandHeights": {
+    "hill": {
+      "minimum": 16.5,
+      "maximum": 35.379999999999995,
+      "median": 31.200000000000003
+    },
+    "low": {
+      "minimum": 52.08,
+      "maximum": 62.16,
+      "median": 57.96
+    },
+    "middle": {
+      "minimum": 60.76,
+      "maximum": 72.52,
+      "median": 67.62
+    },
+    "high": {
+      "minimum": 69.44000000000001,
+      "maximum": 82.88000000000001,
+      "median": 77.28
+    }
+  },
+  "glyphFootprintFraction": 0.25566344264854457,
+  "opaqueGlyphFraction": 0.12012256710758693,
+  "caveat": "Core windows validate continuous plains, not exact boundary polygons; unmodified original sprite per actual cell, uniform scaling only"
+}

@@ -34,7 +34,9 @@ const base=process.argv[2]||'http://127.0.0.1:5532',feedback=process.argv.includ
             }
             const p=Ew4Battlefield.textPath(label.textPath),angles=[.1,.3,.7,.9].map(t=>p.at(p.length*t).angle);
             const glyphs=Ew4Battlefield.pathLettering(libraries.get('maptext'),label,p);
-            results.push({text:label.text,language,ink,edge,angles,glyphs:glyphs.length,width:c.width,height:c.height});
+            const first=label.textPath[0],last=label.textPath[label.textPath.length-1],dx=last[0]-first[0],dy=last[1]-first[1];
+            const expectedCurved=label.textPath.some(([x,y])=>Math.abs((x-first[0])*dy-(y-first[1])*dx)>.01);
+            results.push({text:label.text,language,ink,edge,angles,expectedCurved,glyphs:glyphs.length,width:c.width,height:c.height});
             if(points.length)seaInk.push({text:label.text,language,points});
           }
         }
@@ -46,14 +48,14 @@ const base=process.argv[2]||'http://127.0.0.1:5532',feedback=process.argv.includ
         const mapSwitch=r.mapLabels.get('future-map-only:1:0.72:en').height!==genericCache.height;
         const legacy=manifest.maps.europe.labels[0];r.labelIndex=new Ew4Battlefield.SpatialIndex([legacy],Ew4Battlefield.mapLabelBounds);r.mapLabels.clear();r.mapText();
         const p=Ew4Battlefield.textPath([[0,0],[50,100],[100,0],[150,-100],[200,0]]);
-        return {results,seaInk,genericInk:genericPixels.some(v=>v>0),mapSwitch,legacy:r.mapLabels.size===1,gpu:!!ctx.renderer,
+        return {results,seaInk,expectedLabels:labels.length,genericInk:genericPixels.some(v=>v>0),mapSwitch,legacy:r.mapLabels.size===1,gpu:!!ctx.renderer,
           joined:[p.at(0),p.at(p.length/2),p.at(p.length)],invalid:Ew4Battlefield.textPath([[0,0],[0,0],[0,0]])===null};
       });
-      check(result.results.length===144,'all 72 labels render in both languages');check(result.genericInk,'new maps can curve original English glyphs without a baked animation');
+      check(result.results.length===result.expectedLabels*2,'all current labels render in both languages');check(result.genericInk,'new maps can curve original English glyphs without a baked animation');
       check(result.legacy,'legacy straight label works');check(result.gpu===(backend==='pixi'),'renderer selection');check(result.invalid,'zero length path rejected');
       check(result.mapSwitch,'new map with reused label name gets its own curve');
       check(Math.abs(result.joined[1].x-100)<.001&&Math.abs(result.joined[1].y)<.001,'chained curves meet at shared point');
-      for(const label of result.results){check(label.ink>0&&!label.edge,label.text+' '+label.language+' nonblank and unclipped');const turn=Math.max(...label.angles)-Math.min(...label.angles);check(label.text==='YANSHAN MOUNTAINS'?turn<.001:turn>.001,label.text+' requested character direction');}
+      for(const label of result.results){check(label.ink>0&&!label.edge,label.text+' '+label.language+' nonblank and unclipped');const turn=Math.max(...label.angles)-Math.min(...label.angles);check(label.expectedCurved?turn>.001:turn<.001,label.text+' requested character direction');}
       result.water=result.seaInk.map(({text,language,points})=>{const land=points.filter(([x,y])=>x<0||y<0||x>=mask.width||y>=mask.height||mask.data[(y*mask.width+x)*4]>=128).length;return {text,language,land,sampled:points.length,fraction:land/points.length};});delete result.seaInk;
       for(const water of result.water.filter(w=>['EAST CHINA SEA','SOUTH CHINA SEA','SETO INLAND SEA'].includes(w.text)))check(water.fraction<.02,water.text+' lettering stays on water: '+water.fraction);
       const regions=feedback?[['baikal','LAKE BAIKAL',900],['taebaek','TAEBAEK MOUNTAINS',650]]:[['himalaya','HIMALAYAS',2400],['china','QINLING MOUNTAINS',1800],['sea','EAST CHINA SEA',2200]];

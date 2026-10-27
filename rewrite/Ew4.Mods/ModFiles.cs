@@ -16,11 +16,25 @@ public sealed record ModInfo(string Key, string Id, string Name, string Version,
     long Bytes, int Files, string[] Warnings, bool Active = false);
 public sealed record ImportProgress(string Status, string Message, int Completed = 0, int Total = 0, string? Key = null);
 
-public sealed class ModBase(Func<string, byte[]> read, IEnumerable<string> files, string? saveNamespace = null)
+public sealed class ModBase(Func<string, byte[]> read, IEnumerable<string> files, string? saveNamespace = null, Func<string, Stream>? openRead = null)
 {
     public string? SaveNamespace { get; } = saveNamespace == null ? null : ModFiles.PathName(saveNamespace);
     public string[] Files { get; } = files.Select(ModFiles.PathName).Where(ModFiles.RuntimePath).Order(StringComparer.Ordinal).ToArray();
     public byte[] Read(string path) => read(ModFiles.PathName(path));
+    internal string Hash(string path)
+    {
+        if (openRead == null) return ModFiles.Hash(Read(path));
+        using var stream = openRead(ModFiles.PathName(path));
+        using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        byte[] buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(64 * 1024);
+        try
+        {
+            int count;
+            while ((count = stream.Read(buffer, 0, buffer.Length)) > 0) hash.AppendData(buffer, 0, count);
+            return Convert.ToHexStringLower(hash.GetHashAndReset());
+        }
+        finally { System.Buffers.ArrayPool<byte>.Shared.Return(buffer); }
+    }
     public System.Text.Json.Nodes.JsonObject Catalog() => LegacyCatalogFiles.Load(p => Read(
         p.StartsWith("data/", StringComparison.Ordinal) ? "legacy/" + p[5..] : p)).Catalog;
     public string[] Scenarios => Files.Where(p => p.StartsWith("original/", StringComparison.Ordinal) && p.EndsWith(".btl", StringComparison.Ordinal))

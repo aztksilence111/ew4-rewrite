@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-26",
+  "targets": [
+    {
+      "path": "E:\\Workplace\\game\\o4mod\\build\\japan-compact-20261026",
+      "files": 102,
+      "bytes": 9379244
+    },
+    {
+      "path": "E:\\Workplace\\game\\o4mod\\build\\japan-hre-source-20261026\\browser",
+      "files": 12,
+      "bytes": 8528522
+    }
+  ],
+  "removedFiles": 114.0,
+  "removedBytes": 17907766.0,
+  "remaining": 0,
+  "errors": 0,
+  "browserChecks": 285,
+  "browserViews": 10,
+  "browserErrors": 0,
+  "nativeChecks": 139227,
+  "geographyChecks": 1142,
+  "demChecks": 21995,
+  "compactChecks": 775,
+  "protected": "Original inputs, source code, final map assets, existing services, player accounts/saves/mods retained"
+}

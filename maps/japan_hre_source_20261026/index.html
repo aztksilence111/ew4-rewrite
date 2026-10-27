@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>日本与神罗游戏地形图</title>
+  <link rel="stylesheet" href="../settlement_plan_20261026/viewer.css">
+  <link rel="stylesheet" href="viewer.css?rev=20261027-regional-materials">
+</head>
+<body>
+  <header>
+    <h1>游戏地形图</h1>
+    <nav class="tabs" aria-label="地图">
+      <button id="japan-tab" role="tab" aria-selected="true" data-map="japan">日本</button>
+      <button id="hre-tab" role="tab" aria-selected="false" data-map="hre">神罗</button>
+    </nav>
+    <div class="zoom-tools">
+      <button id="minus" title="缩小" aria-label="缩小">-</button>
+      <input id="zoom" type="range" min="100" max="3000" value="100" aria-label="地图缩放">
+      <button id="plus" title="放大" aria-label="放大">+</button>
+      <button id="fit" title="全图" aria-label="全图">&#9974;</button>
+    </div>
+  </header>
+  <main>
+    <section class="map-surface" aria-label="地图">
+      <canvas id="map" tabindex="0" aria-label="六角格地图"></canvas>
+      <div id="terrain-legend" aria-label="地形图例"></div>
+      <output id="map-status" aria-live="polite"></output>
+    </section>
+    <aside>
+      <div class="filters">
+        <input id="search" type="search" placeholder="地点、地区" aria-label="搜索地点或地区">
+        <select id="region" aria-label="地区"><option value="">全部地区</option></select>
+        <div class="kinds">
+          <label><input type="checkbox" value="city" checked>城市</label>
+          <label><input type="checkbox" value="industry" checked>工厂</label>
+          <label><input type="checkbox" value="stable" checked>马厩</label>
+          <label><input type="checkbox" value="port" checked>港口</label>
+        </div>
+        <div class="layers">
+          <label><input id="grid" type="checkbox">网格</label>
+          <label><input id="geographic" type="checkbox" checked>地理名</label>
+          <label id="province-layer"><input id="provinces" type="checkbox" checked>旧国界</label>
+          <label><input id="deployment" type="checkbox" checked>布阵范围</label>
+        </div>
+      </div>
+      <div id="selected" hidden></div>
+      <div class="list-title"><span id="count"></span><a id="data-link" href="../japan/buildings.json">建筑数据</a></div>
+      <div id="list" role="list" aria-label="建筑"></div>
+      <nav id="downloads" aria-label="地图文件"></nav>
+    </aside>
+  </main>
+  <script src="viewer-data.js?rev=20261027-regional-materials"></script>
+  <script src="viewer.js?rev=20261027-regional-materials"></script>
+</body>
+</html>

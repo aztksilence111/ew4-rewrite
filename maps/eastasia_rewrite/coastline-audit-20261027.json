@@ -1,0 +1,222 @@
+{
+  "structure": {
+    "date": "2026-10-27",
+    "map": "eastasia",
+    "tiles": 80,
+    "publishedTileDifferences": [],
+    "tileOverlapPairs": 268,
+    "tileOverlapPixelDifferences": 0,
+    "terrainSha256": "47289fa67d67022194e41c4ff3ba0a0d9edcca7e11c1bcc8456feb55caee86ea",
+    "publishedTerrainMatches": true,
+    "maskSize": [
+      10144,
+      7362
+    ],
+    "maskValues": [
+      [
+        25466756,
+        0
+      ],
+      [
+        49213372,
+        255
+      ]
+    ],
+    "mouths": 46,
+    "mouthPathFailures": [],
+    "waterCoreSamples": 4197,
+    "bridgeCoveredSamples": 96,
+    "openSeaSamples": 921,
+    "pixelFailures": [],
+    "cityLandPatches": [
+      "定海",
+      "那霸",
+      "马公",
+      "香港"
+    ],
+    "mouthsByName": [
+      "Amur",
+      "Brahmaputra",
+      "Dong",
+      "Fuchun",
+      "Ganges",
+      "Godavari",
+      "Hai",
+      "Han",
+      "Irrawaddy",
+      "Ishikari",
+      "Kiso lower course",
+      "Liao",
+      "Luan",
+      "Mahanadi",
+      "Min",
+      "Nakdong",
+      "Ota",
+      "Red",
+      "Salween",
+      "Sumida",
+      "Taedong",
+      "Tone",
+      "Tumen",
+      "Xi",
+      "Yalu",
+      "Yangtze",
+      "Yellow",
+      "Yodo"
+    ]
+  },
+  "browser": {
+    "errors": [],
+    "missing": [],
+    "views": [
+      {
+        "name": "full",
+        "requested": {
+          "x": 5040,
+          "y": 3615,
+          "zoom": 0.12
+        },
+        "actual": {
+          "x": 5040,
+          "y": 3615,
+          "zoom": 0.14198382961940445
+        }
+      },
+      {
+        "name": "bohai",
+        "requested": {
+          "x": 6095,
+          "y": 3361,
+          "zoom": 1.8
+        },
+        "actual": {
+          "x": 6095,
+          "y": 3361,
+          "zoom": 1.8
+        }
+      },
+      {
+        "name": "yangtze",
+        "requested": {
+          "x": 6724,
+          "y": 4593,
+          "zoom": 2
+        },
+        "actual": {
+          "x": 6724,
+          "y": 4593,
+          "zoom": 2
+        }
+      },
+      {
+        "name": "fujian",
+        "requested": {
+          "x": 6549,
+          "y": 5535,
+          "zoom": 2
+        },
+        "actual": {
+          "x": 6549,
+          "y": 5535,
+          "zoom": 2
+        }
+      },
+      {
+        "name": "pearl",
+        "requested": {
+          "x": 5649,
+          "y": 6156,
+          "zoom": 2
+        },
+        "actual": {
+          "x": 5649,
+          "y": 6156,
+          "zoom": 2
+        }
+      },
+      {
+        "name": "korea",
+        "requested": {
+          "x": 7215,
+          "y": 3753,
+          "zoom": 1.8
+        },
+        "actual": {
+          "x": 7215,
+          "y": 3753,
+          "zoom": 1.8
+        }
+      },
+      {
+        "name": "japan",
+        "requested": {
+          "x": 7941,
+          "y": 4000,
+          "zoom": 1.8
+        },
+        "actual": {
+          "x": 7941,
+          "y": 4000,
+          "zoom": 1.8
+        }
+      },
+      {
+        "name": "ganges",
+        "requested": {
+          "x": 2014,
+          "y": 5926,
+          "zoom": 2
+        },
+        "actual": {
+          "x": 2014,
+          "y": 5926,
+          "zoom": 2
+        }
+      },
+      {
+        "name": "irrawaddy",
+        "requested": {
+          "x": 2553,
+          "y": 7075,
+          "zoom": 2
+        },
+        "actual": {
+          "x": 2553,
+          "y": 7075,
+          "zoom": 2
+        }
+      },
+      {
+        "name": "shore-close",
+        "requested": {
+          "x": 6549,
+          "y": 5535,
+          "zoom": 4
+        },
+        "actual": {
+          "x": 6549,
+          "y": 5535,
+          "zoom": 2.5
+        }
+      },
+      {
+        "name": "mobile",
+        "width": 390,
+        "height": 844
+      }
+    ],
+    "map": {
+      "key": "eastasia",
+      "cells": 21488,
+      "buildings": 521
+    },
+    "reference": {
+      "map": "europe",
+      "view": {
+        "x": 1500,
+        "y": 700,
+        "zoom": 1.8
+      }
+    }
+  }
+}

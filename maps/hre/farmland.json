@@ -1,0 +1,6340 @@
+{
+  "schema": 1,
+  "records": [
+    {
+      "id": "hre-farm-29361",
+      "cell": 29361,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 2.62203239100165,
+      "lat": 48.8857238819015,
+      "world_pixel": [
+        960.0,
+        7866.0
+      ],
+      "region": "北法巴黎盆地",
+      "reason": "grain-region",
+      "anchorCity": "巴黎",
+      "anchorCityId": "hre-e827cc5ce250",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-28752",
+      "cell": 28752,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 1.9868803131829613,
+      "lat": 49.01535692159784,
+      "world_pixel": [
+        608.0,
+        7704.0
+      ],
+      "region": "北法巴黎盆地",
+      "reason": "grain-region",
+      "anchorCity": "巴黎",
+      "anchorCityId": "hre-e827cc5ce250",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-29969",
+      "cell": 29969,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 3.2537935181797386,
+      "lat": 48.75256292337527,
+      "world_pixel": [
+        1312.0,
+        8028.0
+      ],
+      "region": "北法巴黎盆地",
+      "reason": "grain-region",
+      "anchorCity": "巴黎",
+      "anchorCityId": "hre-e827cc5ce250",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-28562",
+      "cell": 28562,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 3.122833777836362,
+      "lat": 49.1713197535763,
+      "world_pixel": [
+        1280.0,
+        7650.0
+      ],
+      "region": "北法巴黎盆地",
+      "reason": "grain-region",
+      "anchorCity": "兰斯",
+      "anchorCityId": "hre-5306b3093b58",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-30160",
+      "cell": 30160,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 2.127045939433855,
+      "lat": 48.597975285681834,
+      "world_pixel": [
+        640.0,
+        8082.0
+      ],
+      "region": "北法巴黎盆地",
+      "reason": "grain-region",
+      "anchorCity": "巴黎",
+      "anchorCityId": "hre-e827cc5ce250",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-27953",
+      "cell": 27953,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 2.485285005847751,
+      "lat": 49.303753023256434,
+      "world_pixel": [
+        928.0,
+        7488.0
+      ],
+      "region": "北法巴黎盆地",
+      "reason": "grain-region",
+      "anchorCity": "博韦",
+      "anchorCityId": "hre-cc667ed17fa5",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-30768",
+      "cell": 30768,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 2.756470264714473,
+      "lat": 48.467598019958295,
+      "world_pixel": [
+        992.0,
+        8244.0
+      ],
+      "region": "北法巴黎盆地",
+      "reason": "grain-region",
+      "anchorCity": "巴黎",
+      "anchorCityId": "hre-e827cc5ce250",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-29551",
+      "cell": 29551,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 1.4943337948852535,
+      "lat": 48.72483223456926,
+      "world_pixel": [
+        288.0,
+        7920.0
+      ],
+      "region": "北法巴黎盆地",
+      "reason": "grain-region",
+      "anchorCity": "沙特尔",
+      "anchorCityId": "hre-a36ede9b95d9",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-29374",
+      "cell": 29374,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 4.040332233844815,
+      "lat": 48.99439022504593,
+      "world_pixel": [
+        1792.0,
+        7866.0
+      ],
+      "region": "香槟平原",
+      "reason": "grain-region",
+      "anchorCity": "兰斯",
+      "anchorCityId": "hre-5306b3093b58",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-28767",
+      "cell": 28767,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 3.6267481092316123,
+      "lat": 49.14829659894298,
+      "world_pixel": [
+        1568.0,
+        7704.0
+      ],
+      "region": "香槟平原",
+      "reason": "grain-region",
+      "anchorCity": "兰斯",
+      "anchorCityId": "hre-5306b3093b58",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-28369",
+      "cell": 28369,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 4.045685840929203,
+      "lat": 49.30078285356024,
+      "world_pixel": [
+        1824.0,
+        7596.0
+      ],
+      "region": "香槟平原",
+      "reason": "grain-region",
+      "anchorCity": "兰斯",
+      "anchorCityId": "hre-5306b3093b58",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-29773",
+      "cell": 29773,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 3.7329705490051324,
+      "lat": 48.8499288522747,
+      "world_pixel": [
+        1600.0,
+        7974.0
+      ],
+      "region": "香槟平原",
+      "reason": "grain-region",
+      "anchorCity": "兰斯",
+      "anchorCityId": "hre-5306b3093b58",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-36012",
+      "cell": 36012,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 4.931758567854053,
+      "lat": 47.03724782598835,
+      "world_pixel": [
+        2144.0,
+        9648.0
+      ],
+      "region": "勃艮第低地",
+      "reason": "grain-region",
+      "anchorCity": "第戎",
+      "anchorCityId": "hre-1bdae8666437",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-34606",
+      "cell": 34606,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 4.925319439606867,
+      "lat": 47.4642779399984,
+      "world_pixel": [
+        2176.0,
+        9270.0
+      ],
+      "region": "勃艮第低地",
+      "reason": "grain-region",
+      "anchorCity": "第戎",
+      "anchorCityId": "hre-1bdae8666437",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-37419",
+      "cell": 37419,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 4.938090530228374,
+      "lat": 46.610383788222684,
+      "world_pixel": [
+        2112.0,
+        10026.0
+      ],
+      "region": "勃艮第低地",
+      "reason": "grain-region",
+      "anchorCity": "多勒",
+      "anchorCityId": "hre-92eb79db5c00",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-22942",
+      "cell": 22942,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 3.7115121654359067,
+      "lat": 50.93046078496387,
+      "world_pixel": [
+        1792.0,
+        6138.0
+      ],
+      "region": "佛兰德低地",
+      "reason": "grain-region",
+      "anchorCity": "根特",
+      "anchorCityId": "hre-505341aa41b9",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-23550",
+      "cell": 23550,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 4.367459400948306,
+      "lat": 50.791152224149435,
+      "world_pixel": [
+        2144.0,
+        6300.0
+      ],
+      "region": "佛兰德低地",
+      "reason": "grain-region",
+      "anchorCity": "布鲁塞尔",
+      "anchorCityId": "hre-9aebcea30a5b",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-23339",
+      "cell": 23339,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 3.165888867190764,
+      "lat": 50.76825632441143,
+      "world_pixel": [
+        1472.0,
+        6246.0
+      ],
+      "region": "佛兰德低地",
+      "reason": "grain-region",
+      "anchorCity": "里尔",
+      "anchorCityId": "hre-588b67bb443b",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-22537",
+      "cell": 22537,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 3.348031453623336,
+      "lat": 51.02688908805513,
+      "world_pixel": [
+        1600.0,
+        6030.0
+      ],
+      "region": "佛兰德低地",
+      "reason": "grain-region",
+      "anchorCity": "布鲁日",
+      "anchorCityId": "hre-0f2d50d336df",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-23140",
+      "cell": 23140,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 3.4382311079886434,
+      "lat": 50.84967398962404,
+      "world_pixel": [
+        1632.0,
+        6192.0
+      ],
+      "region": "佛兰德低地",
+      "reason": "grain-region",
+      "anchorCity": "根特",
+      "anchorCityId": "hre-505341aa41b9",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-23145",
+      "cell": 23145,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 4.006403213320887,
+      "lat": 50.88959448263346,
+      "world_pixel": [
+        1952.0,
+        6192.0
+      ],
+      "region": "佛兰德低地",
+      "reason": "grain-region",
+      "anchorCity": "布鲁塞尔",
+      "anchorCityId": "hre-9aebcea30a5b",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-22348",
+      "cell": 22348,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 4.766018295839243,
+      "lat": 51.18318289440468,
+      "world_pixel": [
+        2400.0,
+        5976.0
+      ],
+      "region": "布拉班特平原",
+      "reason": "grain-region",
+      "anchorCity": "安特卫普",
+      "anchorCityId": "hre-8c4a85802d35",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-21949",
+      "cell": 21949,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 5.091908092919453,
+      "lat": 51.324813978236726,
+      "world_pixel": [
+        2592.0,
+        5868.0
+      ],
+      "region": "布拉班特平原",
+      "reason": "grain-region",
+      "anchorCity": "布雷达",
+      "anchorCityId": "hre-55dc2a5a619f",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-22552",
+      "cell": 22552,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 5.061542604672048,
+      "lat": 51.13969666499449,
+      "world_pixel": [
+        2560.0,
+        6030.0
+      ],
+      "region": "布拉班特平原",
+      "reason": "grain-region",
+      "anchorCity": "鲁汶",
+      "anchorCityId": "hre-a95495eadf80",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-21746",
+      "cell": 21746,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 4.795238223054206,
+      "lat": 51.36837135875492,
+      "world_pixel": [
+        2432.0,
+        5814.0
+      ],
+      "region": "布拉班特平原",
+      "reason": "grain-region",
+      "anchorCity": "布雷达",
+      "anchorCityId": "hre-55dc2a5a619f",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-19737",
+      "cell": 19737,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 4.816624809711297,
+      "lat": 51.9809132087057,
+      "world_pixel": [
+        2496.0,
+        5274.0
+      ],
+      "region": "荷兰河口平原",
+      "reason": "grain-region",
+      "anchorCity": "乌得勒支",
+      "anchorCityId": "hre-4b44549b5f2d",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-19333",
+      "cell": 19333,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 4.563945160643547,
+      "lat": 52.08789213492328,
+      "world_pixel": [
+        2368.0,
+        5166.0
+      ],
+      "region": "荷兰河口平原",
+      "reason": "grain-region",
+      "anchorCity": "莱顿",
+      "anchorCityId": "hre-58509204e307",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-19134",
+      "cell": 19134,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 4.846558161031301,
+      "lat": 52.16601827202032,
+      "world_pixel": [
+        2528.0,
+        5112.0
+      ],
+      "region": "荷兰河口平原",
+      "reason": "grain-region",
+      "anchorCity": "乌得勒支",
+      "anchorCityId": "hre-4b44549b5f2d",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-22363",
+      "cell": 22363,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 6.488001369904249,
+      "lat": 51.2754603389724,
+      "world_pixel": [
+        3360.0,
+        5976.0
+      ],
+      "region": "莱茵下游低地",
+      "reason": "grain-region",
+      "anchorCity": "杜伊斯堡",
+      "anchorCityId": "hre-64f5ae2eb955",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-21359",
+      "cell": 21359,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 6.50977485049167,
+      "lat": 51.58153652148628,
+      "world_pixel": [
+        3392.0,
+        5706.0
+      ],
+      "region": "莱茵下游低地",
+      "reason": "grain-region",
+      "anchorCity": "克桑滕",
+      "anchorCityId": "hre-c766458243ed",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-23369",
+      "cell": 23369,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 6.5807884786452195,
+      "lat": 50.974635061276075,
+      "world_pixel": [
+        3392.0,
+        6246.0
+      ],
+      "region": "莱茵下游低地",
+      "reason": "grain-region",
+      "anchorCity": "科隆",
+      "anchorCityId": "hre-caa757973491",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-21964",
+      "cell": 21964,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 6.819670208060143,
+      "lat": 51.41233719582648,
+      "world_pixel": [
+        3552.0,
+        5868.0
+      ],
+      "region": "莱茵下游低地",
+      "reason": "grain-region",
+      "anchorCity": "杜伊斯堡",
+      "anchorCityId": "hre-64f5ae2eb955",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-21758",
+      "cell": 21758,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 6.177817436974037,
+      "lat": 51.443809827037626,
+      "world_pixel": [
+        3200.0,
+        5814.0
+      ],
+      "region": "莱茵下游低地",
+      "reason": "grain-region",
+      "anchorCity": "克桑滕",
+      "anchorCityId": "hre-c766458243ed",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-32420",
+      "cell": 32420,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 7.58161583329266,
+      "lat": 48.272816302818946,
+      "world_pixel": [
+        3808.0,
+        8676.0
+      ],
+      "region": "上莱茵平原",
+      "reason": "grain-region",
+      "anchorCity": "科尔马",
+      "anchorCityId": "hre-ec02a2282b72",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-31014",
+      "cell": 31014,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 7.598000954498903,
+      "lat": 48.700085625932196,
+      "world_pixel": [
+        3840.0,
+        8298.0
+      ],
+      "region": "上莱茵平原",
+      "reason": "grain-region",
+      "anchorCity": "斯特拉斯堡",
+      "anchorCityId": "hre-a6b6185d18c0",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-33827",
+      "cell": 33827,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 7.565510059664595,
+      "lat": 47.845645758717254,
+      "world_pixel": [
+        3776.0,
+        9054.0
+      ],
+      "region": "上莱茵平原",
+      "reason": "grain-region",
+      "anchorCity": "弗赖堡",
+      "anchorCityId": "hre-72072078b101",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-31818",
+      "cell": 31818,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 7.619625380491744,
+      "lat": 48.45713376067777,
+      "world_pixel": [
+        3840.0,
+        8514.0
+      ],
+      "region": "上莱茵平原",
+      "reason": "grain-region",
+      "anchorCity": "斯特拉斯堡",
+      "anchorCityId": "hre-a6b6185d18c0",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-27206",
+      "cell": 27206,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 8.778299254626768,
+      "lat": 49.897262183839814,
+      "world_pixel": [
+        4576.0,
+        7272.0
+      ],
+      "region": "美因盆地",
+      "reason": "grain-region",
+      "anchorCity": "法兰克福",
+      "anchorCityId": "hre-dfab06fbd6ea",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-27410",
+      "cell": 27410,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 9.061861630350664,
+      "lat": 49.84388963154385,
+      "world_pixel": [
+        4736.0,
+        7326.0
+      ],
+      "region": "美因盆地",
+      "reason": "grain-region",
+      "anchorCity": "法兰克福",
+      "anchorCityId": "hre-dfab06fbd6ea",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-26806",
+      "cell": 26806,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 8.994561372296449,
+      "lat": 50.02490361929577,
+      "world_pixel": [
+        4704.0,
+        7164.0
+      ],
+      "region": "美因盆地",
+      "reason": "grain-region",
+      "anchorCity": "法兰克福",
+      "anchorCityId": "hre-dfab06fbd6ea",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-20767",
+      "cell": 20767,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 7.826385401565137,
+      "lat": 51.817341765374074,
+      "world_pixel": [
+        4128.0,
+        5544.0
+      ],
+      "region": "威斯特法伦平原",
+      "reason": "grain-region",
+      "anchorCity": "明斯特",
+      "anchorCityId": "hre-307b6d213fd7",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-21166",
+      "cell": 21166,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 7.488858571813912,
+      "lat": 51.683286686113284,
+      "world_pixel": [
+        3936.0,
+        5652.0
+      ],
+      "region": "威斯特法伦平原",
+      "reason": "grain-region",
+      "anchorCity": "多特蒙德",
+      "anchorCityId": "hre-9f191934df41",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-20564",
+      "cell": 20564,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 7.529308336051512,
+      "lat": 51.8676437123655,
+      "world_pixel": [
+        3968.0,
+        5490.0
+      ],
+      "region": "威斯特法伦平原",
+      "reason": "grain-region",
+      "anchorCity": "明斯特",
+      "anchorCityId": "hre-307b6d213fd7",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-21172",
+      "cell": 21172,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 8.186032302793802,
+      "lat": 51.70740611824296,
+      "world_pixel": [
+        4320.0,
+        5652.0
+      ],
+      "region": "威斯特法伦平原",
+      "reason": "grain-region",
+      "anchorCity": "帕德博恩",
+      "anchorCityId": "hre-9a80f035f329",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-19780",
+      "cell": 19780,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 9.85360925676498,
+      "lat": 52.17467087642383,
+      "world_pixel": [
+        5248.0,
+        5274.0
+      ],
+      "region": "希尔德斯海姆黄土带",
+      "reason": "grain-region",
+      "anchorCity": "希尔德斯海姆",
+      "anchorCityId": "hre-20e52bb82ae0",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-19983",
+      "cell": 19983,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 10.149963005854953,
+      "lat": 52.1186907601398,
+      "world_pixel": [
+        5408.0,
+        5328.0
+      ],
+      "region": "希尔德斯海姆黄土带",
+      "reason": "grain-region",
+      "anchorCity": "希尔德斯海姆",
+      "anchorCityId": "hre-20e52bb82ae0",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-20383",
+      "cell": 20383,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 9.920669965906026,
+      "lat": 51.993276943427475,
+      "world_pixel": [
+        5280.0,
+        5436.0
+      ],
+      "region": "希尔德斯海姆黄土带",
+      "reason": "grain-region",
+      "anchorCity": "希尔德斯海姆",
+      "anchorCityId": "hre-20e52bb82ae0",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-19777",
+      "cell": 19777,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 9.501022812281635,
+      "lat": 52.16794106902464,
+      "world_pixel": [
+        5056.0,
+        5274.0
+      ],
+      "region": "希尔德斯海姆黄土带",
+      "reason": "grain-region",
+      "anchorCity": "汉诺威",
+      "anchorCityId": "hre-cae0371b4e1d",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-20396",
+      "cell": 20396,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 11.443425953138547,
+      "lat": 52.00982885206964,
+      "world_pixel": [
+        6112.0,
+        5436.0
+      ],
+      "region": "马格德堡黄土带",
+      "reason": "grain-region",
+      "anchorCity": "马格德堡",
+      "anchorCityId": "hre-79e888770bb2",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-20600",
+      "cell": 20600,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 11.736704425553432,
+      "lat": 51.94998681354683,
+      "world_pixel": [
+        6272.0,
+        5490.0
+      ],
+      "region": "马格德堡黄土带",
+      "reason": "grain-region",
+      "anchorCity": "马格德堡",
+      "anchorCityId": "hre-79e888770bb2",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-21000",
+      "cell": 21000,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 11.503980711040924,
+      "lat": 51.827582630619,
+      "world_pixel": [
+        6144.0,
+        5598.0
+      ],
+      "region": "马格德堡黄土带",
+      "reason": "grain-region",
+      "anchorCity": "奎德林堡",
+      "anchorCityId": "hre-44f5f3af6698",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-19794",
+      "cell": 19794,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 11.500025290651292,
+      "lat": 52.19256490865391,
+      "world_pixel": [
+        6144.0,
+        5274.0
+      ],
+      "region": "马格德堡黄土带",
+      "reason": "grain-region",
+      "anchorCity": "马格德堡",
+      "anchorCityId": "hre-79e888770bb2",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-20796",
+      "cell": 20796,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 11.21118226494832,
+      "lat": 51.886865905398246,
+      "world_pixel": [
+        5984.0,
+        5544.0
+      ],
+      "region": "马格德堡黄土带",
+      "reason": "grain-region",
+      "anchorCity": "奎德林堡",
+      "anchorCityId": "hre-44f5f3af6698",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-14975",
+      "cell": 14975,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 12.091139291194148,
+      "lat": 53.65250485088995,
+      "world_pixel": [
+        6464.0,
+        3978.0
+      ],
+      "region": "梅克伦堡平原",
+      "reason": "grain-region",
+      "anchorCity": "什未林",
+      "anchorCityId": "hre-6bbcc623102d",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-15182",
+      "cell": 15182,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 12.879764986748294,
+      "lat": 53.58871198418592,
+      "world_pixel": [
+        6880.0,
+        4032.0
+      ],
+      "region": "梅克伦堡平原",
+      "reason": "grain-region",
+      "anchorCity": "格赖夫斯瓦尔德",
+      "anchorCityId": "hre-cc2bf8aa2498",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-15169",
+      "cell": 15169,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 11.302243373299117,
+      "lat": 53.58985343087748,
+      "world_pixel": [
+        6048.0,
+        4032.0
+      ],
+      "region": "梅克伦堡平原",
+      "reason": "grain-region",
+      "anchorCity": "什未林",
+      "anchorCityId": "hre-6bbcc623102d",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-14777",
+      "cell": 14777,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 12.51715797861055,
+      "lat": 53.71222257469791,
+      "world_pixel": [
+        6688.0,
+        3924.0
+      ],
+      "region": "梅克伦堡平原",
+      "reason": "grain-region",
+      "anchorCity": "罗斯托克",
+      "anchorCityId": "hre-405c20c7e4f5",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-14770",
+      "cell": 14770,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 11.66536525528804,
+      "lat": 53.71283882923286,
+      "world_pixel": [
+        6240.0,
+        3924.0
+      ],
+      "region": "梅克伦堡平原",
+      "reason": "grain-region",
+      "anchorCity": "维斯马",
+      "anchorCityId": "hre-8b3727eb72c7",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-19007",
+      "cell": 19007,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 13.507758428973,
+      "lat": 52.42758778177535,
+      "world_pixel": [
+        7232.0,
+        5058.0
+      ],
+      "region": "勃兰登堡低地",
+      "reason": "grain-region",
+      "anchorCity": "柏林",
+      "anchorCityId": "hre-afad73346281",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-20011",
+      "cell": 20011,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 13.43903402446465,
+      "lat": 52.12425046263669,
+      "world_pixel": [
+        7200.0,
+        5328.0
+      ],
+      "region": "勃兰登堡低地",
+      "reason": "grain-region",
+      "anchorCity": "柏林",
+      "anchorCityId": "hre-afad73346281",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-19406",
+      "cell": 19406,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 13.149984106328047,
+      "lat": 52.309821313152156,
+      "world_pixel": [
+        7040.0,
+        5166.0
+      ],
+      "region": "勃兰登堡低地",
+      "reason": "grain-region",
+      "anchorCity": "柏林",
+      "anchorCityId": "hre-afad73346281",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-19613",
+      "cell": 19613,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 13.913821459086257,
+      "lat": 52.23939434838809,
+      "world_pixel": [
+        7456.0,
+        5220.0
+      ],
+      "region": "勃兰登堡低地",
+      "reason": "grain-region",
+      "anchorCity": "奥得河畔法兰克福",
+      "anchorCityId": "hre-b862da356899",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-23408",
+      "cell": 23408,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 11.0521739957834,
+      "lat": 51.094646064198635,
+      "world_pixel": [
+        5888.0,
+        6246.0
+      ],
+      "region": "图林根盆地",
+      "reason": "grain-region",
+      "anchorCity": "埃尔福特",
+      "anchorCityId": "hre-c371bc2f548c",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-23209",
+      "cell": 23209,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 11.338517158619512,
+      "lat": 51.15744257982806,
+      "world_pixel": [
+        6048.0,
+        6192.0
+      ],
+      "region": "图林根盆地",
+      "reason": "grain-region",
+      "anchorCity": "魏玛",
+      "anchorCityId": "hre-973698242c1e",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-23204",
+      "cell": 23204,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 10.763395429511025,
+      "lat": 51.152856748027425,
+      "world_pixel": [
+        5728.0,
+        6192.0
+      ],
+      "region": "图林根盆地",
+      "reason": "grain-region",
+      "anchorCity": "埃尔福特",
+      "anchorCityId": "hre-c371bc2f548c",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-23808",
+      "cell": 23808,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 10.825481027303546,
+      "lat": 50.97089210173755,
+      "world_pixel": [
+        5760.0,
+        6354.0
+      ],
+      "region": "图林根盆地",
+      "reason": "grain-region",
+      "anchorCity": "埃尔福特",
+      "anchorCityId": "hre-c371bc2f548c",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-22816",
+      "cell": 22816,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 12.374862686625812,
+      "lat": 51.28039981991483,
+      "world_pixel": [
+        6624.0,
+        6084.0
+      ],
+      "region": "莱比锡黄土平原",
+      "reason": "grain-region",
+      "anchorCity": "莱比锡",
+      "anchorCityId": "hre-3dc782d8153a",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-22618",
+      "cell": 22618,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 12.66407204346614,
+      "lat": 51.33999554083212,
+      "world_pixel": [
+        6784.0,
+        6030.0
+      ],
+      "region": "莱比锡黄土平原",
+      "reason": "grain-region",
+      "anchorCity": "莱比锡",
+      "anchorCityId": "hre-3dc782d8153a",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-22613",
+      "cell": 22613,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 12.086620338270313,
+      "lat": 51.34180915920713,
+      "world_pixel": [
+        6464.0,
+        6030.0
+      ],
+      "region": "莱比锡黄土平原",
+      "reason": "grain-region",
+      "anchorCity": "莱比锡",
+      "anchorCityId": "hre-3dc782d8153a",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-22214",
+      "cell": 22214,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 12.43423018193294,
+      "lat": 51.46275364815618,
+      "world_pixel": [
+        6656.0,
+        5922.0
+      ],
+      "region": "莱比锡黄土平原",
+      "reason": "grain-region",
+      "anchorCity": "莱比锡",
+      "anchorCityId": "hre-3dc782d8153a",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-23460",
+      "cell": 23460,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 17.019044965174174,
+      "lat": 50.99227535411868,
+      "world_pixel": [
+        9216.0,
+        6246.0
+      ],
+      "region": "西里西亚平原",
+      "reason": "grain-region",
+      "anchorCity": "弗罗茨瓦夫",
+      "anchorCityId": "hre-0ab3c4c50f95",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-23856",
+      "cell": 23856,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 16.321192265464827,
+      "lat": 50.89785854717781,
+      "world_pixel": [
+        8832.0,
+        6354.0
+      ],
+      "region": "西里西亚平原",
+      "reason": "grain-region",
+      "anchorCity": "莱格尼察",
+      "anchorCityId": "hre-087b96ca82af",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-23063",
+      "cell": 23063,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 17.605114293982073,
+      "lat": 51.08803489327681,
+      "world_pixel": [
+        9536.0,
+        6138.0
+      ],
+      "region": "西里西亚平原",
+      "reason": "grain-region",
+      "anchorCity": "弗罗茨瓦夫",
+      "anchorCityId": "hre-0ab3c4c50f95",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-23255",
+      "cell": 23255,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 16.624576941009956,
+      "lat": 51.069305347275865,
+      "world_pixel": [
+        8992.0,
+        6192.0
+      ],
+      "region": "西里西亚平原",
+      "reason": "grain-region",
+      "anchorCity": "弗罗茨瓦夫",
+      "anchorCityId": "hre-0ab3c4c50f95",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-23865",
+      "cell": 23865,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 17.348226637489272,
+      "lat": 50.85583206695169,
+      "world_pixel": [
+        9408.0,
+        6354.0
+      ],
+      "region": "西里西亚平原",
+      "reason": "grain-region",
+      "anchorCity": "弗罗茨瓦夫",
+      "anchorCityId": "hre-0ab3c4c50f95",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-23261",
+      "cell": 23261,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 17.311780741399595,
+      "lat": 51.04051705041649,
+      "world_pixel": [
+        9376.0,
+        6192.0
+      ],
+      "region": "西里西亚平原",
+      "reason": "grain-region",
+      "anchorCity": "弗罗茨瓦夫",
+      "anchorCityId": "hre-0ab3c4c50f95",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-19236",
+      "cell": 19236,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 16.865295743611803,
+      "lat": 52.27909964084948,
+      "world_pixel": [
+        9056.0,
+        5112.0
+      ],
+      "region": "波兹南低地",
+      "reason": "grain-region",
+      "anchorCity": "波兹南",
+      "anchorCityId": "hre-ef5d104cd455",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-18639",
+      "cell": 18639,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 17.53385778487058,
+      "lat": 52.433515290598834,
+      "world_pixel": [
+        9408.0,
+        4950.0
+      ],
+      "region": "波兹南低地",
+      "reason": "grain-region",
+      "anchorCity": "格涅兹诺",
+      "anchorCityId": "hre-253074920124",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-19642",
+      "cell": 19642,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 17.321394091745994,
+      "lat": 52.13806906650999,
+      "world_pixel": [
+        9312.0,
+        5220.0
+      ],
+      "region": "波兹南低地",
+      "reason": "grain-region",
+      "anchorCity": "波兹南",
+      "anchorCityId": "hre-ef5d104cd455",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-18629",
+      "cell": 18629,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 16.35318923023465,
+      "lat": 52.48122513662027,
+      "world_pixel": [
+        8768.0,
+        4950.0
+      ],
+      "region": "波兹南低地",
+      "reason": "grain-region",
+      "anchorCity": "波兹南",
+      "anchorCityId": "hre-ef5d104cd455",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-18232",
+      "cell": 18232,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 16.957076989345325,
+      "lat": 52.58014765832669,
+      "world_pixel": [
+        9088.0,
+        4842.0
+      ],
+      "region": "波兹南低地",
+      "reason": "grain-region",
+      "anchorCity": "波兹南",
+      "anchorCityId": "hre-ef5d104cd455",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-14424",
+      "cell": 14424,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 18.48132238486583,
+      "lat": 53.66819863723046,
+      "world_pixel": [
+        9824.0,
+        3816.0
+      ],
+      "region": "维斯瓦低地",
+      "reason": "grain-region",
+      "anchorCity": "格但斯克",
+      "anchorCityId": "hre-927eed91e4dc",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-13620",
+      "cell": 13620,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 18.51707845274851,
+      "lat": 53.910228291698836,
+      "world_pixel": [
+        9824.0,
+        3600.0
+      ],
+      "region": "维斯瓦低地",
+      "reason": "grain-region",
+      "anchorCity": "格但斯克",
+      "anchorCityId": "hre-927eed91e4dc",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-14025",
+      "cell": 14025,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 18.863295694976042,
+      "lat": 53.76991547769393,
+      "world_pixel": [
+        10016.0,
+        3708.0
+      ],
+      "region": "维斯瓦低地",
+      "reason": "grain-region",
+      "anchorCity": "埃尔布隆格",
+      "anchorCityId": "hre-09e72687e1d1",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-14019",
+      "cell": 14019,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 18.13469674782678,
+      "lat": 53.80748043855312,
+      "world_pixel": [
+        9632.0,
+        3708.0
+      ],
+      "region": "维斯瓦低地",
+      "reason": "grain-region",
+      "anchorCity": "格但斯克",
+      "anchorCityId": "hre-927eed91e4dc",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-26301",
+      "cell": 26301,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 19.95345262153569,
+      "lat": 49.97414914682742,
+      "world_pixel": [
+        10944.0,
+        7002.0
+      ],
+      "region": "小波兰盆地",
+      "reason": "grain-region",
+      "anchorCity": "克拉科夫",
+      "anchorCityId": "hre-f4cf512107f9",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-25903",
+      "cell": 25903,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 20.420722557902657,
+      "lat": 50.06355784316467,
+      "world_pixel": [
+        11200.0,
+        6894.0
+      ],
+      "region": "小波兰盆地",
+      "reason": "grain-region",
+      "anchorCity": "克拉科夫",
+      "anchorCityId": "hre-f4cf512107f9",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-26096",
+      "cell": 26096,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 19.572338706007834,
+      "lat": 50.06090071056547,
+      "world_pixel": [
+        10720.0,
+        6948.0
+      ],
+      "region": "小波兰盆地",
+      "reason": "grain-region",
+      "anchorCity": "克拉科夫",
+      "anchorCityId": "hre-f4cf512107f9",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-25698",
+      "cell": 25698,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 20.039745095837787,
+      "lat": 50.15184079741817,
+      "world_pixel": [
+        10976.0,
+        6840.0
+      ],
+      "region": "小波兰盆地",
+      "reason": "grain-region",
+      "anchorCity": "克拉科夫",
+      "anchorCityId": "hre-f4cf512107f9",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-26652",
+      "cell": 26652,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 14.22233477563395,
+      "lat": 50.103414763359304,
+      "world_pixel": [
+        7680.0,
+        7110.0
+      ],
+      "region": "波希米亚盆地",
+      "reason": "grain-region",
+      "anchorCity": "布拉格",
+      "anchorCityId": "hre-6ff35a64fa9d",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-27051",
+      "cell": 27051,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 13.880141549097525,
+      "lat": 49.987677512458596,
+      "world_pixel": [
+        7488.0,
+        7218.0
+      ],
+      "region": "波希米亚盆地",
+      "reason": "grain-region",
+      "anchorCity": "布拉格",
+      "anchorCityId": "hre-6ff35a64fa9d",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-26247",
+      "cell": 26247,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 13.889725228374868,
+      "lat": 50.23106048049387,
+      "world_pixel": [
+        7488.0,
+        7002.0
+      ],
+      "region": "波希米亚盆地",
+      "reason": "grain-region",
+      "anchorCity": "利托梅日采",
+      "anchorCityId": "hre-e22f6ab54fbe",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-27456",
+      "cell": 27456,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 14.211094622237399,
+      "lat": 49.86006227291123,
+      "world_pixel": [
+        7680.0,
+        7326.0
+      ],
+      "region": "波希米亚盆地",
+      "reason": "grain-region",
+      "anchorCity": "布拉格",
+      "anchorCityId": "hre-6ff35a64fa9d",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-27057",
+      "cell": 27057,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 14.553169258756268,
+      "lat": 49.974823769876856,
+      "world_pixel": [
+        7872.0,
+        7218.0
+      ],
+      "region": "波希米亚盆地",
+      "reason": "grain-region",
+      "anchorCity": "布拉格",
+      "anchorCityId": "hre-6ff35a64fa9d",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-30293",
+      "cell": 30293,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 16.697906641256495,
+      "lat": 48.93204657595131,
+      "world_pixel": [
+        9152.0,
+        8082.0
+      ],
+      "region": "南摩拉维亚盆地",
+      "reason": "grain-region",
+      "anchorCity": "布尔诺",
+      "anchorCityId": "hre-caead76419b8",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-31097",
+      "cell": 31097,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 16.674721822189777,
+      "lat": 48.68912894715411,
+      "world_pixel": [
+        9152.0,
+        8298.0
+      ],
+      "region": "南摩拉维亚盆地",
+      "reason": "grain-region",
+      "anchorCity": "兹诺伊莫",
+      "anchorCityId": "hre-5ecf450b59c7",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-30697",
+      "cell": 30697,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 16.904910700339013,
+      "lat": 48.80132351282745,
+      "world_pixel": [
+        9280.0,
+        8190.0
+      ],
+      "region": "南摩拉维亚盆地",
+      "reason": "grain-region",
+      "anchorCity": "布尔诺",
+      "anchorCityId": "hre-caead76419b8",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-30693",
+      "cell": 30693,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 16.4675799766552,
+      "lat": 48.819425619184386,
+      "world_pixel": [
+        9024.0,
+        8190.0
+      ],
+      "region": "南摩拉维亚盆地",
+      "reason": "grain-region",
+      "anchorCity": "兹诺伊莫",
+      "anchorCityId": "hre-5ecf450b59c7",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-33106",
+      "cell": 33106,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 16.509995739297022,
+      "lat": 48.08634090851139,
+      "world_pixel": [
+        9088.0,
+        8838.0
+      ],
+      "region": "维也纳盆地",
+      "reason": "grain-region",
+      "anchorCity": "维也纳",
+      "anchorCityId": "hre-42ca490e6e25",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-32502",
+      "cell": 32502,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 16.472468635650518,
+      "lat": 48.270670236597546,
+      "world_pixel": [
+        9056.0,
+        8676.0
+      ],
+      "region": "维也纳盆地",
+      "reason": "grain-region",
+      "anchorCity": "维也纳",
+      "anchorCityId": "hre-42ca490e6e25",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-33708",
+      "cell": 33708,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 16.439875976823284,
+      "lat": 47.906357341052626,
+      "world_pixel": [
+        9056.0,
+        9000.0
+      ],
+      "region": "维也纳盆地",
+      "reason": "grain-region",
+      "anchorCity": "维也纳新城",
+      "anchorCityId": "hre-4535dd344877",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-32662",
+      "cell": 32662,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 11.972894899445906,
+      "lat": 48.298976503589046,
+      "world_pixel": [
+        6400.0,
+        8730.0
+      ],
+      "region": "上巴伐利亚台地",
+      "reason": "grain-region",
+      "anchorCity": "弗赖辛",
+      "anchorCityId": "hre-274cac635a25",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-32465",
+      "cell": 32465,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 12.46134596770726,
+      "lat": 48.358868244968406,
+      "world_pixel": [
+        6688.0,
+        8676.0
+      ],
+      "region": "上巴伐利亚台地",
+      "reason": "grain-region",
+      "anchorCity": "兰茨胡特",
+      "anchorCityId": "hre-94e9eb3bb612",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-32456",
+      "cell": 32456,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 11.484379671230652,
+      "lat": 48.358632276854976,
+      "world_pixel": [
+        6112.0,
+        8676.0
+      ],
+      "region": "上巴伐利亚台地",
+      "reason": "grain-region",
+      "anchorCity": "弗赖辛",
+      "anchorCityId": "hre-274cac635a25",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-32865",
+      "cell": 32865,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 12.243646606513641,
+      "lat": 48.23788136780282,
+      "world_pixel": [
+        6560.0,
+        8784.0
+      ],
+      "region": "上巴伐利亚台地",
+      "reason": "grain-region",
+      "anchorCity": "兰茨胡特",
+      "anchorCityId": "hre-94e9eb3bb612",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-32642",
+      "cell": 32642,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 9.8051193507969,
+      "lat": 48.27750851795513,
+      "world_pixel": [
+        5120.0,
+        8730.0
+      ],
+      "region": "施瓦本低地",
+      "reason": "grain-region",
+      "anchorCity": "乌尔姆",
+      "anchorCityId": "hre-d2e24980e158",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-32438",
+      "cell": 32438,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 9.53131091884739,
+      "lat": 48.33268281388925,
+      "world_pixel": [
+        4960.0,
+        8676.0
+      ],
+      "region": "施瓦本低地",
+      "reason": "grain-region",
+      "anchorCity": "乌尔姆",
+      "anchorCityId": "hre-d2e24980e158",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-32443",
+      "cell": 32443,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 10.073605262163078,
+      "lat": 48.34329681971499,
+      "world_pixel": [
+        5280.0,
+        8676.0
+      ],
+      "region": "施瓦本低地",
+      "reason": "grain-region",
+      "anchorCity": "乌尔姆",
+      "anchorCityId": "hre-d2e24980e158",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-36241",
+      "cell": 36241,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 7.840610138215352,
+      "lat": 47.12553018832093,
+      "world_pixel": [
+        3904.0,
+        9702.0
+      ],
+      "region": "瑞士中部台地",
+      "reason": "grain-region",
+      "anchorCity": "伯尔尼",
+      "anchorCityId": "hre-199154443bef",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-36444",
+      "cell": 36444,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 8.10969665234135,
+      "lat": 47.07454430163106,
+      "world_pixel": [
+        4064.0,
+        9756.0
+      ],
+      "region": "瑞士中部台地",
+      "reason": "grain-region",
+      "anchorCity": "卢塞恩",
+      "anchorCityId": "hre-4799cdc2ffbf",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-36439",
+      "cell": 36439,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 7.581565059309369,
+      "lat": 47.054504798078185,
+      "world_pixel": [
+        3744.0,
+        9756.0
+      ],
+      "region": "瑞士中部台地",
+      "reason": "grain-region",
+      "anchorCity": "伯尔尼",
+      "anchorCityId": "hre-199154443bef",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-42675",
+      "cell": 42675,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 8.197704312268062,
+      "lat": 45.192904717858134,
+      "world_pixel": [
+        4032.0,
+        11430.0
+      ],
+      "region": "波河西部平原",
+      "reason": "grain-region",
+      "anchorCity": "韦尔切利",
+      "anchorCityId": "hre-e5abbe9bed9e",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-42268",
+      "cell": 42268,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 7.678442457257465,
+      "lat": 45.294476079391984,
+      "world_pixel": [
+        3712.0,
+        11322.0
+      ],
+      "region": "波河西部平原",
+      "reason": "grain-region",
+      "anchorCity": "都灵",
+      "anchorCityId": "hre-25c029307060",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-43082",
+      "cell": 43082,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 8.714940327993672,
+      "lat": 45.08881322421598,
+      "world_pixel": [
+        4352.0,
+        11538.0
+      ],
+      "region": "波河西部平原",
+      "reason": "grain-region",
+      "anchorCity": "亚历山德里亚",
+      "anchorCityId": "hre-da948ad4fc2f",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-42276",
+      "cell": 42276,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 8.49538400787467,
+      "lat": 45.32461792095764,
+      "world_pixel": [
+        4224.0,
+        11322.0
+      ],
+      "region": "波河西部平原",
+      "reason": "grain-region",
+      "anchorCity": "韦尔切利",
+      "anchorCityId": "hre-e5abbe9bed9e",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-43074",
+      "cell": 43074,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 7.901515901981447,
+      "lat": 45.060384298759715,
+      "world_pixel": [
+        3840.0,
+        11538.0
+      ],
+      "region": "波河西部平原",
+      "reason": "grain-region",
+      "anchorCity": "都灵",
+      "anchorCityId": "hre-25c029307060",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-42471",
+      "cell": 42471,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 7.938324226951142,
+      "lat": 45.244006430714684,
+      "world_pixel": [
+        3872.0,
+        11376.0
+      ],
+      "region": "波河西部平原",
+      "reason": "grain-region",
+      "anchorCity": "都灵",
+      "anchorCityId": "hre-25c029307060",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-42878",
+      "cell": 42878,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 8.45657792091052,
+      "lat": 45.14117296708825,
+      "world_pixel": [
+        4192.0,
+        11484.0
+      ],
+      "region": "波河西部平原",
+      "reason": "grain-region",
+      "anchorCity": "韦尔切利",
+      "anchorCityId": "hre-e5abbe9bed9e",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-42690",
+      "cell": 42690,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 9.727566382636338,
+      "lat": 45.23677653286437,
+      "world_pixel": [
+        4992.0,
+        11430.0
+      ],
+      "region": "伦巴第平原",
+      "reason": "grain-region",
+      "anchorCity": "皮亚琴察",
+      "anchorCityId": "hre-c92072eeb67b",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-42283",
+      "cell": 42283,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 9.210904198383306,
+      "lat": 45.34583177477695,
+      "world_pixel": [
+        4672.0,
+        11322.0
+      ],
+      "region": "伦巴第平原",
+      "reason": "grain-region",
+      "anchorCity": "米兰",
+      "anchorCityId": "hre-775a2535646c",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-42293",
+      "cell": 42293,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 10.23393323945541,
+      "lat": 45.36776982678668,
+      "world_pixel": [
+        5312.0,
+        11322.0
+      ],
+      "region": "伦巴第平原",
+      "reason": "grain-region",
+      "anchorCity": "布雷西亚",
+      "anchorCityId": "hre-55261b57d586",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-42486",
+      "cell": 42486,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 9.469503491506696,
+      "lat": 45.291616486904154,
+      "world_pixel": [
+        4832.0,
+        11376.0
+      ],
+      "region": "伦巴第平原",
+      "reason": "grain-region",
+      "anchorCity": "米兰",
+      "anchorCityId": "hre-775a2535646c",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-42491",
+      "cell": 42491,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 9.980434015891264,
+      "lat": 45.30257212785896,
+      "world_pixel": [
+        5152.0,
+        11376.0
+      ],
+      "region": "伦巴第平原",
+      "reason": "grain-region",
+      "anchorCity": "克雷莫纳",
+      "anchorCityId": "hre-ef70434fe2c3",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-43090",
+      "cell": 43090,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 9.529145931847955,
+      "lat": 45.11097963731845,
+      "world_pixel": [
+        4864.0,
+        11538.0
+      ],
+      "region": "伦巴第平原",
+      "reason": "grain-region",
+      "anchorCity": "皮亚琴察",
+      "anchorCityId": "hre-c92072eeb67b",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-43094",
+      "cell": 43094,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 9.936481464086132,
+      "lat": 45.11971164527541,
+      "world_pixel": [
+        5120.0,
+        11538.0
+      ],
+      "region": "伦巴第平原",
+      "reason": "grain-region",
+      "anchorCity": "克雷莫纳",
+      "anchorCityId": "hre-ef70434fe2c3",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-42086",
+      "cell": 42086,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 9.66846503017206,
+      "lat": 45.41755680125931,
+      "world_pixel": [
+        4960.0,
+        11268.0
+      ],
+      "region": "伦巴第平原",
+      "reason": "grain-region",
+      "anchorCity": "米兰",
+      "anchorCityId": "hre-775a2535646c",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-44107",
+      "cell": 44107,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 10.809302043119951,
+      "lat": 44.82995632186072,
+      "world_pixel": [
+        5664.0,
+        11808.0
+      ],
+      "region": "艾米利亚平原",
+      "reason": "grain-region",
+      "anchorCity": "摩德纳",
+      "anchorCityId": "hre-7dd36def8f55",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-44304",
+      "cell": 44304,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 10.35529996810952,
+      "lat": 44.763215472441075,
+      "world_pixel": [
+        5376.0,
+        11862.0
+      ],
+      "region": "艾米利亚平原",
+      "reason": "grain-region",
+      "anchorCity": "帕尔马",
+      "anchorCityId": "hre-111d9f109dee",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-44313",
+      "cell": 44313,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 11.266115662032384,
+      "lat": 44.773517576730235,
+      "world_pixel": [
+        5952.0,
+        11862.0
+      ],
+      "region": "艾米利亚平原",
+      "reason": "grain-region",
+      "anchorCity": "费拉拉",
+      "anchorCityId": "hre-623e35ce7adb",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-44511",
+      "cell": 44511,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 11.014205074413084,
+      "lat": 44.71084665157317,
+      "world_pixel": [
+        5792.0,
+        11916.0
+      ],
+      "region": "艾米利亚平原",
+      "reason": "grain-region",
+      "anchorCity": "摩德纳",
+      "anchorCityId": "hre-7dd36def8f55",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-43904",
+      "cell": 43904,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 10.554364907098705,
+      "lat": 44.8873916958147,
+      "world_pixel": [
+        5504.0,
+        11754.0
+      ],
+      "region": "艾米利亚平原",
+      "reason": "grain-region",
+      "anchorCity": "帕尔马",
+      "anchorCityId": "hre-111d9f109dee",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-43909",
+      "cell": 43909,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 11.061537420876116,
+      "lat": 44.893129353447726,
+      "world_pixel": [
+        5824.0,
+        11754.0
+      ],
+      "region": "艾米利亚平原",
+      "reason": "grain-region",
+      "anchorCity": "摩德纳",
+      "anchorCityId": "hre-7dd36def8f55",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-42308",
+      "cell": 42308,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 11.76960121880228,
+      "lat": 45.3821951455689,
+      "world_pixel": [
+        6272.0,
+        11322.0
+      ],
+      "region": "威尼托平原",
+      "reason": "grain-region",
+      "anchorCity": "帕多瓦",
+      "anchorCityId": "hre-d14c8f09bb2e",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-42110",
+      "cell": 42110,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 12.12814785553194,
+      "lat": 45.44303335059252,
+      "world_pixel": [
+        6496.0,
+        11268.0
+      ],
+      "region": "威尼托平原",
+      "reason": "grain-region",
+      "anchorCity": "威尼斯",
+      "anchorCityId": "hre-397c38c3e629",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-42103",
+      "cell": 42103,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 11.410531535538968,
+      "lat": 45.44147771554421,
+      "world_pixel": [
+        6048.0,
+        11268.0
+      ],
+      "region": "威尼托平原",
+      "reason": "grain-region",
+      "anchorCity": "维琴察",
+      "anchorCityId": "hre-ccd919ecbb35",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-42712",
+      "cell": 42712,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 11.974459150666176,
+      "lat": 45.261125775404096,
+      "world_pixel": [
+        6400.0,
+        11430.0
+      ],
+      "region": "威尼托平原",
+      "reason": "grain-region",
+      "anchorCity": "帕多瓦",
+      "anchorCityId": "hre-d14c8f09bb2e",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-41705",
+      "cell": 41705,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 11.820176622117797,
+      "lat": 45.56430524269682,
+      "world_pixel": [
+        6304.0,
+        11160.0
+      ],
+      "region": "威尼托平原",
+      "reason": "grain-region",
+      "anchorCity": "帕多瓦",
+      "anchorCityId": "hre-d14c8f09bb2e",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-42708",
+      "cell": 42708,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 11.565810439748603,
+      "lat": 45.260240135981654,
+      "world_pixel": [
+        6144.0,
+        11430.0
+      ],
+      "region": "威尼托平原",
+      "reason": "grain-region",
+      "anchorCity": "帕多瓦",
+      "anchorCityId": "hre-d14c8f09bb2e",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-48130",
+      "cell": 48130,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 11.133125448489473,
+      "lat": 43.62195853850077,
+      "world_pixel": [
+        5856.0,
+        12888.0
+      ],
+      "region": "托斯卡纳盆地",
+      "reason": "grain-region",
+      "anchorCity": "佛罗伦萨",
+      "anchorCityId": "hre-3abf3064f9e3",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-48529",
+      "cell": 48529,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 10.838552999272178,
+      "lat": 43.49808213454755,
+      "world_pixel": [
+        5664.0,
+        12996.0
+      ],
+      "region": "托斯卡纳盆地",
+      "reason": "grain-region",
+      "anchorCity": "佛罗伦萨",
+      "anchorCityId": "hre-3abf3064f9e3",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-48733",
+      "cell": 48733,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 11.086661273980676,
+      "lat": 43.44010634538517,
+      "world_pixel": [
+        5824.0,
+        13050.0
+      ],
+      "region": "托斯卡纳盆地",
+      "reason": "grain-region",
+      "anchorCity": "锡耶纳",
+      "anchorCityId": "hre-6b6da41cd31f",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-44048",
+      "cell": 44048,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 4.8517946846936235,
+      "lat": 44.5931369220407,
+      "world_pixel": [
+        1888.0,
+        11808.0
+      ],
+      "region": "罗讷河谷",
+      "reason": "grain-region",
+      "anchorCity": "阿维尼翁",
+      "anchorCityId": "hre-a312056f4b9f",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-42641",
+      "cell": 42641,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 4.743793463820771,
+      "lat": 45.011984106565485,
+      "world_pixel": [
+        1856.0,
+        11430.0
+      ],
+      "region": "罗讷河谷",
+      "reason": "grain-region",
+      "anchorCity": "维埃纳",
+      "anchorCityId": "hre-afd7e8c22184",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-43446",
+      "cell": 43446,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 4.877690197065313,
+      "lat": 44.777537080200126,
+      "world_pixel": [
+        1920.0,
+        11646.0
+      ],
+      "region": "罗讷河谷",
+      "reason": "grain-region",
+      "anchorCity": "格勒诺布尔",
+      "anchorCityId": "hre-8c39a225103d",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-34522",
+      "cell": 34522,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 17.4860617366546,
+      "lat": 47.61573522388769,
+      "world_pixel": [
+        9696.0,
+        9216.0
+      ],
+      "region": "潘诺尼亚西部平原",
+      "reason": "grain-region",
+      "anchorCity": "杰尔",
+      "anchorCityId": "hre-75c82d76b3ec",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-34928",
+      "cell": 34928,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 17.89828589823839,
+      "lat": 47.47251439941293,
+      "world_pixel": [
+        9952.0,
+        9324.0
+      ],
+      "region": "潘诺尼亚西部平原",
+      "reason": "grain-region",
+      "anchorCity": "杰尔",
+      "anchorCityId": "hre-75c82d76b3ec",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-35527",
+      "cell": 35527,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 17.400131351476805,
+      "lat": 47.3151648950148,
+      "world_pixel": [
+        9664.0,
+        9486.0
+      ],
+      "region": "潘诺尼亚西部平原",
+      "reason": "grain-region",
+      "anchorCity": "杰尔",
+      "anchorCityId": "hre-75c82d76b3ec",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-34920",
+      "cell": 34920,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 17.047054038507422,
+      "lat": 47.51475185820248,
+      "world_pixel": [
+        9440.0,
+        9324.0
+      ],
+      "region": "潘诺尼亚西部平原",
+      "reason": "grain-region",
+      "anchorCity": "肖普朗",
+      "anchorCityId": "hre-81016af57719",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-33923",
+      "cell": 33923,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 17.880517578954603,
+      "lat": 47.778450233325955,
+      "world_pixel": [
+        9920.0,
+        9054.0
+      ],
+      "region": "潘诺尼亚西部平原",
+      "reason": "grain-region",
+      "anchorCity": "杰尔",
+      "anchorCityId": "hre-75c82d76b3ec",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-36358",
+      "cell": 36358,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 20.21452477280398,
+      "lat": 46.895802949955375,
+      "world_pixel": [
+        11392.0,
+        9702.0
+      ],
+      "region": "匈牙利大平原",
+      "reason": "grain-region",
+      "anchorCity": "塞格德",
+      "anchorCityId": "hre-834674910ac7",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-36955",
+      "cell": 36955,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 19.610458422905992,
+      "lat": 46.756443137098906,
+      "world_pixel": [
+        11040.0,
+        9864.0
+      ],
+      "region": "匈牙利大平原",
+      "reason": "grain-region",
+      "anchorCity": "塞格德",
+      "anchorCityId": "hre-834674910ac7",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-35549",
+      "cell": 35549,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 19.72689483499169,
+      "lat": 47.17592794392699,
+      "world_pixel": [
+        11072.0,
+        9486.0
+      ],
+      "region": "匈牙利大平原",
+      "reason": "grain-region",
+      "anchorCity": "布达",
+      "anchorCityId": "hre-a3e6ed983a3c",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-35760",
+      "cell": 35760,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 20.821860679831214,
+      "lat": 47.0318228217961,
+      "world_pixel": [
+        11744.0,
+        9540.0
+      ],
+      "region": "匈牙利大平原",
+      "reason": "grain-region",
+      "anchorCity": "德布勒森",
+      "anchorCityId": "hre-a94f0614b3e2",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-37167",
+      "cell": 37167,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 20.696809143670453,
+      "lat": 46.61360079331857,
+      "world_pixel": [
+        11712.0,
+        9918.0
+      ],
+      "region": "匈牙利大平原",
+      "reason": "grain-region",
+      "anchorCity": "塞格德",
+      "anchorCityId": "hre-834674910ac7",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-34951",
+      "cell": 34951,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 20.336285158117427,
+      "lat": 47.314681377980904,
+      "world_pixel": [
+        11424.0,
+        9324.0
+      ],
+      "region": "匈牙利大平原",
+      "reason": "grain-region",
+      "anchorCity": "埃格尔",
+      "anchorCityId": "hre-28637a8f291d",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-37764",
+      "cell": 37764,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 20.094747562186267,
+      "lat": 46.47695836839903,
+      "world_pixel": [
+        11360.0,
+        10080.0
+      ],
+      "region": "匈牙利大平原",
+      "reason": "grain-region",
+      "anchorCity": "塞格德",
+      "anchorCityId": "hre-834674910ac7",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-36556",
+      "cell": 36556,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 19.942970629520122,
+      "lat": 46.854842248169724,
+      "world_pixel": [
+        11232.0,
+        9756.0
+      ],
+      "region": "匈牙利大平原",
+      "reason": "grain-region",
+      "anchorCity": "塞格德",
+      "anchorCityId": "hre-834674910ac7",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-42564",
+      "cell": 42564,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 17.436855739015446,
+      "lat": 45.182293088231255,
+      "world_pixel": [
+        9824.0,
+        11376.0
+      ],
+      "region": "萨瓦河低地",
+      "reason": "grain-region",
+      "anchorCity": "班亚卢卡",
+      "anchorCityId": "hre-89c1206e78c5",
+      "group": "巴尔干周边"
+    },
+    {
+      "id": "hre-farm-42759",
+      "cell": 42759,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 16.76963910552724,
+      "lat": 45.15371144449754,
+      "world_pixel": [
+        9408.0,
+        11430.0
+      ],
+      "region": "萨瓦河低地",
+      "reason": "grain-region",
+      "anchorCity": "班亚卢卡",
+      "anchorCityId": "hre-89c1206e78c5",
+      "group": "巴尔干周边"
+    },
+    {
+      "id": "hre-farm-42370",
+      "cell": 42370,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 18.104744165839485,
+      "lat": 45.206668334287386,
+      "world_pixel": [
+        10240.0,
+        11322.0
+      ],
+      "region": "萨瓦河低地",
+      "reason": "grain-region",
+      "anchorCity": "班亚卢卡",
+      "anchorCityId": "hre-89c1206e78c5",
+      "group": "巴尔干周边"
+    },
+    {
+      "id": "hre-farm-42360",
+      "cell": 42360,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 17.08650414131931,
+      "lat": 45.260514896128385,
+      "world_pixel": [
+        9600.0,
+        11322.0
+      ],
+      "region": "萨瓦河低地",
+      "reason": "grain-region",
+      "anchorCity": "班亚卢卡",
+      "anchorCityId": "hre-89c1206e78c5",
+      "group": "巴尔干周边"
+    },
+    {
+      "id": "hre-farm-42366",
+      "cell": 42366,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 17.697699939036504,
+      "lat": 45.22937992888188,
+      "world_pixel": [
+        9984.0,
+        11322.0
+      ],
+      "region": "萨瓦河低地",
+      "reason": "grain-region",
+      "anchorCity": "班亚卢卡",
+      "anchorCityId": "hre-89c1206e78c5",
+      "group": "巴尔干周边"
+    },
+    {
+      "id": "hre-farm-8118",
+      "cell": 8118,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 9.16517487826741,
+      "lat": 55.684723738846,
+      "world_pixel": [
+        4992.0,
+        2142.0
+      ],
+      "region": "丹麦日德兰耕作区",
+      "reason": "grain-region",
+      "anchorCity": "里伯",
+      "anchorCityId": "hre-20df8d1b017b",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-6711",
+      "cell": 6711,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 9.200625871349372,
+      "lat": 56.10957611346713,
+      "world_pixel": [
+        5024.0,
+        1764.0
+      ],
+      "region": "丹麦日德兰耕作区",
+      "reason": "grain-region",
+      "anchorCity": "维堡",
+      "anchorCityId": "hre-e34fb6d642e7",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-9324",
+      "cell": 9324,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 9.189436738119065,
+      "lat": 55.321465950104894,
+      "world_pixel": [
+        4992.0,
+        2466.0
+      ],
+      "region": "丹麦日德兰耕作区",
+      "reason": "grain-region",
+      "anchorCity": "里伯",
+      "anchorCityId": "hre-20df8d1b017b",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-7515",
+      "cell": 7515,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 9.216806406669447,
+      "lat": 55.867615523025904,
+      "world_pixel": [
+        5024.0,
+        1980.0
+      ],
+      "region": "丹麦日德兰耕作区",
+      "reason": "grain-region",
+      "anchorCity": "里伯",
+      "anchorCityId": "hre-20df8d1b017b",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-9139",
+      "cell": 9139,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 11.272315383105774,
+      "lat": 55.41014824287154,
+      "world_pixel": [
+        6048.0,
+        2412.0
+      ],
+      "region": "丹麦岛屿平原",
+      "reason": "grain-region",
+      "anchorCity": "欧登塞",
+      "anchorCityId": "hre-adab933694e6",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-9344",
+      "cell": 9344,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 11.715652768063933,
+      "lat": 55.35125458211539,
+      "world_pixel": [
+        6272.0,
+        2466.0
+      ],
+      "region": "丹麦岛屿平原",
+      "reason": "grain-region",
+      "anchorCity": "罗斯基勒",
+      "anchorCityId": "hre-9a8219216510",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-9336",
+      "cell": 9336,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 10.704764093143789,
+      "lat": 55.345173693691535,
+      "world_pixel": [
+        5760.0,
+        2466.0
+      ],
+      "region": "丹麦岛屿平原",
+      "reason": "grain-region",
+      "anchorCity": "欧登塞",
+      "anchorCityId": "hre-adab933694e6",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-8739",
+      "cell": 8739,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 11.524053446530756,
+      "lat": 55.532482058055834,
+      "world_pixel": [
+        6176.0,
+        2304.0
+      ],
+      "region": "丹麦岛屿平原",
+      "reason": "grain-region",
+      "anchorCity": "罗斯基勒",
+      "anchorCityId": "hre-9a8219216510",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-7749",
+      "cell": 7749,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 13.374096207066902,
+      "lat": 55.82907199227665,
+      "world_pixel": [
+        7104.0,
+        2034.0
+      ],
+      "region": "斯堪尼亚平原",
+      "reason": "grain-region",
+      "anchorCity": "隆德",
+      "anchorCityId": "hre-ee629d628d06",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-7952",
+      "cell": 7952,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 13.691112602033387,
+      "lat": 55.76484592943165,
+      "world_pixel": [
+        7264.0,
+        2088.0
+      ],
+      "region": "斯堪尼亚平原",
+      "reason": "grain-region",
+      "anchorCity": "隆德",
+      "anchorCityId": "hre-ee629d628d06",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-7947",
+      "cell": 7947,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 13.053067186653891,
+      "lat": 55.771443326174406,
+      "world_pixel": [
+        6944.0,
+        2088.0
+      ],
+      "region": "斯堪尼亚平原",
+      "reason": "grain-region",
+      "anchorCity": "隆德",
+      "anchorCityId": "hre-ee629d628d06",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-8352",
+      "cell": 8352,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 13.431790067175983,
+      "lat": 55.646746711780054,
+      "world_pixel": [
+        7136.0,
+        2196.0
+      ],
+      "region": "斯堪尼亚平原",
+      "reason": "grain-region",
+      "anchorCity": "隆德",
+      "anchorCityId": "hre-ee629d628d06",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-44692",
+      "cell": 44692,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 8.94652414011002,
+      "lat": 44.610422258959424,
+      "world_pixel": [
+        4480.0,
+        11970.0
+      ],
+      "region": "热那亚周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "热那亚",
+      "anchorCityId": "hre-0c2da3d7ddba",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-28633",
+      "cell": 28633,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 10.971990409725406,
+      "lat": 49.51139272804243,
+      "world_pixel": [
+        5824.0,
+        7650.0
+      ],
+      "region": "纽伦堡周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "纽伦堡",
+      "anchorCityId": "hre-9e51ba6e9dde",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-26936",
+      "cell": 26936,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 1.0486075016601473,
+      "lat": 49.48196589190095,
+      "world_pixel": [
+        128.0,
+        7218.0
+      ],
+      "region": "鲁昂周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "鲁昂",
+      "anchorCityId": "hre-2c0496fee015",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-34537",
+      "cell": 34537,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 19.08320054313134,
+      "lat": 47.52480694831362,
+      "world_pixel": [
+        10656.0,
+        9216.0
+      ],
+      "region": "布达周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "布达",
+      "anchorCityId": "hre-a3e6ed983a3c",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-30049",
+      "cell": 30049,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 12.02754369868089,
+      "lat": 49.089973244463486,
+      "world_pixel": [
+        6432.0,
+        8028.0
+      ],
+      "region": "雷根斯堡周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "雷根斯堡",
+      "anchorCityId": "hre-c21768d21ffa",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-40029",
+      "cell": 40029,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 4.788069122895786,
+      "lat": 45.80736679729248,
+      "world_pixel": [
+        1952.0,
+        10728.0
+      ],
+      "region": "里昂周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "里昂",
+      "anchorCityId": "hre-ff3a249091f0",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-29192",
+      "cell": 29192,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 6.171071800762858,
+      "lat": 49.18474663284994,
+      "world_pixel": [
+        3040.0,
+        7812.0
+      ],
+      "region": "梅斯周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "梅斯",
+      "anchorCityId": "hre-27e36432552c",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-15397",
+      "cell": 15397,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 14.513666772007356,
+      "lat": 53.50587078235094,
+      "world_pixel": [
+        7744.0,
+        4086.0
+      ],
+      "region": "斯德丁周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "斯德丁",
+      "anchorCityId": "hre-7a8738150054",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-27588",
+      "cell": 27588,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 6.557200342031877,
+      "lat": 49.69201458954712,
+      "world_pixel": [
+        3296.0,
+        7380.0
+      ],
+      "region": "特里尔周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "特里尔",
+      "anchorCityId": "hre-7cc45355aad0",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-14957",
+      "cell": 14957,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 9.904345861734992,
+      "lat": 53.635099374008604,
+      "world_pixel": [
+        5312.0,
+        3978.0
+      ],
+      "region": "汉堡周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "汉堡",
+      "anchorCityId": "hre-7cfabe63ded2",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-46056",
+      "cell": 46056,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 4.733673584446681,
+      "lat": 43.97650796578349,
+      "world_pixel": [
+        1760.0,
+        12348.0
+      ],
+      "region": "阿维尼翁周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "阿维尼翁",
+      "anchorCityId": "hre-a312056f4b9f",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-38836",
+      "cell": 38836,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 6.084640981124032,
+      "lat": 46.25242426559793,
+      "world_pixel": [
+        2784.0,
+        10404.0
+      ],
+      "region": "日内瓦周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "日内瓦",
+      "anchorCityId": "hre-ba7e3396e3c3",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-47870",
+      "cell": 47870,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 5.2489591804489,
+      "lat": 43.464656356443015,
+      "world_pixel": [
+        2048.0,
+        12834.0
+      ],
+      "region": "马赛周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "马赛",
+      "anchorCityId": "hre-c04c3b4a8763",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-42996",
+      "cell": 42996,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 20.458912936552725,
+      "lat": 44.86107907106438,
+      "world_pixel": [
+        11744.0,
+        11484.0
+      ],
+      "region": "贝尔格莱德周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "贝尔格莱德",
+      "anchorCityId": "hre-f12445c1a7dd",
+      "group": "巴尔干周边"
+    },
+    {
+      "id": "hre-farm-34444",
+      "cell": 34444,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 9.132788639307265,
+      "lat": 47.714517678806835,
+      "world_pixel": [
+        4704.0,
+        9216.0
+      ],
+      "region": "康斯坦茨周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "康斯坦茨",
+      "anchorCityId": "hre-0679cb11e61a",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-27885",
+      "cell": 27885,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 17.21368135377727,
+      "lat": 49.64159757847396,
+      "world_pixel": [
+        9408.0,
+        7434.0
+      ],
+      "region": "奥洛穆茨周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "奥洛穆茨",
+      "anchorCityId": "hre-23ed944a8199",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-16435",
+      "cell": 16435,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 18.51308666873186,
+      "lat": 53.05658141022013,
+      "world_pixel": [
+        9888.0,
+        4356.0
+      ],
+      "region": "托伦周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "托伦",
+      "anchorCityId": "hre-244f469aed47",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-16555",
+      "cell": 16555,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 8.726677515956364,
+      "lat": 53.12338192983482,
+      "world_pixel": [
+        4672.0,
+        4410.0
+      ],
+      "region": "不来梅周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "不来梅",
+      "anchorCityId": "hre-3571efdbc083",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-23431",
+      "cell": 23431,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 13.69439807113417,
+      "lat": 51.08634727438196,
+      "world_pixel": [
+        7360.0,
+        6246.0
+      ],
+      "region": "德累斯顿周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "德累斯顿",
+      "anchorCityId": "hre-3ede18d5fcf2",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-41299",
+      "cell": 41299,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 11.407787997236172,
+      "lat": 45.684181891724506,
+      "world_pixel": [
+        6048.0,
+        11052.0
+      ],
+      "region": "特伦托周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "维琴察",
+      "anchorCityId": "hre-ccd919ecbb35",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-31469",
+      "cell": 31469,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 13.39243345736378,
+      "lat": 48.65544394398621,
+      "world_pixel": [
+        7232.0,
+        8406.0
+      ],
+      "region": "帕绍周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "帕绍",
+      "anchorCityId": "hre-52814e9b28b7",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-35420",
+      "cell": 35420,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 6.017013683388758,
+      "lat": 47.284972406298635,
+      "world_pixel": [
+        2816.0,
+        9486.0
+      ],
+      "region": "贝桑松周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "贝桑松",
+      "anchorCityId": "hre-5661d4343447",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-32282",
+      "cell": 32282,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 14.363145465190186,
+      "lat": 48.39582143288111,
+      "world_pixel": [
+        7808.0,
+        8622.0
+      ],
+      "region": "林茨周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "林茨",
+      "anchorCityId": "hre-63ae57b5eee0",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-24163",
+      "cell": 24163,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 5.472965451079261,
+      "lat": 50.674293772080624,
+      "world_pixel": [
+        2752.0,
+        6462.0
+      ],
+      "region": "列日周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "列日",
+      "anchorCityId": "hre-775b342f540c",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-21296",
+      "cell": 21296,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 22.564865405936505,
+      "lat": 51.30121051969914,
+      "world_pixel": [
+        12256.0,
+        5652.0
+      ],
+      "region": "卢布林周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "卢布林",
+      "anchorCityId": "hre-7def041ebcce",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-10418",
+      "cell": 10418,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 20.402956668471102,
+      "lat": 54.7760661004496,
+      "world_pixel": [
+        10720.0,
+        2736.0
+      ],
+      "region": "柯尼斯堡周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "柯尼斯堡",
+      "anchorCityId": "hre-853405e76ca6",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-32166",
+      "cell": 32166,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 1.8198506086061592,
+      "lat": 47.956486382258774,
+      "world_pixel": [
+        384.0,
+        8622.0
+      ],
+      "region": "奥尔良周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "奥尔良",
+      "anchorCityId": "hre-8e6b29f8a244",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-36514",
+      "cell": 36514,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 15.520376056132369,
+      "lat": 47.08705722503841,
+      "world_pixel": [
+        8544.0,
+        9756.0
+      ],
+      "region": "格拉茨周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "格拉茨",
+      "anchorCityId": "hre-944eb0b23878",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-49951",
+      "cell": 49951,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 12.269739995986969,
+      "lat": 43.081120022339825,
+      "world_pixel": [
+        6592.0,
+        13374.0
+      ],
+      "region": "佩鲁贾周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "佩鲁贾",
+      "anchorCityId": "hre-a0d74ff858e2",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-34078",
+      "cell": 34078,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 12.99430399511721,
+      "lat": 47.86874901306011,
+      "world_pixel": [
+        7008.0,
+        9108.0
+      ],
+      "region": "萨尔茨堡周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "萨尔茨堡",
+      "anchorCityId": "hre-a71a316659f9",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-36878",
+      "cell": 36878,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 11.497925655758932,
+      "lat": 47.020848796755686,
+      "world_pixel": [
+        6112.0,
+        9864.0
+      ],
+      "region": "因斯布鲁克周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "因斯布鲁克",
+      "anchorCityId": "hre-bab8066a3bf2",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-28810",
+      "cell": 28810,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 8.367494386876338,
+      "lat": 49.3976249454067,
+      "world_pixel": [
+        4320.0,
+        7704.0
+      ],
+      "region": "施派尔周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "施派尔",
+      "anchorCityId": "hre-c9dc5746cd35",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-25741",
+      "cell": 25741,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 2.186155940442372,
+      "lat": 49.95366882489125,
+      "world_pixel": [
+        832.0,
+        6894.0
+      ],
+      "region": "亚眠周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "亚眠",
+      "anchorCityId": "hre-d6556c2fa016",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-38124",
+      "cell": 38124,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 15.696445661086262,
+      "lat": 46.59452554419579,
+      "world_pixel": [
+        8672.0,
+        10188.0
+      ],
+      "region": "马里博尔周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "马里博尔",
+      "anchorCityId": "hre-024162f00084",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-31914",
+      "cell": 31914,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 18.060848675675327,
+      "lat": 48.379011148351125,
+      "world_pixel": [
+        9984.0,
+        8514.0
+      ],
+      "region": "尼特拉周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "尼特拉",
+      "anchorCityId": "hre-02716cda13e7",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-37909",
+      "cell": 37909,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 14.179667359712337,
+      "lat": 46.696332789232606,
+      "world_pixel": [
+        7744.0,
+        10134.0
+      ],
+      "region": "菲拉赫周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "克拉根福",
+      "anchorCityId": "hre-63302af5dada",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-25313",
+      "cell": 25313,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 21.962762192525673,
+      "lat": 50.12513492923924,
+      "world_pixel": [
+        12064.0,
+        6732.0
+      ],
+      "region": "热舒夫周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "热舒夫",
+      "anchorCityId": "hre-05d4ca799afe",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-13193",
+      "cell": 13193,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 15.473354491928461,
+      "lat": 54.15177570463338,
+      "world_pixel": [
+        8224.0,
+        3492.0
+      ],
+      "region": "科尔贝格周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "科尔贝格",
+      "anchorCityId": "hre-09d42a3487e5",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-46737",
+      "cell": 46737,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 12.474320304989773,
+      "lat": 44.04811298933975,
+      "world_pixel": [
+        6720.0,
+        12510.0
+      ],
+      "region": "里米尼周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "里米尼",
+      "anchorCityId": "hre-0a8dba1e4287",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-32985",
+      "cell": 32985,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 3.466046031704412,
+      "lat": 47.8503188003208,
+      "world_pixel": [
+        1344.0,
+        8838.0
+      ],
+      "region": "欧塞尔周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "欧塞尔",
+      "anchorCityId": "hre-0d4d942dad8d",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-25387",
+      "cell": 25387,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 7.5534553045264925,
+      "lat": 50.40544599199012,
+      "world_pixel": [
+        3904.0,
+        6786.0
+      ],
+      "region": "科布伦茨周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "科布伦茨",
+      "anchorCityId": "hre-0ed127e973d7",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-29626",
+      "cell": 29626,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 9.708887038130555,
+      "lat": 49.188714530695904,
+      "world_pixel": [
+        5088.0,
+        7920.0
+      ],
+      "region": "施韦比施哈尔周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "施韦比施哈尔",
+      "anchorCityId": "hre-17184da08c14",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-15733",
+      "cell": 15733,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 6.541041603200495,
+      "lat": 53.2902759976532,
+      "world_pixel": [
+        3520.0,
+        4194.0
+      ],
+      "region": "格罗宁根周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "格罗宁根",
+      "anchorCityId": "hre-1da972c748a4",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-32940",
+      "cell": 32940,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 20.33048265164349,
+      "lat": 47.92700492740507,
+      "world_pixel": [
+        11360.0,
+        8784.0
+      ],
+      "region": "埃格尔周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "埃格尔",
+      "anchorCityId": "hre-28637a8f291d",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-46161",
+      "cell": 46161,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 15.229349504647676,
+      "lat": 44.18075103477732,
+      "world_pixel": [
+        8480.0,
+        12348.0
+      ],
+      "region": "扎达尔周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "扎达尔",
+      "anchorCityId": "hre-290368c0f7bd",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-40540",
+      "cell": 40540,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 16.057479720680504,
+      "lat": 45.851829679699605,
+      "world_pixel": [
+        8928.0,
+        10836.0
+      ],
+      "region": "萨格勒布周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "萨格勒布",
+      "anchorCityId": "hre-2fc6cec42f0e",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-31383",
+      "cell": 31383,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 4.0298234444971275,
+      "lat": 48.38170870458006,
+      "world_pixel": [
+        1728.0,
+        8406.0
+      ],
+      "region": "特鲁瓦周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "特鲁瓦",
+      "anchorCityId": "hre-30ba812101f1",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-40643",
+      "cell": 40643,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 5.889815575875119,
+      "lat": 45.69333275689685,
+      "world_pixel": [
+        2624.0,
+        10890.0
+      ],
+      "region": "尚贝里周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "尚贝里",
+      "anchorCityId": "hre-314761f50699",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-20654",
+      "cell": 20654,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 18.04259360107569,
+      "lat": 51.79913385048525,
+      "world_pixel": [
+        9728.0,
+        5490.0
+      ],
+      "region": "卡利什周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "卡利什",
+      "anchorCityId": "hre-3ea9b17fa750",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-39922",
+      "cell": 39922,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 14.46533602988605,
+      "lat": 46.08251880627935,
+      "world_pixel": [
+        7936.0,
+        10674.0
+      ],
+      "region": "卢布尔雅那周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "卢布尔雅那",
+      "anchorCityId": "hre-41c05e21b7a4",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-31892",
+      "cell": 31892,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 15.674236233951643,
+      "lat": 48.48241414312233,
+      "world_pixel": [
+        8576.0,
+        8514.0
+      ],
+      "region": "克雷姆斯周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "克雷姆斯",
+      "anchorCityId": "hre-437d8b460a76",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-12547",
+      "cell": 12547,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 10.116191744355923,
+      "lat": 54.367337149867716,
+      "world_pixel": [
+        5440.0,
+        3330.0
+      ],
+      "region": "基尔周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "基尔",
+      "anchorCityId": "hre-44e1a269fe21",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-26062",
+      "cell": 26062,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 15.753670170761737,
+      "lat": 50.246891748286934,
+      "world_pixel": [
+        8544.0,
+        6948.0
+      ],
+      "region": "赫拉德茨周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "赫拉德茨",
+      "anchorCityId": "hre-638dbd7ce69d",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-39555",
+      "cell": 39555,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 18.101407938260255,
+      "lat": 46.05926944954784,
+      "world_pixel": [
+        10176.0,
+        10566.0
+      ],
+      "region": "佩奇周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "佩奇",
+      "anchorCityId": "hre-6708e8142509",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-23991",
+      "cell": 23991,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 8.825967966476885,
+      "lat": 50.87328019419287,
+      "world_pixel": [
+        4640.0,
+        6408.0
+      ],
+      "region": "马尔堡周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "马尔堡",
+      "anchorCityId": "hre-681cf9f60b76",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-1354",
+      "cell": 1354,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 18.384410985459038,
+      "lat": 57.623788562711105,
+      "world_pixel": [
+        9472.0,
+        306.0
+      ],
+      "region": "维斯比周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "维斯比",
+      "anchorCityId": "hre-6c1dfde68166",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-12570",
+      "cell": 12570,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 12.957495909204797,
+      "lat": 54.37760643694229,
+      "world_pixel": [
+        6912.0,
+        3330.0
+      ],
+      "region": "施特拉尔松德周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "施特拉尔松德",
+      "anchorCityId": "hre-801469e72907",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-23040",
+      "cell": 23040,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 14.964666184673774,
+      "lat": 51.18324213262213,
+      "world_pixel": [
+        8064.0,
+        6138.0
+      ],
+      "region": "格尔利茨周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "格尔利茨",
+      "anchorCityId": "hre-812a0c6e5735",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-22389",
+      "cell": 22389,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 9.485678140849355,
+      "lat": 51.37626556596314,
+      "world_pixel": [
+        5024.0,
+        5976.0
+      ],
+      "region": "卡塞尔周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "卡塞尔",
+      "anchorCityId": "hre-8c6fa2a6e21f",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-24802",
+      "cell": 24802,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 9.638201242567785,
+      "lat": 50.64872114997777,
+      "world_pixel": [
+        5088.0,
+        6624.0
+      ],
+      "region": "富尔达周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "富尔达",
+      "anchorCityId": "hre-90eeb9db4c96",
+      "group": "中德与莱茵上游"
+    },
+    {
+      "id": "hre-farm-41121",
+      "cell": 41121,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 13.726877225237875,
+      "lat": 45.732572798071345,
+      "world_pixel": [
+        7488.0,
+        10998.0
+      ],
+      "region": "的里雅斯特周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "的里雅斯特",
+      "anchorCityId": "hre-9d1d81c0e9ef",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-33756",
+      "cell": 33756,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 21.564937818259352,
+      "lat": 47.582033755867435,
+      "world_pixel": [
+        12128.0,
+        9000.0
+      ],
+      "region": "德布勒森周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "德布勒森",
+      "anchorCityId": "hre-a94f0614b3e2",
+      "group": "巴伐利亚奥地利与匈牙利"
+    },
+    {
+      "id": "hre-farm-48153",
+      "cell": 48153,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 13.41166231230293,
+      "lat": 43.6159395302273,
+      "world_pixel": [
+        7328.0,
+        12888.0
+      ],
+      "region": "安科纳周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "安科纳",
+      "anchorCityId": "hre-ac52e32fb49a",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-23300",
+      "cell": 23300,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 21.751618786422718,
+      "lat": 50.75697760705357,
+      "world_pixel": [
+        11872.0,
+        6192.0
+      ],
+      "region": "桑多梅日周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "桑多梅日",
+      "anchorCityId": "hre-b57dd58c90ac",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-39611",
+      "cell": 39611,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 3.127157473361705,
+      "lat": 45.80426170260606,
+      "world_pixel": [
+        928.0,
+        10620.0
+      ],
+      "region": "克莱蒙周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "克莱蒙",
+      "anchorCityId": "hre-bcb18ce6291c",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-37640",
+      "cell": 37640,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 7.089044814154284,
+      "lat": 46.668109861952786,
+      "world_pixel": [
+        3424.0,
+        10080.0
+      ],
+      "region": "锡永周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "弗里堡",
+      "anchorCityId": "hre-75b0bf868e1c",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-42333",
+      "cell": 42333,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 14.328839408555911,
+      "lat": 45.356922818037766,
+      "world_pixel": [
+        7872.0,
+        11322.0
+      ],
+      "region": "里耶卡周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "里耶卡",
+      "anchorCityId": "hre-c64a62b6e280",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-26635",
+      "cell": 26635,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 12.30952867586485,
+      "lat": 50.12421723643668,
+      "world_pixel": [
+        6592.0,
+        7110.0
+      ],
+      "region": "海布周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "海布",
+      "anchorCityId": "hre-c6faa0e32986",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-18467",
+      "cell": 18467,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 21.01050125118755,
+      "lat": 52.2871319894694,
+      "world_pixel": [
+        11296.0,
+        4896.0
+      ],
+      "region": "华沙周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "华沙",
+      "anchorCityId": "hre-cd4e828a39a7",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-3501",
+      "cell": 3501,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 9.92412016218831,
+      "lat": 57.09041806735454,
+      "world_pixel": [
+        5408.0,
+        900.0
+      ],
+      "region": "奥尔堡周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "奥尔堡",
+      "anchorCityId": "hre-d21fe8940ce4",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-47488",
+      "cell": 47488,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 7.210067875119175,
+      "lat": 43.696030867621175,
+      "world_pixel": [
+        3328.0,
+        12726.0
+      ],
+      "region": "尼斯周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "尼斯",
+      "anchorCityId": "hre-d45defa77a26",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-17651",
+      "cell": 17651,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 19.64387712949484,
+      "lat": 52.62519631026631,
+      "world_pixel": [
+        10528.0,
+        4680.0
+      ],
+      "region": "普沃茨克周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "普沃茨克",
+      "anchorCityId": "hre-e0f09cdf4e89",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-30272",
+      "cell": 30272,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 14.392503507458187,
+      "lat": 49.003975258972645,
+      "world_pixel": [
+        7808.0,
+        8082.0
+      ],
+      "region": "布杰约维采周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "布杰约维采",
+      "anchorCityId": "hre-ed4b9958681e",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-1306",
+      "cell": 1306,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 11.966492044089513,
+      "lat": 57.76984678995942,
+      "world_pixel": [
+        6400.0,
+        306.0
+      ],
+      "region": "哥德堡周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "哥德堡",
+      "anchorCityId": "hre-1793e2bfef23",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-42014",
+      "cell": 42014,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 2.340645937405292,
+      "lat": 45.001741445829204,
+      "world_pixel": [
+        352.0,
+        11268.0
+      ],
+      "region": "欧里亚克周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "欧里亚克",
+      "anchorCityId": "hre-2477f3c37584",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-34983",
+      "cell": 34983,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 2.3048236830779087,
+      "lat": 47.14145667774226,
+      "world_pixel": [
+        576.0,
+        9378.0
+      ],
+      "region": "布尔日周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "布尔日",
+      "anchorCityId": "hre-26fe648bc53b",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-35593",
+      "cell": 35593,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 3.125651402461581,
+      "lat": 47.02756269389783,
+      "world_pixel": [
+        1056.0,
+        9540.0
+      ],
+      "region": "讷韦尔周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "讷韦尔",
+      "anchorCityId": "hre-352a944a522f",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-4555",
+      "cell": 4555,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 16.281009837613936,
+      "lat": 56.73674710686381,
+      "world_pixel": [
+        8512.0,
+        1170.0
+      ],
+      "region": "卡尔马周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "卡尔马",
+      "anchorCityId": "hre-390e74c94f56",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-10933",
+      "cell": 10933,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 9.345932036844728,
+      "lat": 54.839388223334524,
+      "world_pixel": [
+        5056.0,
+        2898.0
+      ],
+      "region": "弗伦斯堡周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "弗伦斯堡",
+      "anchorCityId": "hre-3bc523a9063e",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-13435",
+      "cell": 13435,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 20.41144210510774,
+      "lat": 53.8592543002416,
+      "world_pixel": [
+        10816.0,
+        3546.0
+      ],
+      "region": "奥尔什丁周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "奥尔什丁",
+      "anchorCityId": "hre-5b24b5fef24d",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-48047",
+      "cell": 48047,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 2.954319509222827,
+      "lat": 43.226632444021995,
+      "world_pixel": [
+        544.0,
+        12888.0
+      ],
+      "region": "纳博讷周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "纳博讷",
+      "anchorCityId": "hre-5ccc4e85b57d",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-51327",
+      "cell": 51327,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 9.300195835883027,
+      "lat": 42.622759256250255,
+      "world_pixel": [
+        4640.0,
+        13752.0
+      ],
+      "region": "巴斯蒂亚周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "巴斯蒂亚",
+      "anchorCityId": "hre-795819a9e399",
+      "group": "帝国意大利与亚得里亚海"
+    },
+    {
+      "id": "hre-farm-35654",
+      "cell": 35654,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 9.578786788267879,
+      "lat": 47.36013158395629,
+      "world_pixel": [
+        4960.0,
+        9540.0
+      ],
+      "region": "库尔周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "圣加仑",
+      "anchorCityId": "hre-17e88664f0c2",
+      "group": "瑞士勃艮第与法兰西周边"
+    },
+    {
+      "id": "hre-farm-9971",
+      "cell": 9971,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 14.798587329631424,
+      "lat": 55.139750980782004,
+      "world_pixel": [
+        7840.0,
+        2628.0
+      ],
+      "region": "伦讷博恩霍尔姆周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "伦讷博恩霍尔姆",
+      "anchorCityId": "hre-9ae32c9dc5d3",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-18944",
+      "cell": 18944,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 6.069356652252345,
+      "lat": 52.29287864301249,
+      "world_pixel": [
+        3200.0,
+        5058.0
+      ],
+      "region": "代芬特尔周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "代芬特尔",
+      "anchorCityId": "hre-a9c11d2ee308",
+      "group": "低地与莱茵下游"
+    },
+    {
+      "id": "hre-farm-3940",
+      "cell": 3940,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 14.791889495704766,
+      "lat": 56.956840922328965,
+      "world_pixel": [
+        7776.0,
+        1008.0
+      ],
+      "region": "韦克舍周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "韦克舍",
+      "anchorCityId": "hre-fa41ee299264",
+      "group": "北德与丹麦"
+    },
+    {
+      "id": "hre-farm-3204",
+      "cell": 3204,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 23.704655032743045,
+      "lat": 56.72476084043112,
+      "world_pixel": [
+        12128.0,
+        792.0
+      ],
+      "region": "波罗的海东北周边",
+      "reason": "regional-food-coverage",
+      "anchorCity": "柯尼斯堡",
+      "anchorCityId": "hre-853405e76ca6",
+      "group": "波希米亚与东部周边"
+    },
+    {
+      "id": "hre-farm-16492",
+      "cell": 16492,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 1.2274368896281693,
+      "lat": 52.69632712919653,
+      "world_pixel": [
+        640.0,
+        4410.0
+      ],
+      "region": "英格兰东部",
+      "reason": "regional-food-coverage",
+      "anchorCity": "布鲁日",
+      "anchorCityId": "hre-0f2d50d336df",
+      "group": "低地与莱茵下游"
+    }
+  ],
+  "coverage": [
+    {
+      "city": "威尼斯",
+      "cityId": "hre-397c38c3e629",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "布拉格",
+      "cityId": "hre-6ff35a64fa9d",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "米兰",
+      "cityId": "hre-775a2535646c",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "科隆",
+      "cityId": "hre-caa757973491",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "巴黎",
+      "cityId": "hre-e827cc5ce250",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "热那亚",
+      "cityId": "hre-0c2da3d7ddba",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "布鲁日",
+      "cityId": "hre-0f2d50d336df",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "佛罗伦萨",
+      "cityId": "hre-3abf3064f9e3",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "维也纳",
+      "cityId": "hre-42ca490e6e25",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "根特",
+      "cityId": "hre-505341aa41b9",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "纽伦堡",
+      "cityId": "hre-9e51ba6e9dde",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "鲁昂",
+      "cityId": "hre-2c0496fee015",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "布鲁塞尔",
+      "cityId": "hre-9aebcea30a5b",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "奥格斯堡",
+      "cityId": "hre-9f97ae764a4f",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "布达",
+      "cityId": "hre-a3e6ed983a3c",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "斯特拉斯堡",
+      "cityId": "hre-a6b6185d18c0",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "博洛尼亚",
+      "cityId": "hre-b47171ae6145",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "雷根斯堡",
+      "cityId": "hre-c21768d21ffa",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "哥本哈根",
+      "cityId": "hre-c35905b5c2de",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "吕贝克",
+      "cityId": "hre-d7f43cebda1f",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "法兰克福",
+      "cityId": "hre-dfab06fbd6ea",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "美因茨",
+      "cityId": "hre-e77848c27316",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "克拉科夫",
+      "cityId": "hre-f4cf512107f9",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "里昂",
+      "cityId": "hre-ff3a249091f0",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "苏黎世",
+      "cityId": "hre-0a801d6d507c",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "弗罗茨瓦夫",
+      "cityId": "hre-0ab3c4c50f95",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "维罗纳",
+      "cityId": "hre-104bd913a524",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "斯图加特",
+      "cityId": "hre-115ee15b84a1",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "都灵",
+      "cityId": "hre-25c029307060",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "梅斯",
+      "cityId": "hre-27e36432552c",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "巴塞尔",
+      "cityId": "hre-34e7a03d7a7b",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "莱比锡",
+      "cityId": "hre-3dc782d8153a",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "乌得勒支",
+      "cityId": "hre-4b44549b5f2d",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "兰斯",
+      "cityId": "hre-5306b3093b58",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "里尔",
+      "cityId": "hre-588b67bb443b",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "费拉拉",
+      "cityId": "hre-623e35ce7adb",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "锡耶纳",
+      "cityId": "hre-6b6da41cd31f",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "马格德堡",
+      "cityId": "hre-79e888770bb2",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "斯德丁",
+      "cityId": "hre-7a8738150054",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "特里尔",
+      "cityId": "hre-7cc45355aad0",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "汉堡",
+      "cityId": "hre-7cfabe63ded2",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "安特卫普",
+      "cityId": "hre-8c4a85802d35",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "格但斯克",
+      "cityId": "hre-927eed91e4dc",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "比萨",
+      "cityId": "hre-974094afc429",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "慕尼黑",
+      "cityId": "hre-9b3d6fbe8833",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "阿维尼翁",
+      "cityId": "hre-a312056f4b9f",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "日内瓦",
+      "cityId": "hre-ba7e3396e3c3",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "马赛",
+      "cityId": "hre-c04c3b4a8763",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "布尔诺",
+      "cityId": "hre-caead76419b8",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "帕维亚",
+      "cityId": "hre-cd085ab6e329",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "帕多瓦",
+      "cityId": "hre-d14c8f09bb2e",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "波兹南",
+      "cityId": "hre-ef5d104cd455",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "克雷莫纳",
+      "cityId": "hre-ef70434fe2c3",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "贝尔格莱德",
+      "cityId": "hre-f12445c1a7dd",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "康斯坦茨",
+      "cityId": "hre-0679cb11e61a",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "帕尔马",
+      "cityId": "hre-111d9f109dee",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "伯尔尼",
+      "cityId": "hre-199154443bef",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "第戎",
+      "cityId": "hre-1bdae8666437",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "沃尔姆斯",
+      "cityId": "hre-1d5125cfeee4",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "奥洛穆茨",
+      "cityId": "hre-23ed944a8199",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "托伦",
+      "cityId": "hre-244f469aed47",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "明斯特",
+      "cityId": "hre-307b6d213fd7",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "不来梅",
+      "cityId": "hre-3571efdbc083",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "德累斯顿",
+      "cityId": "hre-3ede18d5fcf2",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "阿亨",
+      "cityId": "hre-40a4bde1aa03",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "南锡",
+      "cityId": "hre-44a54185bf14",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "特伦托",
+      "cityId": "hre-45787def9e3d",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "帕绍",
+      "cityId": "hre-52814e9b28b7",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "布雷西亚",
+      "cityId": "hre-55261b57d586",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "图尔奈",
+      "cityId": "hre-55e0f4b93222",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "贝桑松",
+      "cityId": "hre-5661d4343447",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "莱顿",
+      "cityId": "hre-58509204e307",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "林茨",
+      "cityId": "hre-63ae57b5eee0",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "阿拉斯",
+      "cityId": "hre-70caef63cc93",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "列日",
+      "cityId": "hre-775b342f540c",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "卢布林",
+      "cityId": "hre-7def041ebcce",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "柯尼斯堡",
+      "cityId": "hre-853405e76ca6",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "奥尔良",
+      "cityId": "hre-8e6b29f8a244",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "格拉茨",
+      "cityId": "hre-944eb0b23878",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "兰茨胡特",
+      "cityId": "hre-94e9eb3bb612",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "卢卡",
+      "cityId": "hre-9e8d05151b41",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "多特蒙德",
+      "cityId": "hre-9f191934df41",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "佩鲁贾",
+      "cityId": "hre-a0d74ff858e2",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "萨尔茨堡",
+      "cityId": "hre-a71a316659f9",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "鲁汶",
+      "cityId": "hre-a95495eadf80",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "梅赫伦",
+      "cityId": "hre-ad40faf6f8f2",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "维尔茨堡",
+      "cityId": "hre-b14ba2562fc0",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "卢森堡",
+      "cityId": "hre-b501a21c8009",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "因斯布鲁克",
+      "cityId": "hre-bab8066a3bf2",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "曼托瓦",
+      "cityId": "hre-bafb2290ba2c",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "埃尔福特",
+      "cityId": "hre-c371bc2f548c",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "皮亚琴察",
+      "cityId": "hre-c92072eeb67b",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "布拉迪斯拉发",
+      "cityId": "hre-c993a73fb10c",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "施派尔",
+      "cityId": "hre-c9dc5746cd35",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "汉诺威",
+      "cityId": "hre-cae0371b4e1d",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "维琴察",
+      "cityId": "hre-ccd919ecbb35",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "班贝格",
+      "cityId": "hre-cec279141b0e",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "乌尔姆",
+      "cityId": "hre-d2e24980e158",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "亚眠",
+      "cityId": "hre-d6556c2fa016",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "哈勒姆",
+      "cityId": "hre-ddee29311df8",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "不伦瑞克",
+      "cityId": "hre-e035d996e367",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "洛桑",
+      "cityId": "hre-e3ada83e2fca",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "波恩",
+      "cityId": "hre-e878e0cdc29e",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "海牙",
+      "cityId": "hre-ecdc668629a1",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "阿雷佐",
+      "cityId": "hre-02305068d83e",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "马里博尔",
+      "cityId": "hre-024162f00084",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "尼特拉",
+      "cityId": "hre-02716cda13e7",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "菲拉赫",
+      "cityId": "hre-03939d877cc1",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "热舒夫",
+      "cityId": "hre-05d4ca799afe",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "莱格尼察",
+      "cityId": "hre-087b96ca82af",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "科尔贝格",
+      "cityId": "hre-09d42a3487e5",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "埃尔布隆格",
+      "cityId": "hre-09e72687e1d1",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "里米尼",
+      "cityId": "hre-0a8dba1e4287",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "塞克什白堡",
+      "cityId": "hre-0ccc0ac239c0",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "欧塞尔",
+      "cityId": "hre-0d4d942dad8d",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "科布伦茨",
+      "cityId": "hre-0ed127e973d7",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "斯海尔托亨博斯",
+      "cityId": "hre-0f597c8d9270",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "施韦比施哈尔",
+      "cityId": "hre-17184da08c14",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "圣加仑",
+      "cityId": "hre-17e88664f0c2",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "博尔扎诺",
+      "cityId": "hre-18e18ef17401",
+      "distanceHexes": 9,
+      "covered": false
+    },
+    {
+      "city": "格罗宁根",
+      "cityId": "hre-1da972c748a4",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "希尔德斯海姆",
+      "cityId": "hre-20e52bb82ae0",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "弗赖辛",
+      "cityId": "hre-274cac635a25",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "埃格尔",
+      "cityId": "hre-28637a8f291d",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "扎达尔",
+      "cityId": "hre-290368c0f7bd",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "代尔夫特",
+      "cityId": "hre-2e47fc18d8d0",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "萨格勒布",
+      "cityId": "hre-2fc6cec42f0e",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "奥帕瓦",
+      "cityId": "hre-3083ccf67be3",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "特鲁瓦",
+      "cityId": "hre-30ba812101f1",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "尚贝里",
+      "cityId": "hre-314761f50699",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "奈梅亨",
+      "cityId": "hre-351ea241c2a1",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "阿尔勒",
+      "cityId": "hre-37b94ac9bc25",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "卡利什",
+      "cityId": "hre-3ea9b17fa750",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "罗斯托克",
+      "cityId": "hre-405c20c7e4f5",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "奥斯纳布吕克",
+      "cityId": "hre-40b5f032bde4",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "卢布尔雅那",
+      "cityId": "hre-41c05e21b7a4",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "克雷姆斯",
+      "cityId": "hre-437d8b460a76",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "基尔",
+      "cityId": "hre-44e1a269fe21",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "维也纳新城",
+      "cityId": "hre-4535dd344877",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "阿尔巴",
+      "cityId": "hre-46579456e238",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "多德雷赫特",
+      "cityId": "hre-46dad70ea144",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "卢塞恩",
+      "cityId": "hre-4799cdc2ffbf",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "那慕尔",
+      "cityId": "hre-4a0e0330102a",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "布里克森",
+      "cityId": "hre-4de88066eef4",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "布雷达",
+      "cityId": "hre-55dc2a5a619f",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "拉文纳",
+      "cityId": "hre-560a74d9b91d",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "伊普尔",
+      "cityId": "hre-5881b0e892ce",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "诺瓦拉",
+      "cityId": "hre-6127a40b87c2",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "克拉根福",
+      "cityId": "hre-63302af5dada",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "赫拉德茨",
+      "cityId": "hre-638dbd7ce69d",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "杜伊斯堡",
+      "cityId": "hre-64f5ae2eb955",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "佩奇",
+      "cityId": "hre-6708e8142509",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "马尔堡",
+      "cityId": "hre-681cf9f60b76",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "维斯比",
+      "cityId": "hre-6c1dfde68166",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "维滕贝格",
+      "cityId": "hre-7058a828d2c6",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "弗赖堡",
+      "cityId": "hre-72072078b101",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "弗里堡",
+      "cityId": "hre-75b0bf868e1c",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "杰尔",
+      "cityId": "hre-75c82d76b3ec",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "阿斯蒂",
+      "cityId": "hre-767877be73ff",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "塔博尔",
+      "cityId": "hre-77473169c911",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "埃斯泰尔戈姆",
+      "cityId": "hre-78c17cdc9d7b",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "摩德纳",
+      "cityId": "hre-7dd36def8f55",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "施特拉尔松德",
+      "cityId": "hre-801469e72907",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "肖普朗",
+      "cityId": "hre-81016af57719",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "格尔利茨",
+      "cityId": "hre-812a0c6e5735",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "塞格德",
+      "cityId": "hre-834674910ac7",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "科莫",
+      "cityId": "hre-889e00037f71",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "艾森纳赫",
+      "cityId": "hre-8b2daf85a8b9",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "维斯马",
+      "cityId": "hre-8b3727eb72c7",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "格勒诺布尔",
+      "cityId": "hre-8c39a225103d",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "卡塞尔",
+      "cityId": "hre-8c6fa2a6e21f",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "富尔达",
+      "cityId": "hre-90eeb9db4c96",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "多勒",
+      "cityId": "hre-92eb79db5c00",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "米德尔堡",
+      "cityId": "hre-965e62dac0db",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "帕德博恩",
+      "cityId": "hre-9a80f035f329",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "罗斯基勒",
+      "cityId": "hre-9a8219216510",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "马斯特里赫特",
+      "cityId": "hre-9afb5e574e7e",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "吕讷堡",
+      "cityId": "hre-9b81f0162839",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "贝加莫",
+      "cityId": "hre-9be9af81522e",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "的里雅斯特",
+      "cityId": "hre-9d1d81c0e9ef",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "布雷根茨",
+      "cityId": "hre-9e09305b41a7",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "迈森",
+      "cityId": "hre-a0f122795b19",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "沙特尔",
+      "cityId": "hre-a36ede9b95d9",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "图宾根",
+      "cityId": "hre-a76426f16955",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "因戈尔施塔特",
+      "cityId": "hre-a941d09a1305",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "德布勒森",
+      "cityId": "hre-a94f0614b3e2",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "安科纳",
+      "cityId": "hre-ac52e32fb49a",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "雷焦艾米利亚",
+      "cityId": "hre-acc827c0336a",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "欧登塞",
+      "cityId": "hre-adab933694e6",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "柏林",
+      "cityId": "hre-afad73346281",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "维埃纳",
+      "cityId": "hre-afd7e8c22184",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "桑多梅日",
+      "cityId": "hre-b57dd58c90ac",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "乌迪内",
+      "cityId": "hre-b7254b727889",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "奥得河畔法兰克福",
+      "cityId": "hre-b862da356899",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "克莱蒙",
+      "cityId": "hre-bcb18ce6291c",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "海尔布隆",
+      "cityId": "hre-c3cdacf0e22c",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "锡永",
+      "cityId": "hre-c5589526ebd9",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "里耶卡",
+      "cityId": "hre-c64a62b6e280",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "海布",
+      "cityId": "hre-c6faa0e32986",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "华沙",
+      "cityId": "hre-cd4e828a39a7",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "艾克斯",
+      "cityId": "hre-d14afd7cebd1",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "奥尔堡",
+      "cityId": "hre-d21fe8940ce4",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "凡尔登",
+      "cityId": "hre-d2b2a20da857",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "尼斯",
+      "cityId": "hre-d45defa77a26",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "亚历山德里亚",
+      "cityId": "hre-da948ad4fc2f",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "瑙姆堡",
+      "cityId": "hre-ddd839b21e36",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "特雷维索",
+      "cityId": "hre-e0da1a161fda",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "普沃茨克",
+      "cityId": "hre-e0f09cdf4e89",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "利托梅日采",
+      "cityId": "hre-e22f6ab54fbe",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "维堡",
+      "cityId": "hre-e34fb6d642e7",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "奥波莱",
+      "cityId": "hre-e3ae859624e9",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "韦尔切利",
+      "cityId": "hre-e5abbe9bed9e",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "科尔马",
+      "cityId": "hre-ec02a2282b72",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "布杰约维采",
+      "cityId": "hre-ed4b9958681e",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "阿姆斯特丹",
+      "cityId": "hre-ee4d50440549",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "隆德",
+      "cityId": "hre-ee629d628d06",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "明登",
+      "cityId": "hre-f0637698896e",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "施泰尔",
+      "cityId": "hre-f39a8d826bb8",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "萨沃纳",
+      "cityId": "hre-f7f7447b9cb6",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "阿奎莱亚",
+      "cityId": "hre-13d009e2ef5a",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "哥德堡",
+      "cityId": "hre-1793e2bfef23",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "里伯",
+      "cityId": "hre-20df8d1b017b",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "欧里亚克",
+      "cityId": "hre-2477f3c37584",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "格涅兹诺",
+      "cityId": "hre-253074920124",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "巴登",
+      "cityId": "hre-26906036176a",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "布尔日",
+      "cityId": "hre-26fe648bc53b",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "梅尔克",
+      "cityId": "hre-2ab2967436fa",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "罗滕堡",
+      "cityId": "hre-2c57c9dd221f",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "讷韦尔",
+      "cityId": "hre-352a944a522f",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "卡尔马",
+      "cityId": "hre-390e74c94f56",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "弗伦斯堡",
+      "cityId": "hre-3bc523a9063e",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "阿纳姆",
+      "cityId": "hre-3c5eb8faaa15",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "比尔森",
+      "cityId": "hre-3cf0677c301d",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "吕伐登",
+      "cityId": "hre-3d775be64b96",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "勃兰登堡",
+      "cityId": "hre-3dfc6114b04e",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "奥胡斯",
+      "cityId": "hre-40662d08548c",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "奎德林堡",
+      "cityId": "hre-44f5f3af6698",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "代特莫尔德",
+      "cityId": "hre-45638e40ef6c",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "赫尔辛堡",
+      "cityId": "hre-469ba21df86d",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "普拉",
+      "cityId": "hre-48640634df8c",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "伊夫雷亚",
+      "cityId": "hre-5b2097d86a07",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "奥尔什丁",
+      "cityId": "hre-5b24b5fef24d",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "纳博讷",
+      "cityId": "hre-5ccc4e85b57d",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "兹诺伊莫",
+      "cityId": "hre-5ecf450b59c7",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "波雷奇",
+      "cityId": "hre-60adc0bb7ef3",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "什未林",
+      "cityId": "hre-6bbcc623102d",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "巴斯蒂亚",
+      "cityId": "hre-795819a9e399",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "石勒苏益格",
+      "cityId": "hre-84de5a2995d4",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "班亚卢卡",
+      "cityId": "hre-89c1206e78c5",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "奥斯塔",
+      "cityId": "hre-8ac3b4c1abdc",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "库尔",
+      "cityId": "hre-8faa07e87cb8",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "魏玛",
+      "cityId": "hre-973698242c1e",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "克莱沃",
+      "cityId": "hre-979ab26625fc",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "斯波莱托",
+      "cityId": "hre-999d70c87c11",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "伦讷博恩霍尔姆",
+      "cityId": "hre-9ae32c9dc5d3",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "耶拿",
+      "cityId": "hre-a01ab02b7927",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "代芬特尔",
+      "cityId": "hre-a9c11d2ee308",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "弗里茨拉尔",
+      "cityId": "hre-a9fbd3ad822d",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "马尔默",
+      "cityId": "hre-b7cfc13e87c8",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "兹沃勒",
+      "cityId": "hre-c2bbe43c3fe6",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "克桑滕",
+      "cityId": "hre-c766458243ed",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "格赖夫斯瓦尔德",
+      "cityId": "hre-cc2bf8aa2498",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "博韦",
+      "cityId": "hre-cc667ed17fa5",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "费尔登",
+      "cityId": "hre-dc83d8c5f251",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "韦克舍",
+      "cityId": "hre-fa41ee299264",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "约灵",
+      "cityId": "hre-fbb027f160cc",
+      "distanceHexes": 6,
+      "covered": true
+    }
+  ],
+  "groups": {
+    "中德与莱茵上游": 43,
+    "低地与莱茵下游": 23,
+    "北德与丹麦": 44,
+    "巴伐利亚奥地利与匈牙利": 42,
+    "巴尔干周边": 4,
+    "帝国意大利与亚得里亚海": 39,
+    "波希米亚与东部周边": 40,
+    "波罗的海东北周边": 1,
+    "瑞士勃艮第与法兰西周边": 47,
+    "英格兰东部": 1
+  },
+  "exceptions": [
+    {
+      "city": "博尔扎诺",
+      "cityId": "hre-18e18ef17401",
+      "distanceHexes": 9,
+      "covered": false
+    }
+  ],
+  "corridorExclusion": false
+}

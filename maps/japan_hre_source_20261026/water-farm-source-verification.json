@@ -1,0 +1,30 @@
+{
+  "checks": 12200,
+  "errors": 0,
+  "maps": {
+    "japan": {
+      "farms": 153,
+      "farmLevels": {
+        "1": 43,
+        "2": 37,
+        "3": 73
+      },
+      "mouths": 144,
+      "mouthSamples": 7091,
+      "ports": 35,
+      "riverPropertyCellsUpdated": 77
+    },
+    "hre": {
+      "farms": 262,
+      "farmLevels": {
+        "1": 88,
+        "2": 51,
+        "3": 123
+      },
+      "mouths": 80,
+      "mouthSamples": 3644,
+      "ports": 37,
+      "riverPropertyCellsUpdated": 0
+    }
+  }
+}

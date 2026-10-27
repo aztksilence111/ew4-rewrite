@@ -1,0 +1,602 @@
+{
+  "japan": {
+    "ports": 35,
+    "moved": 0,
+    "styles": {
+      "4": 9,
+      "2": 8,
+      "1": 8,
+      "3": 10
+    },
+    "records": [
+      {
+        "name": "小木港",
+        "oldCell": 30593,
+        "cell": 30593,
+        "style": 4,
+        "gap": 15.624,
+        "riverBerth": false
+      },
+      {
+        "name": "函馆港",
+        "oldCell": 16217,
+        "cell": 16217,
+        "style": 2,
+        "gap": 17.861,
+        "riverBerth": false
+      },
+      {
+        "name": "石卷港",
+        "oldCell": 31431,
+        "cell": 31431,
+        "style": 1,
+        "gap": 10.996,
+        "riverBerth": false
+      },
+      {
+        "name": "堺港",
+        "oldCell": 41496,
+        "cell": 41496,
+        "style": 2,
+        "gap": 23.982,
+        "riverBerth": false
+      },
+      {
+        "name": "直江津港",
+        "oldCell": 33261,
+        "cell": 33261,
+        "style": 4,
+        "gap": 36.757,
+        "riverBerth": false
+      },
+      {
+        "name": "敦贺港",
+        "oldCell": 37503,
+        "cell": 37503,
+        "style": 3,
+        "gap": 9.506,
+        "riverBerth": false
+      },
+      {
+        "name": "青森港",
+        "oldCell": 20219,
+        "cell": 20219,
+        "style": 4,
+        "gap": 21.359,
+        "riverBerth": false
+      },
+      {
+        "name": "浦户港",
+        "oldCell": 44676,
+        "cell": 44676,
+        "style": 1,
+        "gap": 9.357,
+        "riverBerth": false
+      },
+      {
+        "name": "浦贺港",
+        "oldCell": 43416,
+        "cell": 43416,
+        "style": 3,
+        "gap": 21.078,
+        "riverBerth": false
+      },
+      {
+        "name": "钏路港",
+        "oldCell": 14660,
+        "cell": 14660,
+        "style": 1,
+        "gap": 27.53,
+        "riverBerth": false
+      },
+      {
+        "name": "清水港",
+        "oldCell": 43135,
+        "cell": 43135,
+        "style": 3,
+        "gap": 26.733,
+        "riverBerth": false
+      },
+      {
+        "name": "七尾港",
+        "oldCell": 32980,
+        "cell": 32980,
+        "style": 3,
+        "gap": 34.032,
+        "riverBerth": false
+      },
+      {
+        "name": "长崎港",
+        "oldCell": 44364,
+        "cell": 44364,
+        "style": 2,
+        "gap": 9.493,
+        "riverBerth": false
+      },
+      {
+        "name": "严原港",
+        "oldCell": 37688,
+        "cell": 37688,
+        "style": 1,
+        "gap": 6.52,
+        "riverBerth": false
+      },
+      {
+        "name": "江户湾港",
+        "oldCell": 41817,
+        "cell": 41817,
+        "style": 1,
+        "gap": 29.769,
+        "riverBerth": false
+      },
+      {
+        "name": "八户港",
+        "oldCell": 22096,
+        "cell": 22096,
+        "style": 3,
+        "gap": 26.022,
+        "riverBerth": false
+      },
+      {
+        "name": "网走港",
+        "oldCell": 9858,
+        "cell": 9858,
+        "style": 3,
+        "gap": 29.088,
+        "riverBerth": false
+      },
+      {
+        "name": "室兰港",
+        "oldCell": 14086,
+        "cell": 14086,
+        "style": 1,
+        "gap": 9.004,
+        "riverBerth": false
+      },
+      {
+        "name": "酒田港",
+        "oldCell": 27411,
+        "cell": 27411,
+        "style": 2,
+        "gap": 7.195,
+        "riverBerth": false
+      },
+      {
+        "name": "尾道港",
+        "oldCell": 40671,
+        "cell": 40671,
+        "style": 1,
+        "gap": 12.751,
+        "riverBerth": false
+      },
+      {
+        "name": "宇和岛港",
+        "oldCell": 44662,
+        "cell": 44662,
+        "style": 2,
+        "gap": 19.407,
+        "riverBerth": false
+      },
+      {
+        "name": "小樽港",
+        "oldCell": 10352,
+        "cell": 10352,
+        "style": 4,
+        "gap": 6.69,
+        "riverBerth": false
+      },
+      {
+        "name": "境港",
+        "oldCell": 35335,
+        "cell": 35335,
+        "style": 4,
+        "gap": 27.249,
+        "riverBerth": false
+      },
+      {
+        "name": "博多港",
+        "oldCell": 40901,
+        "cell": 40901,
+        "style": 2,
+        "gap": 17.576,
+        "riverBerth": false
+      },
+      {
+        "name": "赤间关港",
+        "oldCell": 40375,
+        "cell": 40375,
+        "style": 4,
+        "gap": 6.647,
+        "riverBerth": false
+      },
+      {
+        "name": "鹿儿岛港",
+        "oldCell": 49975,
+        "cell": 49975,
+        "style": 2,
+        "gap": 12.119,
+        "riverBerth": false
+      },
+      {
+        "name": "广岛湾港",
+        "oldCell": 40394,
+        "cell": 40394,
+        "style": 2,
+        "gap": 36.018,
+        "riverBerth": false
+      },
+      {
+        "name": "兵库津",
+        "oldCell": 41229,
+        "cell": 41229,
+        "style": 1,
+        "gap": 9.28,
+        "riverBerth": false
+      },
+      {
+        "name": "伊势大凑港",
+        "oldCell": 43381,
+        "cell": 43381,
+        "style": 4,
+        "gap": 21.483,
+        "riverBerth": false
+      },
+      {
+        "name": "高松港",
+        "oldCell": 41213,
+        "cell": 41213,
+        "style": 3,
+        "gap": 31.383,
+        "riverBerth": false
+      },
+      {
+        "name": "舞鹤港",
+        "oldCell": 37494,
+        "cell": 37494,
+        "style": 3,
+        "gap": 21.925,
+        "riverBerth": false
+      },
+      {
+        "name": "稚内港",
+        "oldCell": 1556,
+        "cell": 1556,
+        "style": 3,
+        "gap": 7.816,
+        "riverBerth": false
+      },
+      {
+        "name": "新潟港",
+        "oldCell": 30869,
+        "cell": 30869,
+        "style": 4,
+        "gap": 32.188,
+        "riverBerth": false
+      },
+      {
+        "name": "府内港",
+        "oldCell": 43584,
+        "cell": 43584,
+        "style": 3,
+        "gap": 24.853,
+        "riverBerth": false
+      },
+      {
+        "name": "馆山港",
+        "oldCell": 44217,
+        "cell": 44217,
+        "style": 4,
+        "gap": 32.155,
+        "riverBerth": false
+      }
+    ]
+  },
+  "hre": {
+    "ports": 37,
+    "moved": 1,
+    "styles": {
+      "1": 10,
+      "3": 7,
+      "4": 14,
+      "2": 6
+    },
+    "records": [
+      {
+        "name": "埃姆登港",
+        "oldCell": 15738,
+        "cell": 15738,
+        "style": 1,
+        "gap": 18.702,
+        "riverBerth": false
+      },
+      {
+        "name": "马尔默港",
+        "oldCell": 8148,
+        "cell": 8148,
+        "style": 1,
+        "gap": 12.978,
+        "riverBerth": false
+      },
+      {
+        "name": "萨沃纳港",
+        "oldCell": 45692,
+        "cell": 45692,
+        "style": 1,
+        "gap": 24.489,
+        "riverBerth": false
+      },
+      {
+        "name": "泰瑟尔锚地",
+        "oldCell": 16321,
+        "cell": 16321,
+        "style": 3,
+        "gap": 8.478,
+        "riverBerth": false
+      },
+      {
+        "name": "加来港",
+        "oldCell": 22321,
+        "cell": 22321,
+        "style": 4,
+        "gap": 23.413,
+        "riverBerth": false
+      },
+      {
+        "name": "罗讷河口泊地",
+        "oldCell": 48267,
+        "cell": 48267,
+        "style": 1,
+        "gap": 31.077,
+        "riverBerth": false
+      },
+      {
+        "name": "易北河口",
+        "oldCell": 13942,
+        "cell": 13942,
+        "style": 3,
+        "gap": 32.497,
+        "riverBerth": false
+      },
+      {
+        "name": "拉文纳外港",
+        "oldCell": 45328,
+        "cell": 45328,
+        "style": 3,
+        "gap": 24.14,
+        "riverBerth": false
+      },
+      {
+        "name": "比萨外港",
+        "oldCell": 48121,
+        "cell": 48121,
+        "style": 2,
+        "gap": 30.682,
+        "riverBerth": false
+      },
+      {
+        "name": "普拉港",
+        "oldCell": 43734,
+        "cell": 43734,
+        "style": 4,
+        "gap": 16.464,
+        "riverBerth": false
+      },
+      {
+        "name": "维斯瓦潟湖泊地",
+        "oldCell": 12019,
+        "cell": 12019,
+        "style": 1,
+        "gap": 21.736,
+        "riverBerth": false
+      },
+      {
+        "name": "施特拉尔松德港",
+        "oldCell": 12772,
+        "cell": 12772,
+        "style": 1,
+        "gap": 7.844,
+        "riverBerth": false
+      },
+      {
+        "name": "格但斯克湾港",
+        "oldCell": 11812,
+        "cell": 11812,
+        "style": 4,
+        "gap": 32.536,
+        "riverBerth": false
+      },
+      {
+        "name": "马斯河口",
+        "oldCell": 19730,
+        "cell": 19730,
+        "style": 2,
+        "gap": 18.807,
+        "riverBerth": false
+      },
+      {
+        "name": "多克姆外海",
+        "oldCell": 15126,
+        "cell": 15126,
+        "style": 2,
+        "gap": 17.574,
+        "riverBerth": false
+      },
+      {
+        "name": "马赛港",
+        "oldCell": 48473,
+        "cell": 48473,
+        "style": 2,
+        "gap": 22.493,
+        "riverBerth": false
+      },
+      {
+        "name": "瓦尔讷明德港",
+        "oldCell": 13165,
+        "cell": 13165,
+        "style": 4,
+        "gap": 18.833,
+        "riverBerth": false
+      },
+      {
+        "name": "泽兰外港",
+        "oldCell": 21332,
+        "cell": 21332,
+        "style": 4,
+        "gap": 11.19,
+        "riverBerth": false
+      },
+      {
+        "name": "哥本哈根港",
+        "oldCell": 8346,
+        "cell": 8346,
+        "style": 3,
+        "gap": 12.907,
+        "riverBerth": false
+      },
+      {
+        "name": "奥胡斯港",
+        "oldCell": 6519,
+        "cell": 6519,
+        "style": 1,
+        "gap": 11.733,
+        "riverBerth": false
+      },
+      {
+        "name": "威悉河口",
+        "oldCell": 14945,
+        "cell": 14945,
+        "style": 4,
+        "gap": 34.617,
+        "riverBerth": false
+      },
+      {
+        "name": "的里雅斯特港",
+        "oldCell": 41723,
+        "cell": 41723,
+        "style": 4,
+        "gap": 6.336,
+        "riverBerth": false
+      },
+      {
+        "name": "热那亚港",
+        "oldCell": 45496,
+        "cell": 45496,
+        "style": 1,
+        "gap": 24.781,
+        "riverBerth": false
+      },
+      {
+        "name": "须德海坎彭港",
+        "oldCell": 18539,
+        "cell": 18539,
+        "style": 1,
+        "gap": 10.392,
+        "riverBerth": false
+      },
+      {
+        "name": "伦讷港",
+        "oldCell": 9970,
+        "cell": 9970,
+        "style": 2,
+        "gap": 13.301,
+        "riverBerth": false
+      },
+      {
+        "name": "安科纳港",
+        "oldCell": 48155,
+        "cell": 48155,
+        "style": 3,
+        "gap": 36.524,
+        "riverBerth": false
+      },
+      {
+        "name": "柯尼斯堡外港",
+        "oldCell": 10816,
+        "cell": 10816,
+        "style": 2,
+        "gap": 7.765,
+        "riverBerth": false
+      },
+      {
+        "name": "安特卫普河口泊地",
+        "oldCell": 21540,
+        "cell": 21943,
+        "style": 4,
+        "gap": 0.0,
+        "riverBerth": true
+      },
+      {
+        "name": "尼斯港",
+        "oldCell": 47689,
+        "cell": 47689,
+        "style": 1,
+        "gap": 31.079,
+        "riverBerth": false
+      },
+      {
+        "name": "威尼斯潟湖港",
+        "oldCell": 42314,
+        "cell": 42314,
+        "style": 3,
+        "gap": 20.974,
+        "riverBerth": false
+      },
+      {
+        "name": "迪耶普港",
+        "oldCell": 25329,
+        "cell": 25329,
+        "style": 4,
+        "gap": 32.772,
+        "riverBerth": false
+      },
+      {
+        "name": "泽布吕赫近海",
+        "oldCell": 21330,
+        "cell": 21330,
+        "style": 4,
+        "gap": 36.349,
+        "riverBerth": false
+      },
+      {
+        "name": "斯卡恩锚地",
+        "oldCell": 1697,
+        "cell": 1697,
+        "style": 3,
+        "gap": 9.578,
+        "riverBerth": false
+      },
+      {
+        "name": "基尔港",
+        "oldCell": 12146,
+        "cell": 12146,
+        "style": 4,
+        "gap": 30.206,
+        "riverBerth": false
+      },
+      {
+        "name": "扎达尔港",
+        "oldCell": 46362,
+        "cell": 46362,
+        "style": 4,
+        "gap": 18.086,
+        "riverBerth": false
+      },
+      {
+        "name": "特拉沃明德港",
+        "oldCell": 13759,
+        "cell": 13759,
+        "style": 4,
+        "gap": 12.552,
+        "riverBerth": false
+      },
+      {
+        "name": "斯维讷明德泊地",
+        "oldCell": 13988,
+        "cell": 13988,
+        "style": 4,
+        "gap": 14.862,
+        "riverBerth": false
+      }
+    ]
+  }
+}

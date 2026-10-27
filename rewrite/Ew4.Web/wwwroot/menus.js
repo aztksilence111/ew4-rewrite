@@ -246,6 +246,7 @@
           if(this.recruiting){this.offer=definition;this.drawPurchases();for(const c of roster.children)c.setAttribute('aria-pressed',String(c===b));}
           else {this.rosterSelected=definition.id;for(const c of roster.children)c.setAttribute('aria-pressed',String(c===b));if(!this.deployment)this.commanderInfo(definition,held);}
         });roster.append(b);if(held)b.dataset.commander=held.id;
+        if(this.recruiting){b.dataset.offer=definition.id;b.ew4OfferKey=JSON.stringify(definition);}
         if(this.deployment){
           b.querySelector('.commander-info').onclick=e=>{e.stopPropagation();this.commanderInfo(definition,held,()=>this.drawRoster());};
           const deploy=this.api.button('',async()=>{await this.api.deploy(this.deployment,held.id);this.closeRoster();},b);deploy.className='deploy-card-confirm';deploy.setAttribute('aria-label','任命 '+definition.name);deploy.disabled=held.locked;deploy.append(this.lettering(this.text('btn_deploy'),'font_text_3_cn_hd','#ebe6e1'));
@@ -260,9 +261,14 @@
       if(!this.recruiting)for(const [i,card] of [...roster.children].entries()){card.style.gridRow=i%2+1;card.style.gridColumn=Math.floor(i/2)+1;}
       for(const id of ['hq-recruit-band','hq-refresh','hq-buy-buttons'])document.getElementById(id)?.remove();
       if(this.recruiting){const band=document.createElement('div');band.id='hq-recruit-band';screen.insertBefore(band,roster);
-        const refresh=this.api.button('',async()=>{this.offer=null;await this.transact({op:'refresh',group:this.rating});},screen);refresh.id='hq-refresh';refresh.className='native-command blue';refresh.setAttribute('aria-label','刷新将领');for(let i=0;i<3;i++)refresh.append(this.api.uiImage('button_refresh.png',13,16));
+        const refresh=this.api.button('',async()=>{
+          if(this.refreshPending)return;
+          this.refreshPending=true;refresh.setAttribute('aria-busy','true');this.offer=null;this.drawPurchases();
+          try{await this.transact({op:'refresh',group:this.rating});}
+          finally{this.refreshPending=false;refresh.removeAttribute('aria-busy');}
+        },screen);refresh.id='hq-refresh';refresh.className='native-command blue';refresh.setAttribute('aria-label','刷新将领');for(let i=0;i<3;i++)refresh.append(this.api.uiImage('button_refresh.png',13,16));
         for(const side of ['left','right']){const ornament=this.api.uiImage('pattern_getgeneral_2_1.png',36,26);ornament.className='hq-refresh-ornament '+side;ornament.setAttribute('aria-hidden','true');refresh.append(ornament);}
-        const remaining=data.refresh?.[this.rating]?.remaining;if(remaining!=null){refresh.append(this.lettering(remaining,'font_char_2_hd','#ebe6e1'));refresh.title='剩余 '+remaining+' 次';}this.drawPurchases();}
+        const counter=document.createElement('span');counter.className='hq-refresh-count';refresh.append(counter);this.updateRefreshCount();this.drawPurchases();}
       roster.scrollLeft=scroll;this.headquartersControls();
       const count=document.getElementById('hq-count');
       count.hidden=this.recruiting;count.replaceChildren(this.lettering(entries.length+' / '+(this.deployment?slots:capacity),'font_char_2_hd','#404040'));
@@ -288,7 +294,47 @@
       }
       this.api.popup(row);
     }
-    async transact(args){this.data=await this.api.rpc('commander',{revision:this.data.revision,...args});this.drawRoster();}
+    updateRefreshCount(){
+      const refresh=document.getElementById('hq-refresh');if(!refresh)return;
+      const remaining=this.data.refresh?.[this.rating]?.remaining,counter=refresh.querySelector('.hq-refresh-count');
+      counter.hidden=remaining==null;
+      if(counter.dataset.value!==String(remaining)){
+        counter.replaceChildren(...(remaining==null?[]:[this.lettering(remaining,'font_char_2_hd','#ebe6e1')]));counter.dataset.value=String(remaining);
+      }
+      refresh.title=remaining==null?'刷新将领':'剩余 '+remaining+' 次';
+    }
+    async updateRecruitmentOffers(){
+      const data=this.data,rating=this.rating,roster=document.getElementById('hq-roster'),definitions=new Map(data.definitions.map(d=>[d.id,d]));
+      const existing=new Map([...roster.children].map(card=>[card.dataset.offer,card]));
+      const entries=(data.offers[rating]||[]).map(id=>definitions.get(id)).filter(Boolean);
+      const cards=entries.map(definition=>{
+        const key=JSON.stringify(definition),old=existing.get(String(definition.id));
+        const card=old?.ew4OfferKey===key?old:this.card(definition,null,()=>{
+          this.offer=definition;this.drawPurchases();for(const other of roster.children)other.setAttribute('aria-pressed',String(other===card));
+        });
+        card.dataset.offer=definition.id;card.ew4OfferKey=key;return card;
+      });
+      for(let i=cards.length;i<[6,4,2][rating];i++){
+        const card=document.createElement('button');card.className='commander-card empty-commander';card.disabled=true;card.setAttribute('aria-label','空将领位');
+        const name=document.createElement('span');name.className='commander-name';card.append(this.api.uiImage('button_add_generals.png',78,78),name);cards.push(card);
+      }
+      await Promise.all([root.Ew4OriginalUI.prepareText(entries.map(d=>d.name).join('')),
+        ...cards.flatMap(card=>[...card.querySelectorAll('img')].map(img=>img.decode().catch(()=>{})))]);
+      if(this.data!==data||!this.recruiting||this.rating!==rating)return;
+      this.offer=null;for(const card of cards)card.setAttribute('aria-pressed','false');
+      // Commit prepared cards together while keeping the title, tabs and refresh frame mounted.
+      for(let i=0;i<cards.length;i++)if(roster.children[i]!==cards[i])roster.insertBefore(cards[i],roster.children[i]||null);
+      while(roster.children.length>cards.length)roster.lastElementChild.remove();
+      const balance=document.getElementById('hq-medals');
+      for(const [index,value] of [[1,data.medals],[3,data.badges]]){
+        if(balance.children[index].getAttribute('aria-label')!==String(value))balance.children[index].replaceWith(this.lettering(value,'font_char_2_hd','#ebe6e1'));
+      }
+      this.updateRefreshCount();this.drawPurchases();
+    }
+    async transact(args){
+      this.data=await this.api.rpc('commander',{revision:this.data.revision,...args});
+      if(args.op==='refresh'&&this.recruiting)await this.updateRecruitmentOffers();else this.drawRoster();
+    }
     async saveMenu(saving,mode,tutorial){
       const slots=await this.api.rpc('saves',{mode}),layout=this.manifest.layouts.form_save;
       const body=this.api.detail(saving?'title_savegame':'title_loadgame',352,235);body.className='save-slots';

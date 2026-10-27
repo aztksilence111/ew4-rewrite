@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-26",
+  "scope": "Japan terrain differentiation temporary verification outputs",
+  "targets": [
+    "build/japan-landforms-20261026",
+    "build/japan-hre-source-20261026/browser",
+    "build/japan-relief-review-20261026"
+  ],
+  "removedFiles": 115,
+  "removedBytes": 17422692,
+  "remainingTargets": 0,
+  "errors": 0,
+  "preflight": "Git state, tracked paths, absolute paths, reparse points and active process command lines inspected; no tracked files, reparse points or active target processes",
+  "preserved": "Map deliverables, original references, source code, player data and unrelated concurrent work"
+}

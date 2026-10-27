@@ -44,7 +44,7 @@ internal static class LegacyBattleExtensions
             uint blockVersion = BinaryPrimitives.ReadUInt32LittleEndian(header[4..]), flags = BinaryPrimitives.ReadUInt32LittleEndian(header[8..]), length = BinaryPrimitives.ReadUInt32LittleEndian(header[12..]);
             cursor += 16;
             if (flags > 1 || length > trailer.Length - cursor || blocks.Any(b => b.Tag == tag)) Fail("BTL扩展块重复、长度或标记无效: " + tag);
-            if (tag is "JURI" or "VICT" or "CNTR" ? blockVersion != 1 || flags != 1 : flags == 1) Fail("不支持的必需BTL扩展: " + tag);
+            if (tag is "JURI" or "VICT" or "CNTR" or "CELL" ? blockVersion != 1 || flags != 1 : flags == 1) Fail("不支持的必需BTL扩展: " + tag);
             blocks.Add(new(tag, blockVersion, flags, trailer.Slice(cursor, (int)length).ToArray()));
             cursor += (int)length;
         }
@@ -147,6 +147,23 @@ internal static class LegacyBattleExtensions
             if (payload.Length > 2 * 1024 * 1024) throw new RuleViolation("legacy.country_ids", "CNTR JSON exceeds 2 MiB");
             blocks.Add(new("CNTR", 1, 1, payload));
         }
+        return Container(body, blocks);
+    }
+    internal static LegacyCellIndices? CellIndices(IReadOnlyList<LegacyBattleExtension> blocks, ReadOnlySpan<byte> body,
+        IReadOnlyList<int> header, int sites, int armies)
+    {
+        var block = blocks.SingleOrDefault(b => b.Tag == "CELL");
+        if (block == null) return null;
+        var data = ExtensionLoader.ParseJson<LegacyCellIndices>(block.Payload);
+        data.Validate(body, header, sites, armies);
+        return data;
+    }
+    internal static byte[] WriteCellIndices(ReadOnlySpan<byte> body, IReadOnlyList<int> header,
+        IReadOnlyList<LegacyBattleExtension> existing, LegacyCellIndices data, int sites, int armies)
+    {
+        data.Validate(body, header, sites, armies);
+        var blocks = existing.Where(b => b.Tag != "CELL").ToList();
+        blocks.Add(new("CELL", 1, 1, System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(data, ExtensionLoader.Json)));
         return Container(body, blocks);
     }
     private static byte[] Container(ReadOnlySpan<byte> body, IReadOnlyList<LegacyBattleExtension> blocks)

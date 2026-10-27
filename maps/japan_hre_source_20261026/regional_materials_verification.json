@@ -1,0 +1,174 @@
+{
+  "checks": 56675,
+  "errors": 0,
+  "maps": {
+    "japan": {
+      "terrainCounts": {
+        "0": 5457,
+        "8": 6548,
+        "9": 1962,
+        "1": 43972
+      },
+      "materialCounts": {
+        "hill_4.png": 1851,
+        "hill_3.png": 1848,
+        "hill_2.png": 711,
+        "hill_1.png": 785,
+        "hill_5.png": 674,
+        "hill_6.png": 679,
+        "mountain_4.png": 323,
+        "mountain_3.png": 323,
+        "mountain_6.png": 297,
+        "mountain_5.png": 299,
+        "mountain_1.png": 345,
+        "mountain_2.png": 375
+      },
+      "maximumSameMaterialPatch": {
+        "8": 7,
+        "9": 1
+      },
+      "baselineComparison": {
+        "changedTerrainKinds": 0,
+        "changedSpriteIndices": 7385,
+        "changedRiverOrOtherFlags": 0,
+        "buildingsUnchanged": true
+      }
+    },
+    "hre": {
+      "terrainCounts": {
+        "1": 14224,
+        "0": 27870,
+        "8": 5519,
+        "9": 4848
+      },
+      "materialCounts": {
+        "hill_2.png": 1599,
+        "hill_1.png": 1582,
+        "hill_4.png": 1073,
+        "hill_3.png": 1068,
+        "hill_5.png": 91,
+        "mountain_3.png": 812,
+        "mountain_5.png": 672,
+        "mountain_4.png": 835,
+        "mountain_2.png": 903,
+        "mountain_1.png": 939,
+        "mountain_6.png": 687,
+        "hill_6.png": 106
+      },
+      "maximumSameMaterialPatch": {
+        "8": 6,
+        "9": 1
+      },
+      "baselineComparison": {
+        "changedTerrainKinds": 6089,
+        "changedSpriteIndices": 14003,
+        "changedRiverOrOtherFlags": 0,
+        "buildingsUnchanged": true
+      },
+      "regions": [
+        {
+          "name": "North German Plain",
+          "cells": 465,
+          "terrainKinds": {
+            "0": 465
+          },
+          "measuredRelief": {
+            "plain": 465
+          }
+        },
+        {
+          "name": "Po Plain",
+          "cells": 143,
+          "terrainKinds": {
+            "0": 132,
+            "8": 8,
+            "9": 3
+          },
+          "measuredRelief": {
+            "plain": 132,
+            "hill": 8,
+            "low": 3
+          }
+        },
+        {
+          "name": "Upper Rhine",
+          "cells": 32,
+          "terrainKinds": {
+            "0": 32
+          },
+          "measuredRelief": {
+            "plain": 32
+          }
+        },
+        {
+          "name": "Hungarian Plain",
+          "cells": 185,
+          "terrainKinds": {
+            "0": 185
+          },
+          "measuredRelief": {
+            "plain": 185
+          }
+        },
+        {
+          "name": "Alps",
+          "cells": 551,
+          "terrainKinds": {
+            "9": 484,
+            "8": 62,
+            "0": 5
+          },
+          "measuredRelief": {
+            "low": 5,
+            "middle": 154,
+            "hill": 65,
+            "high": 327
+          }
+        },
+        {
+          "name": "Vosges",
+          "cells": 31,
+          "terrainKinds": {
+            "8": 11,
+            "9": 18,
+            "0": 2
+          },
+          "measuredRelief": {
+            "hill": 11,
+            "low": 18,
+            "plain": 2
+          }
+        },
+        {
+          "name": "Bohemian Forest",
+          "cells": 71,
+          "terrainKinds": {
+            "8": 35,
+            "0": 21,
+            "9": 15
+          },
+          "measuredRelief": {
+            "hill": 35,
+            "plain": 21,
+            "low": 15
+          }
+        },
+        {
+          "name": "Harz",
+          "cells": 55,
+          "terrainKinds": {
+            "8": 18,
+            "0": 35,
+            "9": 2
+          },
+          "measuredRelief": {
+            "hill": 19,
+            "plain": 34,
+            "low": 2
+          }
+        }
+      ]
+    }
+  },
+  "scope": "Native material variety and DEM regional differences; no claim of complete geological or historical survey"
+}

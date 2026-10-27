@@ -74,7 +74,7 @@ public sealed record LegacyFaction(Resources Resources, bool Ai, int Camp, int S
     }
 }
 
-public sealed record LegacySite(short Cell, short CityId, byte BuildingKind, byte BuildingLevel,
+public sealed record LegacySite(int Cell, short CityId, byte BuildingKind, byte BuildingLevel,
     byte State6, byte State7, sbyte State8, sbyte InstallationKind, byte Marker, sbyte State11,
     byte BridgeStyle0, byte BridgeStyle1, byte BridgeStyle2, byte State15)
 {
@@ -87,7 +87,7 @@ public sealed record LegacySite(short Cell, short CityId, byte BuildingKind, byt
     }
 }
 
-public sealed record LegacyArmy(short Cell, sbyte Unit, sbyte Grade, short Health, short MaximumHealth,
+public sealed record LegacyArmy(int Cell, sbyte Unit, sbyte Grade, short Health, short MaximumHealth,
     uint Experience, sbyte Veterancy, sbyte Movement, sbyte Morale, sbyte MoraleDuration, short Commander,
     byte Flag58, sbyte Objective, byte Behavior, byte Facing, byte Transport, byte Acted, byte ForceRecovery,
     byte Flag5c, sbyte State70, sbyte ConstructionTurns, short BehaviorExpiry, byte RestoreBehavior, sbyte Burning)
@@ -134,6 +134,7 @@ public sealed class LegacyBattle
     public int MapId => Header[1];
     public Ew4.Core.ExtensionVictoryRules? Victory { get; }
     public LegacyCountryIds? CountryIds { get; }
+    public LegacyCellIndices? CellIndices { get; }
     public int Left => Header[2];
     public int Top => Header[3];
     public int Width => Header[4];
@@ -144,6 +145,12 @@ public sealed class LegacyBattle
         source = raw; Header = Array.AsReadOnly(header); Sections = Array.AsReadOnly(sections);
         CountryIds = LegacyBattleExtensions.CountryIds(extensions, raw.AsSpan(0, legacyLength), factions, events);
         CountryIds?.Apply(factions, events);
+        CellIndices = LegacyBattleExtensions.CellIndices(extensions, raw.AsSpan(0, legacyLength), header, sites.Length, armies.Length);
+        if (CellIndices != null)
+        {
+            for (int i = 0; i < sites.Length; i++) sites[i] = sites[i] with { Cell = CellIndices.Sites[i] };
+            for (int i = 0; i < armies.Length; i++) armies[i] = armies[i] with { Cell = CellIndices.Armies[i] };
+        }
         Factions = Array.AsReadOnly(factions); Sites = Array.AsReadOnly(sites); Armies = Array.AsReadOnly(armies); Events = Array.AsReadOnly(events);
         EffectiveSites = Array.AsReadOnly(sites.GroupBy(s => s.Cell).Select(g => g.Last()).ToArray());
         Markets = Array.AsReadOnly(markets); Taverns = Array.AsReadOnly(taverns);
@@ -156,6 +163,7 @@ public sealed class LegacyBattle
     public byte[] WithJurisdictions(LegacyJurisdictionData? data) => LegacyBattleExtensions.Write(source.AsSpan(0, LegacyLength), Header, extensions, data);
     public byte[] WithVictory(Ew4.Core.ExtensionVictoryRules? rules) => LegacyBattleExtensions.WriteVictory(source.AsSpan(0, LegacyLength), extensions, rules);
     public byte[] WithCountryIds(LegacyCountryIds? data) => LegacyBattleExtensions.WriteCountryIds(source.AsSpan(0, LegacyLength), extensions, data, Factions.Count, Events.Count);
+    public byte[] WithCellIndices(LegacyCellIndices data) => LegacyBattleExtensions.WriteCellIndices(source.AsSpan(0, LegacyLength), Header, extensions, data, Sites.Count, Armies.Count);
     public byte[] SectionBytes(string name)
     {
         var section = Sections.Single(s => s.Name == name);

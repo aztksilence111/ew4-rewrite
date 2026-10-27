@@ -1,0 +1,877 @@
+[
+  {
+    "cell": 40138,
+    "other": 40139,
+    "direction": 0,
+    "near": "福山",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 30341,
+    "other": 30608,
+    "direction": 2,
+    "near": "村上",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 42777,
+    "other": 43043,
+    "direction": 2,
+    "near": "日田",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 36729,
+    "other": 36996,
+    "direction": 2,
+    "near": "上田",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 41501,
+    "other": 41502,
+    "direction": 0,
+    "near": "奈良",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 38813,
+    "other": 39080,
+    "direction": 2,
+    "near": "美作",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 28057,
+    "other": 28324,
+    "direction": 2,
+    "near": "全州",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 21826,
+    "other": 22093,
+    "direction": 2,
+    "near": "七户",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 2746,
+    "other": 2747,
+    "direction": 0,
+    "near": "会宁",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 42770,
+    "other": 43036,
+    "direction": 2,
+    "near": "柳川",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 46520,
+    "other": 46786,
+    "direction": 2,
+    "near": "延冈",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 38344,
+    "other": 38345,
+    "direction": 0,
+    "near": "足利",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 34315,
+    "other": 34316,
+    "direction": 0,
+    "near": "富山",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 38291,
+    "other": 38292,
+    "direction": 0,
+    "near": "福知山",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 42854,
+    "other": 42855,
+    "direction": 0,
+    "near": "丰桥",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 43659,
+    "other": 43660,
+    "direction": 0,
+    "near": "滨松",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 21120,
+    "other": 21121,
+    "direction": 0,
+    "near": "汉城",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 28483,
+    "other": 28749,
+    "direction": 2,
+    "near": "新庄",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 43620,
+    "other": 43887,
+    "direction": 2,
+    "near": "德岛",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 48106,
+    "other": 48373,
+    "direction": 1,
+    "near": "出水",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 31692,
+    "other": 31693,
+    "direction": 0,
+    "near": "仙台",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 37539,
+    "other": 37540,
+    "direction": 0,
+    "near": "厩桥",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 22618,
+    "other": 22619,
+    "direction": 0,
+    "near": "大馆",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 11428,
+    "other": 11694,
+    "direction": 2,
+    "near": "岩见泽",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 45199,
+    "other": 45200,
+    "direction": 0,
+    "near": "宇和岛",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 31137,
+    "other": 31138,
+    "direction": 0,
+    "near": "新潟",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 24333,
+    "other": 24334,
+    "direction": 0,
+    "near": "忠州",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 39140,
+    "other": 39141,
+    "direction": 0,
+    "near": "秩父",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 44119,
+    "other": 44120,
+    "direction": 0,
+    "near": "府内",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 45771,
+    "other": 46038,
+    "direction": 2,
+    "near": "新宫",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 30093,
+    "other": 30359,
+    "direction": 2,
+    "near": "大崎",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 38047,
+    "other": 38313,
+    "direction": 2,
+    "near": "郡上",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 3959,
+    "other": 3960,
+    "direction": 0,
+    "near": "天盐",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 11157,
+    "other": 11158,
+    "direction": 0,
+    "near": "札幌",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 40373,
+    "other": 40640,
+    "direction": 2,
+    "near": "小仓",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 42828,
+    "other": 43095,
+    "direction": 1,
+    "near": "和歌山",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 11523,
+    "other": 11790,
+    "direction": 2,
+    "near": "咸兴",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 41231,
+    "other": 41232,
+    "direction": 0,
+    "near": "大阪",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 33001,
+    "other": 33268,
+    "direction": 2,
+    "near": "长冈",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 29951,
+    "other": 29952,
+    "direction": 0,
+    "near": "庆州",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 29676,
+    "other": 29677,
+    "direction": 0,
+    "near": "大邱",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 39646,
+    "other": 39912,
+    "direction": 2,
+    "near": "岐阜",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 35863,
+    "other": 35864,
+    "direction": 0,
+    "near": "出云",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 14991,
+    "other": 14992,
+    "direction": 0,
+    "near": "元山",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 44408,
+    "other": 44674,
+    "direction": 2,
+    "near": "高知",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 32071,
+    "other": 32337,
+    "direction": 2,
+    "near": "晋州",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 43397,
+    "other": 43398,
+    "direction": 0,
+    "near": "挂川",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 11415,
+    "other": 11682,
+    "direction": 1,
+    "near": "俱知安",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 39594,
+    "other": 39595,
+    "direction": 0,
+    "near": "广岛",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 39945,
+    "other": 39946,
+    "direction": 0,
+    "near": "川越",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 40711,
+    "other": 40712,
+    "direction": 0,
+    "near": "桑名",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 43112,
+    "other": 43380,
+    "direction": 1,
+    "near": "伊势",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 40145,
+    "other": 40146,
+    "direction": 0,
+    "near": "冈山",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 32758,
+    "other": 32759,
+    "direction": 0,
+    "near": "相马",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 47309,
+    "other": 47576,
+    "direction": 2,
+    "near": "人吉",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 18445,
+    "other": 18446,
+    "direction": 0,
+    "near": "开城",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 38041,
+    "other": 38042,
+    "direction": 0,
+    "near": "越前今立",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 36751,
+    "other": 36752,
+    "direction": 0,
+    "near": "那须",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 10123,
+    "other": 10124,
+    "direction": 0,
+    "near": "网走",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 40167,
+    "other": 40433,
+    "direction": 2,
+    "near": "京都",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 36992,
+    "other": 36993,
+    "direction": 0,
+    "near": "松本",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 10653,
+    "other": 10654,
+    "direction": 0,
+    "near": "北见",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 13579,
+    "other": 13845,
+    "direction": 2,
+    "near": "带广",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 22345,
+    "other": 22346,
+    "direction": 0,
+    "near": "能代",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 38264,
+    "other": 38531,
+    "direction": 2,
+    "near": "三次",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 36680,
+    "other": 36681,
+    "direction": 0,
+    "near": "鸟取",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 35953,
+    "other": 35954,
+    "direction": 0,
+    "near": "白河",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 13042,
+    "other": 13043,
+    "direction": 0,
+    "near": "十胜清水",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 7711,
+    "other": 7712,
+    "direction": 0,
+    "near": "纹别",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 44908,
+    "other": 45174,
+    "direction": 2,
+    "near": "熊本",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 28494,
+    "other": 28495,
+    "direction": 0,
+    "near": "平泉",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 10700,
+    "other": 10966,
+    "direction": 2,
+    "near": "安州",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 41283,
+    "other": 41284,
+    "direction": 0,
+    "near": "江户",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 30896,
+    "other": 30897,
+    "direction": 0,
+    "near": "石卷",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 33288,
+    "other": 33554,
+    "direction": 2,
+    "near": "福岛",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 6901,
+    "other": 7168,
+    "direction": 2,
+    "near": "名寄",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 10902,
+    "other": 11168,
+    "direction": 2,
+    "near": "富良野",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 26618,
+    "other": 26885,
+    "direction": 2,
+    "near": "横手",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 14393,
+    "other": 14394,
+    "direction": 0,
+    "near": "钏路",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 31949,
+    "other": 31950,
+    "direction": 0,
+    "near": "米泽",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 40743,
+    "other": 40744,
+    "direction": 0,
+    "near": "八王子",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 39157,
+    "other": 39158,
+    "direction": 0,
+    "near": "水户",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 20748,
+    "other": 20749,
+    "direction": 0,
+    "near": "弘前",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 26893,
+    "other": 26894,
+    "direction": 0,
+    "near": "花卷",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 32882,
+    "other": 32883,
+    "direction": 0,
+    "near": "东莱",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 38590,
+    "other": 38856,
+    "direction": 2,
+    "near": "木曾福岛",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 41020,
+    "other": 41021,
+    "direction": 0,
+    "near": "佐仓",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 22465,
+    "other": 22466,
+    "direction": 0,
+    "near": "原州",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 5680,
+    "other": 5681,
+    "direction": 0,
+    "near": "镜城",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 35867,
+    "other": 35868,
+    "direction": 0,
+    "near": "月山富田",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 28211,
+    "other": 28212,
+    "direction": 0,
+    "near": "鹤冈",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 30351,
+    "other": 30352,
+    "direction": 0,
+    "near": "山形",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 26369,
+    "other": 26635,
+    "direction": 2,
+    "near": "宫古",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 39150,
+    "other": 39151,
+    "direction": 0,
+    "near": "结城",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 40192,
+    "other": 40193,
+    "direction": 0,
+    "near": "饭田",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 6176,
+    "other": 6177,
+    "direction": 0,
+    "near": "江界",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 31254,
+    "other": 31522,
+    "direction": 1,
+    "near": "罗州",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 9301,
+    "other": 9302,
+    "direction": 0,
+    "near": "旭川",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 13369,
+    "other": 13636,
+    "direction": 1,
+    "near": "平壤",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 38328,
+    "other": 38329,
+    "direction": 0,
+    "near": "诹访",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 33815,
+    "other": 34081,
+    "direction": 2,
+    "near": "会津若松",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 43072,
+    "other": 43340,
+    "direction": 1,
+    "near": "别子",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 34842,
+    "other": 35108,
+    "direction": 2,
+    "near": "金泽",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 36472,
+    "other": 36738,
+    "direction": 2,
+    "near": "沼田",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 24479,
+    "other": 24747,
+    "direction": 1,
+    "near": "秋田",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 33527,
+    "other": 33528,
+    "direction": 0,
+    "near": "春日山",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 7217,
+    "other": 7218,
+    "direction": 0,
+    "near": "义州",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 46269,
+    "other": 46536,
+    "direction": 2,
+    "near": "中村",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 39398,
+    "other": 39665,
+    "direction": 2,
+    "near": "八岳山麓",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 24861,
+    "other": 25128,
+    "direction": 2,
+    "near": "清州",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 36927,
+    "other": 37194,
+    "direction": 1,
+    "near": "石见银山",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 35649,
+    "other": 35650,
+    "direction": 0,
+    "near": "神冈",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 36171,
+    "other": 36172,
+    "direction": 0,
+    "near": "一乘谷",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 25559,
+    "other": 25560,
+    "direction": 0,
+    "near": "盛冈",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 46241,
+    "other": 46508,
+    "direction": 2,
+    "near": "八代",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 37816,
+    "other": 37817,
+    "direction": 0,
+    "near": "宇都宫",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 35661,
+    "other": 35662,
+    "direction": 0,
+    "near": "长野",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 25924,
+    "other": 25925,
+    "direction": 0,
+    "near": "公州",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 47586,
+    "other": 47587,
+    "direction": 0,
+    "near": "都农",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 41517,
+    "other": 41518,
+    "direction": 0,
+    "near": "冈崎",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 42545,
+    "other": 42812,
+    "direction": 2,
+    "near": "赞岐内陆",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 34620,
+    "other": 34621,
+    "direction": 0,
+    "near": "郡山",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 39886,
+    "other": 40153,
+    "direction": 2,
+    "near": "姬路",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 49714,
+    "other": 49715,
+    "direction": 0,
+    "near": "都城",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 39074,
+    "other": 39075,
+    "direction": 0,
+    "near": "备中松山",
+    "kind": "inspection-crossing"
+  }
+]

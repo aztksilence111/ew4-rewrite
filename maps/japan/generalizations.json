@@ -1,0 +1,963 @@
+{
+  "grid": [
+    {
+      "cell": 19512,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 19513,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 19514,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 19779,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 19781,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 19782,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 20048,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 24314,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 32179,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 33118,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 33136,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 33401,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 33671,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 34189,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 34190,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 34455,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 40109,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 41458,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 43018,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 45969,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 47303,
+      "kind": "preserve-real-water-between-land-masses"
+    }
+  ],
+  "buildings": [],
+  "spacing_exceptions": [
+    {
+      "first": "小木港",
+      "second": "杂太佐渡",
+      "first_id": "japan-0089a5ba4ab6",
+      "second_id": "japan-f2d61530ed75",
+      "first_cell": 30593,
+      "second_cell": 30061,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "函馆港",
+      "second": "函馆",
+      "first_id": "japan-0466fe95c8bd",
+      "second_id": "japan-6fa97e16d1ec",
+      "first_cell": 16483,
+      "second_cell": 16218,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "上田",
+      "second": "小诸",
+      "first_id": "japan-04b8c744f903",
+      "second_id": "japan-1e966657ee58",
+      "first_cell": 36729,
+      "second_cell": 37264,
+      "distance": 2,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "石卷港",
+      "second": "石卷",
+      "first_id": "japan-09d9e06063db",
+      "second_id": "japan-8b5588dbea95",
+      "first_cell": 31429,
+      "second_cell": 31164,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "堺港",
+      "second": "兵库津",
+      "first_id": "japan-0cc1f3d3cfa4",
+      "second_id": "japan-dbd114948d3a",
+      "first_cell": 42029,
+      "second_cell": 41494,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "直江津港",
+      "second": "春日山",
+      "first_id": "japan-0f4b2c8d162a",
+      "second_id": "japan-c66f1ea36834",
+      "first_cell": 33262,
+      "second_cell": 33527,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "柳川",
+      "second": "佐贺",
+      "first_id": "japan-10e8a37faf89",
+      "second_id": "japan-39593bf65a53",
+      "first_cell": 43037,
+      "second_cell": 42502,
+      "distance": 2,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "柳川",
+      "second": "久留米",
+      "first_id": "japan-10e8a37faf89",
+      "second_id": "japan-b02e9873cc86",
+      "first_cell": 43037,
+      "second_cell": 42505,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "室兰",
+      "second": "室兰港",
+      "first_id": "japan-14a09f070b21",
+      "second_id": "japan-af00fdf43f70",
+      "first_cell": 14087,
+      "second_cell": 13818,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "足利",
+      "second": "忍",
+      "first_id": "japan-14f2ea922e26",
+      "second_id": "japan-b079359374e5",
+      "first_cell": 38344,
+      "second_cell": 39145,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "敦贺港",
+      "second": "敦贺",
+      "first_id": "japan-15d3eb2d339f",
+      "second_id": "japan-78864cfe7d1f",
+      "first_cell": 37503,
+      "second_cell": 38037,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "安土",
+      "second": "大津",
+      "first_id": "japan-15e9c6f29a5a",
+      "second_id": "japan-f0eaba41800e",
+      "first_cell": 40172,
+      "second_cell": 40436,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "八户",
+      "second": "八户港",
+      "first_id": "japan-16f0eef46bd0",
+      "second_id": "japan-9ca2f54a0431",
+      "first_cell": 22362,
+      "second_cell": 22632,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "严原对马",
+      "second": "严原港",
+      "first_id": "japan-18c94d9b2cd5",
+      "second_id": "japan-7860fd4422fa",
+      "first_cell": 37421,
+      "second_cell": 37955,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "稚内",
+      "second": "稚内港",
+      "first_id": "japan-1b845b199c12",
+      "second_id": "japan-fc17b76fe942",
+      "first_cell": 1823,
+      "second_cell": 1557,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "山口",
+      "second": "萩",
+      "first_id": "japan-1d8d167345b0",
+      "second_id": "japan-dc3b9db18f14",
+      "first_cell": 39582,
+      "second_cell": 38780,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "青森港",
+      "second": "青森",
+      "first_id": "japan-23fbf4feb808",
+      "second_id": "japan-890879394177",
+      "first_cell": 20219,
+      "second_cell": 20486,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "浦户港",
+      "second": "高知",
+      "first_id": "japan-248dde4942b6",
+      "second_id": "japan-4956aaf77207",
+      "first_cell": 44943,
+      "second_cell": 44409,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "浦贺港",
+      "second": "馆山港",
+      "first_id": "japan-289a6d93c9e4",
+      "second_id": "japan-ffe4ee8cec1c",
+      "first_cell": 43150,
+      "second_cell": 43951,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "大村",
+      "second": "长崎",
+      "first_id": "japan-28ba0990f181",
+      "second_id": "japan-ac8fb43b7fe4",
+      "first_cell": 43565,
+      "second_cell": 44365,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "宇和岛",
+      "second": "宇和岛港",
+      "first_id": "japan-2e90fe09775d",
+      "second_id": "japan-c18fdd48558e",
+      "first_cell": 44931,
+      "second_cell": 44662,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "新潟",
+      "second": "新潟港",
+      "first_id": "japan-2f6f4f76203c",
+      "second_id": "japan-fed6e2d62956",
+      "first_cell": 31137,
+      "second_cell": 30869,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "府内",
+      "second": "府内港",
+      "first_id": "japan-331b9bf89206",
+      "second_id": "japan-ff0f8a2fa54c",
+      "first_cell": 43852,
+      "second_cell": 43586,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "佐贺",
+      "second": "久留米",
+      "first_id": "japan-39593bf65a53",
+      "second_id": "japan-b02e9873cc86",
+      "first_cell": 42502,
+      "second_cell": 42505,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "小仓",
+      "second": "下关",
+      "first_id": "japan-40449bd5f16e",
+      "second_id": "japan-a50ac60141ad",
+      "first_cell": 40642,
+      "second_cell": 39842,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "小仓",
+      "second": "赤间关港",
+      "first_id": "japan-40449bd5f16e",
+      "second_id": "japan-c916042af088",
+      "first_cell": 40642,
+      "second_cell": 40108,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "津",
+      "second": "松阪",
+      "first_id": "japan-4686d29e3c83",
+      "second_id": "japan-7a1366f17fee",
+      "first_cell": 42310,
+      "second_cell": 42844,
+      "distance": 2,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "岐阜",
+      "second": "清洲",
+      "first_id": "japan-483a998c99d8",
+      "second_id": "japan-6ce4b309a25e",
+      "first_cell": 39646,
+      "second_cell": 40447,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "岐阜",
+      "second": "大垣",
+      "first_id": "japan-483a998c99d8",
+      "second_id": "japan-6dfa5d1c4fc7",
+      "first_cell": 39646,
+      "second_cell": 39644,
+      "distance": 2,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "七尾",
+      "second": "七尾港",
+      "first_id": "japan-4f47eebc74fd",
+      "second_id": "japan-6cec6b2dba98",
+      "first_cell": 32979,
+      "second_cell": 32980,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "广岛",
+      "second": "广岛湾港",
+      "first_id": "japan-4fe146f0dbad",
+      "second_id": "japan-d8a1890e0358",
+      "first_cell": 39594,
+      "second_cell": 40394,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "川越",
+      "second": "忍",
+      "first_id": "japan-5046809f56df",
+      "second_id": "japan-b079359374e5",
+      "first_cell": 39945,
+      "second_cell": 39145,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "伊势",
+      "second": "松阪",
+      "first_id": "japan-5499852e832c",
+      "second_id": "japan-7a1366f17fee",
+      "first_cell": 43380,
+      "second_cell": 42844,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "伊势",
+      "second": "伊势大凑港",
+      "first_id": "japan-5499852e832c",
+      "second_id": "japan-df17204691d2",
+      "first_cell": 43380,
+      "second_cell": 43381,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "冈山",
+      "second": "高松港",
+      "first_id": "japan-550e930475e6",
+      "second_id": "japan-dfa2c9ba0368",
+      "first_cell": 40145,
+      "second_cell": 40946,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "骏府",
+      "second": "清水港",
+      "first_id": "japan-585f3ad22902",
+      "second_id": "japan-5f73a88c8b64",
+      "first_cell": 43133,
+      "second_cell": 42869,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "钏路港",
+      "second": "钏路",
+      "first_id": "japan-5d4d2d0af5f6",
+      "second_id": "japan-908eb10b2193",
+      "first_cell": 14660,
+      "second_cell": 14661,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "清洲",
+      "second": "名古屋",
+      "first_id": "japan-6ce4b309a25e",
+      "second_id": "japan-cae82d044d00",
+      "first_cell": 40447,
+      "second_cell": 40715,
+      "distance": 1,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "京都",
+      "second": "龟山丹波",
+      "first_id": "japan-70e7d4de7d91",
+      "second_id": "japan-e12222240aa0",
+      "first_cell": 40434,
+      "second_cell": 40165,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "京都",
+      "second": "大津",
+      "first_id": "japan-70e7d4de7d91",
+      "second_id": "japan-f0eaba41800e",
+      "first_cell": 40434,
+      "second_cell": 40436,
+      "distance": 2,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "鹿儿岛",
+      "second": "鹿儿岛港",
+      "first_id": "japan-71df9e7ef57f",
+      "second_id": "japan-d3a70100ffd4",
+      "first_cell": 49708,
+      "second_cell": 49975,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "长崎港",
+      "second": "长崎",
+      "first_id": "japan-72063f262cd7",
+      "second_id": "japan-ac8fb43b7fe4",
+      "first_cell": 44364,
+      "second_cell": 44365,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "小樽",
+      "second": "小樽港",
+      "first_id": "japan-74ee5d92a46d",
+      "second_id": "japan-c44833050add",
+      "first_cell": 10618,
+      "second_cell": 10619,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "小樽",
+      "second": "余市",
+      "first_id": "japan-74ee5d92a46d",
+      "second_id": "japan-fd4f338366c0",
+      "first_cell": 10618,
+      "second_cell": 10349,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "江户湾港",
+      "second": "江户",
+      "first_id": "japan-78fc0a308c62",
+      "second_id": "japan-89fac6a778b3",
+      "first_cell": 41817,
+      "second_cell": 41283,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "高松",
+      "second": "高松港",
+      "first_id": "japan-7e89d753d1fd",
+      "second_id": "japan-dfa2c9ba0368",
+      "first_cell": 41480,
+      "second_cell": 40946,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "下关",
+      "second": "赤间关港",
+      "first_id": "japan-a50ac60141ad",
+      "second_id": "japan-c916042af088",
+      "first_cell": 39842,
+      "second_cell": 40108,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "明石",
+      "second": "兵库津",
+      "first_id": "japan-a6b48d5f7d22",
+      "second_id": "japan-dbd114948d3a",
+      "first_cell": 40958,
+      "second_cell": 41494,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "鹤冈",
+      "second": "酒田",
+      "first_id": "japan-a87443fc6a89",
+      "second_id": "japan-dc2fd3bbfe41",
+      "first_cell": 28478,
+      "second_cell": 27678,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "酒田港",
+      "second": "酒田",
+      "first_id": "japan-b2686ca8c04d",
+      "second_id": "japan-dc2fd3bbfe41",
+      "first_cell": 27144,
+      "second_cell": 27678,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "博多港",
+      "second": "博多",
+      "first_id": "japan-c4a559185a37",
+      "second_id": "japan-e9c5b34509a7",
+      "first_cell": 40901,
+      "second_cell": 41170,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "馆山",
+      "second": "馆山港",
+      "first_id": "japan-c9ee215a050b",
+      "second_id": "japan-ffe4ee8cec1c",
+      "first_cell": 44485,
+      "second_cell": 43951,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "舞鹤港",
+      "second": "宫津",
+      "first_id": "japan-ee1cb9acbc8d",
+      "second_id": "japan-sengoku-5cb0ec534fa1",
+      "first_cell": 37495,
+      "second_cell": 37493,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    }
+  ],
+  "coastal_spacing_exceptions": [
+    {
+      "first": "小木港",
+      "second": "杂太佐渡",
+      "first_id": "japan-0089a5ba4ab6",
+      "second_id": "japan-f2d61530ed75",
+      "first_cell": 30593,
+      "second_cell": 30061,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "函馆港",
+      "second": "函馆",
+      "first_id": "japan-0466fe95c8bd",
+      "second_id": "japan-6fa97e16d1ec",
+      "first_cell": 16483,
+      "second_cell": 16218,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "石卷港",
+      "second": "石卷",
+      "first_id": "japan-09d9e06063db",
+      "second_id": "japan-8b5588dbea95",
+      "first_cell": 31429,
+      "second_cell": 31164,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "堺港",
+      "second": "兵库津",
+      "first_id": "japan-0cc1f3d3cfa4",
+      "second_id": "japan-dbd114948d3a",
+      "first_cell": 42029,
+      "second_cell": 41494,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "直江津港",
+      "second": "春日山",
+      "first_id": "japan-0f4b2c8d162a",
+      "second_id": "japan-c66f1ea36834",
+      "first_cell": 33262,
+      "second_cell": 33527,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "室兰",
+      "second": "室兰港",
+      "first_id": "japan-14a09f070b21",
+      "second_id": "japan-af00fdf43f70",
+      "first_cell": 14087,
+      "second_cell": 13818,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "敦贺港",
+      "second": "敦贺",
+      "first_id": "japan-15d3eb2d339f",
+      "second_id": "japan-78864cfe7d1f",
+      "first_cell": 37503,
+      "second_cell": 38037,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "八户",
+      "second": "八户港",
+      "first_id": "japan-16f0eef46bd0",
+      "second_id": "japan-9ca2f54a0431",
+      "first_cell": 22362,
+      "second_cell": 22632,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "严原对马",
+      "second": "严原港",
+      "first_id": "japan-18c94d9b2cd5",
+      "second_id": "japan-7860fd4422fa",
+      "first_cell": 37421,
+      "second_cell": 37955,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "稚内",
+      "second": "稚内港",
+      "first_id": "japan-1b845b199c12",
+      "second_id": "japan-fc17b76fe942",
+      "first_cell": 1823,
+      "second_cell": 1557,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "青森港",
+      "second": "青森",
+      "first_id": "japan-23fbf4feb808",
+      "second_id": "japan-890879394177",
+      "first_cell": 20219,
+      "second_cell": 20486,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "浦户港",
+      "second": "高知",
+      "first_id": "japan-248dde4942b6",
+      "second_id": "japan-4956aaf77207",
+      "first_cell": 44943,
+      "second_cell": 44409,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "浦贺港",
+      "second": "馆山港",
+      "first_id": "japan-289a6d93c9e4",
+      "second_id": "japan-ffe4ee8cec1c",
+      "first_cell": 43150,
+      "second_cell": 43951,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "宇和岛",
+      "second": "宇和岛港",
+      "first_id": "japan-2e90fe09775d",
+      "second_id": "japan-c18fdd48558e",
+      "first_cell": 44931,
+      "second_cell": 44662,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "新潟",
+      "second": "新潟港",
+      "first_id": "japan-2f6f4f76203c",
+      "second_id": "japan-fed6e2d62956",
+      "first_cell": 31137,
+      "second_cell": 30869,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "府内",
+      "second": "府内港",
+      "first_id": "japan-331b9bf89206",
+      "second_id": "japan-ff0f8a2fa54c",
+      "first_cell": 43852,
+      "second_cell": 43586,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "小仓",
+      "second": "赤间关港",
+      "first_id": "japan-40449bd5f16e",
+      "second_id": "japan-c916042af088",
+      "first_cell": 40642,
+      "second_cell": 40108,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "七尾",
+      "second": "七尾港",
+      "first_id": "japan-4f47eebc74fd",
+      "second_id": "japan-6cec6b2dba98",
+      "first_cell": 32979,
+      "second_cell": 32980,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "广岛",
+      "second": "广岛湾港",
+      "first_id": "japan-4fe146f0dbad",
+      "second_id": "japan-d8a1890e0358",
+      "first_cell": 39594,
+      "second_cell": 40394,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "伊势",
+      "second": "伊势大凑港",
+      "first_id": "japan-5499852e832c",
+      "second_id": "japan-df17204691d2",
+      "first_cell": 43380,
+      "second_cell": 43381,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "冈山",
+      "second": "高松港",
+      "first_id": "japan-550e930475e6",
+      "second_id": "japan-dfa2c9ba0368",
+      "first_cell": 40145,
+      "second_cell": 40946,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "骏府",
+      "second": "清水港",
+      "first_id": "japan-585f3ad22902",
+      "second_id": "japan-5f73a88c8b64",
+      "first_cell": 43133,
+      "second_cell": 42869,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "钏路港",
+      "second": "钏路",
+      "first_id": "japan-5d4d2d0af5f6",
+      "second_id": "japan-908eb10b2193",
+      "first_cell": 14660,
+      "second_cell": 14661,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "鹿儿岛",
+      "second": "鹿儿岛港",
+      "first_id": "japan-71df9e7ef57f",
+      "second_id": "japan-d3a70100ffd4",
+      "first_cell": 49708,
+      "second_cell": 49975,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "长崎港",
+      "second": "长崎",
+      "first_id": "japan-72063f262cd7",
+      "second_id": "japan-ac8fb43b7fe4",
+      "first_cell": 44364,
+      "second_cell": 44365,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "小樽",
+      "second": "小樽港",
+      "first_id": "japan-74ee5d92a46d",
+      "second_id": "japan-c44833050add",
+      "first_cell": 10618,
+      "second_cell": 10619,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "江户湾港",
+      "second": "江户",
+      "first_id": "japan-78fc0a308c62",
+      "second_id": "japan-89fac6a778b3",
+      "first_cell": 41817,
+      "second_cell": 41283,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "高松",
+      "second": "高松港",
+      "first_id": "japan-7e89d753d1fd",
+      "second_id": "japan-dfa2c9ba0368",
+      "first_cell": 41480,
+      "second_cell": 40946,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "下关",
+      "second": "赤间关港",
+      "first_id": "japan-a50ac60141ad",
+      "second_id": "japan-c916042af088",
+      "first_cell": 39842,
+      "second_cell": 40108,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "明石",
+      "second": "兵库津",
+      "first_id": "japan-a6b48d5f7d22",
+      "second_id": "japan-dbd114948d3a",
+      "first_cell": 40958,
+      "second_cell": 41494,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "酒田港",
+      "second": "酒田",
+      "first_id": "japan-b2686ca8c04d",
+      "second_id": "japan-dc2fd3bbfe41",
+      "first_cell": 27144,
+      "second_cell": 27678,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "博多港",
+      "second": "博多",
+      "first_id": "japan-c4a559185a37",
+      "second_id": "japan-e9c5b34509a7",
+      "first_cell": 40901,
+      "second_cell": 41170,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "馆山",
+      "second": "馆山港",
+      "first_id": "japan-c9ee215a050b",
+      "second_id": "japan-ffe4ee8cec1c",
+      "first_cell": 44485,
+      "second_cell": 43951,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "舞鹤港",
+      "second": "宫津",
+      "first_id": "japan-ee1cb9acbc8d",
+      "second_id": "japan-sengoku-5cb0ec534fa1",
+      "first_cell": 37495,
+      "second_cell": 37493,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    }
+  ]
+}

@@ -5,6 +5,7 @@
 :where(button,a[href],input,select,textarea,[tabindex]):where(:focus:not(:focus-visible)){outline:none}
 #hq-screen .menu-bar::after{display:none}#hq-medals{background:#3f3f3f;padding:0 4px}#hq-roster{scrollbar-width:none!important}#hq-roster::-webkit-scrollbar{display:none}#campaign-battles{background-image:url("content/ui/image_menu_hd/choosestage_back.png")!important}
 *{box-sizing:border-box}body{margin:0;overflow:hidden}button{font:inherit;color:inherit;cursor:pointer;border:0;border-radius:0;padding:0;background:transparent}button:hover{filter:brightness(1.12)}button:active{filter:brightness(.85)}button:disabled{opacity:.5;cursor:default}button:focus-visible{outline:2px solid #fff;outline-offset:2px}[hidden]{display:none!important}h1,h2,p{margin:0}
+#menu-button:hover,#menu-button:active{filter:none}
 #country-list{overflow-x:hidden;scrollbar-width:none}
 #country-list::-webkit-scrollbar{display:none}
 #countries #country-list{width:160px}

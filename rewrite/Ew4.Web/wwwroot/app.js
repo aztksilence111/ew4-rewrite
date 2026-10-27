@@ -11,6 +11,7 @@ const resourceHud=['money','industry','food'].map((key,index)=>{
 });
 let startupReady=false,startupRunning=false,startupError='';
 let effects,damageNumbers,music;
+let selectionRequest=0,dialoguePresentationKey=null,dialoguePresentationTask=null;
 let originalTextQueued=false;
 const originalTextChanges=new MutationObserver(()=>{
   if(!originalTextRenderer||originalTextQueued)return;originalTextQueued=true;
@@ -19,7 +20,7 @@ const originalTextChanges=new MutationObserver(()=>{
 originalTextChanges.observe(document.body,{childList:true,characterData:true,attributes:true,attributeFilter:['hidden'],subtree:true});
 let view = {x: 0, y: 0, zoom: 1}, viewport = {w: 0, h: 0, dpr: 1};
 const images = new Map(), libraries = new Map();
-const imageLoads=new Map(),libraryLoads=new Map(),performanceLog=new Ew4Performance();
+const imageLoads=new Map(),waterImages=new Map(),libraryLoads=new Map(),performanceLog=new Ew4Performance();
 window.ew4Performance=performanceLog;
 let preloadVersion=0;
 function cancelBattlePreload(){preloadVersion++;}
@@ -55,6 +56,7 @@ new MutationObserver(requestRender).observe(document.body,{subtree:true,childLis
 for(const event of ['pointerdown','pointermove','pointerup','wheel','input','change','click'])document.addEventListener(event,requestRender,{passive:true});
 const mapViews=new Ew4MapViews.Controls($('map-view-controls'),requestRender);
 const aiControl=new Ew4AiControl.Panel({state:()=>state,busy:()=>busy,transitioning:()=>sessionTransition,notice,action:act,
+  selectedTask:()=>selected?.aiTask,
   stop:async()=>{await stopAi();while(busy&&!sessionTransition)await new Promise(resolve=>setTimeout(resolve,25));if(!sessionTransition)await act('player_ai_stop');},render:requestRender,
   beginPick:()=>{mapViews.close();closeSingleAction();selected=undefined;selection=undefined;$('selection').hidden=true;},endPick:()=>{},
   pauseSync:()=>pauseObjectives.sync(),fitObjectives:()=>pauseObjectives.fit(),cellAt,unitScreen:unit=>{const p=point(unit.cell);return {x:(p.x-view.x)*view.zoom+viewport.w/2,y:(p.y-view.y)*view.zoom+viewport.h/2};},
@@ -65,11 +67,22 @@ const pauseObjectives=new Ew4PauseObjectives.Panel({rpc,state:()=>state,notice,
   imagePath:name=>Ew4NativeUI.resource(manifest,name)?.file||'',
   repaintMenu:()=>{for(const element of document.querySelectorAll('#pause [data-label]'))element.replaceChildren(originalTextRenderer.forElement(element,element.getAttribute('aria-label')));
     $('turn').replaceChildren(originalTextRenderer.element('回合  '+state.round,'font_text_2_cn_hd','#404040',undefined,'center',{size:20}));}});
-const battlefield = new Ew4Battlefield.Renderer({image,sprite,animation,libraries,loadLibrary,requestFrame:requestRender,get mapMode(){return mapViews.mode;},get cameraActive(){return performance.now()<cameraInputUntil;},get warmingPaused(){return aiRunning;},get visible(){return appVisible;},get imageRevision(){return imageRevision;},get effects(){return effects;},get manifest(){return manifest;},get geographicLanguage(){return settings.geographicLanguage;},cityLabel:(name,cell,rasterScale=1)=>{
-  const translated=manifest.maps[state.map].cityNames?.[cell];
-  const text=translated?.name===name?translated[settings.cityLanguage]:Ew4MenuArt.cityName(name,settings.cityLanguage,cityNames);
-  return originalTextRenderer.element(text,'font_city_labels_hd','#ffffff',undefined,'left',{rasterScale});
+const battlefield = new Ew4Battlefield.Renderer({image,sprite,animation,libraries,loadLibrary,requestFrame:requestRender,get mapMode(){return mapViews.mode;},get cameraActive(){return pointers.size>0||performance.now()<cameraInputUntil;},get warmingPaused(){return aiRunning;},get visible(){return appVisible;},get imageRevision(){return imageRevision;},get effects(){return effects;},get manifest(){return manifest;},get cityLanguage(){return settings.cityLanguage;},get geographicLanguage(){return settings.geographicLanguage;},cityLabelSize:(name,cell)=>{
+  const layout=originalTextRenderer.layout(cityLabelText(name,cell,state.map,settings.cityLanguage),'font_city_labels_hd');
+  return {width:(layout.width+8)/2,height:(layout.height+10)/2};
+},cityLabel:(name,cell,rasterScale=1)=>{
+  return originalTextRenderer.element(cityLabelText(name,cell,state.map,settings.cityLanguage),'font_city_labels_hd','#ffffff',undefined,'left',{rasterScale});
 }});
+function cityLabelText(name,cell,map,language){
+  const translated=manifest.maps[map].cityNames?.[cell];
+  return translated?.name===name?translated[language]:Ew4MenuArt.cityName(name,language,cityNames);
+}
+async function prepareMapFonts(next,preferences=settings){
+  const names=next.cells.flatMap((cell,index)=>cell.name?[cityLabelText(cell.name,index,next.map,preferences.cityLanguage)]:[]);
+  const geography=preferences.geographicLanguage==='zh'?(manifest.maps[next.map].labels||[]):[];
+  await Promise.all([Ew4OriginalUI.prepareText(names.join('')),
+    ...geography.map(label=>Ew4OriginalUI.prepareMapText(label.textZh||'',!label.sea))]);
+}
 const menus = new Ew4Menus.Menus({rpc,button,uiImage,countryImage,labels:labelImage,text:(value,font,color,width,align,options)=>originalTextRenderer?.element(value,font,color,width,align,options)||document.createTextNode(value),prose:(...args)=>originalTextRenderer.prose(...args),detail:detailWindow,start,loadLibrary,image,animation,libraries,notice,main:showMain,
   get manifest(){return manifest;},get catalog(){return catalog;},refreshCatalog:async()=>{catalog=await rpc('catalog');},tutorialUi,popup:popupOpen,load:(slot,mode)=>load(slot,mode),deploy:(unit,commander)=>act('deploy',{unit,commander}),act,
   refresh:async()=>{if(state&&!$('play').hidden){await installState(await rpc('action',{op:'state',revision:state.revision}));}},get menuArt(){return menuArt;},closeDetail});
@@ -177,7 +190,8 @@ async function showMain() {
     await stopAi();
     busy=true;
     if(state)await rpc('leave',{revision:state.revision});
-    state=undefined;selected=undefined;selection=undefined;tutorial=null;tutorialRect=null;
+    state=undefined;selected=undefined;selection=undefined;selectionRequest++;tutorial=null;tutorialRect=null;
+    refreshDialogue();
     music?.menu();
     battleDialogues.length=0;
     detailReturn=null;victoryUi.reset();localMultiplayerUi.sync(null);
@@ -226,6 +240,10 @@ function failure(code, message) {
 }
 function image(path) {
   if (!images.has(path)) { const img = new Image(); img.addEventListener('load',()=>{imageRevision++;requestRender();});img.src = '/content/' + path; images.set(path, img); }
+  if(path.includes('/water-detail/')){
+    waterImages.delete(path);waterImages.set(path,images.get(path));
+    while(waterImages.size>64){const [old,bitmap]=waterImages.entries().next().value;waterImages.delete(old);images.delete(old);ctx?.release?.(bitmap);}
+  }
   return images.get(path);
 }
 async function loadImage(path) {
@@ -362,6 +380,7 @@ async function installState(next, center = false) {
   const keepUnit=center?null:selected?.id,keepCell=center?null:selection?.cell;
   const used = battleLibraries(next,center);
   await performanceLog.stage('libraries',()=>Promise.all([...used, 'choose', 'maptext', 'anim_fire', 'anim_upgrade', 'anim_smoke'].map(loadLibrary)));
+  if(center)await performanceLog.stage('map-fonts',()=>prepareMapFonts(next));
   if(!center)focusAiAction(next);
   if(!center&&next.combat&&!(aiRunning&&skipAi)){
     selection=undefined;$('selection').hidden=true;
@@ -410,7 +429,7 @@ async function installState(next, center = false) {
       queueBattleDialogue(speaker,choices[Math.floor(Math.random()*choices.length)]);
     }
   }
-  state = next; selected = undefined; selection = undefined; $('selection').hidden = true;
+  state = next; selected = undefined; selection = undefined; selectionRequest++; $('selection').hidden = true;
   if(resetPause){pauseObjectives.reset();aiControl.reset();}
   else if(!$('pause').hidden)pauseObjectives.sync();
   music?.sync(next,center);
@@ -447,6 +466,7 @@ async function installState(next, center = false) {
   motions.clear();arrivals.clear();
   requestRender();
   if(!center&&state.activeFaction===state.playerFaction&&!state.dialogue){const unit=state.units.find(u=>u.id===keepUnit);const cell=unit?.cell??(keepUnit?null:keepCell);if(cell!=null)await selectCell(cell,true);}
+  if(dialoguePresentationTask)await dialoguePresentationTask;
 }
 function playAttachedEffects(previous,next){
   const oldUnits=new Map(previous.units.map(u=>[u.id,u])),units=new Map(next.units.map(u=>[u.id,u])),upgraded=new Set(),healed=new Set(),commanders=new Set(),speed=Math.sqrt(settings.speed);
@@ -637,6 +657,28 @@ function updateHudText(host,value,font,color,size) {
   host.ew4HudText=text;host.ew4HudRenderer=originalTextRenderer;host.ew4HudSize=size;
   return true;
 }
+function refreshDialogue(){
+  const host=$('dialogue'),talk=state?.dialoguePresentation;
+  if(!state?.dialogue||state.scenarioPopup||stageIntroOpen){
+    host.hidden=true;dialoguePresentationKey=null;dialoguePresentationTask=null;return;
+  }
+  const key=JSON.stringify([state.dialogue,talk?.name,talk?.portrait,talk?.left]);
+  if(dialoguePresentationKey===key)return;
+  dialoguePresentationKey=key;host.hidden=true;
+  const text=state.dialogue,name=talk?.name||'',portrait=talk?.portrait?menus.portrait(talk.portrait):document.createElement('img');
+  portrait.id='dialogue-portrait';portrait.alt=name;portrait.hidden=!talk?.portrait;
+  // Keep a cold portrait and newly requested font subsets out of the visible panel.
+  const ready=Promise.all([Ew4OriginalUI.prepareText(text+name),talk?.portrait?portrait.decode().catch(()=>{portrait.hidden=true;}):null]);
+  const task=ready.then(()=>{
+    if(dialoguePresentationTask!==task||dialoguePresentationKey!==key)return;
+    $('dialogue-ok').classList.toggle('speaker-right',talk?.left===false);
+    $('dialogue-text').replaceChildren(originalTextRenderer.element(text,'font_text_1_cn_hd','#404040',216));
+    $('dialogue-speaker').replaceChildren(originalTextRenderer.element(name,'font_text_2_cn_hd','#646464',216,'center'));
+    $('dialogue-portrait').replaceWith(portrait);$('dialogue-text').scrollTop=0;
+    host.hidden=false;requestRender();
+  });
+  dialoguePresentationTask=task;
+}
 function refreshHud() {
   aiControl.sync();
   if(!$('pause').hidden||state?.dialogue||state?.scenarioPopup)mapViews.close();
@@ -678,7 +720,7 @@ function refreshHud() {
   $('skip-ai').hidden = active.human || state.phase === 'Finished' || !!state.dialogue || !!state.scenarioPopup || settings.autoTurnFast;
   $('skip-ai').disabled = skipAi;
   refreshAiProgress();
-  $('dialogue').hidden = !state.dialogue || !!state.scenarioPopup || stageIntroOpen;
+  refreshDialogue();
   $('scenario-event').hidden = !state.scenarioPopup || stageIntroOpen;
   if(state.scenarioPopup){
     const popup=state.scenarioPopup;
@@ -709,14 +751,6 @@ function refreshHud() {
     }
     content.scrollTop=contentScroll;choices.scrollTop=choicesScroll;
   }else delete $('scenario-event').dataset.event;
-  if(state.dialogue&&!state.scenarioPopup){
-    const talk=state.dialoguePresentation;
-    $('dialogue-ok').classList.toggle('speaker-right',talk?.left===false);
-    $('dialogue-text').replaceChildren(originalTextRenderer.element(state.dialogue,'font_text_1_cn_hd','#404040',216));
-    $('dialogue-speaker').replaceChildren(originalTextRenderer.element(talk?.name||'','font_text_2_cn_hd','#646464',216,'center'));
-    $('dialogue-portrait').replaceWith(Object.assign(talk?.portrait?menus.portrait(talk.portrait):document.createElement('img'),{id:'dialogue-portrait',alt:talk?.name||'',hidden:!talk?.portrait}));
-    $('dialogue-text').scrollTop=0;
-  }
   $('status').textContent = state.phase === 'Finished' ? (state.outcome === 'Victory' ? '胜利' : '本局结束') : '';
   victoryUi.sync(state.localMultiplayer?null:state);
   localMultiplayerUi.sync(state);
@@ -795,38 +829,50 @@ async function runAiLoop() {
 }
 function aiCanContinue(next){return !aiControl.mode&&!stageIntroOpen&&next&&!next.dialogue&&!next.scenarioPopup&&next.phase!=='Finished'&&
   (!next.factions.find(f=>f.id===next.activeFaction).human||next.activeFaction===next.playerFaction&&next.playerAi?.enabled&&(next.playerAi.endingTurn||next.playerAi.autoBattle));}
-async function selectCell(cell,restore=false,selectOnly=false) {
-  if(aiControl.mode||state?.playerAi?.endingTurn)return;
-  if ((!restore&&busy) || !state || cell < 0 || cell >= state.cells.length || !state.cells[cell].active) return;
-  closeSingleAction();
-  if(!restore&&tutorial?.wait?.name==='wait area'&&Number(tutorial.wait.id)!==cell)return;
-  const target = state.units.find(u => u.cell === cell);
-  if (!restore && !selectOnly && selected && selection && state.activeFaction === state.playerFaction && !state.dialogue) {
-    if (target && selection.targets?.includes(cell))
-      return act('attack', {target:target.id}).then(()=>tutorial?.notify({type:'area',cell}));
-    if (!target && selection.range.includes(cell)) return act('move', {cell}).then(()=>tutorial?.notify({type:'area',cell}));
-  }
-  selection = await rpc('action', {op:'select', cell, revision:state.revision});
-  selected = target;if(!restore)selectedAt = performance.now(); const site = state.cells[cell];
-  $('selection').hidden = false;
-  const own = target?.owner === state.playerFaction;
-  $('actions').replaceChildren(); $('terrain-info').replaceChildren();
-  const terrainRows=Ew4Battlefield.terrainRows(site);
-  $('terrain-info').hidden=!terrainRows.length;
-  const incomeRows=terrainRows.filter(r=>!r.defense),defenseRows=terrainRows.filter(r=>r.defense);
-  $('terrain-info').classList.toggle('with-defense',defenseRows.length>0&&incomeRows.length>0);
-  for(const rows of [incomeRows,defenseRows]){
-    if(!rows.length)continue;
+function refreshTerrainInfo(site){
+  const host=$('terrain-info'),rows=Ew4Battlefield.terrainRows(site),key=JSON.stringify(rows);
+  host.hidden=!rows.length;
+  if(host.ew4TerrainKey===key&&host.ew4TerrainRenderer===originalTextRenderer)return;
+  const income=rows.filter(row=>!row.defense),defense=rows.filter(row=>row.defense),columns=[];
+  host.classList.toggle('with-defense',defense.length>0&&income.length>0);
+  for(const group of [income,defense]){
+    if(!group.length)continue;
     const column=document.createElement('div');column.className='terrain-column';
-    for(const row of rows){
+    for(const row of group){
       const entry=document.createElement('div');entry.className='terrain-row';
       if(row.icon)entry.append(uiImage(row.icon,18));
       if(row.geography){const label=document.createElement('span');label.textContent=row.text;entry.append(label);}
       else entry.append(originalTextRenderer.element(row.text,'font_char_2_hd','#eeeeee'));
       column.append(entry);
     }
-    $('terrain-info').append(column);
+    columns.push(column);
   }
+  host.replaceChildren(...columns);host.ew4TerrainKey=key;host.ew4TerrainRenderer=originalTextRenderer;
+}
+async function selectCell(cell,restore=false,selectOnly=false) {
+  if(aiControl.mode||state?.playerAi?.endingTurn)return;
+  if ((!restore&&busy) || !state || cell < 0 || cell >= state.cells.length || !state.cells[cell].active) return;
+  closeSingleAction();
+  if(!restore&&tutorial?.wait?.name==='wait area'&&Number(tutorial.wait.id)!==cell)return;
+  if(!restore&&!selectOnly&&selection?.cell===cell){
+    selectionRequest++;selected=undefined;selection=undefined;$('selection').hidden=true;
+    refreshHud();requestRender();await tutorial?.notify({type:'area',cell});return;
+  }
+  const target = state.units.find(u => u.cell === cell);
+  if (!restore && !selectOnly && selected && selection && state.activeFaction === state.playerFaction && !state.dialogue) {
+    if (target && selection.targets?.includes(cell))
+      return act('attack', {target:target.id}).then(()=>tutorial?.notify({type:'area',cell}));
+    if (!target && selection.range.includes(cell)) return act('move', {cell}).then(()=>tutorial?.notify({type:'area',cell}));
+  }
+  const source=state,request=++selectionRequest;
+  const next=await rpc('action', {op:'select', cell, revision:source.revision});
+  if(request!==selectionRequest||state!==source||aiControl.mode)return;
+  selection=next;
+  selected = target;if(!restore)selectedAt = performance.now(); const site = state.cells[cell];
+  $('selection').hidden = false;
+  const own = target?.owner === state.playerFaction;
+  $('actions').replaceChildren();
+  refreshTerrainInfo(site);
   if(selection.deploy) toolButton('general','任命将领',()=>menus.deployGeneral(target.id,state.revision));
   if(selection.actionQuotes?.upgrade) singleActionButton('buildupgrade','升级建筑','upgrade',selection.actionQuotes.upgrade,{cell});
   if(selection.installationOffers?.length) toolButton('builddefense','防御',()=>openDefense(cell));
@@ -1151,6 +1197,15 @@ function drawStrategicMap(time=performance.now()) {
   const surface=$('strategic-map'), draw=surface.getContext('2d'), lib=libraries.get('strategicmap');
   if(!lib || !chosenScenario)return;
   const definition=manifest.strategic[chosenScenario]||{};
+  if(definition.preview){
+    const rect=surface.getBoundingClientRect(),ratio=settings.hd?Math.min(devicePixelRatio||1,3):1;
+    surface.width=Math.max(1,Math.round(rect.width*ratio));surface.height=Math.max(1,Math.round(rect.height*ratio));
+    draw.setTransform(ratio,0,0,ratio,0,0);draw.clearRect(0,0,rect.width,rect.height);
+    const preview=image(definition.preview),width=rect.width-158;
+    if(preview.complete&&preview.naturalWidth){const scale=Math.min(width/preview.naturalWidth,rect.height/preview.naturalHeight);
+      const w=preview.naturalWidth*scale,h=preview.naturalHeight*scale;draw.drawImage(preview,(width-w)/2,(rect.height-h)/2,w,h);}
+    return;
+  }
   const textureScale=manifest.uiOverrides?.strategic?1:.8;
   const logicalWidth=surface.clientWidth,logicalHeight=surface.clientHeight;
   const mapWidth=logicalWidth-158,texture=menuArt.strategic;
@@ -1291,8 +1346,15 @@ const languageControls=[['city-language','cityLanguage','城市名称'],['geogra
 for(const [id,key,title] of languageControls){
   const row=document.createElement('div');row.className='setting-row language-row '+id;
   const caption=document.createElement('span');caption.textContent=title;row.append(caption);
-  const choice=button('',()=>{settings[key]=settings[key]==='zh'?'en':'zh';syncLanguages();
-    if(key==='cityLanguage')battlefield.cityLabels.clear();else battlefield.mapLabels.clear();persistSettings();},row);
+  const choice=button('',async()=>{
+    choice.disabled=true;
+    try{
+      const language=settings[key]==='zh'?'en':'zh';
+      if(state)await prepareMapFonts(state,{...settings,[key]:language});
+      settings[key]=language;syncLanguages();
+      if(key==='cityLanguage')battlefield.cityLabels.clear();else battlefield.mapLabels.clear();persistSettings();
+    }finally{choice.disabled=false;}
+  },row);
   choice.id=id;choice.title=title+'语言';$('settings-content').append(row);
 }
 function syncLanguages(){for(const [id,key,title] of languageControls){const choice=$(id),text=settings[key]==='zh'?'中文':'English';

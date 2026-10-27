@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import zipfile
+import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser()
@@ -15,6 +16,7 @@ parser.add_argument("--date", default="20261020")
 parser.add_argument("--notes", default="rewrite/RELEASE_0.2.4_20261020.md")
 parser.add_argument("--rule-api", type=int, choices=(1, 2, 3), default=1)
 parser.add_argument("--android-only", action="store_true")
+parser.add_argument("--extra-file", action="append", default=[], help="Optional importable content included in the release checksum manifest")
 args = parser.parse_args()
 build = ROOT / args.build
 assets = build / "assets"
@@ -29,7 +31,8 @@ if not args.android_only:
 report = json.loads((build / "android-verification.json").read_text(encoding="utf-8"))
 source_apk = ROOT / report["apk"]
 assert hashlib.sha256(source_apk.read_bytes()).hexdigest() == report["sha256"]
-info = dict(version=args.version, source=head, ruleApi=args.rule_api, builtinMaps=["europe", "america", "eastasia"],
+maps = [node.attrib["file"].removesuffix(".bin") for node in ET.parse(ROOT / "rewrite/data/original/def_map.xml").getroot() if "file" in node.attrib]
+info = dict(version=args.version, source=head, ruleApi=args.rule_api, builtinMaps=maps,
             formalScenarios=95, androidDeviceExecution=False, apkCertificate="Android development certificate")
 if args.android_only:
     info["platforms"] = ["android-arm64"]
@@ -48,6 +51,13 @@ if not args.android_only:
         assert output.testzip() is None
         assert json.loads(output.read("release-info.json"))["source"] == head
     packages.append(archive)
+for relative in args.extra_file:
+    source = (ROOT / relative).resolve()
+    assert source.is_file() and ROOT in source.parents, "Extra content must be a repository file"
+    target = assets / source.name
+    assert target.name not in {p.name for p in packages}, "Duplicate release filename"
+    shutil.copyfile(source, target)
+    packages.append(target)
 files = [dict(name=p.name, bytes=p.stat().st_size, sha256=hashlib.sha256(p.read_bytes()).hexdigest())
          for p in packages]
 (assets / "SHA256SUMS.txt").write_text("".join(f"{p['sha256']}  {p['name']}\n" for p in files), encoding="ascii", newline="\n")

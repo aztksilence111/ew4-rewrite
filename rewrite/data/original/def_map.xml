@@ -3,4 +3,6 @@
   <map id="1" name="europe" continent="europe" file="europe.bin" w="4992" h="3582" tile="map1.bin" textpos="maptextpos_europe.xml" tilesize="64" pattern="map_pt.png" patternsize="512" />
   <map id="2" name="america" continent="america" file="america.bin" w="3456" h="4014" tile="map2.bin" textpos="maptextpos_america.xml" tilesize="64" pattern="map_pt.png" patternsize="512" />
   <map id="3" name="eastasia" continent="eastasia" file="eastasia.bin" w="10144" h="7362" textpos="maptextpos_eastasia.xml" />
+  <map id="4" name="japan" continent="japan" file="japan.bin" w="17056" h="11664" />
+  <map id="5" name="hre" continent="hre" file="hre.bin" w="12832" h="14040" />
 </maps>

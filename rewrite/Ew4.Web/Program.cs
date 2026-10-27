@@ -10,15 +10,16 @@ string data = Path.GetFullPath(builder.Configuration["data-root"] ?? (root == nu
 string saves = builder.Configuration["save-root"] ?? (root == null
     ? Path.Combine(AppContext.BaseDirectory, "saves") : Path.Combine(root, "rewrite/local/web"));
 string frontend = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
-byte[] Read(string path) => File.ReadAllBytes(path.StartsWith("frontend/", StringComparison.Ordinal)
-    ? Path.Combine(frontend, path[9..]) : Path.Combine(data, path));
+string ResourcePath(string path) => path.StartsWith("frontend/", StringComparison.Ordinal)
+    ? Path.Combine(frontend, path[9..]) : Path.Combine(data, path);
+byte[] Read(string path) => File.ReadAllBytes(ResourcePath(path));
 var files = new[] { "original", "legacy", "client", "rewrite" }.Where(part => Directory.Exists(Path.Combine(data, part))).SelectMany(part => Directory.EnumerateFiles(Path.Combine(data, part), "*", SearchOption.AllDirectories)
     .Where(p => part != "legacy" || Path.GetDirectoryName(p) == Path.Combine(data, part))
     .Select(p => Path.GetRelativePath(data, p).Replace('\\', '/'))).Concat(["frontend/conquest-pages.json", "frontend/city-names.json"]);
 ModStore store = null!;
 Task StartGame() => Task.Run(() =>
 {
-    var prepared = StartupAssets.Prepare(new ModBase(Read, files), Path.Combine(saves, "startup-assets"),
+    var prepared = StartupAssets.Prepare(new ModBase(Read, files, openRead: p => File.OpenRead(ResourcePath(p))), Path.Combine(saves, "startup-assets"),
         p => System.Console.WriteLine(p.Message));
     store = new ModStore(prepared.Content, builder.Configuration["mod-root"] ?? Path.Combine(saves, "content-mods"), saves);
 });

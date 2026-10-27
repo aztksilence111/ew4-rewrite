@@ -1,0 +1,213 @@
+{
+  "date": "2026-10-27T10:59:41.709Z",
+  "source": "http://127.0.0.1:5586",
+  "method": "Current game Canvas renderer, complete map extent, all named sites, Chinese curved geographic lettering",
+  "maps": [
+    {
+      "key": "japan",
+      "width": 6000,
+      "height": 4103,
+      "worldWidth": 17056,
+      "worldHeight": 11664,
+      "extent": {
+        "left": 0,
+        "top": 0,
+        "width": 17056,
+        "height": 11664
+      },
+      "crop": false,
+      "counts": {
+        "port": 35,
+        "city": 177,
+        "farmland": 153,
+        "stable": 25,
+        "industry": 20
+      },
+      "levels": {
+        "farmland": {
+          "1": 43,
+          "2": 37,
+          "3": 73
+        },
+        "city": {
+          "1": 53,
+          "2": 83,
+          "3": 5,
+          "4": 23,
+          "5": 8,
+          "6": 3,
+          "7": 2
+        }
+      },
+      "names": 257,
+      "geography": [
+        "北海道中央山地",
+        "日高山脉",
+        "奥羽山脉",
+        "北上山地",
+        "越后山脉",
+        "飞驒山脉",
+        "木曾山脉",
+        "赤石山脉",
+        "纪伊山地",
+        "中国山地",
+        "四国山地",
+        "九州山地",
+        "太白山脉",
+        "小白山脉",
+        "咸镜山脉",
+        "石狩平原",
+        "仙台平原",
+        "关东平原",
+        "浓尾平原",
+        "大阪平原",
+        "筑紫平原",
+        "新潟平原",
+        "日本海",
+        "太平洋",
+        "东海",
+        "鄂霍次克海",
+        "濑户内海"
+      ],
+      "nativeDraws": {
+        "farmland": 153,
+        "city": 177,
+        "industry": 20,
+        "stable": 25,
+        "port": 35
+      },
+      "portDirections": [
+        "port_1.png",
+        "port_2.png",
+        "port_3.png",
+        "port_4.png"
+      ],
+      "geographicCanvases": 27,
+      "colors": 9836,
+      "opaqueSamples": 384657,
+      "overlapCount": 0,
+      "clippedNames": 0,
+      "pendingFonts": [],
+      "waterTiles": 30,
+      "waterDetailTiles": 204,
+      "inputs": {
+        "rewrite/data/client/manifest.json": "990f87bcb0dcc37c1e944d68aab47e070d2f684e4a38eaae8093be13ab0c97a8",
+        "maps/japan/buildings.json": "b44201d4b5b2bfe2510a2214fd588d37ff5df7aa88635dfd4beb2cb0d0bd7c5a",
+        "maps/japan/farmland.json": "e6ee44f262351c952121e39ce4305d0492a428d194b8b5ec4a9cf67a98e2a76a",
+        "maps/japan/japan.bin": "2d99cee96b45e070ee8615c905cfb118dd65be1a78dd7d1facccec0af1ead794"
+      },
+      "file": "maps/japan/game-full-overview.jpg",
+      "labelsFile": "maps/japan/game-full-overview.labels.json",
+      "bytes": 3766701,
+      "sha256": "239796f047ef182bcab11e49742bbbfacaa47f1b8c29391c253c256113776301"
+    },
+    {
+      "key": "hre",
+      "width": 6000,
+      "height": 6565,
+      "worldWidth": 12832,
+      "worldHeight": 14040,
+      "extent": {
+        "left": 0,
+        "top": 0,
+        "width": 12832,
+        "height": 14040
+      },
+      "crop": false,
+      "counts": {
+        "farmland": 262,
+        "city": 266,
+        "port": 37,
+        "stable": 46,
+        "industry": 36
+      },
+      "levels": {
+        "farmland": {
+          "1": 88,
+          "2": 51,
+          "3": 123
+        },
+        "city": {
+          "1": 47,
+          "2": 115,
+          "3": 50,
+          "4": 30,
+          "5": 13,
+          "6": 6,
+          "7": 5
+        }
+      },
+      "names": 385,
+      "geography": [
+        "阿尔卑斯山脉",
+        "亚平宁山脉",
+        "汝拉山脉",
+        "孚日山脉",
+        "黑森林",
+        "哈茨山地",
+        "图林根林山",
+        "厄尔士山脉",
+        "苏台德山脉",
+        "波希米亚林山",
+        "喀尔巴阡山脉",
+        "法国中央高地",
+        "迪纳拉山脉",
+        "斯莫兰高地",
+        "莱茵河谷",
+        "波河平原",
+        "维也纳盆地",
+        "匈牙利平原",
+        "北德平原",
+        "北海",
+        "波罗的海",
+        "亚得里亚海",
+        "利古里亚海",
+        "西阿尔卑斯山脉",
+        "奔宁阿尔卑斯山脉",
+        "雷蒂亚阿尔卑斯山脉",
+        "多洛米蒂山脉",
+        "利古里亚亚平宁山脉"
+      ],
+      "nativeDraws": {
+        "farmland": 262,
+        "city": 266,
+        "industry": 36,
+        "stable": 46,
+        "port": 37
+      },
+      "portDirections": [
+        "port_1.png",
+        "port_2.png",
+        "port_3.png",
+        "port_4.png"
+      ],
+      "geographicCanvases": 28,
+      "colors": 16439,
+      "opaqueSamples": 615433,
+      "overlapCount": 0,
+      "clippedNames": 0,
+      "pendingFonts": [],
+      "waterTiles": 42,
+      "waterDetailTiles": 182,
+      "inputs": {
+        "rewrite/data/client/manifest.json": "990f87bcb0dcc37c1e944d68aab47e070d2f684e4a38eaae8093be13ab0c97a8",
+        "maps/hre/buildings.json": "adbc6d3994060efe201030f9fdd780cece8444a041d14017c7e1ccd0925ca676",
+        "maps/hre/farmland.json": "d3f55c6a3f72be0be68faf23597b404242478a749e50683c848cb0632792f131",
+        "maps/hre/hre.bin": "56e802e615d7080e24a6ab3dab380aa027bae9e9f99549f04971e242ee3e6042"
+      },
+      "file": "maps/hre/game-full-overview.jpg",
+      "labelsFile": "maps/hre/game-full-overview.labels.json",
+      "bytes": 11721619,
+      "sha256": "8e2d248a37b771038683eb04ff263c718397d37853894dfe0b3990f4087f1da7"
+    }
+  ],
+  "errors": 0,
+  "missing": [],
+  "activeMod": "7901bbefe89657b6394351a4aa9676473b5f142c930859e7ba199ac1d8fdf33a",
+  "published": {
+    "baseRevision": "c612c9dda5d5acc48ca985075ade5ff97027e4db5fef911abf3f364371bb53f8",
+    "url": "http://127.0.0.1:5585",
+    "activeMod": "7901bbefe89657b6394351a4aa9676473b5f142c930859e7ba199ac1d8fdf33a",
+    "resourceDifferences": 0
+  }
+}

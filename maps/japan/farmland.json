@@ -1,0 +1,3839 @@
+{
+  "schema": 1,
+  "records": [
+    {
+      "id": "japan-farm-11427",
+      "cell": 11427,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 141.6746071439367,
+      "lat": 43.13025243386259,
+      "world_pixel": [
+        13632.0,
+        2250.0
+      ],
+      "region": "石狩平原",
+      "reason": "grain-region",
+      "anchorCity": "岩见泽",
+      "anchorCityId": "japan-2e0f35666ed0",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-10891",
+      "cell": 10891,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 141.47122785588522,
+      "lat": 43.20993396475657,
+      "world_pixel": [
+        13504.0,
+        2142.0
+      ],
+      "region": "石狩平原",
+      "reason": "grain-region",
+      "anchorCity": "札幌",
+      "anchorCityId": "japan-3ff91de9fe54",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-10626",
+      "cell": 10626,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 141.65986096009456,
+      "lat": 43.31473083805842,
+      "world_pixel": [
+        13664.0,
+        2088.0
+      ],
+      "region": "石狩平原",
+      "reason": "grain-region",
+      "anchorCity": "岩见泽",
+      "anchorCityId": "japan-2e0f35666ed0",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-9830",
+      "cell": 9830,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 141.97691220280674,
+      "lat": 43.57344479408839,
+      "world_pixel": [
+        13952.0,
+        1926.0
+      ],
+      "region": "空知平原",
+      "reason": "grain-region",
+      "anchorCity": "岩见泽",
+      "anchorCityId": "japan-2e0f35666ed0",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-10362",
+      "cell": 10362,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 141.84849406430388,
+      "lat": 43.419527711360274,
+      "world_pixel": [
+        13824.0,
+        2034.0
+      ],
+      "region": "空知平原",
+      "reason": "grain-region",
+      "anchorCity": "岩见泽",
+      "anchorCityId": "japan-2e0f35666ed0",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-9560",
+      "cell": 9560,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 141.75079852382314,
+      "lat": 43.585447227597584,
+      "world_pixel": [
+        13792.0,
+        1872.0
+      ],
+      "region": "空知平原",
+      "reason": "grain-region",
+      "anchorCity": "岩见泽",
+      "anchorCityId": "japan-2e0f35666ed0",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-13579",
+      "cell": 13579,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 143.15171914925128,
+      "lat": 42.95999741395492,
+      "world_pixel": [
+        14656.0,
+        2682.0
+      ],
+      "region": "十胜平原",
+      "reason": "grain-region",
+      "anchorCity": "带广",
+      "anchorCityId": "japan-76249096c873",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-14116",
+      "cell": 14116,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 143.43804779394134,
+      "lat": 42.89887477101947,
+      "world_pixel": [
+        14848.0,
+        2790.0
+      ],
+      "region": "十胜平原",
+      "reason": "grain-region",
+      "anchorCity": "带广",
+      "anchorCityId": "japan-76249096c873",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-13309",
+      "cell": 13309,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 142.92560547026767,
+      "lat": 42.97199984746412,
+      "world_pixel": [
+        14496.0,
+        2628.0
+      ],
+      "region": "十胜平原",
+      "reason": "grain-region",
+      "anchorCity": "带广",
+      "anchorCityId": "japan-76249096c873",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-9569",
+      "cell": 9569,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 142.49734273357043,
+      "lat": 43.752477219224374,
+      "world_pixel": [
+        14368.0,
+        1872.0
+      ],
+      "region": "上川盆地",
+      "reason": "grain-region",
+      "anchorCity": "旭川",
+      "anchorCityId": "japan-b3b5c3b85572",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-10101",
+      "cell": 10101,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 142.36892459506754,
+      "lat": 43.59856013649626,
+      "world_pixel": [
+        14240.0,
+        1980.0
+      ],
+      "region": "上川盆地",
+      "reason": "grain-region",
+      "anchorCity": "旭川",
+      "anchorCityId": "japan-b3b5c3b85572",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-20483",
+      "cell": 20483,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 140.48689106905073,
+      "lat": 40.73636868298709,
+      "world_pixel": [
+        12224.0,
+        4086.0
+      ],
+      "region": "津轻平原",
+      "reason": "grain-region",
+      "anchorCity": "弘前",
+      "anchorCityId": "japan-951d3d11e742",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-19947",
+      "cell": 19947,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 140.28351178099925,
+      "lat": 40.81605021388108,
+      "world_pixel": [
+        12096.0,
+        3978.0
+      ],
+      "region": "津轻平原",
+      "reason": "grain-region",
+      "anchorCity": "弘前",
+      "anchorCityId": "japan-951d3d11e742",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-25014",
+      "cell": 25014,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 140.1833557798428,
+      "lat": 39.60438291540421,
+      "world_pixel": [
+        11744.0,
+        5004.0
+      ],
+      "region": "秋田平原",
+      "reason": "grain-region",
+      "anchorCity": "秋田",
+      "anchorCityId": "japan-c510d4c0458a",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-24213",
+      "cell": 24213,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 140.08566023936208,
+      "lat": 39.77030243164151,
+      "world_pixel": [
+        11712.0,
+        4842.0
+      ],
+      "region": "秋田平原",
+      "reason": "grain-region",
+      "anchorCity": "秋田",
+      "anchorCityId": "japan-c510d4c0458a",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-27946",
+      "cell": 27946,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 139.93327747958918,
+      "lat": 38.859912844171525,
+      "world_pixel": [
+        11392.0,
+        5598.0
+      ],
+      "region": "庄内平原",
+      "reason": "grain-region",
+      "anchorCity": "酒田",
+      "anchorCityId": "japan-dc2fd3bbfe41",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-28210",
+      "cell": 28210,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 139.74464437537986,
+      "lat": 38.75511597086967,
+      "world_pixel": [
+        11232.0,
+        5652.0
+      ],
+      "region": "庄内平原",
+      "reason": "grain-region",
+      "anchorCity": "鹤冈",
+      "anchorCityId": "japan-a87443fc6a89",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-27145",
+      "cell": 27145,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 139.91853129574704,
+      "lat": 39.04439124836736,
+      "world_pixel": [
+        11424.0,
+        5436.0
+      ],
+      "region": "庄内平原",
+      "reason": "grain-region",
+      "anchorCity": "酒田",
+      "anchorCityId": "japan-dc2fd3bbfe41",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-31426",
+      "cell": 31426,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 140.96492010368868,
+      "lat": 38.27702678550579,
+      "world_pixel": [
+        12000.0,
+        6300.0
+      ],
+      "region": "仙台平原",
+      "reason": "grain-region",
+      "anchorCity": "仙台",
+      "anchorCityId": "japan-226f27dc1c1e",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-30626",
+      "cell": 30626,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 140.95017391984652,
+      "lat": 38.461505189701626,
+      "world_pixel": [
+        12032.0,
+        6138.0
+      ],
+      "region": "仙台平原",
+      "reason": "grain-region",
+      "anchorCity": "仙台",
+      "anchorCityId": "japan-226f27dc1c1e",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-31958",
+      "cell": 31958,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 140.8365019651858,
+      "lat": 38.123109702777676,
+      "world_pixel": [
+        11872.0,
+        6408.0
+      ],
+      "region": "仙台平原",
+      "reason": "grain-region",
+      "anchorCity": "仙台",
+      "anchorCityId": "japan-226f27dc1c1e",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-31157",
+      "cell": 31157,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 140.73880642470505,
+      "lat": 38.28902921901498,
+      "world_pixel": [
+        11840.0,
+        6246.0
+      ],
+      "region": "仙台平原",
+      "reason": "grain-region",
+      "anchorCity": "仙台",
+      "anchorCityId": "japan-226f27dc1c1e",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-27159",
+      "cell": 27159,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 141.07982228868727,
+      "lat": 39.30421567978682,
+      "world_pixel": [
+        12320.0,
+        5436.0
+      ],
+      "region": "北上盆地",
+      "reason": "grain-region",
+      "anchorCity": "花卷",
+      "anchorCityId": "japan-96a841179a39",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-28760",
+      "cell": 28760,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 141.10931465637157,
+      "lat": 38.93525887139515,
+      "world_pixel": [
+        12256.0,
+        5760.0
+      ],
+      "region": "北上盆地",
+      "reason": "grain-region",
+      "anchorCity": "平泉",
+      "anchorCityId": "japan-83d82fba18b2",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-25826",
+      "cell": 25826,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 141.11054488670942,
+      "lat": 39.62405227875223,
+      "world_pixel": [
+        12416.0,
+        5166.0
+      ],
+      "region": "北上盆地",
+      "reason": "grain-region",
+      "anchorCity": "盛冈",
+      "anchorCityId": "japan-e31a94f98cd4",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-31936",
+      "cell": 31936,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 139.01161611913685,
+      "lat": 37.714814167689966,
+      "world_pixel": [
+        10464.0,
+        6408.0
+      ],
+      "region": "越后平原",
+      "reason": "grain-region",
+      "anchorCity": "新潟",
+      "anchorCityId": "japan-2f6f4f76203c",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-31136",
+      "cell": 31136,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 138.9968699352947,
+      "lat": 37.8992925718858,
+      "world_pixel": [
+        10496.0,
+        6246.0
+      ],
+      "region": "越后平原",
+      "reason": "grain-region",
+      "anchorCity": "新潟",
+      "anchorCityId": "japan-2f6f4f76203c",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-32737",
+      "cell": 32737,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 139.02636230297898,
+      "lat": 37.53033576349413,
+      "world_pixel": [
+        10432.0,
+        6570.0
+      ],
+      "region": "越后平原",
+      "reason": "grain-region",
+      "anchorCity": "长冈",
+      "anchorCityId": "japan-4331fcbe6c2a",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-31672",
+      "cell": 31672,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 139.20024922334616,
+      "lat": 37.819611040991816,
+      "world_pixel": [
+        10624.0,
+        6354.0
+      ],
+      "region": "越后平原",
+      "reason": "grain-region",
+      "anchorCity": "新潟",
+      "anchorCityId": "japan-2f6f4f76203c",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-32201",
+      "cell": 32201,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 138.82298301492753,
+      "lat": 37.61001729438811,
+      "world_pixel": [
+        10304.0,
+        6462.0
+      ],
+      "region": "越后平原",
+      "reason": "grain-region",
+      "anchorCity": "长冈",
+      "anchorCityId": "japan-4331fcbe6c2a",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-33537",
+      "cell": 33537,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 139.04110848682114,
+      "lat": 37.34585735929829,
+      "world_pixel": [
+        10400.0,
+        6732.0
+      ],
+      "region": "越后平原",
+      "reason": "grain-region",
+      "anchorCity": "长冈",
+      "anchorCityId": "japan-4331fcbe6c2a",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-34315",
+      "cell": 34315,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 137.14801946797576,
+      "lat": 36.73452453205621,
+      "world_pixel": [
+        8896.0,
+        6894.0
+      ],
+      "region": "富山平原",
+      "reason": "grain-region",
+      "anchorCity": "富山",
+      "anchorCityId": "japan-17cab6bf6af2",
+      "group": "东海与北陆"
+    },
+    {
+      "id": "japan-farm-34851",
+      "cell": 34851,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 137.3513987560272,
+      "lat": 36.65484300116223,
+      "world_pixel": [
+        9024.0,
+        7002.0
+      ],
+      "region": "富山平原",
+      "reason": "grain-region",
+      "anchorCity": "富山",
+      "anchorCityId": "japan-17cab6bf6af2",
+      "group": "东海与北陆"
+    },
+    {
+      "id": "japan-farm-34579",
+      "cell": 34579,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 136.9593863637664,
+      "lat": 36.629727658754355,
+      "world_pixel": [
+        8736.0,
+        6948.0
+      ],
+      "region": "富山平原",
+      "reason": "grain-region",
+      "anchorCity": "富山",
+      "anchorCityId": "japan-17cab6bf6af2",
+      "group": "东海与北陆"
+    },
+    {
+      "id": "japan-farm-35107",
+      "cell": 35107,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 136.49917079870917,
+      "lat": 36.40157502419211,
+      "world_pixel": [
+        8352.0,
+        7056.0
+      ],
+      "region": "加贺平原",
+      "reason": "grain-region",
+      "anchorCity": "金泽",
+      "anchorCityId": "japan-c0900ff96c6e",
+      "group": "东海与北陆"
+    },
+    {
+      "id": "japan-farm-34843",
+      "cell": 34843,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 136.68780390291852,
+      "lat": 36.50637189749397,
+      "world_pixel": [
+        8512.0,
+        7002.0
+      ],
+      "region": "加贺平原",
+      "reason": "grain-region",
+      "anchorCity": "金泽",
+      "anchorCityId": "japan-c0900ff96c6e",
+      "group": "东海与北陆"
+    },
+    {
+      "id": "japan-farm-39947",
+      "cell": 39947,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 139.65677409738984,
+      "lat": 35.981383453482806,
+      "world_pixel": [
+        10528.0,
+        8028.0
+      ],
+      "region": "关东平原",
+      "reason": "grain-region",
+      "anchorCity": "川越",
+      "anchorCityId": "japan-5046809f56df",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-40754",
+      "cell": 40754,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 140.1692164210635,
+      "lat": 35.908258377038166,
+      "world_pixel": [
+        10880.0,
+        8190.0
+      ],
+      "region": "关东平原",
+      "reason": "grain-region",
+      "anchorCity": "土浦",
+      "anchorCityId": "japan-e9d01ad03ff2",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-38608",
+      "cell": 38608,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 139.18980055558046,
+      "lat": 36.189866724697026,
+      "world_pixel": [
+        10240.0,
+        7758.0
+      ],
+      "region": "关东平原",
+      "reason": "grain-region",
+      "anchorCity": "足利",
+      "anchorCityId": "japan-14f2ea922e26",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-38884",
+      "cell": 38884,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 139.99655973103418,
+      "lat": 36.30777650689756,
+      "world_pixel": [
+        10848.0,
+        7812.0
+      ],
+      "region": "关东平原",
+      "reason": "grain-region",
+      "anchorCity": "宇都宫",
+      "anchorCityId": "japan-e8a513e8a9a4",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-40743",
+      "cell": 40743,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 139.25677349803902,
+      "lat": 35.70411060949431,
+      "world_pixel": [
+        10176.0,
+        8190.0
+      ],
+      "region": "关东平原",
+      "reason": "grain-region",
+      "anchorCity": "八王子",
+      "anchorCityId": "japan-928b853919ae",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-41816",
+      "cell": 41816,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 139.74648143078056,
+      "lat": 35.56330643566488,
+      "world_pixel": [
+        10496.0,
+        8406.0
+      ],
+      "region": "关东平原",
+      "reason": "grain-region",
+      "anchorCity": "江户",
+      "anchorCityId": "japan-89fac6a778b3",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-38613",
+      "cell": 38613,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 139.6045473387734,
+      "lat": 36.28266116448969,
+      "world_pixel": [
+        10560.0,
+        7758.0
+      ],
+      "region": "关东平原",
+      "reason": "grain-region",
+      "anchorCity": "足利",
+      "anchorCityId": "japan-14f2ea922e26",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-39677",
+      "cell": 39677,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 139.34771106176763,
+      "lat": 35.97482699903347,
+      "world_pixel": [
+        10304.0,
+        7974.0
+      ],
+      "region": "关东平原",
+      "reason": "grain-region",
+      "anchorCity": "川越",
+      "anchorCityId": "japan-5046809f56df",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-41017",
+      "cell": 41017,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 139.8976339602156,
+      "lat": 35.784902615777774,
+      "world_pixel": [
+        10656.0,
+        8244.0
+      ],
+      "region": "关东平原",
+      "reason": "grain-region",
+      "anchorCity": "江户",
+      "anchorCityId": "japan-89fac6a778b3",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-40468",
+      "cell": 40468,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 138.61591303586246,
+      "lat": 35.62331860321083,
+      "world_pixel": [
+        9696.0,
+        8136.0
+      ],
+      "region": "甲府盆地",
+      "reason": "grain-region",
+      "anchorCity": "甲府",
+      "anchorCityId": "japan-f1266127096a",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-35928",
+      "cell": 35928,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 138.1729041153231,
+      "lat": 36.58827437916693,
+      "world_pixel": [
+        9600.0,
+        7218.0
+      ],
+      "region": "长野盆地",
+      "reason": "grain-region",
+      "anchorCity": "长野",
+      "anchorCityId": "japan-e927401b0a1e",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-34861",
+      "cell": 34861,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 138.18089232241311,
+      "lat": 36.84043188074755,
+      "world_pixel": [
+        9664.0,
+        7002.0
+      ],
+      "region": "长野盆地",
+      "reason": "grain-region",
+      "anchorCity": "长野",
+      "anchorCityId": "japan-e927401b0a1e",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-40446",
+      "cell": 40446,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 136.79102718981352,
+      "lat": 35.21502306812312,
+      "world_pixel": [
+        8288.0,
+        8136.0
+      ],
+      "region": "浓尾平原",
+      "reason": "grain-region",
+      "anchorCity": "清洲",
+      "anchorCityId": "japan-6ce4b309a25e",
+      "group": "东海与北陆"
+    },
+    {
+      "id": "japan-farm-40982",
+      "cell": 40982,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 136.994406477865,
+      "lat": 35.13534153722914,
+      "world_pixel": [
+        8416.0,
+        8244.0
+      ],
+      "region": "浓尾平原",
+      "reason": "grain-region",
+      "anchorCity": "名古屋",
+      "anchorCityId": "japan-cae82d044d00",
+      "group": "东海与北陆"
+    },
+    {
+      "id": "japan-farm-40711",
+      "cell": 40711,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 136.6023940856042,
+      "lat": 35.110226194821266,
+      "world_pixel": [
+        8128.0,
+        8190.0
+      ],
+      "region": "浓尾平原",
+      "reason": "grain-region",
+      "anchorCity": "名古屋",
+      "anchorCityId": "japan-cae82d044d00",
+      "group": "东海与北陆"
+    },
+    {
+      "id": "japan-farm-40182",
+      "cell": 40182,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 136.97966029402286,
+      "lat": 35.319819941424974,
+      "world_pixel": [
+        8448.0,
+        8082.0
+      ],
+      "region": "浓尾平原",
+      "reason": "grain-region",
+      "anchorCity": "名古屋",
+      "anchorCityId": "japan-cae82d044d00",
+      "group": "东海与北陆"
+    },
+    {
+      "id": "japan-farm-39910",
+      "cell": 39910,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 136.58764790176207,
+      "lat": 35.29470459901711,
+      "world_pixel": [
+        8160.0,
+        8028.0
+      ],
+      "region": "浓尾平原",
+      "reason": "grain-region",
+      "anchorCity": "大垣",
+      "anchorCityId": "japan-6dfa5d1c4fc7",
+      "group": "东海与北陆"
+    },
+    {
+      "id": "japan-farm-42318",
+      "cell": 42318,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 137.12958259312003,
+      "lat": 34.85262271418079,
+      "world_pixel": [
+        8448.0,
+        8514.0
+      ],
+      "region": "三河平原",
+      "reason": "grain-region",
+      "anchorCity": "冈崎",
+      "anchorCityId": "japan-ef8be2a71cc0",
+      "group": "东海与北陆"
+    },
+    {
+      "id": "japan-farm-41782",
+      "cell": 41782,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 136.92620330506855,
+      "lat": 34.932304245074775,
+      "world_pixel": [
+        8320.0,
+        8406.0
+      ],
+      "region": "三河平原",
+      "reason": "grain-region",
+      "anchorCity": "冈崎",
+      "anchorCityId": "japan-ef8be2a71cc0",
+      "group": "东海与北陆"
+    },
+    {
+      "id": "japan-farm-40171",
+      "cell": 40171,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 136.06721737099838,
+      "lat": 35.115672173881116,
+      "world_pixel": [
+        7744.0,
+        8082.0
+      ],
+      "region": "近江盆地",
+      "reason": "grain-region",
+      "anchorCity": "安土",
+      "anchorCityId": "japan-15e9c6f29a5a",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-39906",
+      "cell": 39906,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 136.2558504752077,
+      "lat": 35.220469047182974,
+      "world_pixel": [
+        7904.0,
+        8028.0
+      ],
+      "region": "近江盆地",
+      "reason": "grain-region",
+      "anchorCity": "安土",
+      "anchorCityId": "japan-15e9c6f29a5a",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-40972",
+      "cell": 40972,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 136.16491291147912,
+      "lat": 34.94975265764381,
+      "world_pixel": [
+        7776.0,
+        8244.0
+      ],
+      "region": "近江盆地",
+      "reason": "grain-region",
+      "anchorCity": "大津",
+      "anchorCityId": "japan-f0eaba41800e",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-40700",
+      "cell": 40700,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 135.68995116257972,
+      "lat": 34.90607842727741,
+      "world_pixel": [
+        7424.0,
+        8190.0
+      ],
+      "region": "京都盆地",
+      "reason": "grain-region",
+      "anchorCity": "京都",
+      "anchorCityId": "japan-70e7d4de7d91",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-39634",
+      "cell": 39634,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 135.78088872630832,
+      "lat": 35.176794816816574,
+      "world_pixel": [
+        7552.0,
+        7974.0
+      ],
+      "region": "京都盆地",
+      "reason": "grain-region",
+      "anchorCity": "京都",
+      "anchorCityId": "japan-70e7d4de7d91",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-41764",
+      "cell": 41764,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 135.43311488557396,
+      "lat": 34.59824426182119,
+      "world_pixel": [
+        7168.0,
+        8406.0
+      ],
+      "region": "大阪平原",
+      "reason": "grain-region",
+      "anchorCity": "大阪",
+      "anchorCityId": "japan-430a09242932",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-41499",
+      "cell": 41499,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 135.62174798978327,
+      "lat": 34.703041135123044,
+      "world_pixel": [
+        7328.0,
+        8352.0
+      ],
+      "region": "大阪平原",
+      "reason": "grain-region",
+      "anchorCity": "大阪",
+      "anchorCityId": "japan-430a09242932",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-40963",
+      "cell": 40963,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 135.41836870173182,
+      "lat": 34.78272266601702,
+      "world_pixel": [
+        7200.0,
+        8244.0
+      ],
+      "region": "大阪平原",
+      "reason": "grain-region",
+      "anchorCity": "大阪",
+      "anchorCityId": "japan-430a09242932",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-42568",
+      "cell": 42568,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 135.77965849597047,
+      "lat": 34.488001409459486,
+      "world_pixel": [
+        7392.0,
+        8568.0
+      ],
+      "region": "奈良盆地",
+      "reason": "grain-region",
+      "anchorCity": "奈良",
+      "anchorCityId": "japan-086568f0d007",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-42304",
+      "cell": 42304,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 135.96829160017978,
+      "lat": 34.592798282761336,
+      "world_pixel": [
+        7552.0,
+        8514.0
+      ],
+      "region": "奈良盆地",
+      "reason": "grain-region",
+      "anchorCity": "奈良",
+      "anchorCityId": "japan-086568f0d007",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-39877",
+      "cell": 39877,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 133.85031913268864,
+      "lat": 34.68226129638553,
+      "world_pixel": [
+        6048.0,
+        8028.0
+      ],
+      "region": "冈山平原",
+      "reason": "grain-region",
+      "anchorCity": "冈山",
+      "anchorCityId": "japan-550e930475e6",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-40413",
+      "cell": 40413,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 134.05369842074012,
+      "lat": 34.602579765491555,
+      "world_pixel": [
+        6176.0,
+        8136.0
+      ],
+      "region": "冈山平原",
+      "reason": "grain-region",
+      "anchorCity": "冈山",
+      "anchorCityId": "japan-550e930475e6",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-40142",
+      "cell": 40142,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 133.66168602847932,
+      "lat": 34.57746442308368,
+      "world_pixel": [
+        5888.0,
+        8082.0
+      ],
+      "region": "冈山平原",
+      "reason": "grain-region",
+      "anchorCity": "冈山",
+      "anchorCityId": "japan-550e930475e6",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-36131",
+      "cell": 36131,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 132.92436025615987,
+      "lat": 35.35138534039459,
+      "world_pixel": [
+        5536.0,
+        7272.0
+      ],
+      "region": "出云平原",
+      "reason": "grain-region",
+      "anchorCity": "出云",
+      "anchorCityId": "japan-48d58bedfb35",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-35862",
+      "cell": 35862,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 132.69824657717626,
+      "lat": 35.36338777390379,
+      "world_pixel": [
+        5376.0,
+        7218.0
+      ],
+      "region": "出云平原",
+      "reason": "grain-region",
+      "anchorCity": "出云",
+      "anchorCityId": "japan-48d58bedfb35",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-42010",
+      "cell": 42010,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 133.75139336187004,
+      "lat": 34.159387405265754,
+      "world_pixel": [
+        5856.0,
+        8460.0
+      ],
+      "region": "讃岐平原",
+      "reason": "grain-region",
+      "anchorCity": "高松",
+      "anchorCityId": "japan-7e89d753d1fd",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-42013",
+      "cell": 42013,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 134.0002414317858,
+      "lat": 34.21506406914135,
+      "world_pixel": [
+        6048.0,
+        8460.0
+      ],
+      "region": "讃岐平原",
+      "reason": "grain-region",
+      "anchorCity": "高松",
+      "anchorCityId": "japan-7e89d753d1fd",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-42284",
+      "cell": 42284,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 134.30930446740803,
+      "lat": 34.22162052359069,
+      "world_pixel": [
+        6272.0,
+        8514.0
+      ],
+      "region": "讃岐平原",
+      "reason": "grain-region",
+      "anchorCity": "高松",
+      "anchorCityId": "japan-7e89d753d1fd",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-43085",
+      "cell": 43085,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 134.40700000788874,
+      "lat": 34.055701007353385,
+      "world_pixel": [
+        6304.0,
+        8676.0
+      ],
+      "region": "德岛平原",
+      "reason": "grain-region",
+      "anchorCity": "德岛",
+      "anchorCityId": "japan-1e3dc9930f8f",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-42531",
+      "cell": 42531,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 132.7105323003427,
+      "lat": 33.80132255499378,
+      "world_pixel": [
+        5024.0,
+        8568.0
+      ],
+      "region": "松山平原",
+      "reason": "grain-region",
+      "anchorCity": "松山",
+      "anchorCityId": "japan-ecad2ef8926c",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-44675",
+      "cell": 44675,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 133.52404945254855,
+      "lat": 33.48259643141786,
+      "world_pixel": [
+        5536.0,
+        9000.0
+      ],
+      "region": "高知平原",
+      "reason": "grain-region",
+      "anchorCity": "高知",
+      "anchorCityId": "japan-4956aaf77207",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-42503",
+      "cell": 42503,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 130.38795031446222,
+      "lat": 33.281673692154875,
+      "world_pixel": [
+        3232.0,
+        8568.0
+      ],
+      "region": "筑紫佐贺平原",
+      "reason": "grain-region",
+      "anchorCity": "佐贺",
+      "anchorCityId": "japan-39593bf65a53",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-43039",
+      "cell": 43039,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 130.59132960251367,
+      "lat": 33.2019921612609,
+      "world_pixel": [
+        3360.0,
+        8676.0
+      ],
+      "region": "筑紫佐贺平原",
+      "reason": "grain-region",
+      "anchorCity": "柳川",
+      "anchorCityId": "japan-10e8a37faf89",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-42768",
+      "cell": 42768,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 130.19931721025287,
+      "lat": 33.176876818853025,
+      "world_pixel": [
+        3072.0,
+        8622.0
+      ],
+      "region": "筑紫佐贺平原",
+      "reason": "grain-region",
+      "anchorCity": "佐贺",
+      "anchorCityId": "japan-39593bf65a53",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-43304",
+      "cell": 43304,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 130.40269649830435,
+      "lat": 33.09719528795904,
+      "world_pixel": [
+        3200.0,
+        8730.0
+      ],
+      "region": "筑紫佐贺平原",
+      "reason": "grain-region",
+      "anchorCity": "柳川",
+      "anchorCityId": "japan-10e8a37faf89",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-42239",
+      "cell": 42239,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 130.57658341867153,
+      "lat": 33.386470565456726,
+      "world_pixel": [
+        3392.0,
+        8514.0
+      ],
+      "region": "筑紫佐贺平原",
+      "reason": "grain-region",
+      "anchorCity": "久留米",
+      "anchorCityId": "japan-b02e9873cc86",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-45175",
+      "cell": 45175,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 130.74125190161084,
+      "lat": 32.73479493401671,
+      "world_pixel": [
+        3360.0,
+        9108.0
+      ],
+      "region": "熊本平原",
+      "reason": "grain-region",
+      "anchorCity": "熊本",
+      "anchorCityId": "japan-80bde8ec3982",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-44374",
+      "cell": 44374,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 130.64355636113012,
+      "lat": 32.900714450254014,
+      "world_pixel": [
+        3328.0,
+        8946.0
+      ],
+      "region": "熊本平原",
+      "reason": "grain-region",
+      "anchorCity": "熊本",
+      "anchorCityId": "japan-80bde8ec3982",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-45707",
+      "cell": 45707,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 130.61283376310797,
+      "lat": 32.5808778512886,
+      "world_pixel": [
+        3232.0,
+        9216.0
+      ],
+      "region": "熊本平原",
+      "reason": "grain-region",
+      "anchorCity": "八代",
+      "anchorCityId": "japan-e5872a184e88",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-48917",
+      "cell": 48917,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 131.33541335158526,
+      "lat": 31.99143533817352,
+      "world_pixel": [
+        3616.0,
+        9864.0
+      ],
+      "region": "宫崎平原",
+      "reason": "grain-region",
+      "anchorCity": "都城",
+      "anchorCityId": "japan-fabf7c19f4cd",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-49719",
+      "cell": 49719,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 131.433108892066,
+      "lat": 31.825515821936214,
+      "world_pixel": [
+        3648.0,
+        10026.0
+      ],
+      "region": "宫崎平原",
+      "reason": "grain-region",
+      "anchorCity": "饫肥",
+      "anchorCityId": "japan-3d59003f6eab",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-48373",
+      "cell": 48373,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 130.4684392104251,
+      "lat": 31.922645765399242,
+      "world_pixel": [
+        2976.0,
+        9756.0
+      ],
+      "region": "仙台川盆地",
+      "reason": "grain-region",
+      "anchorCity": "出水",
+      "anchorCityId": "japan-213fc1711506",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-28856",
+      "cell": 28856,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 126.90224028024079,
+      "lat": 35.69400993310131,
+      "world_pixel": [
+        1280.0,
+        5814.0
+      ],
+      "region": "湖南平原",
+      "reason": "grain-region",
+      "anchorCity": "全州",
+      "anchorCityId": "japan-093e2eb072d3",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-26987",
+      "cell": 26987,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 126.81253294685006,
+      "lat": 36.112086950919235,
+      "world_pixel": [
+        1312.0,
+        5436.0
+      ],
+      "region": "湖南平原",
+      "reason": "grain-region",
+      "anchorCity": "全州",
+      "anchorCityId": "japan-093e2eb072d3",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-30724",
+      "cell": 30724,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 126.99194761363152,
+      "lat": 35.275932915283384,
+      "world_pixel": [
+        1248.0,
+        6192.0
+      ],
+      "region": "湖南平原",
+      "reason": "grain-region",
+      "anchorCity": "罗州",
+      "anchorCityId": "japan-b2de4d43140b",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-28057",
+      "cell": 28057,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 127.05339280967581,
+      "lat": 35.91560611321421,
+      "world_pixel": [
+        1440.0,
+        5652.0
+      ],
+      "region": "湖南平原",
+      "reason": "grain-region",
+      "anchorCity": "全州",
+      "anchorCityId": "japan-093e2eb072d3",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-29653",
+      "cell": 29653,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 126.66813839416717,
+      "lat": 35.453854865029875,
+      "world_pixel": [
+        1056.0,
+        5976.0
+      ],
+      "region": "湖南平原",
+      "reason": "grain-region",
+      "anchorCity": "罗州",
+      "anchorCityId": "japan-b2de4d43140b",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-25925",
+      "cell": 25925,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 127.235267937133,
+      "lat": 36.457038892292516,
+      "world_pixel": [
+        1696.0,
+        5220.0
+      ],
+      "region": "忠清平原",
+      "reason": "grain-region",
+      "anchorCity": "公州",
+      "anchorCityId": "japan-ed709c7e4ad3",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-26456",
+      "cell": 26456,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 127.02390044199153,
+      "lat": 36.28456292160588,
+      "world_pixel": [
+        1504.0,
+        5328.0
+      ],
+      "region": "忠清平原",
+      "reason": "grain-region",
+      "anchorCity": "公州",
+      "anchorCityId": "japan-ed709c7e4ad3",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-25388",
+      "cell": 25388,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 126.94893929244294,
+      "lat": 36.51816153522797,
+      "world_pixel": [
+        1504.0,
+        5112.0
+      ],
+      "region": "忠清平原",
+      "reason": "grain-region",
+      "anchorCity": "公州",
+      "anchorCityId": "japan-ed709c7e4ad3",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-26726",
+      "cell": 26726,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 127.25001412097515,
+      "lat": 36.27256048809669,
+      "world_pixel": [
+        1664.0,
+        5382.0
+      ],
+      "region": "忠清平原",
+      "reason": "grain-region",
+      "anchorCity": "公州",
+      "anchorCityId": "japan-ed709c7e4ad3",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-16570",
+      "cell": 16570,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 125.7083896338777,
+      "lat": 38.30615843792123,
+      "world_pixel": [
+        1024.0,
+        3330.0
+      ],
+      "region": "黄海平原",
+      "reason": "grain-region",
+      "anchorCity": "海州",
+      "anchorCityId": "japan-a57e7a404d7e",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-16033",
+      "cell": 16033,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 125.42206098918763,
+      "lat": 38.367281080856685,
+      "world_pixel": [
+        832.0,
+        3222.0
+      ],
+      "region": "黄海平原",
+      "reason": "grain-region",
+      "anchorCity": "海州",
+      "anchorCityId": "japan-a57e7a404d7e",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-17107",
+      "cell": 17107,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 125.99471827856775,
+      "lat": 38.24503579498579,
+      "world_pixel": [
+        1216.0,
+        3438.0
+      ],
+      "region": "黄海平原",
+      "reason": "grain-region",
+      "anchorCity": "海州",
+      "anchorCityId": "japan-a57e7a404d7e",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-17371",
+      "cell": 17371,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 125.80608517435843,
+      "lat": 38.14023892168393,
+      "world_pixel": [
+        1056.0,
+        3492.0
+      ],
+      "region": "黄海平原",
+      "reason": "grain-region",
+      "anchorCity": "海州",
+      "anchorCityId": "japan-a57e7a404d7e",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-13634",
+      "cell": 13634,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 125.62667050757696,
+      "lat": 38.97639295731979,
+      "world_pixel": [
+        1120.0,
+        2736.0
+      ],
+      "region": "平壤平原",
+      "reason": "grain-region",
+      "anchorCity": "平壤",
+      "anchorCityId": "japan-b8097bb4f5a7",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-13370",
+      "cell": 13370,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 125.81530361178629,
+      "lat": 39.08118983062164,
+      "world_pixel": [
+        1280.0,
+        2682.0
+      ],
+      "region": "平壤平原",
+      "reason": "grain-region",
+      "anchorCity": "平壤",
+      "anchorCityId": "japan-b8097bb4f5a7",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-12834",
+      "cell": 12834,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 125.61192432373483,
+      "lat": 39.160871361515625,
+      "world_pixel": [
+        1152.0,
+        2574.0
+      ],
+      "region": "平壤平原",
+      "reason": "grain-region",
+      "anchorCity": "平壤",
+      "anchorCityId": "japan-b8097bb4f5a7",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-21120",
+      "cell": 21120,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 126.98089212080295,
+      "lat": 37.526791541550466,
+      "world_pixel": [
+        1760.0,
+        4248.0
+      ],
+      "region": "汉江低地",
+      "reason": "grain-region",
+      "anchorCity": "汉城",
+      "anchorCityId": "japan-1bd3913c11ee",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-21390",
+      "cell": 21390,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 127.20700579978657,
+      "lat": 37.51478910804127,
+      "world_pixel": [
+        1920.0,
+        4302.0
+      ],
+      "region": "汉江低地",
+      "reason": "grain-region",
+      "anchorCity": "汉城",
+      "anchorCityId": "japan-1bd3913c11ee",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-21922",
+      "cell": 21922,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 127.07858766128368,
+      "lat": 37.360872025313164,
+      "world_pixel": [
+        1792.0,
+        4410.0
+      ],
+      "region": "汉江低地",
+      "reason": "grain-region",
+      "anchorCity": "汉城",
+      "anchorCityId": "japan-1bd3913c11ee",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-30742",
+      "cell": 30742,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 128.4850360331261,
+      "lat": 35.609992898536966,
+      "world_pixel": [
+        2400.0,
+        6192.0
+      ],
+      "region": "洛东江盆地",
+      "reason": "grain-region",
+      "anchorCity": "大邱",
+      "anchorCityId": "japan-4433b5e76e83",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-32611",
+      "cell": 32611,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 128.57474336651686,
+      "lat": 35.19191588071904,
+      "world_pixel": [
+        2368.0,
+        6570.0
+      ],
+      "region": "洛东江盆地",
+      "reason": "grain-region",
+      "anchorCity": "晋州",
+      "anchorCityId": "japan-49734da65f56",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-29141",
+      "cell": 29141,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 128.4555436654418,
+      "lat": 35.97894970692863,
+      "world_pixel": [
+        2464.0,
+        5868.0
+      ],
+      "region": "洛东江盆地",
+      "reason": "grain-region",
+      "anchorCity": "大邱",
+      "anchorCityId": "japan-4433b5e76e83",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-31543",
+      "cell": 31543,
+      "kind": "farmland",
+      "name": null,
+      "level": 3,
+      "lon": 128.49978221696827,
+      "lat": 35.42551449434113,
+      "world_pixel": [
+        2368.0,
+        6354.0
+      ],
+      "region": "洛东江盆地",
+      "reason": "grain-region",
+      "anchorCity": "大邱",
+      "anchorCityId": "japan-4433b5e76e83",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-22211",
+      "cell": 22211,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 128.96368847303907,
+      "lat": 37.720047350974625,
+      "world_pixel": [
+        3232.0,
+        4464.0
+      ],
+      "region": "江陵沿海平原",
+      "reason": "grain-region",
+      "anchorCity": "江陵",
+      "anchorCityId": "japan-207defb2b5df",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-11790",
+      "cell": 11790,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 127.52774773351236,
+      "lat": 39.839883286142495,
+      "world_pixel": [
+        2688.0,
+        2358.0
+      ],
+      "region": "咸兴平原",
+      "reason": "grain-region",
+      "anchorCity": "咸兴",
+      "anchorCityId": "japan-42aac5edcb27",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-10989",
+      "cell": 10989,
+      "kind": "farmland",
+      "name": null,
+      "level": 2,
+      "lon": 127.51300154967021,
+      "lat": 40.024361690338324,
+      "world_pixel": [
+        2720.0,
+        2196.0
+      ],
+      "region": "咸兴平原",
+      "reason": "grain-region",
+      "anchorCity": "咸兴",
+      "anchorCityId": "japan-42aac5edcb27",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-39848",
+      "cell": 39848,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 131.44478779016958,
+      "lat": 34.14405354558809,
+      "world_pixel": [
+        4192.0,
+        8028.0
+      ],
+      "region": "山口周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "山口",
+      "anchorCityId": "japan-1d8d167345b0",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-42866",
+      "cell": 42866,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 138.32835416083455,
+      "lat": 34.9956478387892,
+      "world_pixel": [
+        9344.0,
+        8622.0
+      ],
+      "region": "骏府周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "骏府",
+      "anchorCityId": "japan-585f3ad22902",
+      "group": "东海与北陆"
+    },
+    {
+      "id": "japan-farm-30217",
+      "cell": 30217,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 129.1940996680991,
+      "lat": 35.8938221969748,
+      "world_pixel": [
+        2976.0,
+        6084.0
+      ],
+      "region": "庆州周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "庆州",
+      "anchorCityId": "japan-43f77c790ff2",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-39593",
+      "cell": 39593,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 132.3799651041262,
+      "lat": 34.41588041051674,
+      "world_pixel": [
+        4928.0,
+        7974.0
+      ],
+      "region": "广岛周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "广岛",
+      "anchorCityId": "japan-4fe146f0dbad",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-31949",
+      "cell": 31949,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 140.0899577554385,
+      "lat": 37.956079711150885,
+      "world_pixel": [
+        11296.0,
+        6408.0
+      ],
+      "region": "米泽周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "米泽",
+      "anchorCityId": "japan-91399a4cead4",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-24066",
+      "cell": 24066,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 127.89210481348957,
+      "lat": 37.04214590173724,
+      "world_pixel": [
+        2304.0,
+        4842.0
+      ],
+      "region": "忠州周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "忠州",
+      "anchorCityId": "japan-3012d62a6bb8",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-43851",
+      "cell": 43851,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 131.5185187093803,
+      "lat": 33.22166152460892,
+      "world_pixel": [
+        4032.0,
+        8838.0
+      ],
+      "region": "府内周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "府内",
+      "anchorCityId": "japan-331b9bf89206",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-46521",
+      "cell": 46521,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 131.70592158325175,
+      "lat": 32.63766499055369,
+      "world_pixel": [
+        4032.0,
+        9378.0
+      ],
+      "region": "延冈周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "延冈",
+      "anchorCityId": "japan-1173c22dee64",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-22095",
+      "cell": 22095,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 141.42882635975948,
+      "lat": 40.57155964213928,
+      "world_pixel": [
+        12864.0,
+        4410.0
+      ],
+      "region": "八户周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "八户",
+      "anchorCityId": "japan-16f0eef46bd0",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-38291",
+      "cell": 38291,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 135.06506711458317,
+      "lat": 35.32960142415519,
+      "world_pixel": [
+        7072.0,
+        7704.0
+      ],
+      "region": "福知山周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "福知山",
+      "anchorCityId": "japan-18a0dec1187e",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-37154",
+      "cell": 37154,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 129.266600356972,
+      "lat": 34.28263676863854,
+      "world_pixel": [
+        2656.0,
+        7488.0
+      ],
+      "region": "严原对马周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "严原对马",
+      "anchorCityId": "japan-18c94d9b2cd5",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-44665",
+      "cell": 44665,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 132.69455588616268,
+      "lat": 33.297007551832536,
+      "world_pixel": [
+        4896.0,
+        9000.0
+      ],
+      "region": "宇和岛周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "宇和岛",
+      "anchorCityId": "japan-2e90fe09775d",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-45772",
+      "cell": 45772,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 136.00454194461622,
+      "lat": 33.78720556859321,
+      "world_pixel": [
+        7392.0,
+        9216.0
+      ],
+      "region": "新宫周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "新宫",
+      "anchorCityId": "japan-3694d948575b",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-14456",
+      "cell": 14456,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 127.38335318082947,
+      "lat": 39.181651200253135,
+      "world_pixel": [
+        2432.0,
+        2898.0
+      ],
+      "region": "元山周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "元山",
+      "anchorCityId": "japan-48e92dc57a51",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-15950",
+      "cell": 15950,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 140.70747700162008,
+      "lat": 41.84979556261145,
+      "world_pixel": [
+        12640.0,
+        3168.0
+      ],
+      "region": "函馆周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "函馆",
+      "anchorCityId": "japan-6fa97e16d1ec",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-36679",
+      "cell": 36679,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 134.12313182387442,
+      "lat": 35.494410465003,
+      "world_pixel": [
+        6432.0,
+        7380.0
+      ],
+      "region": "鸟取周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "鸟取",
+      "anchorCityId": "japan-7ce1a2a0e0e0",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-35418",
+      "cell": 35418,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 140.12620809987493,
+      "lat": 37.15048699698276,
+      "world_pixel": [
+        11136.0,
+        7110.0
+      ],
+      "region": "白河周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "白河",
+      "anchorCityId": "japan-7df42f7b677b",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-36495",
+      "cell": 36495,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 140.9477134591708,
+      "lat": 37.083918374987455,
+      "world_pixel": [
+        11712.0,
+        7326.0
+      ],
+      "region": "磐城周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "磐城",
+      "anchorCityId": "japan-a4b0cdc649a2",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-5679",
+      "cell": 5679,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 129.62667650108494,
+      "lat": 41.74912139720476,
+      "world_pixel": [
+        4640.0,
+        1116.0
+      ],
+      "region": "镜城周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "镜城",
+      "anchorCityId": "japan-a6c4f5f55baf",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-40458",
+      "cell": 40458,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 137.78641946947658,
+      "lat": 35.43772972362551,
+      "world_pixel": [
+        9056.0,
+        8136.0
+      ],
+      "region": "饭田周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "饭田",
+      "anchorCityId": "japan-ae7984d27168",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-37924",
+      "cell": 37924,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 126.70991648501789,
+      "lat": 33.5228328377282,
+      "world_pixel": [
+        640.0,
+        7650.0
+      ],
+      "region": "济州周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "济州",
+      "anchorCityId": "japan-c4d61691de15",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-6950",
+      "cell": 6950,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 124.37014443483172,
+      "lat": 40.2600748568518,
+      "world_pixel": [
+        512.0,
+        1386.0
+      ],
+      "region": "义州周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "义州",
+      "anchorCityId": "japan-c94990b67786",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-44218",
+      "cell": 44218,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 139.87366933894558,
+      "lat": 35.0284301110359,
+      "world_pixel": [
+        10464.0,
+        8892.0
+      ],
+      "region": "馆山周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "馆山",
+      "anchorCityId": "japan-c9ee215a050b",
+      "group": "关东与甲信越"
+    },
+    {
+      "id": "japan-farm-16746",
+      "cell": 16746,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 140.30747640226926,
+      "lat": 41.57252271862295,
+      "world_pixel": [
+        12288.0,
+        3330.0
+      ],
+      "region": "松前周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "松前",
+      "anchorCityId": "japan-ed7969d67332",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-3012",
+      "cell": 3012,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 129.68812169712925,
+      "lat": 42.388794595135586,
+      "world_pixel": [
+        4832.0,
+        576.0
+      ],
+      "region": "会宁周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "会宁",
+      "anchorCityId": "japan-0f3788b1d37b",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-13821",
+      "cell": 13821,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 141.13820019899302,
+      "lat": 42.446905005565355,
+      "world_pixel": [
+        13088.0,
+        2736.0
+      ],
+      "region": "室兰周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "室兰",
+      "anchorCityId": "japan-14a09f070b21",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-1824",
+      "cell": 1824,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 141.7465010077467,
+      "lat": 45.39966994808821,
+      "world_pixel": [
+        14208.0,
+        306.0
+      ],
+      "region": "稚内周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "稚内",
+      "anchorCityId": "japan-1b845b199c12",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-33199",
+      "cell": 33199,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 133.0914891997749,
+      "lat": 36.07729652366874,
+      "world_pixel": [
+        5824.0,
+        6678.0
+      ],
+      "region": "西乡隐岐周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "西乡隐岐",
+      "anchorCityId": "japan-2fdc792060fa",
+      "group": "畿内与中国"
+    },
+    {
+      "id": "japan-farm-16241",
+      "cell": 16241,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 142.67552717001405,
+      "lat": 42.227529776231435,
+      "world_pixel": [
+        14144.0,
+        3222.0
+      ],
+      "region": "浦河周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "浦河",
+      "anchorCityId": "japan-4278c40172ad",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-11148",
+      "cell": 11148,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 140.7019492552058,
+      "lat": 42.975224875744985,
+      "world_pixel": [
+        12896.0,
+        2196.0
+      ],
+      "region": "俱知安周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "俱知安",
+      "anchorCityId": "japan-4c5053d1aa70",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-9857",
+      "cell": 9857,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 144.21654483204864,
+      "lat": 44.07453476896876,
+      "world_pixel": [
+        15680.0,
+        1926.0
+      ],
+      "region": "网走周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "网走",
+      "anchorCityId": "japan-688894b17f43",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-55048",
+      "cell": 55048,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 130.89547171678444,
+      "lat": 30.4533749862819,
+      "world_pixel": [
+        2944.0,
+        11106.0
+      ],
+      "region": "宫之浦屋久岛周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "宫之浦屋久岛",
+      "anchorCityId": "japan-7ce5e9490253",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-7711",
+      "cell": 7711,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 143.2371289665656,
+      "lat": 44.35614311662763,
+      "world_pixel": [
+        15040.0,
+        1494.0
+      ],
+      "region": "纹别周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "纹别",
+      "anchorCityId": "japan-7f01198990b6",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-14409",
+      "cell": 14409,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 145.65494603225108,
+      "lat": 43.33228564851506,
+      "world_pixel": [
+        16544.0,
+        2844.0
+      ],
+      "region": "根室周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "根室",
+      "anchorCityId": "japan-8d3c19ba984a",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-14393",
+      "cell": 14393,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 144.32775632603366,
+      "lat": 43.03534344117854,
+      "world_pixel": [
+        15520.0,
+        2844.0
+      ],
+      "region": "钏路周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "钏路",
+      "anchorCityId": "japan-908eb10b2193",
+      "group": "北海道"
+    },
+    {
+      "id": "japan-farm-2505",
+      "cell": 2505,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 131.89027375159682,
+      "lat": 43.00668387682701,
+      "world_pixel": [
+        6560.0,
+        468.0
+      ],
+      "region": "海参崴周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "海参崴",
+      "anchorCityId": "japan-9d49fb7ee284",
+      "group": "俄远东沿海"
+    },
+    {
+      "id": "japan-farm-26370",
+      "cell": 26370,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 141.9775190278696,
+      "lat": 39.69284185152651,
+      "world_pixel": [
+        13056.0,
+        5274.0
+      ],
+      "region": "宫古周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "宫古",
+      "anchorCityId": "japan-a92b92db0665",
+      "group": "东北"
+    },
+    {
+      "id": "japan-farm-5374",
+      "cell": 5374,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 126.41438598311214,
+      "lat": 41.093003864206786,
+      "world_pixel": [
+        2176.0,
+        1062.0
+      ],
+      "region": "江界周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "江界",
+      "anchorCityId": "japan-afa1204e6563",
+      "group": "朝鲜半岛"
+    },
+    {
+      "id": "japan-farm-43284",
+      "cell": 43284,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 128.7437093655326,
+      "lat": 32.72601752878839,
+      "world_pixel": [
+        1920.0,
+        8730.0
+      ],
+      "region": "福江周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "福江",
+      "anchorCityId": "japan-b5cde014b7b0",
+      "group": "四国九州与琉球"
+    },
+    {
+      "id": "japan-farm-39561",
+      "cell": 39561,
+      "kind": "farmland",
+      "name": null,
+      "level": 1,
+      "lon": 129.72558569169135,
+      "lat": 33.8219959958437,
+      "world_pixel": [
+        2880.0,
+        7974.0
+      ],
+      "region": "郷之浦壹岐周边平地",
+      "reason": "regional-food-coverage",
+      "anchorCity": "郷之浦壹岐",
+      "anchorCityId": "japan-e32782d90967",
+      "group": "四国九州与琉球"
+    }
+  ],
+  "coverage": [
+    {
+      "city": "汉城",
+      "cityId": "japan-1bd3913c11ee",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "京都",
+      "cityId": "japan-70e7d4de7d91",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "大阪",
+      "cityId": "japan-430a09242932",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "江户",
+      "cityId": "japan-89fac6a778b3",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "平壤",
+      "cityId": "japan-b8097bb4f5a7",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "奈良",
+      "cityId": "japan-086568f0d007",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "山口",
+      "cityId": "japan-1d8d167345b0",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "骏府",
+      "cityId": "japan-585f3ad22902",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "鹿儿岛",
+      "cityId": "japan-71df9e7ef57f",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "熊本",
+      "cityId": "japan-80bde8ec3982",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "金泽",
+      "cityId": "japan-c0900ff96c6e",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "小田原",
+      "cityId": "japan-d4ba99fd6108",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "博多",
+      "cityId": "japan-e9c5b34509a7",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "全州",
+      "cityId": "japan-093e2eb072d3",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "仙台",
+      "cityId": "japan-226f27dc1c1e",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "咸兴",
+      "cityId": "japan-42aac5edcb27",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "庆州",
+      "cityId": "japan-43f77c790ff2",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "岐阜",
+      "cityId": "japan-483a998c99d8",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "高知",
+      "cityId": "japan-4956aaf77207",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "广岛",
+      "cityId": "japan-4fe146f0dbad",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "冈山",
+      "cityId": "japan-550e930475e6",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "开城",
+      "cityId": "japan-608ce6520d9c",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "高松",
+      "cityId": "japan-7e89d753d1fd",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "米泽",
+      "cityId": "japan-91399a4cead4",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "弘前",
+      "cityId": "japan-951d3d11e742",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "山形",
+      "cityId": "japan-a8d7df454d96",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "长崎",
+      "cityId": "japan-ac8fb43b7fe4",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "会津若松",
+      "cityId": "japan-bc665764b7e7",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "秋田",
+      "cityId": "japan-c510d4c0458a",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "春日山",
+      "cityId": "japan-c66f1ea36834",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "名古屋",
+      "cityId": "japan-cae82d044d00",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "一乘谷",
+      "cityId": "japan-e028c8d8ca2a",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "盛冈",
+      "cityId": "japan-e31a94f98cd4",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "松山",
+      "cityId": "japan-ecad2ef8926c",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "甲府",
+      "cityId": "japan-f1266127096a",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "姬路",
+      "cityId": "japan-f9d046a61622",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "忠州",
+      "cityId": "japan-3012d62a6bb8",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "府内",
+      "cityId": "japan-331b9bf89206",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "和歌山",
+      "cityId": "japan-4180450f7169",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "镰仓",
+      "cityId": "japan-d89836d10e09",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "大津",
+      "cityId": "japan-f0eaba41800e",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "福山",
+      "cityId": "japan-004535cbb32b",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "村上",
+      "cityId": "japan-0148baa97eef",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "日田",
+      "cityId": "japan-0193d9e778ce",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "上田",
+      "cityId": "japan-04b8c744f903",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "柳川",
+      "cityId": "japan-10e8a37faf89",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "延冈",
+      "cityId": "japan-1173c22dee64",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "足利",
+      "cityId": "japan-14f2ea922e26",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "安土",
+      "cityId": "japan-15e9c6f29a5a",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "岛原",
+      "cityId": "japan-168370264845",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "八户",
+      "cityId": "japan-16f0eef46bd0",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "富山",
+      "cityId": "japan-17cab6bf6af2",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "福知山",
+      "cityId": "japan-18a0dec1187e",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "严原对马",
+      "cityId": "japan-18c94d9b2cd5",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "滨松",
+      "cityId": "japan-1b005f67eab8",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "新庄",
+      "cityId": "japan-1d3b7f126363",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "德岛",
+      "cityId": "japan-1e3dc9930f8f",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "小诸",
+      "cityId": "japan-1e966657ee58",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "江陵",
+      "cityId": "japan-207defb2b5df",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "厩桥",
+      "cityId": "japan-277149735026",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "唐津",
+      "cityId": "japan-282357f3f425",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "大村",
+      "cityId": "japan-28ba0990f181",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "高山",
+      "cityId": "japan-2da32a9523d2",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "宇和岛",
+      "cityId": "japan-2e90fe09775d",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "新潟",
+      "cityId": "japan-2f6f4f76203c",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "新宫",
+      "cityId": "japan-3694d948575b",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "佐贺",
+      "cityId": "japan-39593bf65a53",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "小仓",
+      "cityId": "japan-40449bd5f16e",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "长冈",
+      "cityId": "japan-4331fcbe6c2a",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "大邱",
+      "cityId": "japan-4433b5e76e83",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "津",
+      "cityId": "japan-4686d29e3c83",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "出云",
+      "cityId": "japan-48d58bedfb35",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "元山",
+      "cityId": "japan-48e92dc57a51",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "晋州",
+      "cityId": "japan-49734da65f56",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "挂川",
+      "cityId": "japan-4b2b9888bdec",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "川越",
+      "cityId": "japan-5046809f56df",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "伊势",
+      "cityId": "japan-5499852e832c",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "大垣",
+      "cityId": "japan-6dfa5d1c4fc7",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "函馆",
+      "cityId": "japan-6fa97e16d1ec",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "松本",
+      "cityId": "japan-717a6eb3bc92",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "敦贺",
+      "cityId": "japan-78864cfe7d1f",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "松阪",
+      "cityId": "japan-7a1366f17fee",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "鸟取",
+      "cityId": "japan-7ce1a2a0e0e0",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "白河",
+      "cityId": "japan-7df42f7b677b",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "津山",
+      "cityId": "japan-87f04863ce74",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "福岛",
+      "cityId": "japan-8bd4ee6c786e",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "水户",
+      "cityId": "japan-93c5c75972bb",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "东莱",
+      "cityId": "japan-9dc69c2a9be2",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "佐仓",
+      "cityId": "japan-9ea4f9302407",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "磐城",
+      "cityId": "japan-a4b0cdc649a2",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "下关",
+      "cityId": "japan-a50ac60141ad",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "海州",
+      "cityId": "japan-a57e7a404d7e",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "原州",
+      "cityId": "japan-a637d9d6a0dd",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "镜城",
+      "cityId": "japan-a6c4f5f55baf",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "月山富田",
+      "cityId": "japan-a71565f6e962",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "鹤冈",
+      "cityId": "japan-a87443fc6a89",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "伊贺上野",
+      "cityId": "japan-ae238fc7d078",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "饭田",
+      "cityId": "japan-ae7984d27168",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "久留米",
+      "cityId": "japan-b02e9873cc86",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "忍",
+      "cityId": "japan-b079359374e5",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "罗州",
+      "cityId": "japan-b2de4d43140b",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "诹访",
+      "cityId": "japan-b86e7e25aa57",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "沼田",
+      "cityId": "japan-c3553cd5c441",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "济州",
+      "cityId": "japan-c4d61691de15",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "义州",
+      "cityId": "japan-c94990b67786",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "馆山",
+      "cityId": "japan-c9ee215a050b",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "田边",
+      "cityId": "japan-d53fbe366670",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "中村",
+      "cityId": "japan-d57aea81b6fc",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "清州",
+      "cityId": "japan-d8f437f2924b",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "酒田",
+      "cityId": "japan-dc2fd3bbfe41",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "龟山丹波",
+      "cityId": "japan-e12222240aa0",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "洲本",
+      "cityId": "japan-e153083446be",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "八代",
+      "cityId": "japan-e5872a184e88",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "宇都宫",
+      "cityId": "japan-e8a513e8a9a4",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "长野",
+      "cityId": "japan-e927401b0a1e",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "公州",
+      "cityId": "japan-ed709c7e4ad3",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "松前",
+      "cityId": "japan-ed7969d67332",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "冈崎",
+      "cityId": "japan-ef8be2a71cc0",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "郡山",
+      "cityId": "japan-f8e921cf901f",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "都城",
+      "cityId": "japan-fabf7c19f4cd",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "备中松山",
+      "cityId": "japan-sengoku-1a60c5c69d7a",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "后濑山",
+      "cityId": "japan-sengoku-33152b6681ac",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "韮山",
+      "cityId": "japan-sengoku-386c23a359eb",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "宫津",
+      "cityId": "japan-sengoku-5cb0ec534fa1",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "苫小牧",
+      "cityId": "japan-052d1e74b705",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "会宁",
+      "cityId": "japan-0f3788b1d37b",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "室兰",
+      "cityId": "japan-14a09f070b21",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "稚内",
+      "cityId": "japan-1b845b199c12",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "出水",
+      "cityId": "japan-213fc1711506",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "久慈",
+      "cityId": "japan-2519c82d502f",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "大馆",
+      "cityId": "japan-2ad7ec2628c9",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "岩见泽",
+      "cityId": "japan-2e0f35666ed0",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "西乡隐岐",
+      "cityId": "japan-2fdc792060fa",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "留萌",
+      "cityId": "japan-3943633f8546",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "饫肥",
+      "cityId": "japan-3d59003f6eab",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "天盐",
+      "cityId": "japan-3eb80aa598ac",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "札幌",
+      "cityId": "japan-3ff91de9fe54",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "浦河",
+      "cityId": "japan-4278c40172ad",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "俱知安",
+      "cityId": "japan-4c5053d1aa70",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "七尾",
+      "cityId": "japan-4f47eebc74fd",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "相马",
+      "cityId": "japan-56a49b7f01ab",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "人吉",
+      "cityId": "japan-5fb7d3c5f5ee",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "网走",
+      "cityId": "japan-688894b17f43",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "清洲",
+      "cityId": "japan-6ce4b309a25e",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "小樽",
+      "cityId": "japan-74ee5d92a46d",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "北见",
+      "cityId": "japan-75022a30d1b9",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "带广",
+      "cityId": "japan-76249096c873",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "能代",
+      "cityId": "japan-77ea1a29a55b",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "宫之浦屋久岛",
+      "cityId": "japan-7ce5e9490253",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "纹别",
+      "cityId": "japan-7f01198990b6",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "平泉",
+      "cityId": "japan-83d82fba18b2",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "青森",
+      "cityId": "japan-890879394177",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "安州",
+      "cityId": "japan-8985a81e3ecb",
+      "distanceHexes": 7,
+      "covered": true
+    },
+    {
+      "city": "石卷",
+      "cityId": "japan-8b5588dbea95",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "根室",
+      "cityId": "japan-8d3c19ba984a",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "横手",
+      "cityId": "japan-8f6e0bad4480",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "钏路",
+      "cityId": "japan-908eb10b2193",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "八王子",
+      "cityId": "japan-928b853919ae",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "花卷",
+      "cityId": "japan-96a841179a39",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "气仙沼",
+      "cityId": "japan-9b4a4c6c7f3a",
+      "distanceHexes": 6,
+      "covered": true
+    },
+    {
+      "city": "海参崴",
+      "cityId": "japan-9d49fb7ee284",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "明石",
+      "cityId": "japan-a6b48d5f7d22",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "宫古",
+      "cityId": "japan-a92b92db0665",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "江界",
+      "cityId": "japan-afa1204e6563",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "长万部",
+      "cityId": "japan-b318183bc270",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "旭川",
+      "cityId": "japan-b3b5c3b85572",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "福江",
+      "cityId": "japan-b5cde014b7b0",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "江差",
+      "cityId": "japan-bd94d8242670",
+      "distanceHexes": 5,
+      "covered": true
+    },
+    {
+      "city": "萩",
+      "cityId": "japan-dc3b9db18f14",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "西之表",
+      "cityId": "japan-ddbd34dd8fe8",
+      "distanceHexes": 4,
+      "covered": true
+    },
+    {
+      "city": "郷之浦壹岐",
+      "cityId": "japan-e32782d90967",
+      "distanceHexes": 1,
+      "covered": true
+    },
+    {
+      "city": "土浦",
+      "cityId": "japan-e9d01ad03ff2",
+      "distanceHexes": 2,
+      "covered": true
+    },
+    {
+      "city": "杂太佐渡",
+      "cityId": "japan-f2d61530ed75",
+      "distanceHexes": 8,
+      "covered": true
+    },
+    {
+      "city": "鱼津",
+      "cityId": "japan-f65e9acad0f4",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "余市",
+      "cityId": "japan-fd4f338366c0",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "羽衣石",
+      "cityId": "japan-sengoku-0aa570d1c080",
+      "distanceHexes": 3,
+      "covered": true
+    },
+    {
+      "city": "久留里",
+      "cityId": "japan-sengoku-a5f2d8765e0e",
+      "distanceHexes": 5,
+      "covered": true
+    }
+  ],
+  "groups": {
+    "东北": 19,
+    "东海与北陆": 21,
+    "中国": 4,
+    "中部": 1,
+    "俄远东沿海": 1,
+    "关东": 2,
+    "关东与甲信越": 22,
+    "北海道": 21,
+    "四国九州与琉球": 27,
+    "朝鲜半岛": 34,
+    "畿内与中国": 29,
+    "近畿": 4
+  },
+  "exceptions": [],
+  "corridorExclusion": false
+}

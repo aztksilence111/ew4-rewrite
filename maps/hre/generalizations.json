@@ -1,0 +1,921 @@
+{
+  "grid": [
+    {
+      "name": "威尼斯",
+      "cell": 42112,
+      "kind": "retain-small-island",
+      "land_fraction": 0.2025
+    },
+    {
+      "cell": 99,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 4095,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 4496,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 4498,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 4696,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 4697,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 4698,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 8345,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 8725,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 8916,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 10534,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 10553,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 10754,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 10952,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 11153,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 11355,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 11556,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 12864,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 12974,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 12975,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 13065,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 13764,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 17735,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 17936,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 18139,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 18339,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 18538,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 18540,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 18735,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 18738,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 18938,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 20707,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 41911,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 42111,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 42738,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 44952,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 44953,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 45558,
+      "kind": "preserve-real-water-between-land-masses"
+    },
+    {
+      "cell": 49799,
+      "kind": "preserve-real-water-between-land-masses"
+    }
+  ],
+  "buildings": [],
+  "spacing_exceptions": [
+    {
+      "first": "热那亚",
+      "second": "热那亚港",
+      "first_id": "hre-0c2da3d7ddba",
+      "second_id": "hre-ac79f8019f3f",
+      "first_cell": 45294,
+      "second_cell": 45496,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "马尔默港",
+      "second": "哥本哈根港",
+      "first_id": "hre-0ed457f5a16e",
+      "second_id": "hre-85b344289b4b",
+      "first_cell": 8148,
+      "second_cell": 8346,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "马尔默港",
+      "second": "马尔默",
+      "first_id": "hre-0ed457f5a16e",
+      "second_id": "hre-b7cfc13e87c8",
+      "first_cell": 8148,
+      "second_cell": 8550,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "马尔默港",
+      "second": "隆德",
+      "first_id": "hre-0ed457f5a16e",
+      "second_id": "hre-ee629d628d06",
+      "first_cell": 8148,
+      "second_cell": 8150,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "布鲁日",
+      "second": "泽兰外港",
+      "first_id": "hre-0f2d50d336df",
+      "second_id": "hre-74f0f3cf90be",
+      "first_cell": 21933,
+      "second_cell": 21332,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "布鲁日",
+      "second": "泽布吕赫近海",
+      "first_id": "hre-0f2d50d336df",
+      "second_id": "hre-de38403f6b94",
+      "first_cell": 21933,
+      "second_cell": 21330,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "萨沃纳港",
+      "second": "萨沃纳",
+      "first_id": "hre-111305fd2339",
+      "second_id": "hre-f7f7447b9cb6",
+      "first_cell": 45692,
+      "second_cell": 45491,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "希尔德斯海姆",
+      "second": "汉诺威",
+      "first_id": "hre-20e52bb82ae0",
+      "second_id": "hre-cae0371b4e1d",
+      "first_cell": 19781,
+      "second_cell": 19176,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "拉文纳外港",
+      "second": "拉文纳",
+      "first_id": "hre-256d443a44a5",
+      "second_id": "hre-560a74d9b91d",
+      "first_cell": 45128,
+      "second_cell": 45528,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "扎达尔",
+      "second": "扎达尔港",
+      "first_id": "hre-290368c0f7bd",
+      "second_id": "hre-eb18ffd7109c",
+      "first_cell": 46363,
+      "second_cell": 46362,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "比萨外港",
+      "second": "比萨",
+      "first_id": "hre-2c24f44bb97e",
+      "second_id": "hre-974094afc429",
+      "first_cell": 48121,
+      "second_cell": 47721,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "代尔夫特",
+      "second": "莱顿",
+      "first_id": "hre-2e47fc18d8d0",
+      "second_id": "hre-58509204e307",
+      "first_cell": 19532,
+      "second_cell": 19131,
+      "distance": 2,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "代尔夫特",
+      "second": "海牙",
+      "first_id": "hre-2e47fc18d8d0",
+      "second_id": "hre-ecdc668629a1",
+      "first_cell": 19532,
+      "second_cell": 19331,
+      "distance": 1,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "普拉港",
+      "second": "普拉",
+      "first_id": "hre-2e5bf49fe069",
+      "second_id": "hre-48640634df8c",
+      "first_cell": 43734,
+      "second_cell": 43937,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "奈梅亨",
+      "second": "阿纳姆",
+      "first_id": "hre-351ea241c2a1",
+      "second_id": "hre-3c5eb8faaa15",
+      "first_cell": 20348,
+      "second_cell": 19947,
+      "distance": 2,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "奈梅亨",
+      "second": "克莱沃",
+      "first_id": "hre-351ea241c2a1",
+      "second_id": "hre-979ab26625fc",
+      "first_cell": 20348,
+      "second_cell": 20552,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "威尼斯",
+      "second": "威尼斯潟湖港",
+      "first_id": "hre-397c38c3e629",
+      "second_id": "hre-cf0b2530aee6",
+      "first_cell": 42112,
+      "second_cell": 42314,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "施特拉尔松德港",
+      "second": "施特拉尔松德",
+      "first_id": "hre-3bd8d3816a34",
+      "second_id": "hre-801469e72907",
+      "first_cell": 12370,
+      "second_cell": 12771,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "阿纳姆",
+      "second": "克莱沃",
+      "first_id": "hre-3c5eb8faaa15",
+      "second_id": "hre-979ab26625fc",
+      "first_cell": 19947,
+      "second_cell": 20552,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "德累斯顿",
+      "second": "迈森",
+      "first_id": "hre-3ede18d5fcf2",
+      "second_id": "hre-a0f122795b19",
+      "first_cell": 23632,
+      "second_cell": 23228,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "罗斯托克",
+      "second": "瓦尔讷明德港",
+      "first_id": "hre-405c20c7e4f5",
+      "second_id": "hre-6f066ede2b47",
+      "first_cell": 13568,
+      "second_cell": 12965,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "奥胡斯",
+      "second": "奥胡斯港",
+      "first_id": "hre-40662d08548c",
+      "second_id": "hre-8db6d3b5d1f4",
+      "first_cell": 6518,
+      "second_cell": 6720,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "格但斯克湾港",
+      "second": "格但斯克",
+      "first_id": "hre-448da12d6e80",
+      "second_id": "hre-927eed91e4dc",
+      "first_cell": 11812,
+      "second_cell": 12214,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "阿尔巴",
+      "second": "阿斯蒂",
+      "first_id": "hre-46579456e238",
+      "second_id": "hre-767877be73ff",
+      "first_cell": 44281,
+      "second_cell": 43679,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "多德雷赫特",
+      "second": "布雷达",
+      "first_id": "hre-46dad70ea144",
+      "second_id": "hre-55dc2a5a619f",
+      "first_cell": 20338,
+      "second_cell": 20942,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "图尔奈",
+      "second": "里尔",
+      "first_id": "hre-55e0f4b93222",
+      "second_id": "hre-588b67bb443b",
+      "first_cell": 23943,
+      "second_cell": 23740,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "莱顿",
+      "second": "海牙",
+      "first_id": "hre-58509204e307",
+      "second_id": "hre-ecdc668629a1",
+      "first_cell": 19131,
+      "second_cell": 19331,
+      "distance": 2,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "马赛港",
+      "second": "马赛",
+      "first_id": "hre-595a1648828d",
+      "second_id": "hre-c04c3b4a8763",
+      "first_cell": 48473,
+      "second_cell": 48474,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "诺瓦拉",
+      "second": "韦尔切利",
+      "first_id": "hre-6127a40b87c2",
+      "second_id": "hre-e5abbe9bed9e",
+      "first_cell": 41875,
+      "second_cell": 42275,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "泽兰外港",
+      "second": "米德尔堡",
+      "first_id": "hre-74f0f3cf90be",
+      "second_id": "hre-965e62dac0db",
+      "first_cell": 21332,
+      "second_cell": 20932,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "泽兰外港",
+      "second": "泽布吕赫近海",
+      "first_id": "hre-74f0f3cf90be",
+      "second_id": "hre-de38403f6b94",
+      "first_cell": 21332,
+      "second_cell": 21330,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "哥本哈根港",
+      "second": "马尔默",
+      "first_id": "hre-85b344289b4b",
+      "second_id": "hre-b7cfc13e87c8",
+      "first_cell": 8346,
+      "second_cell": 8550,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "哥本哈根港",
+      "second": "哥本哈根",
+      "first_id": "hre-85b344289b4b",
+      "second_id": "hre-c35905b5c2de",
+      "first_cell": 8346,
+      "second_cell": 8144,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "安特卫普",
+      "second": "梅赫伦",
+      "first_id": "hre-8c4a85802d35",
+      "second_id": "hre-ad40faf6f8f2",
+      "first_cell": 22144,
+      "second_cell": 22747,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "安特卫普",
+      "second": "安特卫普河口泊地",
+      "first_id": "hre-8c4a85802d35",
+      "second_id": "hre-c072429ec9ed",
+      "first_cell": 22144,
+      "second_cell": 21540,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "卡塞尔",
+      "second": "弗里茨拉尔",
+      "first_id": "hre-8c6fa2a6e21f",
+      "second_id": "hre-a9fbd3ad822d",
+      "first_cell": 22590,
+      "second_cell": 23191,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "魏玛",
+      "second": "耶拿",
+      "first_id": "hre-973698242c1e",
+      "second_id": "hre-a01ab02b7927",
+      "first_cell": 23812,
+      "second_cell": 24015,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "魏玛",
+      "second": "埃尔福特",
+      "first_id": "hre-973698242c1e",
+      "second_id": "hre-c371bc2f548c",
+      "first_cell": 23812,
+      "second_cell": 23810,
+      "distance": 2,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "比萨",
+      "second": "卢卡",
+      "first_id": "hre-974094afc429",
+      "second_id": "hre-9e8d05151b41",
+      "first_cell": 47721,
+      "second_cell": 47320,
+      "distance": 2,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "伦讷博恩霍尔姆",
+      "second": "伦讷港",
+      "first_id": "hre-9ae32c9dc5d3",
+      "second_id": "hre-b2e996419c22",
+      "first_cell": 10172,
+      "second_cell": 9970,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "布鲁塞尔",
+      "second": "梅赫伦",
+      "first_id": "hre-9aebcea30a5b",
+      "second_id": "hre-ad40faf6f8f2",
+      "first_cell": 23349,
+      "second_cell": 22747,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "的里雅斯特",
+      "second": "的里雅斯特港",
+      "first_id": "hre-9d1d81c0e9ef",
+      "second_id": "hre-a7254751fcc5",
+      "first_cell": 41322,
+      "second_cell": 41722,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "安科纳",
+      "second": "安科纳港",
+      "first_id": "hre-ac52e32fb49a",
+      "second_id": "hre-b41cdc2cecd5",
+      "first_cell": 48154,
+      "second_cell": 47953,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "马尔默",
+      "second": "隆德",
+      "first_id": "hre-b7cfc13e87c8",
+      "second_id": "hre-ee629d628d06",
+      "first_cell": 8550,
+      "second_cell": 8150,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "尼斯港",
+      "second": "尼斯",
+      "first_id": "hre-c4e0e23e0815",
+      "second_id": "hre-d45defa77a26",
+      "first_cell": 47688,
+      "second_cell": 47489,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "科隆",
+      "second": "波恩",
+      "first_id": "hre-caa757973491",
+      "second_id": "hre-e878e0cdc29e",
+      "first_cell": 23573,
+      "second_cell": 24177,
+      "distance": 3,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    },
+    {
+      "first": "吕贝克",
+      "second": "特拉沃明德港",
+      "first_id": "hre-d7f43cebda1f",
+      "second_id": "hre-ebcbfa61b50e",
+      "first_cell": 14160,
+      "second_cell": 13760,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "哈勒姆",
+      "second": "阿姆斯特丹",
+      "first_id": "hre-ddee29311df8",
+      "second_id": "hre-ee4d50440549",
+      "first_cell": 18329,
+      "second_cell": 18532,
+      "distance": 2,
+      "reason": "Keep nearby cities at their real geographic anchors"
+    }
+  ],
+  "coastal_spacing_exceptions": [
+    {
+      "first": "热那亚",
+      "second": "热那亚港",
+      "first_id": "hre-0c2da3d7ddba",
+      "second_id": "hre-ac79f8019f3f",
+      "first_cell": 45294,
+      "second_cell": 45496,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "马尔默港",
+      "second": "哥本哈根港",
+      "first_id": "hre-0ed457f5a16e",
+      "second_id": "hre-85b344289b4b",
+      "first_cell": 8148,
+      "second_cell": 8346,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "马尔默港",
+      "second": "马尔默",
+      "first_id": "hre-0ed457f5a16e",
+      "second_id": "hre-b7cfc13e87c8",
+      "first_cell": 8148,
+      "second_cell": 8550,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "马尔默港",
+      "second": "隆德",
+      "first_id": "hre-0ed457f5a16e",
+      "second_id": "hre-ee629d628d06",
+      "first_cell": 8148,
+      "second_cell": 8150,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "布鲁日",
+      "second": "泽兰外港",
+      "first_id": "hre-0f2d50d336df",
+      "second_id": "hre-74f0f3cf90be",
+      "first_cell": 21933,
+      "second_cell": 21332,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "布鲁日",
+      "second": "泽布吕赫近海",
+      "first_id": "hre-0f2d50d336df",
+      "second_id": "hre-de38403f6b94",
+      "first_cell": 21933,
+      "second_cell": 21330,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "萨沃纳港",
+      "second": "萨沃纳",
+      "first_id": "hre-111305fd2339",
+      "second_id": "hre-f7f7447b9cb6",
+      "first_cell": 45692,
+      "second_cell": 45491,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "拉文纳外港",
+      "second": "拉文纳",
+      "first_id": "hre-256d443a44a5",
+      "second_id": "hre-560a74d9b91d",
+      "first_cell": 45128,
+      "second_cell": 45528,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "扎达尔",
+      "second": "扎达尔港",
+      "first_id": "hre-290368c0f7bd",
+      "second_id": "hre-eb18ffd7109c",
+      "first_cell": 46363,
+      "second_cell": 46362,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "比萨外港",
+      "second": "比萨",
+      "first_id": "hre-2c24f44bb97e",
+      "second_id": "hre-974094afc429",
+      "first_cell": 48121,
+      "second_cell": 47721,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "普拉港",
+      "second": "普拉",
+      "first_id": "hre-2e5bf49fe069",
+      "second_id": "hre-48640634df8c",
+      "first_cell": 43734,
+      "second_cell": 43937,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "威尼斯",
+      "second": "威尼斯潟湖港",
+      "first_id": "hre-397c38c3e629",
+      "second_id": "hre-cf0b2530aee6",
+      "first_cell": 42112,
+      "second_cell": 42314,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "施特拉尔松德港",
+      "second": "施特拉尔松德",
+      "first_id": "hre-3bd8d3816a34",
+      "second_id": "hre-801469e72907",
+      "first_cell": 12370,
+      "second_cell": 12771,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "罗斯托克",
+      "second": "瓦尔讷明德港",
+      "first_id": "hre-405c20c7e4f5",
+      "second_id": "hre-6f066ede2b47",
+      "first_cell": 13568,
+      "second_cell": 12965,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "奥胡斯",
+      "second": "奥胡斯港",
+      "first_id": "hre-40662d08548c",
+      "second_id": "hre-8db6d3b5d1f4",
+      "first_cell": 6518,
+      "second_cell": 6720,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "格但斯克湾港",
+      "second": "格但斯克",
+      "first_id": "hre-448da12d6e80",
+      "second_id": "hre-927eed91e4dc",
+      "first_cell": 11812,
+      "second_cell": 12214,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "马赛港",
+      "second": "马赛",
+      "first_id": "hre-595a1648828d",
+      "second_id": "hre-c04c3b4a8763",
+      "first_cell": 48473,
+      "second_cell": 48474,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "泽兰外港",
+      "second": "米德尔堡",
+      "first_id": "hre-74f0f3cf90be",
+      "second_id": "hre-965e62dac0db",
+      "first_cell": 21332,
+      "second_cell": 20932,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "泽兰外港",
+      "second": "泽布吕赫近海",
+      "first_id": "hre-74f0f3cf90be",
+      "second_id": "hre-de38403f6b94",
+      "first_cell": 21332,
+      "second_cell": 21330,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "哥本哈根港",
+      "second": "马尔默",
+      "first_id": "hre-85b344289b4b",
+      "second_id": "hre-b7cfc13e87c8",
+      "first_cell": 8346,
+      "second_cell": 8550,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "哥本哈根港",
+      "second": "哥本哈根",
+      "first_id": "hre-85b344289b4b",
+      "second_id": "hre-c35905b5c2de",
+      "first_cell": 8346,
+      "second_cell": 8144,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "安特卫普",
+      "second": "安特卫普河口泊地",
+      "first_id": "hre-8c4a85802d35",
+      "second_id": "hre-c072429ec9ed",
+      "first_cell": 22144,
+      "second_cell": 21540,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "伦讷博恩霍尔姆",
+      "second": "伦讷港",
+      "first_id": "hre-9ae32c9dc5d3",
+      "second_id": "hre-b2e996419c22",
+      "first_cell": 10172,
+      "second_cell": 9970,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "的里雅斯特",
+      "second": "的里雅斯特港",
+      "first_id": "hre-9d1d81c0e9ef",
+      "second_id": "hre-a7254751fcc5",
+      "first_cell": 41322,
+      "second_cell": 41722,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "安科纳",
+      "second": "安科纳港",
+      "first_id": "hre-ac52e32fb49a",
+      "second_id": "hre-b41cdc2cecd5",
+      "first_cell": 48154,
+      "second_cell": 47953,
+      "distance": 1,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "尼斯港",
+      "second": "尼斯",
+      "first_id": "hre-c4e0e23e0815",
+      "second_id": "hre-d45defa77a26",
+      "first_cell": 47688,
+      "second_cell": 47489,
+      "distance": 2,
+      "reason": "Geographic coastal berth"
+    },
+    {
+      "first": "吕贝克",
+      "second": "特拉沃明德港",
+      "first_id": "hre-d7f43cebda1f",
+      "second_id": "hre-ebcbfa61b50e",
+      "first_cell": 14160,
+      "second_cell": 13760,
+      "distance": 3,
+      "reason": "Geographic coastal berth"
+    }
+  ]
+}

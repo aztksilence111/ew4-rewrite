@@ -1,0 +1,1507 @@
+[
+  {
+    "cell": 48539,
+    "other": 48740,
+    "direction": 2,
+    "near": "阿雷佐",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 38325,
+    "other": 38326,
+    "direction": 0,
+    "near": "马里博尔",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 32115,
+    "other": 32316,
+    "direction": 2,
+    "near": "尼特拉",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 16349,
+    "other": 16551,
+    "direction": 1,
+    "near": "奥尔登堡作坊",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 38106,
+    "other": 38307,
+    "direction": 2,
+    "near": "菲拉赫",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 35325,
+    "other": 35526,
+    "direction": 2,
+    "near": "帕帕",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 25515,
+    "other": 25516,
+    "direction": 0,
+    "near": "热舒夫",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 34444,
+    "other": 34645,
+    "direction": 2,
+    "near": "康斯坦茨",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 22649,
+    "other": 22650,
+    "direction": 0,
+    "near": "莱格尼察",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 13194,
+    "other": 13395,
+    "direction": 2,
+    "near": "科尔贝格",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 12622,
+    "other": 12623,
+    "direction": 0,
+    "near": "埃尔布隆格",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 28259,
+    "other": 28260,
+    "direction": 0,
+    "near": "普日布拉姆",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 35444,
+    "other": 35644,
+    "direction": 2,
+    "near": "苏黎世",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 23058,
+    "other": 23059,
+    "direction": 0,
+    "near": "弗罗茨瓦夫",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 33186,
+    "other": 33187,
+    "direction": 0,
+    "near": "欧塞尔",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 14864,
+    "other": 15065,
+    "direction": 2,
+    "near": "比亚韦斯托克",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 21604,
+    "other": 21605,
+    "direction": 0,
+    "near": "曼斯费尔德",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 30717,
+    "other": 30718,
+    "direction": 0,
+    "near": "班斯卡比斯特里察",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 25588,
+    "other": 25789,
+    "direction": 2,
+    "near": "科布伦茨",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 20745,
+    "other": 20746,
+    "direction": 0,
+    "near": "斯海尔托亨博斯",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 4729,
+    "other": 4931,
+    "direction": 1,
+    "near": "哈尔姆斯塔德",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 42099,
+    "other": 42100,
+    "direction": 0,
+    "near": "维罗纳",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 43701,
+    "other": 43702,
+    "direction": 0,
+    "near": "帕尔马",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 28816,
+    "other": 28817,
+    "direction": 0,
+    "near": "内卡谷地",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 30827,
+    "other": 30828,
+    "direction": 0,
+    "near": "斯图加特",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 40916,
+    "other": 40917,
+    "direction": 0,
+    "near": "阿奎莱亚",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 35252,
+    "other": 35253,
+    "direction": 0,
+    "near": "圣加仑",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 38686,
+    "other": 38886,
+    "direction": 2,
+    "near": "博尔扎诺",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 36840,
+    "other": 37041,
+    "direction": 2,
+    "near": "伯尔尼",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 26861,
+    "other": 26862,
+    "direction": 0,
+    "near": "库特纳霍拉",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 18375,
+    "other": 18576,
+    "direction": 2,
+    "near": "策勒",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 28006,
+    "other": 28007,
+    "direction": 0,
+    "near": "沃尔姆斯",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 19578,
+    "other": 19579,
+    "direction": 0,
+    "near": "希尔德斯海姆",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 28086,
+    "other": 28087,
+    "direction": 0,
+    "near": "奥洛穆茨",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 16435,
+    "other": 16636,
+    "direction": 2,
+    "near": "托伦",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 43072,
+    "other": 43272,
+    "direction": 2,
+    "near": "都灵",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 34983,
+    "other": 35183,
+    "direction": 2,
+    "near": "布尔日",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 32258,
+    "other": 32459,
+    "direction": 1,
+    "near": "弗赖辛",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 29192,
+    "other": 29193,
+    "direction": 0,
+    "near": "梅斯",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 32693,
+    "other": 32694,
+    "direction": 0,
+    "near": "梅尔克",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 24563,
+    "other": 24564,
+    "direction": 0,
+    "near": "于伊",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 27137,
+    "other": 27338,
+    "direction": 2,
+    "near": "鲁昂",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 19733,
+    "other": 19933,
+    "direction": 2,
+    "near": "代尔夫特",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 40741,
+    "other": 40941,
+    "direction": 2,
+    "near": "萨格勒布",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 19961,
+    "other": 19962,
+    "direction": 0,
+    "near": "明斯特",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 26685,
+    "other": 26886,
+    "direction": 1,
+    "near": "奥帕瓦",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 31584,
+    "other": 31785,
+    "direction": 2,
+    "near": "特鲁瓦",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 39699,
+    "other": 39700,
+    "direction": 0,
+    "near": "贝卢诺",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 41246,
+    "other": 41448,
+    "direction": 1,
+    "near": "尚贝里",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 34631,
+    "other": 34632,
+    "direction": 0,
+    "near": "巴塞尔",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 20148,
+    "other": 20149,
+    "direction": 0,
+    "near": "奈梅亨",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 35795,
+    "other": 35796,
+    "direction": 0,
+    "near": "讷韦尔",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 16756,
+    "other": 16757,
+    "direction": 0,
+    "near": "不来梅",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 47060,
+    "other": 47260,
+    "direction": 2,
+    "near": "阿尔勒",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 25363,
+    "other": 25364,
+    "direction": 0,
+    "near": "迪南铜工",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 47528,
+    "other": 47728,
+    "direction": 2,
+    "near": "佛罗伦萨",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 37202,
+    "other": 37203,
+    "direction": 0,
+    "near": "穆兰",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 44663,
+    "other": 44864,
+    "direction": 1,
+    "near": "加普",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 27649,
+    "other": 27851,
+    "direction": 1,
+    "near": "比尔森",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 22615,
+    "other": 22616,
+    "direction": 0,
+    "near": "莱比锡",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 18999,
+    "other": 19000,
+    "direction": 0,
+    "near": "勃兰登堡",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 20855,
+    "other": 20856,
+    "direction": 0,
+    "near": "卡利什",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 23632,
+    "other": 23633,
+    "direction": 0,
+    "near": "德累斯顿",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 13568,
+    "other": 13569,
+    "direction": 0,
+    "near": "罗斯托克",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 39923,
+    "other": 39924,
+    "direction": 0,
+    "near": "卢布尔雅那",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 32703,
+    "other": 32704,
+    "direction": 0,
+    "near": "维也纳",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 32092,
+    "other": 32293,
+    "direction": 2,
+    "near": "克雷姆斯",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 30800,
+    "other": 31001,
+    "direction": 2,
+    "near": "南锡",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 40090,
+    "other": 40091,
+    "direction": 0,
+    "near": "特伦托",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 44079,
+    "other": 44281,
+    "direction": 1,
+    "near": "阿尔巴",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 20540,
+    "other": 20740,
+    "direction": 2,
+    "near": "多德雷赫特",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 36446,
+    "other": 36647,
+    "direction": 2,
+    "near": "卢塞恩",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 29422,
+    "other": 29622,
+    "direction": 2,
+    "near": "霍恩洛厄",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 19739,
+    "other": 19740,
+    "direction": 0,
+    "near": "乌得勒支",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 37885,
+    "other": 37886,
+    "direction": 0,
+    "near": "布里克森",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 22540,
+    "other": 22541,
+    "direction": 0,
+    "near": "根特",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 34070,
+    "other": 34071,
+    "direction": 0,
+    "near": "罗森海姆",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 21958,
+    "other": 21959,
+    "direction": 0,
+    "near": "芬洛",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 26666,
+    "other": 26667,
+    "direction": 0,
+    "near": "帕尔杜比采",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 31670,
+    "other": 31871,
+    "direction": 2,
+    "near": "帕绍",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 28971,
+    "other": 29171,
+    "direction": 2,
+    "near": "兰斯",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 23943,
+    "other": 23944,
+    "direction": 0,
+    "near": "图尔奈",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 35420,
+    "other": 35621,
+    "direction": 1,
+    "near": "贝桑松",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 23136,
+    "other": 23338,
+    "direction": 1,
+    "near": "伊普尔",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 41667,
+    "other": 41868,
+    "direction": 2,
+    "near": "伊夫雷亚",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 13435,
+    "other": 13635,
+    "direction": 2,
+    "near": "奥尔什丁",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 21263,
+    "other": 21264,
+    "direction": 0,
+    "near": "谢拉兹",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 47847,
+    "other": 48047,
+    "direction": 2,
+    "near": "纳博讷",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 30689,
+    "other": 30690,
+    "direction": 0,
+    "near": "兹诺伊莫",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 41674,
+    "other": 41675,
+    "direction": 0,
+    "near": "诺瓦拉",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 43914,
+    "other": 43915,
+    "direction": 0,
+    "near": "费拉拉",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 38312,
+    "other": 38512,
+    "direction": 2,
+    "near": "克拉根福",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 32482,
+    "other": 32683,
+    "direction": 2,
+    "near": "林茨",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 21763,
+    "other": 21963,
+    "direction": 2,
+    "near": "杜伊斯堡",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 24392,
+    "other": 24393,
+    "direction": 0,
+    "near": "马尔堡",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 34883,
+    "other": 34884,
+    "direction": 0,
+    "near": "哈莱因盐场",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 33247,
+    "other": 33248,
+    "direction": 0,
+    "near": "梅明根",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 15573,
+    "other": 15775,
+    "direction": 1,
+    "near": "什未林",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 26654,
+    "other": 26655,
+    "direction": 0,
+    "near": "布拉格",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 39728,
+    "other": 39929,
+    "direction": 2,
+    "near": "采列",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 20808,
+    "other": 21009,
+    "direction": 2,
+    "near": "维滕贝格",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 34121,
+    "other": 34122,
+    "direction": 0,
+    "near": "杰尔",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 28867,
+    "other": 29068,
+    "direction": 2,
+    "near": "塔博尔",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 42083,
+    "other": 42084,
+    "direction": 0,
+    "near": "米兰",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 33729,
+    "other": 33730,
+    "direction": 0,
+    "near": "埃斯泰尔戈姆",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 19996,
+    "other": 20197,
+    "direction": 2,
+    "near": "马格德堡",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 15598,
+    "other": 15800,
+    "direction": 1,
+    "near": "斯德丁",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 27388,
+    "other": 27389,
+    "direction": 0,
+    "near": "特里尔",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 15158,
+    "other": 15359,
+    "direction": 2,
+    "near": "汉堡",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 21097,
+    "other": 21098,
+    "direction": 0,
+    "near": "卢布林",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 24809,
+    "other": 25010,
+    "direction": 2,
+    "near": "施马尔卡尔登",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 38368,
+    "other": 38569,
+    "direction": 1,
+    "near": "塞格德",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 35474,
+    "other": 35675,
+    "direction": 1,
+    "near": "施瓦茨银矿",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 10620,
+    "other": 10820,
+    "direction": 2,
+    "near": "柯尼斯堡",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 31016,
+    "other": 31217,
+    "direction": 1,
+    "near": "哈根奥",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 40474,
+    "other": 40475,
+    "direction": 0,
+    "near": "科莫",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 43969,
+    "other": 43970,
+    "direction": 0,
+    "near": "班亚卢卡",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 28242,
+    "other": 28442,
+    "direction": 2,
+    "near": "魏登",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 40657,
+    "other": 40858,
+    "direction": 1,
+    "near": "奥斯塔",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 23601,
+    "other": 23602,
+    "direction": 0,
+    "near": "艾森纳赫",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 42249,
+    "other": 42250,
+    "direction": 0,
+    "near": "格勒诺布尔",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 22144,
+    "other": 22145,
+    "direction": 0,
+    "near": "安特卫普",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 22590,
+    "other": 22591,
+    "direction": 0,
+    "near": "卡塞尔",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 32367,
+    "other": 32568,
+    "direction": 2,
+    "near": "奥尔良",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 37261,
+    "other": 37262,
+    "direction": 0,
+    "near": "库尔",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 18390,
+    "other": 18391,
+    "direction": 0,
+    "near": "施滕达尔",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 36017,
+    "other": 36018,
+    "direction": 0,
+    "near": "多勒",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 36513,
+    "other": 36514,
+    "direction": 0,
+    "near": "格拉茨",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 31658,
+    "other": 31860,
+    "direction": 1,
+    "near": "兰茨胡特",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 47721,
+    "other": 47922,
+    "direction": 2,
+    "near": "比萨",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 51564,
+    "other": 51764,
+    "direction": 2,
+    "near": "斯波莱托",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 23562,
+    "other": 23763,
+    "direction": 2,
+    "near": "马斯特里赫特",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 33060,
+    "other": 33061,
+    "direction": 0,
+    "near": "慕尼黑",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 15765,
+    "other": 15766,
+    "direction": 0,
+    "near": "吕讷堡",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 41281,
+    "other": 41482,
+    "direction": 2,
+    "near": "贝加莫",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 22970,
+    "other": 23170,
+    "direction": 2,
+    "near": "索林根",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 28834,
+    "other": 29035,
+    "direction": 2,
+    "near": "纽伦堡",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 21969,
+    "other": 22170,
+    "direction": 2,
+    "near": "多特蒙德",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 32451,
+    "other": 32652,
+    "direction": 2,
+    "near": "奥格斯堡",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 24015,
+    "other": 24016,
+    "direction": 0,
+    "near": "耶拿",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 49952,
+    "other": 49953,
+    "direction": 0,
+    "near": "佩鲁贾",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 46258,
+    "other": 46458,
+    "direction": 2,
+    "near": "阿维尼翁",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 34738,
+    "other": 34739,
+    "direction": 0,
+    "near": "布达",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 31831,
+    "other": 31832,
+    "direction": 0,
+    "near": "图宾根",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 31049,
+    "other": 31249,
+    "direction": 2,
+    "near": "因戈尔施塔特",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 22951,
+    "other": 23151,
+    "direction": 2,
+    "near": "鲁汶",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 19145,
+    "other": 19146,
+    "direction": 0,
+    "near": "代芬特尔",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 3406,
+    "other": 3606,
+    "direction": 2,
+    "near": "叶尔加瓦",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 44275,
+    "other": 44276,
+    "direction": 0,
+    "near": "萨卢佐",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 18604,
+    "other": 18804,
+    "direction": 2,
+    "near": "柏林",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 40833,
+    "other": 41034,
+    "direction": 2,
+    "near": "维埃纳",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 27618,
+    "other": 27619,
+    "direction": 0,
+    "near": "维尔茨堡",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 17749,
+    "other": 17949,
+    "direction": 2,
+    "near": "梅彭",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 29264,
+    "other": 29265,
+    "direction": 0,
+    "near": "皮塞克",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 27988,
+    "other": 27989,
+    "direction": 0,
+    "near": "卢森堡",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 23502,
+    "other": 23503,
+    "direction": 0,
+    "near": "桑多梅日",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 20882,
+    "other": 20883,
+    "direction": 0,
+    "near": "拉多姆",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 5512,
+    "other": 5713,
+    "direction": 2,
+    "near": "兰讷斯",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 19216,
+    "other": 19217,
+    "direction": 0,
+    "near": "奥得河畔法兰克福",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 39038,
+    "other": 39238,
+    "direction": 2,
+    "near": "日内瓦",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 35872,
+    "other": 36073,
+    "direction": 1,
+    "near": "因斯布鲁克",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 42901,
+    "other": 43102,
+    "direction": 2,
+    "near": "曼托瓦",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 40013,
+    "other": 40014,
+    "direction": 0,
+    "near": "克莱蒙",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 41029,
+    "other": 41229,
+    "direction": 2,
+    "near": "圣艾蒂安",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 30251,
+    "other": 30252,
+    "direction": 0,
+    "near": "雷根斯堡",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 18341,
+    "other": 18542,
+    "direction": 2,
+    "near": "兹沃勒",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 23608,
+    "other": 23809,
+    "direction": 2,
+    "near": "埃尔福特",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 39050,
+    "other": 39051,
+    "direction": 0,
+    "near": "锡永",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 42843,
+    "other": 43044,
+    "direction": 2,
+    "near": "瓦朗斯",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 20956,
+    "other": 20957,
+    "direction": 0,
+    "near": "克桑滕",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 34698,
+    "other": 34898,
+    "direction": 2,
+    "near": "艾森埃尔茨",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 43091,
+    "other": 43092,
+    "direction": 0,
+    "near": "皮亚琴察",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 32910,
+    "other": 32911,
+    "direction": 0,
+    "near": "布拉迪斯拉发",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 29012,
+    "other": 29013,
+    "direction": 0,
+    "near": "施派尔",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 29488,
+    "other": 29688,
+    "direction": 2,
+    "near": "布尔诺",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 13779,
+    "other": 13979,
+    "direction": 2,
+    "near": "格赖夫斯瓦尔德",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 41503,
+    "other": 41504,
+    "direction": 0,
+    "near": "维琴察",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 42885,
+    "other": 42886,
+    "direction": 0,
+    "near": "帕维亚",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 18669,
+    "other": 18869,
+    "direction": 2,
+    "near": "华沙",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 35505,
+    "other": 35506,
+    "direction": 0,
+    "near": "莱奥本",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 22191,
+    "other": 22391,
+    "direction": 2,
+    "near": "哥廷根",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 27426,
+    "other": 27427,
+    "direction": 0,
+    "near": "班贝格",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 47269,
+    "other": 47270,
+    "direction": 0,
+    "near": "艾克斯",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 29185,
+    "other": 29386,
+    "direction": 2,
+    "near": "凡尔登",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 32242,
+    "other": 32442,
+    "direction": 2,
+    "near": "乌尔姆",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 47286,
+    "other": 47287,
+    "direction": 0,
+    "near": "尼斯",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 25942,
+    "other": 25943,
+    "direction": 0,
+    "near": "亚眠",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 13958,
+    "other": 14160,
+    "direction": 1,
+    "near": "吕贝克",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 39230,
+    "other": 39432,
+    "direction": 1,
+    "near": "布雷斯",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 43683,
+    "other": 43684,
+    "direction": 0,
+    "near": "亚历山德里亚",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 17363,
+    "other": 17364,
+    "direction": 0,
+    "near": "费尔登",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 23012,
+    "other": 23212,
+    "direction": 2,
+    "near": "瑙姆堡",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 26401,
+    "other": 26602,
+    "direction": 2,
+    "near": "法兰克福",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 19181,
+    "other": 19182,
+    "direction": 0,
+    "near": "不伦瑞克",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 40905,
+    "other": 40906,
+    "direction": 0,
+    "near": "特雷维索",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 17853,
+    "other": 18053,
+    "direction": 2,
+    "near": "普沃茨克",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 25244,
+    "other": 25445,
+    "direction": 2,
+    "near": "利托梅日采",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 5710,
+    "other": 5911,
+    "direction": 1,
+    "near": "维堡",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 24473,
+    "other": 24674,
+    "direction": 2,
+    "near": "奥波莱",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 42275,
+    "other": 42276,
+    "direction": 0,
+    "near": "韦尔切利",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 29232,
+    "other": 29433,
+    "direction": 2,
+    "near": "安斯巴赫",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 26800,
+    "other": 26801,
+    "direction": 0,
+    "near": "美因茨",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 29358,
+    "other": 29359,
+    "direction": 0,
+    "near": "巴黎",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 24177,
+    "other": 24178,
+    "direction": 0,
+    "near": "波恩",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 32820,
+    "other": 32821,
+    "direction": 0,
+    "near": "科尔马",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 30473,
+    "other": 30474,
+    "direction": 0,
+    "near": "布杰约维采",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 18834,
+    "other": 18835,
+    "direction": 0,
+    "near": "波兹南",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 43095,
+    "other": 43295,
+    "direction": 2,
+    "near": "克雷莫纳",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 19370,
+    "other": 19371,
+    "direction": 0,
+    "near": "明登",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 42996,
+    "other": 43197,
+    "direction": 2,
+    "near": "贝尔格莱德",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 33287,
+    "other": 33288,
+    "direction": 0,
+    "near": "施泰尔",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 25898,
+    "other": 26099,
+    "direction": 1,
+    "near": "克拉科夫",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 35553,
+    "other": 35554,
+    "direction": 0,
+    "near": "索尔诺克",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 4341,
+    "other": 4542,
+    "direction": 2,
+    "near": "韦克舍",
+    "kind": "inspection-crossing"
+  },
+  {
+    "cell": 43706,
+    "other": 43707,
+    "direction": 0,
+    "near": "卡尔皮",
+    "kind": "inspection-crossing"
+  }
+]

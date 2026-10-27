@@ -1,0 +1,406 @@
+{
+  "beforeSoftware": {
+    "phase": "before",
+    "errors": [],
+    "missing": [],
+    "runs": [
+      {
+        "map": "japan",
+        "renderer": "pixi",
+        "frames": 32,
+        "frameMedian": 3.300000000745058,
+        "frameP95": 5.300000000745058,
+        "frameMax": 33.09999999962747,
+        "labelMedian": 0.5,
+        "labelP95": 1.099999999627471,
+        "builtDuringDrag": 3,
+        "drawsPerLabelPass": 167.02702702702703,
+        "groundBuilds": 0,
+        "groundMs": 0,
+        "uploadsDuringDrag": 13,
+        "cacheSize": 175
+      },
+      {
+        "map": "hre",
+        "renderer": "pixi",
+        "frames": 32,
+        "frameMedian": 4.699999999254942,
+        "frameP95": 35.69999999925494,
+        "frameMax": 2493.300000000745,
+        "labelMedian": 0.6999999992549419,
+        "labelP95": 1.5,
+        "builtDuringDrag": 19,
+        "drawsPerLabelPass": 222.86317567567568,
+        "groundBuilds": 0,
+        "groundMs": 0,
+        "uploadsDuringDrag": 54,
+        "cacheSize": 254
+      },
+      {
+        "map": "japan",
+        "renderer": "canvas",
+        "frames": 32,
+        "frameMedian": 1.8999999985098839,
+        "frameP95": 3.700000001117587,
+        "frameMax": 10.5,
+        "labelMedian": 0.5,
+        "labelP95": 1.5,
+        "builtDuringDrag": 3,
+        "drawsPerLabelPass": 167.03209459459458,
+        "groundBuilds": 0,
+        "groundMs": 0,
+        "uploadsDuringDrag": 0,
+        "cacheSize": 175
+      },
+      {
+        "map": "hre",
+        "renderer": "canvas",
+        "frames": 32,
+        "frameMedian": 1.900000000372529,
+        "frameP95": 7.400000000372529,
+        "frameMax": 23.399999998509884,
+        "labelMedian": 0.599999999627471,
+        "labelP95": 1.700000001117587,
+        "builtDuringDrag": 20,
+        "drawsPerLabelPass": 223.17905405405406,
+        "groundBuilds": 0,
+        "groundMs": 0,
+        "uploadsDuringDrag": 0,
+        "cacheSize": 255
+      }
+    ]
+  },
+  "afterSoftware": {
+    "phase": "after",
+    "errors": [],
+    "missing": [],
+    "runs": [
+      {
+        "map": "japan",
+        "renderer": "pixi",
+        "frames": 32,
+        "frameMedian": 3,
+        "frameP95": 5,
+        "frameMax": 19.300000000745058,
+        "labelMedian": 0.19999999925494194,
+        "labelP95": 0.30000000074505806,
+        "builtDuringDrag": 0,
+        "drawsPerLabelPass": 35.2652027027027,
+        "groundBuilds": 0,
+        "groundMs": 0,
+        "uploadsDuringDrag": 0,
+        "cacheSize": 40,
+        "layout": {
+          "all": 257,
+          "far": 72,
+          "near": 257,
+          "overlaps": false,
+          "selected": true,
+          "levels": {
+            "1": 53,
+            "2": 83,
+            "3": 5,
+            "4": 23,
+            "5": 8,
+            "6": 3,
+            "7": 2
+          }
+        }
+      },
+      {
+        "map": "hre",
+        "renderer": "pixi",
+        "frames": 32,
+        "frameMedian": 3.300000000745058,
+        "frameP95": 5.400000002235174,
+        "frameMax": 1961.0999999977648,
+        "labelMedian": 0.19999999925494194,
+        "labelP95": 0.3999999985098839,
+        "builtDuringDrag": 0,
+        "drawsPerLabelPass": 55.73141891891892,
+        "groundBuilds": 0,
+        "groundMs": 0,
+        "uploadsDuringDrag": 0,
+        "cacheSize": 63,
+        "layout": {
+          "all": 385,
+          "far": 102,
+          "near": 384,
+          "overlaps": false,
+          "selected": true,
+          "levels": {
+            "1": 47,
+            "2": 115,
+            "3": 50,
+            "4": 30,
+            "5": 13,
+            "6": 6,
+            "7": 5
+          }
+        }
+      },
+      {
+        "map": "japan",
+        "renderer": "canvas",
+        "frames": 32,
+        "frameMedian": 1,
+        "frameP95": 1.6000000014901161,
+        "frameMax": 2.800000000745058,
+        "labelMedian": 0.10000000149011612,
+        "labelP95": 0.20000000298023224,
+        "builtDuringDrag": 0,
+        "drawsPerLabelPass": 36.179054054054056,
+        "groundBuilds": 0,
+        "groundMs": 0,
+        "uploadsDuringDrag": 0,
+        "cacheSize": 40,
+        "layout": {
+          "all": 257,
+          "far": 72,
+          "near": 257,
+          "overlaps": false,
+          "selected": true,
+          "levels": {
+            "1": 53,
+            "2": 83,
+            "3": 5,
+            "4": 23,
+            "5": 8,
+            "6": 3,
+            "7": 2
+          }
+        }
+      },
+      {
+        "map": "hre",
+        "renderer": "canvas",
+        "frames": 32,
+        "frameMedian": 0.8000000007450581,
+        "frameP95": 1.0999999977648258,
+        "frameMax": 1.300000000745058,
+        "labelMedian": 0.19999999925494194,
+        "labelP95": 0.30000000074505806,
+        "builtDuringDrag": 0,
+        "drawsPerLabelPass": 58.63513513513514,
+        "groundBuilds": 0,
+        "groundMs": 0,
+        "uploadsDuringDrag": 0,
+        "cacheSize": 63,
+        "layout": {
+          "all": 385,
+          "far": 102,
+          "near": 384,
+          "overlaps": false,
+          "selected": true,
+          "levels": {
+            "1": 47,
+            "2": 115,
+            "3": 50,
+            "4": 30,
+            "5": 13,
+            "6": 6,
+            "7": 5
+          }
+        }
+      }
+    ]
+  },
+  "afterNative": {
+    "phase": "after",
+    "errors": [],
+    "missing": [],
+    "runs": [
+      {
+        "map": "japan",
+        "renderer": "pixi",
+        "driver": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4060 (0x00002808) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "frames": 32,
+        "frameMedian": 1.2000000029802322,
+        "frameP95": 2.199999999254942,
+        "frameMax": 2.5,
+        "labelMedian": 0.09999999776482582,
+        "labelP95": 0.19999999925494194,
+        "builtDuringDrag": 0,
+        "drawsPerLabelPass": 35.2652027027027,
+        "groundBuilds": 0,
+        "groundMs": 0,
+        "uploadsDuringDrag": 0,
+        "cacheSize": 40,
+        "slowFrames": [],
+        "layout": {
+          "all": 257,
+          "far": 72,
+          "near": 257,
+          "overlaps": false,
+          "selected": true,
+          "levels": {
+            "1": 53,
+            "2": 83,
+            "3": 5,
+            "4": 23,
+            "5": 8,
+            "6": 3,
+            "7": 2
+          }
+        }
+      },
+      {
+        "map": "hre",
+        "renderer": "pixi",
+        "driver": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4060 (0x00002808) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "frames": 32,
+        "frameMedian": 1.5,
+        "frameP95": 1.9000000022351742,
+        "frameMax": 2.300000000745058,
+        "labelMedian": 0.10000000149011612,
+        "labelP95": 0.20000000298023224,
+        "builtDuringDrag": 0,
+        "drawsPerLabelPass": 55.73141891891892,
+        "groundBuilds": 0,
+        "groundMs": 0,
+        "uploadsDuringDrag": 0,
+        "cacheSize": 63,
+        "slowFrames": [],
+        "layout": {
+          "all": 385,
+          "far": 102,
+          "near": 384,
+          "overlaps": false,
+          "selected": true,
+          "levels": {
+            "1": 47,
+            "2": 115,
+            "3": 50,
+            "4": 30,
+            "5": 13,
+            "6": 6,
+            "7": 5
+          }
+        }
+      },
+      {
+        "map": "japan",
+        "renderer": "canvas",
+        "driver": null,
+        "frames": 32,
+        "frameMedian": 0.6999999992549419,
+        "frameP95": 1.4000000022351742,
+        "frameMax": 2,
+        "labelMedian": 0.09999999776482582,
+        "labelP95": 0.19999999925494194,
+        "builtDuringDrag": 0,
+        "drawsPerLabelPass": 36.179054054054056,
+        "groundBuilds": 0,
+        "groundMs": 0,
+        "uploadsDuringDrag": 0,
+        "cacheSize": 40,
+        "slowFrames": [],
+        "layout": {
+          "all": 257,
+          "far": 72,
+          "near": 257,
+          "overlaps": false,
+          "selected": true,
+          "levels": {
+            "1": 53,
+            "2": 83,
+            "3": 5,
+            "4": 23,
+            "5": 8,
+            "6": 3,
+            "7": 2
+          }
+        }
+      },
+      {
+        "map": "hre",
+        "renderer": "canvas",
+        "driver": null,
+        "frames": 32,
+        "frameMedian": 0.5,
+        "frameP95": 0.7000000029802322,
+        "frameMax": 0.8000000007450581,
+        "labelMedian": 0.10000000149011612,
+        "labelP95": 0.20000000298023224,
+        "builtDuringDrag": 0,
+        "drawsPerLabelPass": 58.63513513513514,
+        "groundBuilds": 0,
+        "groundMs": 0,
+        "uploadsDuringDrag": 0,
+        "cacheSize": 63,
+        "slowFrames": [],
+        "layout": {
+          "all": 385,
+          "far": 102,
+          "near": 384,
+          "overlaps": false,
+          "selected": true,
+          "levels": {
+            "1": 47,
+            "2": 115,
+            "3": 50,
+            "4": 30,
+            "5": 13,
+            "6": 6,
+            "7": 5
+          }
+        }
+      }
+    ]
+  },
+  "softwareSubmissionProfile": {
+    "phase": "profile",
+    "errors": [],
+    "missing": [],
+    "runs": [
+      {
+        "map": "hre",
+        "renderer": "pixi",
+        "frames": 32,
+        "frameMedian": 4.100000001490116,
+        "frameP95": 6.899999998509884,
+        "frameMax": 1981.300000000745,
+        "labelMedian": 0.19999999925494194,
+        "labelP95": 0.4000000022351742,
+        "builtDuringDrag": 0,
+        "drawsPerLabelPass": 55.73141891891892,
+        "groundBuilds": 0,
+        "groundMs": 0,
+        "uploadsDuringDrag": 0,
+        "cacheSize": 63,
+        "slowFrames": [
+          {
+            "frame": 21,
+            "ms": 1981.300000000745,
+            "endMs": 1978.9000000022352
+          }
+        ]
+      }
+    ]
+  },
+  "nativeSubmissionProfile": {
+    "phase": "native-profile",
+    "errors": [],
+    "missing": [],
+    "runs": [
+      {
+        "map": "hre",
+        "renderer": "pixi",
+        "driver": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4060 (0x00002808) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "frames": 32,
+        "frameMedian": 1.800000000745058,
+        "frameP95": 2.600000001490116,
+        "frameMax": 3.900000002235174,
+        "labelMedian": 0.10000000149011612,
+        "labelP95": 0.20000000298023224,
+        "builtDuringDrag": 0,
+        "drawsPerLabelPass": 55.73141891891892,
+        "groundBuilds": 0,
+        "groundMs": 0,
+        "uploadsDuringDrag": 0,
+        "cacheSize": 63,
+        "slowFrames": []
+      }
+    ]
+  }
+}

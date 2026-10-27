@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-26",
+  "scope": "Only this correction's isolated compiler output and browser verification screenshots",
+  "targets": ["build/japan-hre-source-20261026", "build/japan-hre-geography-correction-20261026"],
+  "files": 112,
+  "bytes": 16670565,
+  "errors": 0,
+  "remaining": 0,
+  "checks": ["Resolved paths within workspace/build", "No tracked target files", "No active target process", "No reparse points"],
+  "retained": ["Corrected maps and comparison images", "Original geography inputs", "Verification source code", "Player environments and concurrent work"]
+}

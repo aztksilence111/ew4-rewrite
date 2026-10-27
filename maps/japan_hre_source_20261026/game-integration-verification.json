@@ -1,0 +1,80 @@
+{
+  "checks": 114391,
+  "errors": 0,
+  "maps": [
+    {
+      "key": "eastasia",
+      "total": 21488,
+      "buildings": 521,
+      "farms": 0,
+      "farmLevels": {
+        "1": 37,
+        "2": 60,
+        "3": 16
+      },
+      "cityLevels": {
+        "1": 24,
+        "2": 110,
+        "3": 68,
+        "4": 34,
+        "6": 6,
+        "7": 3
+      },
+      "sessionBytes": 8181510,
+      "highSites": 0,
+      "seconds": 0.7112638
+    },
+    {
+      "key": "japan",
+      "total": 57939,
+      "buildings": 410,
+      "farms": 153,
+      "farmLevels": {
+        "1": 43,
+        "2": 37,
+        "3": 73
+      },
+      "cityLevels": {
+        "1": 53,
+        "2": 83,
+        "3": 5,
+        "4": 23,
+        "5": 8,
+        "6": 3,
+        "7": 2
+      },
+      "sessionBytes": 21951899,
+      "highSites": 345,
+      "seconds": 2.0745869
+    },
+    {
+      "key": "hre",
+      "total": 52461,
+      "buildings": 647,
+      "farms": 262,
+      "farmLevels": {
+        "1": 88,
+        "2": 51,
+        "3": 123
+      },
+      "cityLevels": {
+        "1": 47,
+        "2": 115,
+        "3": 50,
+        "4": 30,
+        "5": 13,
+        "6": 6,
+        "7": 5
+      },
+      "sessionBytes": 19948015,
+      "highSites": 363,
+      "seconds": 1.7782877
+    }
+  ],
+  "package": "E:\\Workplace\\game\\o4mod\\rewrite/content/three-map-review.ew4mod",
+  "packageBytes": 57980,
+  "sha256": "5853f4fb9e7cc0511f437d5a16beed11f9ae37c11fe12573bc5f6a8850eb0862",
+  "activeKey": "b4de40053671cb64dc18d8f6c11bb855b69629ab65dd339872192a530de7dbe4",
+  "baseRevision": "8e19f744df4e9b34d502972ff800860d17ad77a7811349af4890aa038dff33b0",
+  "preview": "E:\\Workplace\\game\\o4mod\\build/map-review-runtime-20261027"
+}

@@ -13,7 +13,7 @@ const folder=path.resolve(__dirname,'../rewrite/reports/dialogue-touch-20261021'
   page.on('pageerror',e=>report.errors.push(e.message));
   page.on('response',r=>{if(r.status()>=400)report.missing.push(r.url());});
   const reset=async()=>{
-    await page.evaluate(async()=>{await start('campaign1_01');window.dialogueCalls=0;});
+    await page.evaluate(async()=>{await start('campaign1_01');if(stageIntroOpen)closeDetail();if(dialoguePresentationTask)await dialoguePresentationTask;window.dialogueCalls=0;});
     check(await page.locator('#dialogue').isVisible(),'real campaign dialogue visible');
   };
   try{

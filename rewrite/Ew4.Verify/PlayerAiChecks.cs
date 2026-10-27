@@ -187,6 +187,16 @@ internal static class PlayerAiChecks
         Call("save",new{slot=1,mode=2});view=Call("load",new{slot=1,mode=2});
         Check(view.GetProperty("playerAi").GetProperty("enabled").GetBoolean(),"real session save retains execution gate");
         Check(view.GetProperty("playerAi").GetProperty("draft").GetProperty("goals").GetArrayLength()==2,"real session save retains target priority");
+        var secondOwn=view.GetProperty("units").EnumerateArray().First(u=>u.GetProperty("owner").GetString()==player
+            && u.GetProperty("id").GetString()!=ownId && u.GetProperty("canMove").GetBoolean());
+        view=Call("action",new{op="player_ai_config",offer="task_add",revision=Revision()});
+        view=Call("action",new{op="player_ai_config",offer="mission",kind="defend",revision=Revision()});
+        view=Call("action",new{op="player_ai_config",offer="policy",policy="hold",revision=Revision()});
+        view=Call("action",new{op="player_ai_config",offer="units",units=new[]{secondOwn.GetProperty("id").GetString()},revision=Revision()});
+        view=Call("action",new{op="player_ai_config",offer="goal",cell=secondOwn.GetProperty("cell").GetInt32(),revision=Revision()});
+        view=Call("action",new{op="player_ai_start",revision=Revision()});
+        Check(view.GetProperty("playerAi").GetProperty("tasks").EnumerateArray().All(t=>t.GetProperty("enabled").GetBoolean()),"real API runs attack and defense tasks together");
+        Call("save",new{slot=1,mode=2});
         var branches = new List<byte[]>();
         foreach (string op in new[] { "ai", "ai_batch" })
         {
@@ -211,6 +221,9 @@ internal static class PlayerAiChecks
         }
         Check(branches[0].SequenceEqual(branches[1]),"real ordinary and batch AI preserve identical session, world and both RNGs");
         view=Call("action",new{op="player_ai_stop",revision=Revision()});
+        Check(view.GetProperty("playerAi").GetProperty("enabled").GetBoolean(),"real API stop preserves other task execution");
+        view=Call("action",new{op="player_ai_config",offer="task_select",taskId=1,revision=Revision()});
+        view=Call("action",new{op="player_ai_stop",revision=Revision()});
         Check(!view.GetProperty("playerAi").GetProperty("enabled").GetBoolean(),"real API stops execution");
         var presentation=new AiControlPresentation();
         AiControlPresentation.Validate(presentation,path=>File.ReadAllBytes(Path.Combine(root,"rewrite/data",path)));
@@ -222,6 +235,6 @@ internal static class PlayerAiChecks
         var extension=ExtensionLoader.Load(ReadSample);
         Check(extension.ApiVersion==3&&extension.AiControl.ConfirmText=="确认", "Mod manifest loads AI presentation entry");
         Reject(()=>AiControlPresentation.Validate(presentation with{PanelImage="client/../../escape.png"},_=>[]),"extension.ai_control");
-        return checks;
+        return checks + PlayerAiTaskChecks.Run();
     }
 }

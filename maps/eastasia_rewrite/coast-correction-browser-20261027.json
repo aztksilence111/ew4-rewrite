@@ -1,0 +1,594 @@
+{
+  "phase": "after",
+  "checks": 39,
+  "errors": [],
+  "missing": [],
+  "views": [
+    {
+      "renderer": "canvas",
+      "viewport": "desktop",
+      "name": "bohai",
+      "gpu": false,
+      "colors": 11337,
+      "view": {
+        "x": 6095,
+        "y": 3361,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "viewport": "desktop",
+      "name": "yangtze",
+      "gpu": false,
+      "colors": 8747,
+      "view": {
+        "x": 6724,
+        "y": 4593,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "viewport": "desktop",
+      "name": "fujian",
+      "gpu": false,
+      "colors": 7746,
+      "view": {
+        "x": 6549,
+        "y": 5535,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "viewport": "desktop",
+      "name": "pearl",
+      "gpu": false,
+      "colors": 11051,
+      "view": {
+        "x": 5649,
+        "y": 6156,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "viewport": "desktop",
+      "name": "korea",
+      "gpu": false,
+      "colors": 6871,
+      "view": {
+        "x": 7215,
+        "y": 3753,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "viewport": "desktop",
+      "name": "japan",
+      "gpu": false,
+      "colors": 10580,
+      "view": {
+        "x": 7941,
+        "y": 4000,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "viewport": "desktop",
+      "name": "ganges",
+      "gpu": false,
+      "colors": 5454,
+      "view": {
+        "x": 2014,
+        "y": 5926,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "viewport": "desktop",
+      "name": "irrawaddy",
+      "gpu": false,
+      "colors": 5533,
+      "view": {
+        "x": 2553,
+        "y": 7075,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "viewport": "mobile",
+      "name": "fujian",
+      "gpu": false,
+      "colors": 2472,
+      "view": {
+        "x": 6549,
+        "y": 5535,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "viewport": "mobile",
+      "name": "korea",
+      "gpu": false,
+      "colors": 2860,
+      "view": {
+        "x": 7215,
+        "y": 3753,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "viewport": "mobile",
+      "name": "ganges",
+      "gpu": false,
+      "colors": 2104,
+      "view": {
+        "x": 2014,
+        "y": 5926,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "viewport": "desktop",
+      "name": "bohai",
+      "gpu": true,
+      "colors": 11263,
+      "view": {
+        "x": 6095,
+        "y": 3361,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "viewport": "desktop",
+      "name": "yangtze",
+      "gpu": true,
+      "colors": 8758,
+      "view": {
+        "x": 6724,
+        "y": 4593,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "viewport": "desktop",
+      "name": "fujian",
+      "gpu": true,
+      "colors": 7646,
+      "view": {
+        "x": 6549,
+        "y": 5535,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "viewport": "desktop",
+      "name": "pearl",
+      "gpu": true,
+      "colors": 10990,
+      "view": {
+        "x": 5649,
+        "y": 6156,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "viewport": "desktop",
+      "name": "korea",
+      "gpu": true,
+      "colors": 6851,
+      "view": {
+        "x": 7215,
+        "y": 3753,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "viewport": "desktop",
+      "name": "japan",
+      "gpu": true,
+      "colors": 10527,
+      "view": {
+        "x": 7941,
+        "y": 4000,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "viewport": "desktop",
+      "name": "ganges",
+      "gpu": true,
+      "colors": 5377,
+      "view": {
+        "x": 2014,
+        "y": 5926,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "viewport": "desktop",
+      "name": "irrawaddy",
+      "gpu": true,
+      "colors": 5523,
+      "view": {
+        "x": 2553,
+        "y": 7075,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "viewport": "mobile",
+      "name": "fujian",
+      "gpu": true,
+      "colors": 2493,
+      "view": {
+        "x": 6549,
+        "y": 5535,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "viewport": "mobile",
+      "name": "korea",
+      "gpu": true,
+      "colors": 2863,
+      "view": {
+        "x": 7215,
+        "y": 3753,
+        "zoom": 2
+      },
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "viewport": "mobile",
+      "name": "ganges",
+      "gpu": true,
+      "colors": 2070,
+      "view": {
+        "x": 2014,
+        "y": 5926,
+        "zoom": 2
+      },
+      "overflow": false
+    }
+  ],
+  "glyphs": [
+    {
+      "renderer": "canvas",
+      "key": "japan",
+      "name": "濑户内海",
+      "language": "zh",
+      "ink": 3140,
+      "edge": 0,
+      "drawn": [
+        "濑",
+        "户",
+        "内",
+        "海"
+      ],
+      "characters": [
+        {
+          "character": "濑",
+          "ink": 1085,
+          "visible": true
+        },
+        {
+          "character": "户",
+          "ink": 461,
+          "visible": true
+        },
+        {
+          "character": "内",
+          "ink": 690,
+          "visible": true
+        },
+        {
+          "character": "海",
+          "ink": 904,
+          "visible": true
+        }
+      ],
+      "fontFailures": []
+    },
+    {
+      "renderer": "canvas",
+      "key": "japan",
+      "name": "濑户内海",
+      "language": "en",
+      "ink": 1141,
+      "edge": 0,
+      "drawn": [],
+      "characters": [
+        {
+          "character": "濑",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "户",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "内",
+          "ink": 411,
+          "visible": true
+        },
+        {
+          "character": "海",
+          "ink": 0,
+          "visible": true
+        }
+      ],
+      "fontFailures": []
+    },
+    {
+      "renderer": "canvas",
+      "key": "hre",
+      "name": "利古里亚海",
+      "language": "zh",
+      "ink": 8426,
+      "edge": 0,
+      "drawn": [
+        "利",
+        "古",
+        "里",
+        "亚",
+        "海"
+      ],
+      "characters": [
+        {
+          "character": "利",
+          "ink": 1765,
+          "visible": true
+        },
+        {
+          "character": "古",
+          "ink": 1292,
+          "visible": true
+        },
+        {
+          "character": "里",
+          "ink": 1779,
+          "visible": true
+        },
+        {
+          "character": "亚",
+          "ink": 1602,
+          "visible": true
+        },
+        {
+          "character": "海",
+          "ink": 1988,
+          "visible": true
+        }
+      ],
+      "fontFailures": []
+    },
+    {
+      "renderer": "canvas",
+      "key": "hre",
+      "name": "利古里亚海",
+      "language": "en",
+      "ink": 4721,
+      "edge": 0,
+      "drawn": [],
+      "characters": [
+        {
+          "character": "利",
+          "ink": 87,
+          "visible": true
+        },
+        {
+          "character": "古",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "里",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "亚",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "海",
+          "ink": 0,
+          "visible": true
+        }
+      ],
+      "fontFailures": []
+    },
+    {
+      "renderer": "pixi",
+      "key": "japan",
+      "name": "濑户内海",
+      "language": "zh",
+      "ink": 3140,
+      "edge": 0,
+      "drawn": [
+        "濑",
+        "户",
+        "内",
+        "海"
+      ],
+      "characters": [
+        {
+          "character": "濑",
+          "ink": 1085,
+          "visible": true
+        },
+        {
+          "character": "户",
+          "ink": 461,
+          "visible": true
+        },
+        {
+          "character": "内",
+          "ink": 690,
+          "visible": true
+        },
+        {
+          "character": "海",
+          "ink": 904,
+          "visible": true
+        }
+      ],
+      "fontFailures": []
+    },
+    {
+      "renderer": "pixi",
+      "key": "japan",
+      "name": "濑户内海",
+      "language": "en",
+      "ink": 1141,
+      "edge": 0,
+      "drawn": [],
+      "characters": [
+        {
+          "character": "濑",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "户",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "内",
+          "ink": 411,
+          "visible": true
+        },
+        {
+          "character": "海",
+          "ink": 0,
+          "visible": true
+        }
+      ],
+      "fontFailures": []
+    },
+    {
+      "renderer": "pixi",
+      "key": "hre",
+      "name": "利古里亚海",
+      "language": "zh",
+      "ink": 8426,
+      "edge": 0,
+      "drawn": [
+        "利",
+        "古",
+        "里",
+        "亚",
+        "海"
+      ],
+      "characters": [
+        {
+          "character": "利",
+          "ink": 1765,
+          "visible": true
+        },
+        {
+          "character": "古",
+          "ink": 1292,
+          "visible": true
+        },
+        {
+          "character": "里",
+          "ink": 1779,
+          "visible": true
+        },
+        {
+          "character": "亚",
+          "ink": 1602,
+          "visible": true
+        },
+        {
+          "character": "海",
+          "ink": 1988,
+          "visible": true
+        }
+      ],
+      "fontFailures": []
+    },
+    {
+      "renderer": "pixi",
+      "key": "hre",
+      "name": "利古里亚海",
+      "language": "en",
+      "ink": 4721,
+      "edge": 0,
+      "drawn": [],
+      "characters": [
+        {
+          "character": "利",
+          "ink": 87,
+          "visible": true
+        },
+        {
+          "character": "古",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "里",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "亚",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "海",
+          "ink": 0,
+          "visible": true
+        }
+      ],
+      "fontFailures": []
+    }
+  ]
+}

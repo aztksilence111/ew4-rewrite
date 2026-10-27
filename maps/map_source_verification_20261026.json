@@ -1,0 +1,84 @@
+{
+  "checks": 139227,
+  "errors": 0,
+  "scope": "Native terrain import, spacing, movement and neutral MapDocument; not scenario or Android integration",
+  "maps": [
+    {
+      "key": "japan",
+      "cells": 57939,
+      "buildings": 257,
+      "bytes": 21767299,
+      "sha256": "a5fbb94556586a0ff6f8ce518576b520cc32c7dd3f15e85ae33974b11a340d4c",
+      "geographicSpacingExceptions": 53,
+      "narrowCoastOrIsland": [
+        {
+          "name": "\u5BA4\u5170",
+          "cell": 14087,
+          "clearRing": 2
+        },
+        {
+          "name": "\u4E25\u539F\u5BF9\u9A6C",
+          "cell": 37421,
+          "clearRing": 2
+        },
+        {
+          "name": "\u4E03\u5C3E",
+          "cell": 32979,
+          "clearRing": 2
+        },
+        {
+          "name": "\u6839\u5BA4",
+          "cell": 14408,
+          "clearRing": 2
+        },
+        {
+          "name": "\u6D77\u53C2\u5D34",
+          "cell": 1972,
+          "clearRing": 2
+        },
+        {
+          "name": "\u90F7\u4E4B\u6D66\u58F9\u5C90",
+          "cell": 39827,
+          "clearRing": 1
+        }
+      ],
+      "seconds": 1.39
+    },
+    {
+      "key": "hre",
+      "cells": 52461,
+      "buildings": 385,
+      "bytes": 19779190,
+      "sha256": "ba5def910d77442619c16f3bb263851be335a8903882d5919e22657bbe6155b0",
+      "geographicSpacingExceptions": 48,
+      "narrowCoastOrIsland": [
+        {
+          "name": "\u5361\u5C14\u9A6C",
+          "cell": 4756,
+          "clearRing": 2
+        },
+        {
+          "name": "\u5A01\u5C3C\u65AF",
+          "cell": 42112,
+          "clearRing": 0
+        },
+        {
+          "name": "\u666E\u62C9",
+          "cell": 43937,
+          "clearRing": 2
+        },
+        {
+          "name": "\u4F26\u8BB7\u535A\u6069\u970D\u5C14\u59C6",
+          "cell": 10172,
+          "clearRing": 2
+        },
+        {
+          "name": "\u9A6C\u5C14\u9ED8",
+          "cell": 8550,
+          "clearRing": 2
+        }
+      ],
+      "seconds": 1.02
+    }
+  ]
+}

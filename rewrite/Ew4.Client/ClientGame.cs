@@ -8,7 +8,8 @@ namespace Ew4.Client;
 public sealed record ClientCommand(string Op = "", long Revision = -1, string? Scenario = null, string? Country = null,
     string? Unit = null, string? Target = null, int Cell = -1, string? Offer = null, string? Commander = null, string? Item = null, JsonElement? Tutorial = null, int Group = 0, int Slot = 0, int Mode = 0,
     IReadOnlyList<string>? LocalPlayers = null, string? Tag = null, IReadOnlyList<string>? TaggedCommanders = null, bool Delta = false,
-    string? KnownVersion = null, string[]? Units = null, string? Policy = null, bool? AutoBattle = null, int[]? Goals = null);
+    string? KnownVersion = null, string[]? Units = null, string? Policy = null, bool? AutoBattle = null, int[]? Goals = null,
+    int? TaskId = null, string? Kind = null, int? Radius = null, int[]? Line = null, bool? DeployFirst = null);
 public sealed record ClientSlot(string Scenario, string? Country, byte[] Session, MovementHistoryState? MovementHistory = null, JsonElement? Tutorial = null,
     int Round = 0, DateTimeOffset? SavedAt = null, IReadOnlyList<string>? LocalPlayers = null, string? DisplayCountry = null,
     IReadOnlyList<int>? TechnologySnapshot = null);
@@ -279,7 +280,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             "move" => WorldActions.Move(world, world.Revision, command.Unit!, command.Cell, rules.Movement),
             "disband" => WorldDisband.Execute(world, world.Revision, command.Unit!, DisbandConfiguration()),
             "attack" => WorldBattle.Attack(world, world.Revision, command.Unit!, command.Target!, rules.Battle),
-            "end" => PlayerAi.BeginEnd(world, world.Revision, rules.Turns),
+            "end" => PlayerAi.BeginEnd(world, world.Revision, rules.Turns, rules.Ai),
             "train" => WorldImprovements.Train(world, world.Revision, command.Unit!, rules.Training),
             "upgrade" => WorldImprovements.UpgradeBuilding(world, world.Revision, command.Cell, rules.Upgrades),
             "transport" => WorldSupportActions.BuyTransport(world, world.Revision, command.Unit!, rules.Transport),
@@ -520,7 +521,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             skills = SkillViews(u.Combatant), statuses = StatusViews(u.Combatant), traits = u.Combatant.Profile.Traits.Where(content.Extensions.Bus.Skills.ContainsKey)
                 .Select(id => SkillView(new SkillSlot(id, "trait." + id))).ToArray(),
             health = u.Combatant.Health, maxHealth = u.Combatant.Profile.MaxHealth, u.Combatant.ConstructionTurns, u.RemainingMovement, u.Acted, u.CommanderId, u.Transport, u.Burning, u.Objective,
-            aiControlled = PlayerAi.Managed(world, u), aiPolicy = PlayerAi.Order(u).Policy, aiGoal = PlayerAi.Order(u).Goal, aiGoals = PlayerAi.Targets(PlayerAi.Order(u)),
+            aiControlled = PlayerAi.Managed(world, u), aiPolicy = PlayerAi.Order(u).Policy, aiGoal = PlayerAi.Order(u).Goal, aiGoals = PlayerAi.Targets(PlayerAi.Order(u)), aiTask = PlayerAi.Order(u).TaskId,
             objectiveMarker = u.Objective ? 1 : originalUnits.TryGetValue(u.Id, out var markedUnit) && markedUnit.Objective == 2 ? 2 : 0,
             canMove = u.Combatant.Profile.Category != "fort" && u.RemainingMovement > 0 && u.Morale.Effective != -3 && u.Combatant.ConstructionTurns == 0,
             canAttack = CanAttack(u), canNavigateMove = navigationMoves.Contains(u.Id), veterancy = u.Veterancy, morale = u.Morale.Effective,

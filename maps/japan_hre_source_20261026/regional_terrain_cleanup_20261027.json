@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-27",
+  "removedTargets": ["build/dual-terrain-regions-20261027", "build/japan-hre-source-20261026/browser"],
+  "removedFiles": 119,
+  "removedBytes": 21490677,
+  "remainingTargets": 0,
+  "errors": 0,
+  "preflight": "Git tracked paths, absolute paths, reparse points and active processes inspected; no active target process or reparse points",
+  "verification": {"materialsAndRegions": 56675, "relief": 18984, "geography": 1142, "japanPlains": 1193, "compact": 776, "nativeRules": 139227, "browser": 335, "browserViews": 10, "errors": 0},
+  "preserved": "Current map deliverables, original references and assets, validation sources, player data and concurrent work",
+  "dataInvariants": "Both maps retain frame, coastline, rivers, legacy flags and building positions; Japan retains all terrain kinds; HRE terrain revisions are intentional",
+  "modernSourceSha256": {"japan": "a5fbb94556586a0ff6f8ce518576b520cc32c7dd3f15e85ae33974b11a340d4c", "hre": "ba5def910d77442619c16f3bb263851be335a8903882d5919e22657bbe6155b0"}
+}

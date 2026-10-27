@@ -1,0 +1,25 @@
+{
+  "pid": 25804,
+  "url": "http://127.0.0.1:5585",
+  "activeMod": "7901bbefe89657b6394351a4aa9676473b5f142c930859e7ba199ac1d8fdf33a",
+  "baseRevision": "c612c9dda5d5acc48ca985075ade5ff97027e4db5fef911abf3f364371bb53f8",
+  "protectedFiles": 8,
+  "protectedFileChanges": 0,
+  "publishedResourceDifferences": 0,
+  "japanCharacters": 4,
+  "hreCharacters": 5,
+  "packageSha256": "46a5489e0a9182a8b8e832703683a0aa52e96a4dc27714b789fa4474b73cc8a9",
+  "eastasiaPreview": {
+    "width": 6000,
+    "path": "maps/eastasia_rewrite/eastasia_full_preview.jpg",
+    "sha256": "0ca08db25798508327eff1c04705ab45ed9101861b90d6f9675d829f67824663",
+    "height": 4355
+  },
+  "curvedRegression": {
+    "missing": 0,
+    "checks": 2168,
+    "renderedLabels": 1044,
+    "cases": 6,
+    "errors": 0
+  }
+}

@@ -42,6 +42,8 @@ public static class LegacyScenarioMap
             throw new RuleViolation("legacy.faction_mapping", "Each serialized faction needs a distinct modern identity");
         if (battle.Left < 0 || battle.Top < 0 || (long)battle.Left + battle.Width > map.Width || (long)battle.Top + battle.Height > map.Height)
             throw new RuleViolation("legacy.region", "Scenario rectangle is outside its map");
+        if (battle.CellIndices is { } indices && (indices.MapWidth != map.Width || indices.MapHeight != map.Height))
+            throw new RuleViolation("legacy.cell_indices", "CELL dimensions differ from the actual map");
         var ownership = battle.SectionBytes("ownership");
         var cells = new CellState[map.Cells.Count];
         var diagnostics = new List<LegacyMapDiagnostic>();

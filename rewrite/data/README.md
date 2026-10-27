@@ -1,5 +1,12 @@
 # Runtime Content
 
+The reviewed Japan (map 4, 267 x 217 cells) and HRE (map 5, 201 x 261)
+maps are now registered alongside Europe, America and East Asia. Both use
+native mountain/hill sprites and actual BIN terrain. Their 49 bilingual
+geographic labels follow projected geographic axes using East Asia's regional
+lettering style. The optional three-map review Mod adds conquest7/8/9 without
+changing the original 95 scenarios; see `../THREE_MAP_REVIEW_20261027.md`.
+
 `rewrite/` contains the API 3 extension manifest and reusable geography rules.
 The built-in East Asia map uses 121 impassable mountain cells; the two barrier
 types and default atlas sprites are available to every registered map and Mod.

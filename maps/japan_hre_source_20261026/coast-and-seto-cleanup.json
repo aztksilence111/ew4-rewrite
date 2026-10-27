@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-27",
+  "targets": [
+    {
+      "path": "build/eastasia-coast-audit-20261027",
+      "files": 24,
+      "bytes": 4209344.0
+    },
+    {
+      "path": "build/map-review-tests-20261027",
+      "files": 0,
+      "bytes": null
+    },
+    {
+      "path": "build/map-review-runtime-20261027/saves/startup-assets/adc6278eb50891417d7300a96688a5c6f71d50111a22e31c04c2f98613878c4b",
+      "files": 1,
+      "bytes": 168.0
+    }
+  ],
+  "remaining": 0,
+  "errors": 0,
+  "currentRuntimePid": 15672,
+  "protectedOriginalSaveFilesChanged": 0
+}

@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-26",
+  "request": "收紧神罗图周围裁切",
+  "coordinate_system": "spherical Lambert conformal conic metres; lon0=12, lat0=50, standard parallels=44/56",
+  "previous_bounds": [-1050000,-900000,1050000,1080000],
+  "bounds": [-800000,-850000,800000,900000],
+  "boundary_order": ["west","south","east","north"],
+  "retention": ["丹麦全境及博恩霍尔姆","完整低地","瑞士","北意大利及托斯卡纳","波希米亚摩拉维亚","奥地利及波兰匈牙利必要纵深"],
+  "policy": "仅裁矩形外围；大陆自然延续出框，框外候选保留在原始选点表，不移动城市以迁就裁切"
+}

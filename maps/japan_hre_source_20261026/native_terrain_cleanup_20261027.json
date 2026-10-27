@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-27",
+  "removedTargets": ["build/japan-hre-source-20261026/browser", "maps/japan/connected-ridges-detail.jpg", "maps/japan/connected-ridges-preview.jpg", "maps/japan/ridge_verification.json"],
+  "removedFiles": 17,
+  "removedBytes": 10763927,
+  "remainingTargets": 0,
+  "errors": 0,
+  "preflight": "Git tracked paths, absolute paths, reparse points and active processes inspected",
+  "dataHashChanges": 0,
+  "unchangedData": "Japan BIN, modern map source and buildings; all HRE files",
+  "verification": {"landforms": 876, "relief": 20759, "browser": 310, "views": 10, "errors": 0},
+  "preserved": "Original references, current map deliverables, sources and player data",
+  "rejectedApproach": "Repeated mountain stamps had passed pixel joins but produced unnatural comb patterns; removed with their experimental verifier"
+}

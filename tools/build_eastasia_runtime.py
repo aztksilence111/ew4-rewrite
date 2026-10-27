@@ -257,13 +257,7 @@ def make_land_mask(land,placements):
 
 def background(land,rivers,placements,bridges,mask):
     # The renderer puts terrain and scenario ownership BELOW these map tiles.
-    sea = Image.new("RGBA",(IMAGE_W,IMAGE_H),(*geo.SEA,0))
-    sea.putalpha(Image.eval(mask,lambda p:255-p))
-    outer = Image.eval(mask.filter(ImageFilter.MaxFilter(5)),lambda p:p)
-    edge = np.asarray(outer,dtype=np.int16)-np.asarray(mask,dtype=np.int16)
-    sea.paste((110,143,153,255),(0,0,IMAGE_W,IMAGE_H),Image.fromarray(edge.astype(np.uint8)))
-    del edge,outer
-    sea = eastasia_water.rivers(sys.modules[__name__], sea, rivers, mask)
+    sea = eastasia_water.background(sys.modules[__name__], land, rivers, placements, mask)
     atlas=Image.open(BASE/'client/images/buildings.png').convert('RGBA')
     sprites=json.loads((BASE/'client/manifest.json').read_text(encoding='utf-8'))['atlases']['buildings']
     for bridge in bridges:

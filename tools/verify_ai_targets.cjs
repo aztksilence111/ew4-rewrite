@@ -23,7 +23,7 @@ const base=process.argv[2]||'http://127.0.0.1:5579',folder=path.resolve(process.
     check(await page.locator('.ai-control-status').evaluate(el=>(el.textContent||el.querySelector('[aria-label]')?.getAttribute('aria-label')||'').includes('1 支部队')),
       'sidebar reports live selected count: '+await page.locator('.ai-control-status').evaluate(el=>el.outerHTML));
     await page.locator('#ai-units').click();
-    check(await page.evaluate(()=>aiControl.chosen.size===1&&document.querySelector('.ai-selection-count').textContent==='1 支部队'),'map reports surviving count');
+    check(await page.evaluate(()=>aiControl.chosen.size===1&&document.querySelector('.ai-selection-count').textContent.endsWith('1 支部队')),'map reports surviving count');
     await page.locator('#ai-clear-selection').click();check(await page.evaluate(()=>aiControl.chosen.size===0&&!$('ai-map-confirm').disabled),'one-click clear empties selection');
     await page.locator('#ai-map-cancel').click();await settle();check(await page.evaluate(()=>state.playerAi.draft.units.length===1),'cancel does not submit clear');
     await page.locator('#ai-units').click();

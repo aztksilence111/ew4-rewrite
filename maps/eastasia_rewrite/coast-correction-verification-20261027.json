@@ -1,0 +1,20 @@
+{
+  "checks": 5601,
+  "errors": 0,
+  "tiles": 80,
+  "overlapPairs": 268,
+  "overlapPixelDifferences": 0,
+  "mouths": 46,
+  "waterSamples": 4197,
+  "bridgeCoveredSamples": 96,
+  "openSeaSamples": 513,
+  "antialiasPixels": 430805,
+  "darkBankPixels": 13547,
+  "shallowShorePixels": 132428,
+  "sampledLandComponents": 404,
+  "riverBlendSamples": 34,
+  "mouthColorDistanceBefore": 84.176,
+  "mouthColorDistanceAfter": 58.471,
+  "coastalThresholdChangesBeyond2px": 0,
+  "protectedGameplayChanged": 0
+}

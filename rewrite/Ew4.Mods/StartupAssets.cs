@@ -13,22 +13,68 @@ public static class StartupAssets
     private const int Schema = 1;
     private static readonly object Gate = new();
     private sealed record Receipt(int Schema, string Fingerprint, bool Rebuilt, Dictionary<string, string> Files, string? SaveNamespace = null);
+    private sealed record PackageReceipt(string Key, string Fingerprint, string[] Files, int CheckedFiles);
+
+    private static string Engine => string.Join(':', new[] { typeof(StartupAssets), typeof(Client.ClientContent), typeof(LegacyRuntimeCatalog), typeof(Core.UnitProfile) }
+        .Select(t => t.Assembly.ManifestModule.ModuleVersionId));
+
+    // Only use this for installed, immutable package assets. Editable directories must use Prepare.
+    public static StartupAssetResult PreparePackage(Func<string, byte[]> read, Func<IEnumerable<string>> files,
+        string packageRevision, string cacheRoot, Action<ImportProgress>? report = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(packageRevision);
+        lock (Gate)
+        {
+            cacheRoot = Path.GetFullPath(cacheRoot);
+            string key = ModFiles.Hash(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new { Schema, engine = Engine, packageRevision })));
+            string index = Path.Combine(cacheRoot, "package-" + key + ".json");
+            try
+            {
+                var receipt = JsonSerializer.Deserialize<PackageReceipt>(File.ReadAllBytes(index), ModFiles.Json);
+                if (receipt?.Key == key && receipt.Files != null && receipt.CheckedFiles >= 0
+                    && receipt.Fingerprint is { Length: 64 } && receipt.Fingerprint.All(char.IsAsciiHexDigit))
+                {
+                    var baseline = new ModBase(read, receipt.Files);
+                    if (TryCached(baseline, ModFiles.Under(cacheRoot, receipt.Fingerprint), receipt.Fingerprint) is { } cached)
+                    {
+                        report?.Invoke(new("complete", "资源检查完成"));
+                        return new(cached.Content, receipt.Fingerprint, true, cached.Rebuilt, receipt.CheckedFiles);
+                    }
+                }
+            }
+            catch (Exception error) when (error is IOException or UnauthorizedAccessException or JsonException or ArgumentException)
+            { }
+            var source = new ModBase(read, files());
+            var result = PrepareCore(source, cacheRoot, report ?? (_ => { }), immutablePackage: true);
+            string temporary = index + "." + Guid.NewGuid().ToString("N") + ".tmp";
+            try
+            {
+                File.WriteAllBytes(temporary, JsonSerializer.SerializeToUtf8Bytes(new PackageReceipt(key, result.Fingerprint, source.Files, result.CheckedFiles), ModFiles.Json));
+                File.Move(temporary, index, overwrite: true);
+            }
+            finally { if (File.Exists(temporary)) File.Delete(temporary); }
+            return result;
+        }
+    }
 
     public static StartupAssetResult Prepare(ModBase baseline, string cacheRoot, Action<ImportProgress>? report = null)
     {
         lock (Gate) return PrepareCore(baseline, Path.GetFullPath(cacheRoot), report ?? (_ => { }));
     }
 
-    private static StartupAssetResult PrepareCore(ModBase baseline, string cacheRoot, Action<ImportProgress> report)
+    private static StartupAssetResult PrepareCore(ModBase baseline, string cacheRoot, Action<ImportProgress> report, bool immutablePackage = false)
     {
         report(new("working", "检查游戏资源"));
         var hashes = new Dictionary<string, string>(StringComparer.Ordinal);
         var originals = new Dictionary<string, byte[]>(StringComparer.Ordinal);
         foreach (string path in baseline.Files)
         {
-            byte[] bytes = baseline.Read(path);
-            hashes.Add(path, ModFiles.Hash(bytes));
-            if (path.StartsWith("original/", StringComparison.Ordinal)) originals.Add(path, bytes);
+            if (path.StartsWith("original/", StringComparison.Ordinal))
+            {
+                byte[] bytes = baseline.Read(path);
+                hashes.Add(path, ModFiles.Hash(bytes)); originals.Add(path, bytes);
+            }
+            else hashes.Add(path, baseline.Hash(path));
         }
         JsonObject? reference = null;
         try
@@ -51,8 +97,7 @@ public static class StartupAssets
         bool logicChanges = expectedLogic != null && (logic.Any(p => !expectedLogic.TryGetValue(p.Key, out string? hash) || hash != p.Value)
             || expectedLogic.Keys.Any(p => !logic.ContainsKey(p)));
         string logicRevision = ModFiles.Hash(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(logic)));
-        string engine = string.Join(':', new[] { typeof(StartupAssets), typeof(Client.ClientContent), typeof(LegacyRuntimeCatalog), typeof(Core.UnitProfile) }
-            .Select(t => t.Assembly.ManifestModule.ModuleVersionId));
+        string engine = Engine;
         string assetRevision = ModFiles.Hash(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(hashes)));
         string fingerprint = ModFiles.Hash(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new { Schema, engine, assetRevision })));
         string target = ModFiles.Under(cacheRoot, fingerprint);
@@ -81,8 +126,9 @@ public static class StartupAssets
                 }
             });
         var mapFiles = Xml("def_map.xml").Elements("map").Select(e => "original/" + (string)e.Attribute("file")!).ToHashSet(StringComparer.Ordinal);
+        var terrainMaps = new Dictionary<string, LegacyTerrainMap>(StringComparer.Ordinal);
         foreach (var path in mapFiles)
-            InFile(path, () => LegacyTerrainMap.Read(Read(path)));
+            InFile(path, () => terrainMaps.Add(path, LegacyTerrainMap.Read(Read(path))));
         foreach (var path in originals.Keys.Where(p => p.EndsWith(".bin", StringComparison.Ordinal) && !mapFiles.Contains(p)))
             InFile(path, () => LegacyBinary.Animation(Read(path)));
 
@@ -117,15 +163,15 @@ public static class StartupAssets
         foreach (string path in mapFiles)
             InFile(path, () =>
             {
-                var map = LegacyTerrainMap.Read(Read(path));
+                var map = terrainMaps[path];
                 foreach (var cell in map.Cells) terrain.Resolve(cell);
             });
         ContentValidation.Check(baseline, Read, baseline.Scenarios, baseline.Files.Union(generated.Keys).ToHashSet(StringComparer.Ordinal),
             startScenarios: originalChanges || logicChanges || generated.Count > 0);
 
         // A source directory can change while a desktop startup is validating it.
-        foreach (var (path, hash) in hashes)
-            if (ModFiles.Hash(baseline.Read(path)) != hash)
+        if (!immutablePackage) foreach (var (path, hash) in hashes)
+            if (baseline.Hash(path) != hash)
                 throw new InvalidDataException("资源在启动检查期间发生变化，请重试: " + path);
         Directory.CreateDirectory(cacheRoot);
         string stage = ModFiles.Under(cacheRoot, ".staging-" + Guid.NewGuid().ToString("N"));

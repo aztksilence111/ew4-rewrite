@@ -56,7 +56,13 @@
   function mapLabelBounds(label) {
     const path=textPath(label.textPath);
     if(path){const pad=Number(label.size)*.85+8,x=path.samples.map(p=>p.x+Number(label.tx)),y=path.samples.map(p=>p.y+Number(label.ty));
-      return {left:Math.min(...x)-pad,top:Math.min(...y)-pad,right:Math.max(...x)+pad,bottom:Math.max(...y)+pad};}
+      const bounds={left:Math.min(...x)-pad,top:Math.min(...y)-pad,right:Math.max(...x)+pad,bottom:Math.max(...y)+pad};
+      const radius=Number(label.characterSizeZh||label.size)*.85+8;
+      for(const p of label.characterPositionsZh||[]){if(!Number.isFinite(p.x)||!Number.isFinite(p.y))continue;
+        const px=Number(label.tx)+p.x,py=Number(label.ty)+p.y;
+        bounds.left=Math.min(bounds.left,px-radius);bounds.top=Math.min(bounds.top,py-radius);
+        bounds.right=Math.max(bounds.right,px+radius);bounds.bottom=Math.max(bounds.bottom,py+radius);}
+      return bounds;}
     return paddedBounds(Number(label.tx),Number(label.ty),Math.max(Number(label.width),Number(label.height)));
   }
   function pose(motion,width,time) {
@@ -162,6 +168,7 @@
       this.mapLabels.clear();
       this.overlayIndex=new SpatialIndex(map.overlays,o=>paddedBounds(o.x,o.y,120));
       this.tileIndex=new SpatialIndex(map.tiles,t=>paddedBounds(t.x+t.width/2,t.y+t.height/2,Math.max(t.width,t.height)));
+      this.waterTileIndex=new SpatialIndex(map.detailTiles||[],t=>({left:t.x,top:t.y,right:t.x+t.width,bottom:t.y+t.height}));
       this.labelIndex=new SpatialIndex(map.labels||[],mapLabelBounds);
     }
     resetMotions(){this.unitMotions=new Map();this.motionSelection=null;}
@@ -201,6 +208,8 @@
         if(this.preparedMap!==this.map||this.preparedWidth!==this.state.width||this.preparedHeight!==this.state.height){this.invalidateGround();this.gpuGroundRect=null;if(this.surfaceMap!==this.map)this.surface=new Ew4MapSurface.Surface();this.cityLabels.clear();this.pendingCityLabels?.clear();this.mapLabels.clear();this.unitFrames.clear();this.unitFramePixels=0;}
         this.preparedWidth=this.state.width;this.preparedHeight=this.state.height;
         this.preparedMap=this.map;this.preparedState=this.state;
+        this.namedSites=[];this.state.cells.forEach((site,cell)=>{if(site.active&&site.name)this.namedSites.push({cell,p:point(cell,this.state.width)});});
+        this.cityLayout=null;
         this.factions=new Map(this.state.factions.map(f=>[f.id,f]));
         if(root.Ew4MapViews){this.projection??=new root.Ew4MapViews.Projection();if(this.projection.sync(this.state,this.map))this.invalidateGround();}
         this.stationed=new Map(this.state.units.map(u=>[u.cell,u]));
@@ -268,9 +277,12 @@
     }
     staticGround(){
       if(this.draw.gpu){
-        const key=[this.groundSignature,this.api.imageRevision||0,this.api.geographicLanguage||'en',Ew4OriginalUI.revision].join(':');
-        const r=this.visibleRect,prior=this.gpuGroundRect;
-        const far=Ew4Camera.constrain({x:r.left+r.width/2,y:r.top+r.height/2,zoom:Math.min(this.zoom,this.detailScale*.28)},
+        const waterDetail=!!this.map.waterDetailZoom&&this.zoom>=this.map.waterDetailZoom;
+        const key=[this.groundSignature,this.api.imageRevision||0,this.api.geographicLanguage||'en',Ew4OriginalUI.revision,this.map.terrainDetailZoom?this.zoom>=this.map.terrainDetailZoom:'',waterDetail].join(':');
+        const r=this.visibleRect,rangeMode=waterDetail?'water':'standard';
+        if(this.gpuGroundRangeMode!==rangeMode){this.gpuGroundRect=null;this.gpuGroundRangeMode=rangeMode;}
+        const prior=this.gpuGroundRect;
+        const far=Ew4Camera.constrain({x:r.left+r.width/2,y:r.top+r.height/2,zoom:waterDetail?this.zoom*.85:Math.min(this.zoom,this.detailScale*.28)},
           {w:r.width*this.zoom,h:r.height*this.zoom},cameraBounds(this.state,this.map)),ratio=this.zoom/far.zoom;
         const left=Math.min(r.left,far.x-r.width*ratio/2),top=Math.min(r.top,far.y-r.height*ratio/2);
         const right=Math.max(r.left+r.width,far.x+r.width*ratio/2),bottom=Math.max(r.top+r.height,far.y+r.height*ratio/2);
@@ -312,16 +324,16 @@
       this.ground();this.facilities(true);this.terrain(false);this.ownership();this.mapTiles();this.terrain(false,true);this.geography();this.mapText();this.borders();this.districtBorders();this.terrain(true);this.facilities(false);this.bridges();
     }
     scheduleCityLabels(){
-      if(this.warmTimer||!this.pendingCityLabels?.size||!this.draw?.gpu||this.api.warmingPaused||this.draw.lost||document.hidden||this.api.visible===false)return;
+      if(this.warmTimer||!this.pendingCityLabels?.size||!this.draw||this.api.warmingPaused||this.draw.lost||document.hidden||this.api.visible===false)return;
       const run=()=>{
         this.warmTimer=0;
-        if(!this.draw?.gpu||this.api.warmingPaused||this.draw.lost||document.hidden||this.api.visible===false)return;
+        if(!this.draw||this.api.warmingPaused||this.draw.lost||document.hidden||this.api.visible===false)return;
         if(this.api.cameraActive){this.scheduleCityLabels();return;}
         if(!this.pendingCityLabels?.size)return;
         const [key,label]=this.pendingCityLabels.entries().next().value;this.pendingCityLabels.delete(key);
-        this.cacheCityLabel(key,label.name,label.cell,label.density);
+        if(!this.cityLabels.has(key))this.cacheCityLabel(key,label.name,label.cell,label.density);
         const canvas=this.cityLabels.get(key);
-        if(canvas&&this.draw.renderer&&!this.draw.lost){const texture=this.draw.texture(canvas,0,0,canvas.width,canvas.height);this.draw.renderer.texture.bind(texture.baseTexture);}
+        if(canvas&&this.draw.gpu&&this.draw.renderer&&!this.draw.lost){const texture=this.draw.texture(canvas,0,0,canvas.width,canvas.height);this.draw.renderer.texture.bind(texture.baseTexture);}
         this.api.requestFrame?.();this.scheduleCityLabels();
       };
       this.warmTimer=setTimeout(run,32);
@@ -354,6 +366,25 @@
     neighbors(index){return Array.from({length:6},(_,d)=>{const cell=this.state.cells[neighbor(index,d,this.state.width,this.state.height)];
       return cell?{...cell,owner:this.projection?.borderOwner(cell,this.mapMode)??cell.owner,color:this.projection?.color(cell,this.mapMode)??this.factions.get(cell.owner)?.color??0}:null;});}
     mapTiles() {
+      if(this.map.waterDetailZoom&&this.zoom>=this.map.waterDetailZoom){
+        for(const tile of this.waterTileIndex.query(this.visibleRect)){
+          const r=this.visibleRect;if(tile.x>r.left+r.width||tile.y>r.top+r.height||tile.x+tile.width<r.left||tile.y+tile.height<r.top)continue;
+          const image=this.api.image(tile.file);
+          if(image.complete&&image.naturalWidth){this.draw.drawImage(image,tile.x,tile.y,tile.width,tile.height);continue;}
+          // Replace each loaded patch, including its transparent land, to avoid coarse river ghosts.
+          for(const low of this.tileIndex.query({left:tile.x,top:tile.y,width:tile.width,height:tile.height})){
+            const x=Math.max(tile.x,low.x),y=Math.max(tile.y,low.y),right=Math.min(tile.x+tile.width,low.x+low.width),bottom=Math.min(tile.y+tile.height,low.y+low.height);
+            if(x>=right||y>=bottom)continue;
+            const fallback=this.api.image(low.file);if(!fallback.complete||!fallback.naturalWidth)continue;
+            const sx=fallback.naturalWidth/low.width,sy=fallback.naturalHeight/low.height;
+            const sourceX=(x-low.x)*sx,sourceY=(y-low.y)*sy;
+            // Pixi rejects even a subpixel rounding excess at the source texture edge.
+            const sourceWidth=Math.min((right-x)*sx,fallback.naturalWidth-sourceX-1e-6),sourceHeight=Math.min((bottom-y)*sy,fallback.naturalHeight-sourceY-1e-6);
+            if(sourceWidth>0&&sourceHeight>0)this.draw.drawImage(fallback,sourceX,sourceY,sourceWidth,sourceHeight,x,y,right-x,bottom-y);
+          }
+        }
+        return;
+      }
       for(const tile of this.tileIndex.query(this.visibleRect)){if(!this.visible({x:tile.x+tile.width/2,y:tile.y+tile.height/2},Math.max(tile.width,tile.height)))continue;
         const image=this.api.image(tile.file);if(image.complete&&image.naturalWidth)this.draw.drawImage(image,tile.x,tile.y,tile.width,tile.height);
       }
@@ -391,7 +422,15 @@
     }
     terrain(seaForeground,reliefForeground=false) {
       // Relief mountains share the snow ridge's natural sprite alpha above rivers.
-      for(const overlay of this.overlayIndex.query(this.visibleRect))if(!!overlay.seaForeground===seaForeground&&!!(overlay.relief&&overlay.relief!=='hill'&&!overlay.seaForeground)===reliefForeground&&this.state.cells[overlay.cell]?.active&&!this.state.cells[overlay.cell]?.geographySprite&&this.visible(overlay))this.api.sprite('tiles',overlay.image,overlay.x,overlay.y,1,this.draw);
+      for(const overlay of this.overlayIndex.query(this.visibleRect)){
+        if(!!overlay.seaForeground!==seaForeground||!!(overlay.relief&&overlay.relief!=='hill'&&!overlay.seaForeground)!==reliefForeground||!this.state.cells[overlay.cell]?.active||this.state.cells[overlay.cell]?.geographySprite||!this.visible(overlay))continue;
+        if(overlay.overview===false&&this.zoom<(this.map.terrainDetailZoom??0))continue;
+        const scale=this.zoom<(this.map.terrainDetailZoom??0)?(overlay.overviewScale??1):1;
+        this.draw.save();this.draw.translate(overlay.x,overlay.y);
+        this.draw.scale((overlay.scaleX??1)*scale,(overlay.scaleY??1)*scale);
+        this.draw.globalAlpha=overlay.opacity??1;
+        this.api.sprite('tiles',overlay.image,0,0,1,this.draw);this.draw.restore();
+      }
     }
     geography(){
       for(const {site,p,cell} of this.visibleCells)if(site.active&&site.geographySprite){
@@ -431,7 +470,9 @@
           const draw=canvas.getContext('2d');draw.scale(density,density);draw.translate(-left,-top);draw.globalAlpha=opacity;
           if(chinese){
             void Ew4OriginalUI.prepareMapText(label.textZh,!label.sea);
-            const height=Number(label.size),text=[...Ew4OriginalUI.availableText(label.textZh)],length=path?path.length:Number(label.letteringLength);
+            const text=[...Ew4OriginalUI.availableText(label.textZh)],positions=label.characterPositionsZh;
+            const positioned=Array.isArray(positions)&&positions.length===text.length&&positions.every(p=>[p.x,p.y,p.angle].every(Number.isFinite));
+            const height=Number(positioned?label.characterSizeZh||label.size:label.size),length=path?path.length:Number(label.letteringLength);
             if(!path)draw.rotate(Number(label.angle||0)*Math.PI/180);
             draw.font=(label.sea?'italic ':'')+height+'px '+(label.sea?'':'"EW4 Serif",')+Ew4OriginalUI.mapFontFamily;
             draw.fontKerning='none';draw.textBaseline='alphabetic';
@@ -441,7 +482,8 @@
             let x=path?0:-Math.max(length,natural*scale)/2/scale;
             const metrics=draw.measureText(text.join('')),baseline=(metrics.actualBoundingBoxAscent-metrics.actualBoundingBoxDescent)/2;
             for(let i=0;i<text.length;i++){
-              if(path){const p=path.at(x+widths[i]*scale/2);draw.save();draw.translate(p.x,p.y);draw.rotate(p.angle);draw.scale(scale,1);draw.fillText(text[i],-widths[i]/2,baseline);draw.restore();x+=widths[i]*scale+spacing;}
+              if(positioned){const p=positions[i];draw.save();draw.translate(p.x,p.y);draw.rotate(p.angle*Math.PI/180);draw.fillText(text[i],-widths[i]/2,baseline);draw.restore();}
+              else if(path){const p=path.at(x+widths[i]*scale/2);draw.save();draw.translate(p.x,p.y);draw.rotate(p.angle);draw.scale(scale,1);draw.fillText(text[i],-widths[i]/2,baseline);draw.restore();x+=widths[i]*scale+spacing;}
               else{draw.fillText(text[i],x,baseline);x+=widths[i]+spacing/scale;}
             }
           }else if(path){
@@ -597,16 +639,27 @@
       return this.aiBadgeCanvas;
     }
     playerOrders(){
-      const overlay=this.aiOverlay,config=this.state.aiPresentation||{},draw=this.draw;
-      const ids=overlay?.units||[],selected=new Set(ids);
-      let targets=overlay?(overlay.goals||[overlay.goal]):this.selected?.aiControlled?(this.selected.aiGoals||[this.selected.aiGoal]):[];
+      const overlay=this.aiOverlay,config=this.state.aiPresentation||{};
+      if(overlay?.tasks){for(const task of overlay.tasks)this.playerTask(task,config);return;}
+      this.playerTask({units:overlay?.units||[],goals:overlay?(overlay.goals||[overlay.goal]):this.selected?.aiControlled?(this.selected.aiGoals||[this.selected.aiGoal]):[],current:true},config);
+    }
+    playerTask(task,config){
+      const draw=this.draw,selected=new Set(task.units||[]),color=task.color||config.selectionColor||'#ffe995';
+      let targets=task.goals||[];
       targets=targets.filter(target=>Number.isInteger(target)&&this.state.cells[target]?.active);
       draw.save();
-      for(const unit of this.visibleUnits)if(selected.has(unit.id)){const p=point(unit.cell,this.state.width);hex(draw,p.x,p.y);draw.fillStyle=(config.selectionColor||'#ffe995')+'33';draw.fill();draw.strokeStyle=config.selectionColor||'#ffe995';draw.lineWidth=2/this.zoom;draw.stroke();}
+      draw.globalAlpha=task.current===false?.32:1;
+      const distance=(a,b)=>{const r=Math.floor(a/this.state.width),s=Math.floor(b/this.state.width),q=a%this.state.width-(r-r%2)/2,t=b%this.state.width-(s-s%2)/2;return Math.max(Math.abs(q-t),Math.abs(r-s),Math.abs(q-t+r-s));};
+      const line=[];for(const end of task.line||[]){if(!line.length)line.push(end);while(line[line.length-1]!==end&&line.length<513){const origin=line[line.length-1];const next=Array.from({length:6},(_,d)=>neighbor(origin,d,this.state.width,this.state.height)).filter(c=>c>=0).sort((a,b)=>distance(a,end)-distance(b,end)||a-b)[0];line.push(next);}}
+      const centers=task.kind==='defend'?targets.slice(0,1):line;
+      for(const {cell,p,site} of this.visibleCells){if(!site.active||!centers.length)continue;const d=Math.min(...centers.map(c=>distance(cell,c)));if(d>(task.radius??1))continue;hex(draw,p.x,p.y);draw.fillStyle=color+(d===0?'44':'18');draw.fill();if(d===0){draw.strokeStyle=color;draw.lineWidth=2/this.zoom;draw.stroke();}}
+      for(const unit of this.visibleUnits)if(selected.has(unit.id)){const p=point(unit.cell,this.state.width);hex(draw,p.x,p.y);draw.fillStyle=color+'33';draw.fill();draw.strokeStyle=color;draw.lineWidth=2/this.zoom;draw.stroke();if(task.taskId)draw.drawImage(this.aiGoalNumber(task.taskId,{badgeColor:color,badgeTextColor:'#18231f'}),p.x-29,p.y-32,15/this.zoom,15/this.zoom);}
+      for(const cell of Object.values(task.stations||{})){const p=point(cell,this.state.width);if(!this.visible(p))continue;draw.strokeStyle=color;draw.lineWidth=2/this.zoom;draw.beginPath();draw.moveTo(p.x-9,p.y-9);draw.lineTo(p.x+9,p.y-9);draw.lineTo(p.x+9,p.y+9);draw.lineTo(p.x-9,p.y+9);draw.closePath();draw.stroke();}
       for(let index=0;index<targets.length;index++){
         const target=targets[index];
-        const end=point(target,this.state.width),units=overlay?this.state.units.filter(u=>selected.has(u.id)):this.selected?[this.selected]:[];
-        draw.strokeStyle=config.lineColor||'#ffdb65';draw.lineWidth=(config.lineWidth||2)/this.zoom;
+        const end=point(target,this.state.width),units=task.units?.length?this.state.units.filter(u=>selected.has(u.id)):this.selected?[this.selected]:[];
+        draw.strokeStyle=task.color||config.lineColor||'#ffdb65';draw.lineWidth=(config.lineWidth||2)/this.zoom;
+        hex(draw,end.x,end.y);draw.stroke();
         // Draw separate segments: the Pixi adapter does not implement Canvas line dashes.
         const dash=(config.dashLength||8)/this.zoom;
         const starts=index?[point(targets[index-1],this.state.width)]:units.map(unit=>point(unit.cell,this.state.width));
@@ -615,21 +668,20 @@
         const offset=Math.sin(this.time/220)*5;
         this.api.sprite('buildings','arrow_shadow.png',end.x,end.y+5,.7,draw);
         this.api.sprite('buildings',config.arrowImage||'arrow_red.png',end.x,end.y+offset,1,draw);
-        if(targets.length>1)draw.drawImage(this.aiGoalNumber(index+1,config),end.x+10,end.y-28,18,18);
+        if(targets.length>1||task.taskId)draw.drawImage(this.aiGoalNumber(targets.length>1?index+1:task.taskId,{...config,badgeColor:task.color||config.badgeColor}),end.x+10,end.y-28,18,18);
         this.animated=true;
       }
       draw.restore();
     }
     aiGoalNumber(number,config){
       this.aiGoalNumbers??=new Map();
-      const key=JSON.stringify([config.badgeColor,config.badgeTextColor]);
-      if(this.aiGoalNumberStyle!==key){for(const canvas of this.aiGoalNumbers.values())this.draw.release?.(canvas);this.aiGoalNumbers.clear();this.aiGoalNumberStyle=key;}
-      if(!this.aiGoalNumbers.has(number)){
+      const key=JSON.stringify([number,config.badgeColor,config.badgeTextColor]);
+      if(!this.aiGoalNumbers.has(key)){
         const canvas=document.createElement('canvas');canvas.width=48;canvas.height=48;const draw=canvas.getContext('2d');
         draw.fillStyle=config.badgeColor||'#343e38';draw.fillRect(0,0,48,48);draw.fillStyle=config.badgeTextColor||'#fff4c5';draw.font='bold 32px sans-serif';draw.textAlign='center';draw.textBaseline='middle';draw.fillText(String(number),24,25);
-        this.aiGoalNumbers.set(number,canvas);
+        this.aiGoalNumbers.set(key,canvas);
       }
-      return this.aiGoalNumbers.get(number);
+      return this.aiGoalNumbers.get(key);
     }
     campMark(owner){
       const text=this.projection?.abbreviation(owner);if(!text)return null;
@@ -713,19 +765,50 @@
       }
       this.draw.drawImage(cached.canvas,cached.left,cached.top,cached.width,cached.height);
     }
+    cityLabelLayout() {
+      const zoom=Math.pow(1.1,Math.floor(Math.log(this.zoom)/Math.log(1.1))),scale=Math.max(1,this.detailScale/zoom);
+      const metricsKey=[this.api.cityLanguage||'en',Ew4OriginalUI.revision].join(':');
+      if(this.cityMetricsKey!==metricsKey||this.cityMetricsMap!==this.map){this.cityMetrics=new Map();this.cityMetricsKey=metricsKey;this.cityMetricsMap=this.map;this.cityLayout=null;}
+      const key=[zoom,this.detailScale,this.selection?.cell??''].join(':');
+      if(this.cityLayout?.key===key)return this.cityLayout;
+      const bounds=cameraBounds(this.state,this.map),bins=new Map(),rows=[],step=128*scale;
+      const priority=cell=>{const c=this.state.cells[cell];return (this.selection?.cell===cell?10000:0)+(c.buildingKind==='city'?100+Number(c.buildingLevel||1)*10:0);};
+      const ordered=[...this.namedSites].sort((a,b)=>priority(b.cell)-priority(a.cell)||a.cell-b.cell);
+      for(const {cell,p} of ordered){
+        const site=this.state.cells[cell],metricKey=cell+':'+site.name;
+        if(!this.cityMetrics.has(metricKey))this.cityMetrics.set(metricKey,this.api.cityLabelSize(site.name,cell));
+        const size=this.cityMetrics.get(metricKey),width=size.width*scale,height=size.height*scale;
+        const x=Math.max(bounds.left,Math.min(bounds.left+bounds.width-width,p.x-width/2));
+        const y=p.y+29+height<=bounds.top+bounds.height?p.y+29:Math.max(bounds.top,p.y-29-height);
+        const box={left:x-4*scale,top:y-3*scale,right:x+width+4*scale,bottom:y+height+3*scale};
+        const keys=[];let blocked=false;
+        for(let by=Math.floor(box.top/step);by<=Math.floor(box.bottom/step);by++)for(let bx=Math.floor(box.left/step);bx<=Math.floor(box.right/step);bx++){
+          const k=bx+':'+by;keys.push(k);
+          if((bins.get(k)||[]).some(b=>box.left<b.right&&box.right>b.left&&box.top<b.bottom&&box.bottom>b.top))blocked=true;
+        }
+        if(blocked)continue;
+        rows.push({cell,p,box});
+        for(const k of keys){if(!bins.has(k))bins.set(k,[]);bins.get(k).push(box);}
+      }
+      this.cityLayout={key,rows,index:new SpatialIndex(rows,row=>row.box)};
+      return this.cityLayout;
+    }
     labels() {
       const {draw,state}=this;
       const scale=Math.max(1,this.markerScale),density=Math.max(1,Math.min(4,Math.ceil(draw.getTransform().a*scale/2)));
       const bounds=cameraBounds(state,this.map);
       const wanted=new Set();this.pendingCityLabels??=new Map();
-      for(const {site:c,cell:i,p} of this.visibleCells){if(!c.active||!c.name)continue;
+      for(const {cell:i,p} of this.cityLabelLayout().index.query(this.visibleRect)){
+        const c=state.cells[i];
         const key=i+':'+c.name+':'+density;
         wanted.add(key);
         if(!this.cityLabels.has(key)){
-          if(draw.gpu&&(this.api.cameraActive||this.pendingCityLabels.has(key))){this.pendingCityLabels.set(key,{name:c.name,cell:i,density});continue;}
+          if(this.api.cameraActive||this.pendingCityLabels.has(key)){this.pendingCityLabels.set(key,{name:c.name,cell:i,density});continue;}
           this.cacheCityLabel(key,c.name,i,density);
         }
-        const label=this.cityLabels.get(key),width=label.width/density/2*scale,height=label.height/density/2*scale;
+        const label=this.cityLabels.get(key);
+        if(draw.gpu&&this.api.cameraActive&&draw.sources&&!draw.sources.has(label)){this.pendingCityLabels.set(key,{name:c.name,cell:i,density});continue;}
+        const width=label.width/density/2*scale,height=label.height/density/2*scale;
         // Text stays legible at distance, but its anchor stays on the building.
         const x=Math.max(bounds.left,Math.min(bounds.left+bounds.width-width,p.x-width/2));
         const y=p.y+29+height<=bounds.top+bounds.height?p.y+29:Math.max(bounds.top,p.y-29-height);

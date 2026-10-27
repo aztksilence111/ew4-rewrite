@@ -474,8 +474,8 @@
     },
     {
       "path": "original/def_areaname.xml",
-      "bytes": 19449,
-      "sha256": "da41ac8ee2b1fc0c5c41e2bb800f59758a0f5ef0b8295a5884c003db93871a60"
+      "bytes": 47994,
+      "sha256": "83898512615dcc8aa410e67bf789717e2ba56c6eba22256a0131e2fbf225f3d8"
     },
     {
       "path": "original/def_army.xml",
@@ -534,8 +534,8 @@
     },
     {
       "path": "original/def_map.xml",
-      "bytes": 563,
-      "sha256": "52bcc83105eb13336282e1b5fba53a643bfcbd75495e47bfbea2ae58c288b2e5"
+      "bytes": 729,
+      "sha256": "cc5088614d00995c6ff81e04eb21a7022a14ac3818843b1864bd07f092698d7d"
     },
     {
       "path": "original/def_mapterrain.xml",
@@ -571,6 +571,16 @@
       "path": "original/europe.bin",
       "bytes": 64480,
       "sha256": "cbab47e29b6eeda038a9c529e68298550ed7a7d652b61482eed63181e97c8efa"
+    },
+    {
+      "path": "original/hre.bin",
+      "bytes": 629548,
+      "sha256": "56e802e615d7080e24a6ab3dab380aa027bae9e9f99549f04971e242ee3e6042"
+    },
+    {
+      "path": "original/japan.bin",
+      "bytes": 695284,
+      "sha256": "2d99cee96b45e070ee8615c905cfb118dd65be1a78dd7d1facccec0af1ead794"
     },
     {
       "path": "original/maptextpos_eastasia.xml",
@@ -759,8 +769,8 @@
     },
     {
       "path": "client/animations/maptext.json",
-      "bytes": 464558,
-      "sha256": "7a8c450eba2c5883997a2e9ed74ef1850bdb2fbf07fe634d2777647ee90e622b"
+      "bytes": 584585,
+      "sha256": "e01a1dd993fdc3f99fb539bd69738445bec9a425a630f7c5c5f1930a3a7c3561"
     },
     {
       "path": "client/animations/strategicmap.json",
@@ -3359,8 +3369,8 @@
     },
     {
       "path": "client/manifest.json",
-      "bytes": 2141838,
-      "sha256": "2d95508191b97a9a44673fc62d9cb4fcd6f883d144c01555814f7f97353af8cb"
+      "bytes": 6502220,
+      "sha256": "990f87bcb0dcc37c1e944d68aab47e070d2f684e4a38eaae8093be13ab0c97a8"
     },
     {
       "path": "client/maps/america/0_0.png",
@@ -3644,38 +3654,38 @@
     },
     {
       "path": "client/maps/eastasia/0_0.png",
-      "bytes": 21629,
-      "sha256": "63e41e75438cae51a037625c003c7a5e77f04336f34339ec42fdef97820faf44"
+      "bytes": 57778,
+      "sha256": "d72b8292461ed76960a4db19d8c221c7c3ca89d4aefb8164369f2e64bea5332a"
     },
     {
       "path": "client/maps/eastasia/0_1024.png",
-      "bytes": 8301,
-      "sha256": "7814ac2e030ae88d7168baeb7746258441564e6f493bdd59c53a7945fd3cb49b"
+      "bytes": 24961,
+      "sha256": "67c63624c64a4321f7f3d39f965139d029f19629b892ef56f0aa39959992caf7"
     },
     {
       "path": "client/maps/eastasia/0_2048.png",
-      "bytes": 6502,
-      "sha256": "fb540e4fea464d373ca62387cb82f47d7b47839c4961ad818a9d5a6e68097175"
+      "bytes": 4161,
+      "sha256": "4c89b5f3d0d95dc6bf74ffd44bc1a337677827feafcc4e16af33fc918e11b731"
     },
     {
       "path": "client/maps/eastasia/0_3072.png",
-      "bytes": 11805,
-      "sha256": "51701faac6c02e23635a8120187fe5371e3c4d76b71267f987ee96f0446ef86a"
+      "bytes": 23782,
+      "sha256": "cf3ddf476c0ac3c04a553e7817bf245e776caa36f4f1f54408a92017228f96b5"
     },
     {
       "path": "client/maps/eastasia/0_4096.png",
-      "bytes": 145991,
-      "sha256": "617af707f1b59106f911e5b4824dad39a332906d6dee3f621f8f86dbe28e66c3"
+      "bytes": 145825,
+      "sha256": "01655c5cff080ba2dd012ba4d073f96d29751fc075e7352057bde31ec8748170"
     },
     {
       "path": "client/maps/eastasia/0_5120.png",
-      "bytes": 118765,
-      "sha256": "49c4bd096cea0b8a1994b5acb10da0b9a3a320c714fa1a64d8c18e083417594e"
+      "bytes": 118034,
+      "sha256": "63255a1d34048191486e8090a7b827478df34b1b6bb6bd33439c471a9d6f74d8"
     },
     {
       "path": "client/maps/eastasia/0_6144.png",
-      "bytes": 40840,
-      "sha256": "1adb881191a5b7645f76ede0bf02b7894ba983c130f88831f950b1e3a3b96697"
+      "bytes": 90499,
+      "sha256": "d724846474477d16204b8027cf381203b24a38821b24579d74dedae8bea499a9"
     },
     {
       "path": "client/maps/eastasia/0_7168.png",
@@ -3684,38 +3694,38 @@
     },
     {
       "path": "client/maps/eastasia/1024_0.png",
-      "bytes": 76823,
-      "sha256": "769ca12e4a6b73b0f8a9d34516d7a054e9a445acb49a4836c371b5ec8dae7b38"
+      "bytes": 130344,
+      "sha256": "dd25d73f565ec8bc684763ad508184781bba7cee97825531db3f99f08de4e9a5"
     },
     {
       "path": "client/maps/eastasia/1024_1024.png",
-      "bytes": 23774,
-      "sha256": "2c980f547c7d8a56a55f99e8e8b855241cbc508ce9c4ff4f54348a49f99062c5"
+      "bytes": 87201,
+      "sha256": "edf8e5d91b2fb45c682d89fbe6b1edc20de948c7b41ace76d13dc44b9db5dbad"
     },
     {
       "path": "client/maps/eastasia/1024_2048.png",
-      "bytes": 8047,
-      "sha256": "d57e944ba98bc99386ee2696e8796909b60100d551ee5e931669a50f2f3bf30a"
+      "bytes": 23403,
+      "sha256": "4b97a32f4dcb03698ce4c981590b24d49cfd05257a9da17e79ae0cbcd2ec74e5"
     },
     {
       "path": "client/maps/eastasia/1024_3072.png",
-      "bytes": 7791,
-      "sha256": "3c3fb27d311e36a1418567c5ca68f6b53202afc1022de91b7b5e0a9ba550d460"
+      "bytes": 18486,
+      "sha256": "8eb64b764c83d475430615cb161e163c764a61784b00de4ab21d7bfcb378ffc1"
     },
     {
       "path": "client/maps/eastasia/1024_4096.png",
-      "bytes": 20812,
-      "sha256": "22e41038355d4863f87be62784327921fee0c89c701f81b2092aaa0a5252d945"
+      "bytes": 74515,
+      "sha256": "d33a06be9251e97ca8ce43466223d57a5bb973b1bd766b78d7aee35dbb1282c9"
     },
     {
       "path": "client/maps/eastasia/1024_5120.png",
-      "bytes": 197962,
-      "sha256": "7959337b207c7f64878512d2318d72bf0a0fc3ce097074924c59eb90910a4049"
+      "bytes": 254499,
+      "sha256": "ece73ea52ea02f59de03c4f7cc893e2cf74cdc92119bbb8f15cee44170cdcda6"
     },
     {
       "path": "client/maps/eastasia/1024_6144.png",
-      "bytes": 9543,
-      "sha256": "6c6bca7f5a1361d37e09c940e723642799cc274d72b8aa7d6546aafba73a471d"
+      "bytes": 25575,
+      "sha256": "216fd24052637023e9cf97790fc41ec79bc4114d76a7bdf6a783761a68ecd3eb"
     },
     {
       "path": "client/maps/eastasia/1024_7168.png",
@@ -3724,238 +3734,238 @@
     },
     {
       "path": "client/maps/eastasia/2048_0.png",
-      "bytes": 75809,
-      "sha256": "e5f2f54b85ca0db76228c474565fcb4040f04a69a393ad22b2b8a82619c1f876"
+      "bytes": 80960,
+      "sha256": "3e87891fdb42d9be9c7fd43e6721d5d6b59e388d7f70e9f5d00a351b9582a3f9"
     },
     {
       "path": "client/maps/eastasia/2048_1024.png",
-      "bytes": 76285,
-      "sha256": "e9e49d75195737a401843bc2e0de88af9359fd57aac25e08d9b99974e94a076c"
+      "bytes": 99517,
+      "sha256": "1634d00475e316778eb005ccb043484a09cdfd526cabb13124594c7c9545ce95"
     },
     {
       "path": "client/maps/eastasia/2048_2048.png",
-      "bytes": 7171,
-      "sha256": "b5ae055a605a6c2310bd058c95dc8166dee96da247d1fa89744e26ccdecf244e"
+      "bytes": 12016,
+      "sha256": "ead8c518840bf3ac9c68be66e27d4abf84d3fc3a6d33079f4d1401fb74c7c5a5"
     },
     {
       "path": "client/maps/eastasia/2048_3072.png",
-      "bytes": 11299,
-      "sha256": "74852abc8a476e34755400571552164666afb08186cdeb6c56096362d999d9bf"
+      "bytes": 59753,
+      "sha256": "7105bf51437254eb53ac95018e84f7a2054c8d225c74326a45e7d6028fa4b416"
     },
     {
       "path": "client/maps/eastasia/2048_4096.png",
-      "bytes": 110558,
-      "sha256": "3cd0f33d9daeebdc48cc0e3a3bf7c45823c51580f099df58bc6ab9516c031812"
+      "bytes": 158220,
+      "sha256": "1c41e3764c52257e65284f607e34c045d349562c040c64ec8ce059823a7b895a"
     },
     {
       "path": "client/maps/eastasia/2048_5120.png",
-      "bytes": 94825,
-      "sha256": "3db24244f3fefed6dd5096479610bc511e2a4e5b27a090c74836ec65c37a36b3"
+      "bytes": 143594,
+      "sha256": "6896a17db11ad7ee320446b6141d0a656b43732ea1ca6d162161b4ad4ae56bf3"
     },
     {
       "path": "client/maps/eastasia/2048_6144.png",
-      "bytes": 154258,
-      "sha256": "48cb8faa5109e360901a82f891845efee6115c84fad4a325c129462b6d02f6e4"
+      "bytes": 257293,
+      "sha256": "8c12bed632753c96ebf5a2a84da7b8c8cff74a6153fd686a46afbbeb5941f6b4"
     },
     {
       "path": "client/maps/eastasia/2048_7168.png",
-      "bytes": 2382,
-      "sha256": "bb8a914db7071132c9c0859b52ce5aeb46031587f3d25019fd4a4bb3be8849c1"
+      "bytes": 12863,
+      "sha256": "cf4a7d7af3607b8e8939e6a59797127b5de134a994cf824e592156016776d06b"
     },
     {
       "path": "client/maps/eastasia/3072_0.png",
-      "bytes": 62416,
-      "sha256": "de2350f5774547a062314426e11486bfe81a357e639ad0a4f022ab6bd494f74a"
+      "bytes": 62488,
+      "sha256": "2ea99bdbc79e8405b4fc88c8afe5d5c04dec8bdda9956d6e4e7c94e5226ca081"
     },
     {
       "path": "client/maps/eastasia/3072_1024.png",
-      "bytes": 33098,
-      "sha256": "896bdc384265719d00d5255858c58d5cbc08dca9d08055f0b94a00007d2e9a9a"
+      "bytes": 89444,
+      "sha256": "ca10a60eacc9a952e098c648c77ee5d127db57a677411e718e08ece084995211"
     },
     {
       "path": "client/maps/eastasia/3072_2048.png",
-      "bytes": 6502,
-      "sha256": "fb540e4fea464d373ca62387cb82f47d7b47839c4961ad818a9d5a6e68097175"
+      "bytes": 4161,
+      "sha256": "4c89b5f3d0d95dc6bf74ffd44bc1a337677827feafcc4e16af33fc918e11b731"
     },
     {
       "path": "client/maps/eastasia/3072_3072.png",
-      "bytes": 54116,
-      "sha256": "241e7b1c8c132dbb0dd71fe573ed7356ea802f4ae572ecda31493f87a8ceb76e"
+      "bytes": 74289,
+      "sha256": "9c2b23f6c652d5b18fdc24dce1768e29d61dbce4b6099d4a79159327b9dfa679"
     },
     {
       "path": "client/maps/eastasia/3072_4096.png",
-      "bytes": 144938,
-      "sha256": "4f8264abdf45bc8881234cf3e8e2c30a3a7551faf7e28c071b855f3663a2d122"
+      "bytes": 145617,
+      "sha256": "61a628961af34e2721a2e6e277f3319ea93bf836f3e8eb7750f136326cca3b68"
     },
     {
       "path": "client/maps/eastasia/3072_5120.png",
-      "bytes": 231648,
-      "sha256": "37da2eae73edb85dfb80d81ba7cfacf1af399b81c81be9aca743fb99f62708ca"
+      "bytes": 231691,
+      "sha256": "5630dd5560bebd7ec409d377c6f53bd6e5308589d63b6ca6d83d6d27dd5d4fa7"
     },
     {
       "path": "client/maps/eastasia/3072_6144.png",
-      "bytes": 164263,
-      "sha256": "8c3b63ad8dc4c12d358d11ae2bc86a64cc5b13beda0005a86f8a52064bb9b766"
+      "bytes": 163531,
+      "sha256": "993e99c3c7a9e89cf5ca1416f10f0485c9bb39428d3c0abcf21859dea543685e"
     },
     {
       "path": "client/maps/eastasia/3072_7168.png",
-      "bytes": 8924,
-      "sha256": "a9971c7000c0b150bf45fa54d96aa6b4924f684cb97911f66c82155f7eaf4e00"
+      "bytes": 8734,
+      "sha256": "3a798fa11d19f6a6e1bd13c21f8a05fc5bd2be5fa344a49c2c5715cddc84e497"
     },
     {
       "path": "client/maps/eastasia/4096_0.png",
-      "bytes": 87117,
-      "sha256": "aaae8c1fd470c5460b623bdcd83d38673048ce148b25b0c16c6355e19818696e"
+      "bytes": 116576,
+      "sha256": "371e5d55f573826cb38a917732f7f8355f1ee1a8f51e9f0486e8800a8c0f57a8"
     },
     {
       "path": "client/maps/eastasia/4096_1024.png",
-      "bytes": 65687,
-      "sha256": "af25fb54660bfd72b8bc3619608450dcecccff45d9066d635318ee64479954b2"
+      "bytes": 108176,
+      "sha256": "5ab53a7058e40e430e9adc3904ea90b7a45b0577a0da9967c3ed378b3c9559e9"
     },
     {
       "path": "client/maps/eastasia/4096_2048.png",
-      "bytes": 6502,
-      "sha256": "fb540e4fea464d373ca62387cb82f47d7b47839c4961ad818a9d5a6e68097175"
+      "bytes": 4161,
+      "sha256": "4c89b5f3d0d95dc6bf74ffd44bc1a337677827feafcc4e16af33fc918e11b731"
     },
     {
       "path": "client/maps/eastasia/4096_3072.png",
-      "bytes": 101110,
-      "sha256": "3c6d4b3029b0bc5dfc9d4d2e4034cf20b942356acea1d57e37686f8a17930b95"
+      "bytes": 102890,
+      "sha256": "4efb44eff2bdbd9e069e316f71820110ee6e9fdb484aa6809b99fdf3d62742dd"
     },
     {
       "path": "client/maps/eastasia/4096_4096.png",
-      "bytes": 135095,
-      "sha256": "65abef66872cdfa4f5f7c31c43da317c3b55426bff524a7e0a50108ef5f39c91"
+      "bytes": 133933,
+      "sha256": "30d8c82e07730f2cbb1c7c7f632f3947fae532df8197e6734c7ecd00008397fe"
     },
     {
       "path": "client/maps/eastasia/4096_5120.png",
-      "bytes": 38798,
-      "sha256": "e17e48fefe45898017c4fac1f9156d266e6b9cfebd2d1a777dcfab4b844c53a5"
+      "bytes": 36573,
+      "sha256": "4e3d652d501d30d0fb86b494778d30836fbb107d41aa2d7666c98bbe582ec40c"
     },
     {
       "path": "client/maps/eastasia/4096_6144.png",
-      "bytes": 70269,
-      "sha256": "e4e5690bb6fce81bc0dec3689425603e2fb03eb1adc56b380d3ad7acf4f2d29b"
+      "bytes": 184346,
+      "sha256": "05040cb68195482c69ac9b682fa077bf82381183fe1cadb3b967fa07501103af"
     },
     {
       "path": "client/maps/eastasia/4096_7168.png",
-      "bytes": 15634,
-      "sha256": "4a7e46013c0d71cc1ffb733293f82eb32c091032a832bee1c3adc3b64778bd03"
+      "bytes": 28315,
+      "sha256": "f72695f1050b2ac4b70389f14a84003249efc5be1e8a63f228d95d6110f440d7"
     },
     {
       "path": "client/maps/eastasia/5120_0.png",
-      "bytes": 19979,
-      "sha256": "9e6a22e1fdc2eb1b84556f3521c994689d26ace5d809af465ab246af7b9fc0ea"
+      "bytes": 21273,
+      "sha256": "9d9d952f4c6b14df5b82562cd49b2b4a3bb7d90cb23ea43da4bb3acd73ec1f50"
     },
     {
       "path": "client/maps/eastasia/5120_1024.png",
-      "bytes": 8623,
-      "sha256": "85675a74418fde6fa03cdd4b82771f06704777bb84418a1212b886a63a1b8ca2"
+      "bytes": 31807,
+      "sha256": "460684820ad3da352f2a17e54e5ae370992d2513caa7e08a2b34c4f68e668aa0"
     },
     {
       "path": "client/maps/eastasia/5120_2048.png",
-      "bytes": 18316,
-      "sha256": "e0b22a4ae4ce9ba29f33bcb8fc8460fc985902ebe03b6def489fbbd874beede7"
+      "bytes": 21446,
+      "sha256": "5b53405afce11ed31582fff5fb9beab4745a46b7e1e333b046995bde108da183"
     },
     {
       "path": "client/maps/eastasia/5120_3072.png",
-      "bytes": 166220,
-      "sha256": "45d08382849d7031a56ce2f2fe0daeb61ff1516baa5292e22fa21e8bf752a11e"
+      "bytes": 174513,
+      "sha256": "ae87afb38fb176c3911b979f6a4babbe72654c6058f5a1acd9146b501f7b025d"
     },
     {
       "path": "client/maps/eastasia/5120_4096.png",
-      "bytes": 208657,
-      "sha256": "ce471888f5b1e75aa2af6e3cc57e278c9f8e70c3c057ba23f87b7f9557f4844a"
+      "bytes": 284347,
+      "sha256": "eb644329895ee583184268fb608db546a319b02c1ac61e7e072b366453de461c"
     },
     {
       "path": "client/maps/eastasia/5120_5120.png",
-      "bytes": 133489,
-      "sha256": "85c973c059376b3e0507e23ffe0670ce8b206c7d1f4f0c522dc7e53a0c403662"
+      "bytes": 164253,
+      "sha256": "d402a53fe3582d094a0f657272955940c0c36e043e4fcf911bfb83516c8b9382"
     },
     {
       "path": "client/maps/eastasia/5120_6144.png",
-      "bytes": 28664,
-      "sha256": "af613b50118ac358f42c302575fdc94a46faede3b016d0447a5941a5becad1ea"
+      "bytes": 124813,
+      "sha256": "55ec129f8613ca42d4b616e27a72ee933e72665327d15c3a43f8532632d725cd"
     },
     {
       "path": "client/maps/eastasia/5120_7168.png",
-      "bytes": 1713,
-      "sha256": "757628fee6090144904e2606e329377a8669ff719972166e5ee0349848aaf4b9"
+      "bytes": 4131,
+      "sha256": "a406ba4e58643d0f47e4aecc778a06fec7bad3f6325417b6a36e5433d08f7cfb"
     },
     {
       "path": "client/maps/eastasia/6144_0.png",
-      "bytes": 33923,
-      "sha256": "7f416f7d72cb0bb701cfcae50941e249945b58d1c023c9209877d8f82034a325"
+      "bytes": 31404,
+      "sha256": "e9c7292618f2d62ead63ed157b3fc3ff72ad0a0a6fe85d08329158a6f33b55a5"
     },
     {
       "path": "client/maps/eastasia/6144_1024.png",
-      "bytes": 87403,
-      "sha256": "12c89ed427348803d5866196bfc6af0d7f721ee18ec9b769c32fedcda13d6491"
+      "bytes": 87104,
+      "sha256": "cbeaf84e616eb833dfa1351ae52945863390738ad7fa0a93d1e5e606f0787660"
     },
     {
       "path": "client/maps/eastasia/6144_2048.png",
-      "bytes": 135726,
-      "sha256": "b9edc63ff1f1b2f933c1f89aa31945923d92163a8c48cec59db3370d930e826b"
+      "bytes": 146561,
+      "sha256": "8da47f9e883c5f494f6e344463871f67c2cfd66ffb1c68bdbc090a6ef4395d9d"
     },
     {
       "path": "client/maps/eastasia/6144_3072.png",
-      "bytes": 64330,
-      "sha256": "4938f5bd2a22cf96a3d750c35a0a9532558455ef7e55356b189a6b8c0829b77d"
+      "bytes": 212432,
+      "sha256": "ea4a5c5c61fdadade4c9d13cf9f65ecf57cc3acd12f2f2874553d97b363f3e67"
     },
     {
       "path": "client/maps/eastasia/6144_4096.png",
-      "bytes": 94391,
-      "sha256": "0104b34438ad2e9d614cbd9cde210ab98b21842cea359608e7f539d70804ea7c"
+      "bytes": 243978,
+      "sha256": "a8e213c8576d09e0acfbbf2a860f0836c8a48f20f0ce596358c00bc3c9b86c97"
     },
     {
       "path": "client/maps/eastasia/6144_5120.png",
-      "bytes": 46773,
-      "sha256": "a1940f85da70b4ec217e976f2860de2d4bbe35fdd2289b030a3abb59d3edca73"
+      "bytes": 191798,
+      "sha256": "71460c7e9729c7c83341c8ee0b49fad13f410eba62f00cbc349633967740cc51"
     },
     {
       "path": "client/maps/eastasia/6144_6144.png",
-      "bytes": 11609,
-      "sha256": "f9cfa861071aba96c93d0b1a6e8c317dbdb04fd02f6bc942a16d4b662a3c0f87"
+      "bytes": 66795,
+      "sha256": "0585ab1bde9369e9e587b20b756180f22c31030e3d12b5fba903cc2a4ca7f1d8"
     },
     {
       "path": "client/maps/eastasia/6144_7168.png",
-      "bytes": 3225,
-      "sha256": "07805b951ca968758da7360fd1e4fbd38788f7f0d2845e8b778d16c9c9961b54"
+      "bytes": 25009,
+      "sha256": "5d33092c4505e92cd0b839a86006092fc1f0f0a8528e87571d3ef5e374d10c2a"
     },
     {
       "path": "client/maps/eastasia/7168_0.png",
-      "bytes": 27685,
-      "sha256": "f4f495fa10dda642f818ddf37dbac07d49b4ac594235f76b59308f810b8ffd12"
+      "bytes": 108107,
+      "sha256": "f0af684eb82c4ddbd5ca3cc0420aa00c27f3fe94791f2e1ee0db1d0963645840"
     },
     {
       "path": "client/maps/eastasia/7168_1024.png",
-      "bytes": 131501,
-      "sha256": "3d4d719d42a80108d597c9d31766112a23f8c7b4626cad7e4d1b49b9cad37424"
+      "bytes": 140390,
+      "sha256": "08e09bbd11ccb0ee23a0d85aa00485a8cf2071fa5fe767b95fce15e97b82449e"
     },
     {
       "path": "client/maps/eastasia/7168_2048.png",
-      "bytes": 87257,
-      "sha256": "dbd5708c363b81f01e6f415a9d033aa2dce5acdc68dfad828ce7b704e57bce1a"
+      "bytes": 154524,
+      "sha256": "cbc137db72237b58551350466dc647c0466afdb515755036ef2359de9bd6a2e9"
     },
     {
       "path": "client/maps/eastasia/7168_3072.png",
-      "bytes": 70445,
-      "sha256": "bc102b78037482c534463afdce252562c875ba099a1ea80501b0890915d5c4de"
+      "bytes": 286996,
+      "sha256": "207959b981fcf84e998c2cf0f32825216c0f5300699e6083a98cdd5eb31e9318"
     },
     {
       "path": "client/maps/eastasia/7168_4096.png",
-      "bytes": 18379,
-      "sha256": "5797d1c43084644e39c89fda3870754d5321307c376a944ea9d1ea6551152ea4"
+      "bytes": 136791,
+      "sha256": "79e216a93a5c545d186bb77af4434f910afabd4260891dd2a023fecbdaee0697"
     },
     {
       "path": "client/maps/eastasia/7168_5120.png",
-      "bytes": 9852,
-      "sha256": "d99d73c517c78d61fc26c77c6c2b235d8c7e3b35243b2c4e9ac81789b44d5b6b"
+      "bytes": 43332,
+      "sha256": "103a1841628620d0ad8b92a88b8324cd76761d0d3c566022ccf238df968e6f56"
     },
     {
       "path": "client/maps/eastasia/7168_6144.png",
-      "bytes": 6722,
-      "sha256": "445ed70bf0af6f740e8982b8b373cda37a4f78a8d618ce207f8263eb6223ff5d"
+      "bytes": 9107,
+      "sha256": "11ce33b0af1082cb260bd749ab5050c3a26b83167a50f978d092fd2142168ba1"
     },
     {
       "path": "client/maps/eastasia/7168_7168.png",
@@ -3964,33 +3974,33 @@
     },
     {
       "path": "client/maps/eastasia/8192_0.png",
-      "bytes": 34657,
-      "sha256": "7d8ac7bb7505930c9c03b290abc77721bdf67851a5721fa068134cbfbbc28096"
+      "bytes": 124428,
+      "sha256": "97e05ca75c1be77cb5149f34ac05bd3c8653a0a90ae399285cfa7bc9f3f592f1"
     },
     {
       "path": "client/maps/eastasia/8192_1024.png",
-      "bytes": 24197,
-      "sha256": "55420c6299e06b9ecd191a8c0abf3cfe9896afb2ecd99378d59e9911889ca106"
+      "bytes": 136086,
+      "sha256": "e220f2d811ac5d4ee791830a24aff9ff6f51146f38ad575ee95e6a1e84eea86f"
     },
     {
       "path": "client/maps/eastasia/8192_2048.png",
-      "bytes": 24115,
-      "sha256": "1a837238c58019e9df7d859640191fa524abaca27b79165bb737afd4d4298a76"
+      "bytes": 132210,
+      "sha256": "2edb3ea670104ec29c6c9888d2d347af8dac3db930189fd6ed381d6d30a36847"
     },
     {
       "path": "client/maps/eastasia/8192_3072.png",
-      "bytes": 53480,
-      "sha256": "6275a6d0ae9d9d97bd53fd9dd0f7de5378db5761b425992fd437ea5309deff4b"
+      "bytes": 221817,
+      "sha256": "9e2dc47735059a0384d3b2aab74d7cdfa6d1c8d20f543143b9dfd2883e152b56"
     },
     {
       "path": "client/maps/eastasia/8192_4096.png",
-      "bytes": 7095,
-      "sha256": "99fdae6776d51275f7ead1c8023c2b8a7ca00245ffc6d3f7b1cec4ab1df67246"
+      "bytes": 12569,
+      "sha256": "4267ba9238d25b021dee8011acb4d4fc072cbebd4cc11f4a0560eac730a94cca"
     },
     {
       "path": "client/maps/eastasia/8192_5120.png",
-      "bytes": 6731,
-      "sha256": "811612c01bc5d84442b1be9e440ba88b5127eed628a846951d758bd957a32426"
+      "bytes": 8132,
+      "sha256": "63f0758198d4226b3e55377ee3b2185875284e33808e4897cc5b60d8a42eb640"
     },
     {
       "path": "client/maps/eastasia/8192_6144.png",
@@ -4004,33 +4014,33 @@
     },
     {
       "path": "client/maps/eastasia/9216_0.png",
-      "bytes": 10268,
-      "sha256": "62e229cbe43af477a1436689b80b0b5e354c9e25be8c17754eacce05ec438429"
+      "bytes": 57930,
+      "sha256": "addf5766f50f07f35e6717432bb096bdc0f0f9f81bcfef2343e0add5a32de1aa"
     },
     {
       "path": "client/maps/eastasia/9216_1024.png",
-      "bytes": 11998,
-      "sha256": "d479c65a9da35b1f9b863aa9c882a8905dde09fba01169f6816031c9502ab082"
+      "bytes": 82345,
+      "sha256": "9dcf0fcd83f1f3a09f93ab2ef186fe5ea343f52262b0e30186731cb4650ad1f2"
     },
     {
       "path": "client/maps/eastasia/9216_2048.png",
-      "bytes": 6100,
-      "sha256": "7ceff137f442f3885522f3d17683b34919a695b629eae1d1c1d30021273c467a"
+      "bytes": 7443,
+      "sha256": "1fe1548bb17c5b623d5022c3dfafb8407669a563cc580ddf37be9f6204a7ba52"
     },
     {
       "path": "client/maps/eastasia/9216_3072.png",
-      "bytes": 6037,
-      "sha256": "47b5f1044f20c31cfc2c04593a27f67857804ee82f66dc2c8ed779abe829d995"
+      "bytes": 6283,
+      "sha256": "7668135102dc8466c782859ce82d0581b18b9ddbf4900c03dcb6321d3038de7e"
     },
     {
       "path": "client/maps/eastasia/9216_4096.png",
-      "bytes": 6873,
-      "sha256": "7d9d4da8daf5697f9f985022c9d35f146ae6a2a55203ebbeefd13aa00b85a9de"
+      "bytes": 12943,
+      "sha256": "a36efa6dece568d33228838168eb1a3bf1c1a843f9160ea4a827d2ec3ef9f580"
     },
     {
       "path": "client/maps/eastasia/9216_5120.png",
-      "bytes": 6062,
-      "sha256": "ff62d1a3927c9f04bff6f787400930a57c9515c5839cf9e048c1b30b8cebce6e"
+      "bytes": 6412,
+      "sha256": "9edc392759ff2f6d5664adba4066b15d508500c8c20d72bcf5bc480935baa18f"
     },
     {
       "path": "client/maps/eastasia/9216_6144.png",
@@ -4408,6 +4418,2311 @@
       "sha256": "6e588101050fadc54e9e3de53de13509f06ba3f80219edaeefb8416307a4042b"
     },
     {
+      "path": "client/maps/hre/0_0.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/hre/0_1024.png",
+      "bytes": 48899,
+      "sha256": "5bd66b0831afec9e6f003c4532791cdb6a004e6636919b365bd8071f03ca6e3e"
+    },
+    {
+      "path": "client/maps/hre/0_2048.png",
+      "bytes": 140232,
+      "sha256": "de0204ad088fd81cb1355cc6c4270c5c0faa68742c066ab26cfbd2fcfa357401"
+    },
+    {
+      "path": "client/maps/hre/0_3072.png",
+      "bytes": 193246,
+      "sha256": "eaccc146faf2edebb302445f63d9b9ac7d55ac19a0431e28a20c18959864f943"
+    },
+    {
+      "path": "client/maps/hre/0_4096.png",
+      "bytes": 167987,
+      "sha256": "9b1234d4f519d95ffe8d8d2e0de1928706a5ad63f75c0f9ca32acc10feecc425"
+    },
+    {
+      "path": "client/maps/hre/0_5120.png",
+      "bytes": 161179,
+      "sha256": "5fc307665714e43e5ba3f4996fd6f34a5e605a89300bd66cc75edf883dbd4313"
+    },
+    {
+      "path": "client/maps/hre/0_6144.png",
+      "bytes": 23366,
+      "sha256": "8caca95098abc45ecc9e71261b6f138b343cd62c15073f12d8c8ceeec3177b70"
+    },
+    {
+      "path": "client/maps/hre/1024_0.png",
+      "bytes": 10360,
+      "sha256": "ef12b786feea03206ae6f4415ea8753df9e54efe8d7fa76f1c492a9e190ad6dc"
+    },
+    {
+      "path": "client/maps/hre/1024_1024.png",
+      "bytes": 72587,
+      "sha256": "ccc0e2d1fb03d7493742b1b3d3fb71338385347bd4da447960c85857fcd93434"
+    },
+    {
+      "path": "client/maps/hre/1024_2048.png",
+      "bytes": 206801,
+      "sha256": "2532d2798b79175628c10193e332ed18b7dbb21437de88a4b803ac68acdce618"
+    },
+    {
+      "path": "client/maps/hre/1024_3072.png",
+      "bytes": 203741,
+      "sha256": "c33422bbb42ac10bb916fc195471893963c1cb1b019a94f3a06768b8c1cd3f95"
+    },
+    {
+      "path": "client/maps/hre/1024_4096.png",
+      "bytes": 200910,
+      "sha256": "4320054f02746e0d8a7a6aab2731981f966ec8524816752a6e01699efcbb6144"
+    },
+    {
+      "path": "client/maps/hre/1024_5120.png",
+      "bytes": 139270,
+      "sha256": "62af9eacfcfe207034aa8d90b2691575b5d36905ad7e1ebf591de163411b2d38"
+    },
+    {
+      "path": "client/maps/hre/1024_6144.png",
+      "bytes": 26529,
+      "sha256": "078901d65a6b0da9b27e7e618ba5c2c9c65d6d7a43634a36ae360bd913fac9ba"
+    },
+    {
+      "path": "client/maps/hre/2048_0.png",
+      "bytes": 222546,
+      "sha256": "a5ed23b3e8bc596fc107ff3503f2807cf09d93472461f286db45b89193ede18c"
+    },
+    {
+      "path": "client/maps/hre/2048_1024.png",
+      "bytes": 299917,
+      "sha256": "c701919fff7436a13445d10ced00c69693b24356a163c09679576439110ef84d"
+    },
+    {
+      "path": "client/maps/hre/2048_2048.png",
+      "bytes": 206715,
+      "sha256": "8d27f2b312a2748fa640ac1d7c802cf924f0afd9b0d424c3c964b5438cd01bbc"
+    },
+    {
+      "path": "client/maps/hre/2048_3072.png",
+      "bytes": 178164,
+      "sha256": "9c6306dce0101004384abbe8849a0057f60584be1b0bceef106f66b941c5e205"
+    },
+    {
+      "path": "client/maps/hre/2048_4096.png",
+      "bytes": 165782,
+      "sha256": "41793f07b13ff54b9a30abcf9fda2ecc243655ea24c1c9e3559dc7cf95544d3c"
+    },
+    {
+      "path": "client/maps/hre/2048_5120.png",
+      "bytes": 188704,
+      "sha256": "a0ef51d2108f8866c3e26bf4a0f06e72b380de0dce85475be128810a9861f095"
+    },
+    {
+      "path": "client/maps/hre/2048_6144.png",
+      "bytes": 68224,
+      "sha256": "2445540eca78da847a1d7295fc2a7454ff9a8b9e333e215e2a65280873dd9874"
+    },
+    {
+      "path": "client/maps/hre/3072_0.png",
+      "bytes": 208243,
+      "sha256": "bc77aa976818ba31db33840559994cbbf531a26abcace1e78d4156a543d24aa9"
+    },
+    {
+      "path": "client/maps/hre/3072_1024.png",
+      "bytes": 175371,
+      "sha256": "807135730548652d753836075631cf6b2dd9cb8ab7ed19fd311dcaebb24ea2d6"
+    },
+    {
+      "path": "client/maps/hre/3072_2048.png",
+      "bytes": 213587,
+      "sha256": "d9339cf3246936533550e115e469ce5f336610c7b2657da416fefc6a707eca31"
+    },
+    {
+      "path": "client/maps/hre/3072_3072.png",
+      "bytes": 171573,
+      "sha256": "ee5ed7b0355828fed3202cb9bf75e7edc8132d3bab19c3b0de9ae21a1936e419"
+    },
+    {
+      "path": "client/maps/hre/3072_4096.png",
+      "bytes": 164065,
+      "sha256": "48d3f8ee216ea878f0e040042b7b672757879da5bfea35cbd7d19468211e3b9a"
+    },
+    {
+      "path": "client/maps/hre/3072_5120.png",
+      "bytes": 217320,
+      "sha256": "9abaa50b96f9f884759439eafce3b4f53e4cae6e1394d811106d3192d1469bf7"
+    },
+    {
+      "path": "client/maps/hre/3072_6144.png",
+      "bytes": 41206,
+      "sha256": "53599090914e4d561818f77db50d297ad7bc2fd586ab82bfa3f1196ce9e07509"
+    },
+    {
+      "path": "client/maps/hre/4096_0.png",
+      "bytes": 69816,
+      "sha256": "21a7d36c18875ad0a6ce87833f8857761782d6e60f617f7c188c8775f09750c8"
+    },
+    {
+      "path": "client/maps/hre/4096_1024.png",
+      "bytes": 142947,
+      "sha256": "384c59f1d3f675496be8b7feecef6c403a191b9931844e4c89524ceed0baccee"
+    },
+    {
+      "path": "client/maps/hre/4096_2048.png",
+      "bytes": 159790,
+      "sha256": "0f3e4b05df92ec844fc70b7281b9257e01f75c05561c1219d3c90790b085a09e"
+    },
+    {
+      "path": "client/maps/hre/4096_3072.png",
+      "bytes": 164465,
+      "sha256": "58898574bbe38082a5e0f3f24fd3592055f1996ddfd75b07fe56d5f80b4ebdb6"
+    },
+    {
+      "path": "client/maps/hre/4096_4096.png",
+      "bytes": 226664,
+      "sha256": "222bda997daba4aa748bbb4fd343c2991154f5ae0c998e5954cd07399a784d06"
+    },
+    {
+      "path": "client/maps/hre/4096_5120.png",
+      "bytes": 184286,
+      "sha256": "e350ad5204e3823da631261b67751e68cf4c16137e5b8260efba3e577a232821"
+    },
+    {
+      "path": "client/maps/hre/4096_6144.png",
+      "bytes": 72315,
+      "sha256": "f133cc6cb9931ae36e0725e5e489247d912c784f28e192690cc0e4a1f8e239af"
+    },
+    {
+      "path": "client/maps/hre/5120_0.png",
+      "bytes": 143634,
+      "sha256": "917305d4bd113ea984b96c5c1ef1011667bdb7d0463a0b92012b0575ea5fab1b"
+    },
+    {
+      "path": "client/maps/hre/5120_1024.png",
+      "bytes": 195451,
+      "sha256": "f69b417a0ebf0166db4d7e8e2ac1677db5b26776ccb5d2e6cb4dd19ffbb7de51"
+    },
+    {
+      "path": "client/maps/hre/5120_2048.png",
+      "bytes": 173759,
+      "sha256": "c6192422bf3dcd511f915550136f294f84cbf7b52c50de6244cecfb73631ce61"
+    },
+    {
+      "path": "client/maps/hre/5120_3072.png",
+      "bytes": 163193,
+      "sha256": "2e3c8d1dc491478ea30c8e93431177a8d1f7851c07aef17b5053c8604ea6b0a9"
+    },
+    {
+      "path": "client/maps/hre/5120_4096.png",
+      "bytes": 176835,
+      "sha256": "a3f38eb555a55351b482f18916b73cccca14765d43c44dc93e2b990361f97aa5"
+    },
+    {
+      "path": "client/maps/hre/5120_5120.png",
+      "bytes": 191892,
+      "sha256": "f7067157d667239d7aec764f12389f314041ea0e86f91b716f3643adee9ea819"
+    },
+    {
+      "path": "client/maps/hre/5120_6144.png",
+      "bytes": 48423,
+      "sha256": "741425e4be84577f9cbe88dd8b16b9b68bedbbcc6dae97263e2ab7fa9f86ab79"
+    },
+    {
+      "path": "client/maps/hre/selection.png",
+      "bytes": 129948,
+      "sha256": "528ef3096f7caaaf6ab6acf5de8f296fea3472f49773c8a57526821a923fb3ec"
+    },
+    {
+      "path": "client/maps/hre/water-detail/0_0.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/0_1024.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/0_10240.png",
+      "bytes": 63981,
+      "sha256": "530a083283a9b58dc8b6406997f76ae994aa96baab727ba50b32a31792294ac9"
+    },
+    {
+      "path": "client/maps/hre/water-detail/0_11264.png",
+      "bytes": 99412,
+      "sha256": "e2c4f1d40f6e3a5da7f08fd600de6fcfcd4457d9e42ff16bd54d7a49c7cf3582"
+    },
+    {
+      "path": "client/maps/hre/water-detail/0_12288.png",
+      "bytes": 71460,
+      "sha256": "9f322ad544b9907421cd2bfb2063037706b2ffe4e6fab734bc20ff681cd9567c"
+    },
+    {
+      "path": "client/maps/hre/water-detail/0_13312.png",
+      "bytes": 51200,
+      "sha256": "4576c4b8a4e5b4cb50ceb20a53a0d636847121289d054ce23054676e0a6f96e7"
+    },
+    {
+      "path": "client/maps/hre/water-detail/0_2048.png",
+      "bytes": 16580,
+      "sha256": "b858894d3a17652ad2db7bf7c345f267551887606b8aa4ead61f409feceae923"
+    },
+    {
+      "path": "client/maps/hre/water-detail/0_3072.png",
+      "bytes": 56953,
+      "sha256": "d09f9020a1c00f0a52336277a918495704bbacae2035947820ed4c921cc625cd"
+    },
+    {
+      "path": "client/maps/hre/water-detail/0_4096.png",
+      "bytes": 104442,
+      "sha256": "108702fcb160fb8f2b9904139ad7bc0e66fecffe539c250f1be1620bee8c9072"
+    },
+    {
+      "path": "client/maps/hre/water-detail/0_5120.png",
+      "bytes": 86042,
+      "sha256": "691ee712c2c13fadb5a7546ee666b5f75fb9332613c36b76331dae8e6dd2d7c3"
+    },
+    {
+      "path": "client/maps/hre/water-detail/0_6144.png",
+      "bytes": 63340,
+      "sha256": "51608139adc76edc1c17145ed0e719f258876d44a4bcbb989902905f0fcc867b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/0_7168.png",
+      "bytes": 195138,
+      "sha256": "c7d9c7ca8796ac4ebab94aed8009a85f51931de6b25fba9c4178f625e94b3067"
+    },
+    {
+      "path": "client/maps/hre/water-detail/0_8192.png",
+      "bytes": 126349,
+      "sha256": "8992917aad9bc547ffdb24c52ca4e6a5b5ebd906a81af5d29a001c9446c206e8"
+    },
+    {
+      "path": "client/maps/hre/water-detail/0_9216.png",
+      "bytes": 108303,
+      "sha256": "597a475a5b3b043b382a636618627b0d2f2b0e3945a501a2c8d1d6399e52dcc6"
+    },
+    {
+      "path": "client/maps/hre/water-detail/10240_0.png",
+      "bytes": 77656,
+      "sha256": "e27fc2beb721d4a35ca47f96744c531bf3fe37b66de302d2a4d071dbaa24e639"
+    },
+    {
+      "path": "client/maps/hre/water-detail/10240_1024.png",
+      "bytes": 69538,
+      "sha256": "fefd748b859b8c969e24fe72f175483f330802e084afe0b43d1586330248ce80"
+    },
+    {
+      "path": "client/maps/hre/water-detail/10240_10240.png",
+      "bytes": 123010,
+      "sha256": "dde99165a2afa2d09d5860656d7c3f618dd6f3a09ba3839383730503c77e1b4c"
+    },
+    {
+      "path": "client/maps/hre/water-detail/10240_11264.png",
+      "bytes": 179649,
+      "sha256": "9110f686bb354737ad7912fa11b550b76decfdd02f3407b95d1e723369ccb3ee"
+    },
+    {
+      "path": "client/maps/hre/water-detail/10240_12288.png",
+      "bytes": 78342,
+      "sha256": "2fe17f745c7db0ffd4418fca36922f892c91eafaa2d3fd41a9c354f259051e94"
+    },
+    {
+      "path": "client/maps/hre/water-detail/10240_13312.png",
+      "bytes": 68318,
+      "sha256": "07d74633a128fe644e1449ee10b0dda18d00ea38683e3a422a6b6fe5cdde1760"
+    },
+    {
+      "path": "client/maps/hre/water-detail/10240_2048.png",
+      "bytes": 160926,
+      "sha256": "bccdae689dec32ff7c102d23cde0a79c9075d54d1a01252541996e05398080e4"
+    },
+    {
+      "path": "client/maps/hre/water-detail/10240_3072.png",
+      "bytes": 84289,
+      "sha256": "f4cfc64bd32f2337d77b693bcc5c4d6e52eb2fc8dbb482ade6232dfaedde45bd"
+    },
+    {
+      "path": "client/maps/hre/water-detail/10240_4096.png",
+      "bytes": 113200,
+      "sha256": "211973b5ab9c8c0f33b7ce36a7acd4ce641828c392a76a3eafdfb4de5ff255ec"
+    },
+    {
+      "path": "client/maps/hre/water-detail/10240_5120.png",
+      "bytes": 70954,
+      "sha256": "1293a21ef38742521aef4ce0bcc66ebd51b10f725ae9f95bf067ca5391cc9f2a"
+    },
+    {
+      "path": "client/maps/hre/water-detail/10240_6144.png",
+      "bytes": 86871,
+      "sha256": "7a73581c610bc2e82b6a80e530771364177c29a8492a7d4dd24b3958d2d71da3"
+    },
+    {
+      "path": "client/maps/hre/water-detail/10240_7168.png",
+      "bytes": 46317,
+      "sha256": "6de24a1631fe559b0ad77d67896d70844a0e30455bb400c395afef6e81b1d4ca"
+    },
+    {
+      "path": "client/maps/hre/water-detail/10240_8192.png",
+      "bytes": 130037,
+      "sha256": "2f917aabd024af90e7fcd4bcc31259fe8d315e740cbdd72725ad1e3da38781f1"
+    },
+    {
+      "path": "client/maps/hre/water-detail/10240_9216.png",
+      "bytes": 125724,
+      "sha256": "6d8d72b4df4aa8014a03c9a4156b1869ec520a06cd5358ac79d08b928b548ed3"
+    },
+    {
+      "path": "client/maps/hre/water-detail/1024_0.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/1024_1024.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/1024_10240.png",
+      "bytes": 156165,
+      "sha256": "efc0da766c41d5805a96bd079412e5c6f53bf1514629bfb76e748a136785604b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/1024_11264.png",
+      "bytes": 82334,
+      "sha256": "9d548721a3405a6f86da52bd98c167f4794d6a206ee45c295172a81bcdd2878c"
+    },
+    {
+      "path": "client/maps/hre/water-detail/1024_12288.png",
+      "bytes": 114602,
+      "sha256": "194ad5defb7c902a10ec56a23aefa5d5c39e141f1416eb43dca7784d1e23f2cb"
+    },
+    {
+      "path": "client/maps/hre/water-detail/1024_13312.png",
+      "bytes": 4641,
+      "sha256": "dc906dc0716a4e3af38df6dd95871133d68e2526c36943a8180b3013286e4693"
+    },
+    {
+      "path": "client/maps/hre/water-detail/1024_2048.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/1024_3072.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/1024_4096.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/1024_5120.png",
+      "bytes": 100020,
+      "sha256": "8db9717c4f6aa7e3eb77a2bba6a56802f46928bd53c9805f4aa41af38f8eebd1"
+    },
+    {
+      "path": "client/maps/hre/water-detail/1024_6144.png",
+      "bytes": 59799,
+      "sha256": "8224d72a9e08f3f2b168f1dd9b5505119a025a05856eb3b84a142b73fce97381"
+    },
+    {
+      "path": "client/maps/hre/water-detail/1024_7168.png",
+      "bytes": 123757,
+      "sha256": "cc703a083638167dd15f6c47026e55ac2638c051283cc7da388cc741e820e9fb"
+    },
+    {
+      "path": "client/maps/hre/water-detail/1024_8192.png",
+      "bytes": 141225,
+      "sha256": "8bfd0f2555887af3d72bf8b340f66ae7ecfd095ee9e0fad96d6c1579e0d29cf3"
+    },
+    {
+      "path": "client/maps/hre/water-detail/1024_9216.png",
+      "bytes": 115171,
+      "sha256": "855f3a29a97f57b88a85c6243bba5162ba1f7a17513d20f217da25124a8ff894"
+    },
+    {
+      "path": "client/maps/hre/water-detail/11264_0.png",
+      "bytes": 102510,
+      "sha256": "617ea8f89bba838ebae1fbf297c3512fc2e292f2c23f5422c2a882084e67d949"
+    },
+    {
+      "path": "client/maps/hre/water-detail/11264_1024.png",
+      "bytes": 29990,
+      "sha256": "8a77e6a3454d66309a88f641b4f2047c175c64073e29592b7f7d6bd8f6e00b1b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/11264_10240.png",
+      "bytes": 237356,
+      "sha256": "2f657aa2206374944b8bc3de262e357bc2d504aac23b6da346190ef1219cb22c"
+    },
+    {
+      "path": "client/maps/hre/water-detail/11264_11264.png",
+      "bytes": 162668,
+      "sha256": "29924dca3c5a54e01989c7fa837db8bc075b135e687af236cb36de4418050b2a"
+    },
+    {
+      "path": "client/maps/hre/water-detail/11264_12288.png",
+      "bytes": 123981,
+      "sha256": "4d7c5bc966edfe2967724bcfa4e2f6e0f8891a9c1df4e0e31d2104ea23cfe7af"
+    },
+    {
+      "path": "client/maps/hre/water-detail/11264_13312.png",
+      "bytes": 78503,
+      "sha256": "49401ed936e25d001b114ac2212cc9480b0597361f7fe15d8442eb47fdd89e3d"
+    },
+    {
+      "path": "client/maps/hre/water-detail/11264_2048.png",
+      "bytes": 137156,
+      "sha256": "d859130f428bf5f2e9925d43fa9dc6de1e4b5292bde481c9fbe4fef4b69a8e86"
+    },
+    {
+      "path": "client/maps/hre/water-detail/11264_3072.png",
+      "bytes": 155943,
+      "sha256": "9eba0bfa2277094978ceda3157787f60d4460e38d5cf8153a0b23782156bffdd"
+    },
+    {
+      "path": "client/maps/hre/water-detail/11264_4096.png",
+      "bytes": 158922,
+      "sha256": "9285c25fba7b86c489a1d9a53ed9a11e66ae741cf08e22392f7f80ac0235c63e"
+    },
+    {
+      "path": "client/maps/hre/water-detail/11264_5120.png",
+      "bytes": 134360,
+      "sha256": "19080ed84b373950a9658bfa7f807cdc039befbf5ec39e214b2dae4e277df3c4"
+    },
+    {
+      "path": "client/maps/hre/water-detail/11264_6144.png",
+      "bytes": 170288,
+      "sha256": "403da4455abdec209422334eaa32fc725184b2910b650e34b10f3d6125da4a8b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/11264_7168.png",
+      "bytes": 77491,
+      "sha256": "d6415dba8075b9e54fb2aefc0012d111e6bb22d1666433ed94d11f5c642eb503"
+    },
+    {
+      "path": "client/maps/hre/water-detail/11264_8192.png",
+      "bytes": 145742,
+      "sha256": "dbe932fa73805476ccda12e77ee4befe283d907dce7f10b8a405c5263b7bddfd"
+    },
+    {
+      "path": "client/maps/hre/water-detail/11264_9216.png",
+      "bytes": 205502,
+      "sha256": "a6a030002a54ce50e43bc57791a1350894711893b7ae42d643cde715c469324a"
+    },
+    {
+      "path": "client/maps/hre/water-detail/12288_0.png",
+      "bytes": 89745,
+      "sha256": "1c3e11806ed81834b1a43bf7e3cb9f9c8aee47b460e571aed991ea1325b7c2da"
+    },
+    {
+      "path": "client/maps/hre/water-detail/12288_1024.png",
+      "bytes": 52983,
+      "sha256": "0383ce7338097eb7017af524df0afddf2210fc6412315c53b79d7954ce17f4d2"
+    },
+    {
+      "path": "client/maps/hre/water-detail/12288_10240.png",
+      "bytes": 52325,
+      "sha256": "bbb32d76d606de9d29111d5abcbf1f912921382e70adc38db1fddf147032b3d1"
+    },
+    {
+      "path": "client/maps/hre/water-detail/12288_11264.png",
+      "bytes": 42910,
+      "sha256": "ede91de00bedaa8c2db1ca027ac87a3a4bf500e5100467d3d3b97efb9989086f"
+    },
+    {
+      "path": "client/maps/hre/water-detail/12288_12288.png",
+      "bytes": 64520,
+      "sha256": "7c42df939bf2e7ef0d45ec75d1382649ee9bd2c3402641d4b5c02d9223bb5eb2"
+    },
+    {
+      "path": "client/maps/hre/water-detail/12288_13312.png",
+      "bytes": 19229,
+      "sha256": "f7e55390fcd1144cb43061149743c3736de88b886295fc7884f5df0d9e71029e"
+    },
+    {
+      "path": "client/maps/hre/water-detail/12288_2048.png",
+      "bytes": 131533,
+      "sha256": "3cad6e703cb724e9a1ba7b2dd626b1a5741ce334c052001a7c3b22dc82b99393"
+    },
+    {
+      "path": "client/maps/hre/water-detail/12288_3072.png",
+      "bytes": 48322,
+      "sha256": "6ca95ca464b1f1c9e98daa60743fce444500e98e70f0dd44cd4486aba511cf04"
+    },
+    {
+      "path": "client/maps/hre/water-detail/12288_4096.png",
+      "bytes": 83698,
+      "sha256": "0130f72105d6bb527dbaf5b61650cdf74c34661e1e50664ec1c52dafe1fdd0ef"
+    },
+    {
+      "path": "client/maps/hre/water-detail/12288_5120.png",
+      "bytes": 53018,
+      "sha256": "a358ba4239bc88030edd17a55b8f34903e44a48e84eda0a0a47cba4fb18fbeb7"
+    },
+    {
+      "path": "client/maps/hre/water-detail/12288_6144.png",
+      "bytes": 63284,
+      "sha256": "df1375cc149fe7e5eb210acdd830aa1d9e45f72cf1c1a3a8bba0fa4ea4143e1c"
+    },
+    {
+      "path": "client/maps/hre/water-detail/12288_7168.png",
+      "bytes": 30433,
+      "sha256": "f2db24b4663389a82d559ec8708be281c525e125961d25c9b2244b79f3b4de86"
+    },
+    {
+      "path": "client/maps/hre/water-detail/12288_8192.png",
+      "bytes": 89540,
+      "sha256": "b5b25b273b37c8521f487dccd51a804fc577694d1fffc137c77f5694b88feb25"
+    },
+    {
+      "path": "client/maps/hre/water-detail/12288_9216.png",
+      "bytes": 43454,
+      "sha256": "c1253249c75e840fe384b15b35d8fe6a48b8c59743f21727b93442f166a7a217"
+    },
+    {
+      "path": "client/maps/hre/water-detail/2048_0.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/2048_1024.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/2048_10240.png",
+      "bytes": 155870,
+      "sha256": "3fb5e6a6fd2420de6d66dc3b2cef596650807c9032cf9552ef58d2c0c480dcd2"
+    },
+    {
+      "path": "client/maps/hre/water-detail/2048_11264.png",
+      "bytes": 83263,
+      "sha256": "031003a992129a09b015a4296905ad9ef85e3c22db4fe2a26783bbb4c1e94edf"
+    },
+    {
+      "path": "client/maps/hre/water-detail/2048_12288.png",
+      "bytes": 113095,
+      "sha256": "5cb4a8dcac44164df8bd7a9c1d0f0e5ef4ba3ff4f48b82d098c4361999ee4aa7"
+    },
+    {
+      "path": "client/maps/hre/water-detail/2048_13312.png",
+      "bytes": 5077,
+      "sha256": "6b21943b96e341b64ce5e4dad4868639b57d91705db7c771a03dc2e01bce9da4"
+    },
+    {
+      "path": "client/maps/hre/water-detail/2048_2048.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/2048_3072.png",
+      "bytes": 17848,
+      "sha256": "b5bc01bf3336cd8e89195f801839403b8691e58c6dacc93ffba1d648f915813d"
+    },
+    {
+      "path": "client/maps/hre/water-detail/2048_4096.png",
+      "bytes": 146677,
+      "sha256": "4faad58e08b07357644212acbf5404b4cf0b402e71eda33a9e2e3308b9d27bc6"
+    },
+    {
+      "path": "client/maps/hre/water-detail/2048_5120.png",
+      "bytes": 152390,
+      "sha256": "412ac23c9bc58b4eb1b1b2666dff8208c8d355edfeb073774bf36eaabdee029c"
+    },
+    {
+      "path": "client/maps/hre/water-detail/2048_6144.png",
+      "bytes": 116759,
+      "sha256": "dc015ec07b95d503b81a77ccf9a7e81617bd6c16062237acdf679bd8843ed44c"
+    },
+    {
+      "path": "client/maps/hre/water-detail/2048_7168.png",
+      "bytes": 139073,
+      "sha256": "d8be5b1ce83ad6265b412fbb5372044177d17681c9e2baec6b8f0f8a8fb22170"
+    },
+    {
+      "path": "client/maps/hre/water-detail/2048_8192.png",
+      "bytes": 130859,
+      "sha256": "a12d549aa67259e2e1a25cfa5b5605274439515c4de1274f7f705f9eadcd0e31"
+    },
+    {
+      "path": "client/maps/hre/water-detail/2048_9216.png",
+      "bytes": 149506,
+      "sha256": "fe9c510ffeae7ab89cf737fa0aee51e8e023444dca72a7297f93a1723b0b1e0c"
+    },
+    {
+      "path": "client/maps/hre/water-detail/3072_0.png",
+      "bytes": 9183,
+      "sha256": "9c7f60146495219ee3b6309f1d6265451ee68b1fea9bb3f618ac3f5686f307fd"
+    },
+    {
+      "path": "client/maps/hre/water-detail/3072_1024.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/3072_10240.png",
+      "bytes": 71851,
+      "sha256": "5bd0a2f0d47ad7d7ab009eb78d8b35ad5d481ba18fa6fe9dd0556316549c0b03"
+    },
+    {
+      "path": "client/maps/hre/water-detail/3072_11264.png",
+      "bytes": 80526,
+      "sha256": "bd6696104c229f2174c0b0dd25d4a83dc6db32a3ada31b430b696fa5d3fc45dc"
+    },
+    {
+      "path": "client/maps/hre/water-detail/3072_12288.png",
+      "bytes": 55866,
+      "sha256": "9ddfd126e7a92b461aa0206b66668802d1f7d76fadc2c9d52031faedb40c3056"
+    },
+    {
+      "path": "client/maps/hre/water-detail/3072_13312.png",
+      "bytes": 4641,
+      "sha256": "dc906dc0716a4e3af38df6dd95871133d68e2526c36943a8180b3013286e4693"
+    },
+    {
+      "path": "client/maps/hre/water-detail/3072_2048.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/3072_3072.png",
+      "bytes": 61122,
+      "sha256": "110b263be9952decbb156cf846845aedd6e9bbca6835eac59f5fd9850f50230c"
+    },
+    {
+      "path": "client/maps/hre/water-detail/3072_4096.png",
+      "bytes": 139032,
+      "sha256": "c2fd1795470fe5a116b480851be7bbc929519cdce79621463e36638aa562d188"
+    },
+    {
+      "path": "client/maps/hre/water-detail/3072_5120.png",
+      "bytes": 172394,
+      "sha256": "0ec37155671e93763fc07713e8faa3b4db2ec74dba050035f25b52378e6b34cb"
+    },
+    {
+      "path": "client/maps/hre/water-detail/3072_6144.png",
+      "bytes": 119486,
+      "sha256": "61fe02b70d4d7134402963ad03ed81336e4e91e60b8e8c8677811c3c473b77f0"
+    },
+    {
+      "path": "client/maps/hre/water-detail/3072_7168.png",
+      "bytes": 118923,
+      "sha256": "609316bdc3f051973a694cc403e7d60aa9468b1b659429f18d28ebf8b3ca08e8"
+    },
+    {
+      "path": "client/maps/hre/water-detail/3072_8192.png",
+      "bytes": 104889,
+      "sha256": "9d742170878ec68493da9bc3c4affb03377c84f5888b13a79e25d45bacae7e31"
+    },
+    {
+      "path": "client/maps/hre/water-detail/3072_9216.png",
+      "bytes": 128940,
+      "sha256": "24dc16609e1d1a9c9401843294c09d04491ddd3813abfe84b0e540a26e58e72e"
+    },
+    {
+      "path": "client/maps/hre/water-detail/4096_0.png",
+      "bytes": 42457,
+      "sha256": "7a1513960ad542eb930f37a29f15cf0b187c117e570a0f5c6d314dc2674a55d9"
+    },
+    {
+      "path": "client/maps/hre/water-detail/4096_1024.png",
+      "bytes": 139693,
+      "sha256": "25dc6f492f3abe5a55d1619cbefbb1eab81e48841b8ae660c030146eb71fbcf0"
+    },
+    {
+      "path": "client/maps/hre/water-detail/4096_10240.png",
+      "bytes": 129046,
+      "sha256": "01d3d3a79456db1c2745bc3db8fd981ada496562e5208b0c10dee288935c0164"
+    },
+    {
+      "path": "client/maps/hre/water-detail/4096_11264.png",
+      "bytes": 157630,
+      "sha256": "6bd9143be7433f01420ff2e2ded8af9cf7e741c5c5284c76d71499520685c2c3"
+    },
+    {
+      "path": "client/maps/hre/water-detail/4096_12288.png",
+      "bytes": 26377,
+      "sha256": "447bf86e5f2189d494d8822756ed54f2a1806f4eb27b55f10de8d58d761e28b2"
+    },
+    {
+      "path": "client/maps/hre/water-detail/4096_13312.png",
+      "bytes": 63106,
+      "sha256": "fd869fd3a8b00cf78bf0f5ae91b89020c7fee6fd932d04a37c971b352c942cef"
+    },
+    {
+      "path": "client/maps/hre/water-detail/4096_2048.png",
+      "bytes": 97362,
+      "sha256": "19971acc340c33240d626da847f3fdefdb11dea3cba0b53c2617699a13e60852"
+    },
+    {
+      "path": "client/maps/hre/water-detail/4096_3072.png",
+      "bytes": 136849,
+      "sha256": "c1116d3a74bd7fcf40200346e8da5102a9f44b1ac82a4385183ceb34f63960bc"
+    },
+    {
+      "path": "client/maps/hre/water-detail/4096_4096.png",
+      "bytes": 127726,
+      "sha256": "7bb6f39df4700084f5ddbb4bbb3051f17b7ae4e91da50b0b7b7d009fa298abf6"
+    },
+    {
+      "path": "client/maps/hre/water-detail/4096_5120.png",
+      "bytes": 99318,
+      "sha256": "a2db8a1bfa8c59da6a0d40e1243066d4bd843674edde299ebe392a019efbb9af"
+    },
+    {
+      "path": "client/maps/hre/water-detail/4096_6144.png",
+      "bytes": 118336,
+      "sha256": "a6f110b52fc46be744b776e6a06daa3cd031852f4172ace214a0b920c6acb04a"
+    },
+    {
+      "path": "client/maps/hre/water-detail/4096_7168.png",
+      "bytes": 163743,
+      "sha256": "6058c6b6d26d393c064db97870bfd35e474c2b8b1a445e0c9dd423de76f1abf4"
+    },
+    {
+      "path": "client/maps/hre/water-detail/4096_8192.png",
+      "bytes": 125781,
+      "sha256": "4dda96ec3c72956b56f31b9c0ce2eb7b0beeb0d68f30bc8840f51bf92bef95ad"
+    },
+    {
+      "path": "client/maps/hre/water-detail/4096_9216.png",
+      "bytes": 144169,
+      "sha256": "3699d5aab6c2d93743053d9905551219e7460e99dc4d7dc57bfe5d9b10accca2"
+    },
+    {
+      "path": "client/maps/hre/water-detail/5120_0.png",
+      "bytes": 83199,
+      "sha256": "d18d7201367ade9cef5a65baf31f24b9edd50f3389eaeef2ecffe481c05545d9"
+    },
+    {
+      "path": "client/maps/hre/water-detail/5120_1024.png",
+      "bytes": 117210,
+      "sha256": "8bd46ec0708a72b3f1222d2facb82a868c20c83cbe6937dc584da6ab362908ec"
+    },
+    {
+      "path": "client/maps/hre/water-detail/5120_10240.png",
+      "bytes": 104870,
+      "sha256": "3bc1dea63678be36814f0b50c5b2313b77eca66f581c999263b3589b6133a49f"
+    },
+    {
+      "path": "client/maps/hre/water-detail/5120_11264.png",
+      "bytes": 137816,
+      "sha256": "314c404453aaadd2cc97fbf1b5c0d6d46215a847a4093a4a73db6f2b476cc979"
+    },
+    {
+      "path": "client/maps/hre/water-detail/5120_12288.png",
+      "bytes": 79022,
+      "sha256": "7ff776d60c060dd4410e836ff2f364935a629ea006948320a480741401570b78"
+    },
+    {
+      "path": "client/maps/hre/water-detail/5120_13312.png",
+      "bytes": 91810,
+      "sha256": "959e02ca45f72a4803e19a5d1fba9a487251d483a24d915ba67383e551dbd7d2"
+    },
+    {
+      "path": "client/maps/hre/water-detail/5120_2048.png",
+      "bytes": 261282,
+      "sha256": "62e7a6f30c801b33e55add891c8b990d7a18e334760fe1ca3d0563e7f43571be"
+    },
+    {
+      "path": "client/maps/hre/water-detail/5120_3072.png",
+      "bytes": 112175,
+      "sha256": "c556c3acfd44bed35dd9bff3143d207bccdd3d659ec4e8248c5d20f357aeace3"
+    },
+    {
+      "path": "client/maps/hre/water-detail/5120_4096.png",
+      "bytes": 104079,
+      "sha256": "7d5c596056e744b59acbe15b5e13fbff87aa575635d8b28a587fcec2bc39dd31"
+    },
+    {
+      "path": "client/maps/hre/water-detail/5120_5120.png",
+      "bytes": 71122,
+      "sha256": "07f393b31bff7f8fe2567b1b3373215b69f54a3a7703df7db77da2519093500b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/5120_6144.png",
+      "bytes": 112728,
+      "sha256": "f1f88304be3fdc2902448ed9dbca8554c3e10df459e03a5fa6862dbd9bfcbb48"
+    },
+    {
+      "path": "client/maps/hre/water-detail/5120_7168.png",
+      "bytes": 102422,
+      "sha256": "68c26991ab9f2338eb74043e3d9ba3f710c65b4ea9aceeb80fd2dc328c464fdb"
+    },
+    {
+      "path": "client/maps/hre/water-detail/5120_8192.png",
+      "bytes": 105548,
+      "sha256": "470d5e4f3320aa69a1d2d4cd3617f064786d497e6286667ed5a32fdcb414b708"
+    },
+    {
+      "path": "client/maps/hre/water-detail/5120_9216.png",
+      "bytes": 95380,
+      "sha256": "3d7a27c44390056f594469d038976c98a8ead68334bd1d403544b7d0d57c859a"
+    },
+    {
+      "path": "client/maps/hre/water-detail/6144_0.png",
+      "bytes": 125402,
+      "sha256": "62c9ad57d9aab327084fbeb680f4a7a18561af3d051b679ac9e06d44b6dfa7b6"
+    },
+    {
+      "path": "client/maps/hre/water-detail/6144_1024.png",
+      "bytes": 129608,
+      "sha256": "4d9ce8013fde5c81a4944c2deecb7c281d1cef970b3106f9a0163176837a09b1"
+    },
+    {
+      "path": "client/maps/hre/water-detail/6144_10240.png",
+      "bytes": 132875,
+      "sha256": "dc6fd2c1b7499a4149696743be11bdba7d922b352e444f78a9994cfffbddddcb"
+    },
+    {
+      "path": "client/maps/hre/water-detail/6144_11264.png",
+      "bytes": 144379,
+      "sha256": "066d2e7a743e7d245b367e11deb88b9c77f8d04d65ef3eb9a5e87a332539eb42"
+    },
+    {
+      "path": "client/maps/hre/water-detail/6144_12288.png",
+      "bytes": 44915,
+      "sha256": "f9792bc8907813e3afdb054de2651b8d1e316cbf7d72bf8ca1d62d72c2f4f9dc"
+    },
+    {
+      "path": "client/maps/hre/water-detail/6144_13312.png",
+      "bytes": 88354,
+      "sha256": "88460d244bdbde9c59040f276303958e3b7de189056a2357130eebe07236cb7c"
+    },
+    {
+      "path": "client/maps/hre/water-detail/6144_2048.png",
+      "bytes": 174235,
+      "sha256": "7ff4884d4b07bb1e020c528701aac5cc8f8b9fc72fc7ade85f6a68ee12123724"
+    },
+    {
+      "path": "client/maps/hre/water-detail/6144_3072.png",
+      "bytes": 157136,
+      "sha256": "7ffdd074e2f034c3509260f74d3db513e13928a3fe58567d0808234f7ac68fea"
+    },
+    {
+      "path": "client/maps/hre/water-detail/6144_4096.png",
+      "bytes": 153305,
+      "sha256": "daccf282247a647255920fd25a201dadabed00baa11cd5cf223078f59281ab25"
+    },
+    {
+      "path": "client/maps/hre/water-detail/6144_5120.png",
+      "bytes": 194504,
+      "sha256": "f750224d0f76421b4b1f3be9a5135016d8a406c3c5602898ffaef36a3b5e9c19"
+    },
+    {
+      "path": "client/maps/hre/water-detail/6144_6144.png",
+      "bytes": 87802,
+      "sha256": "ea78a453ebc47259da7402427890d17ed84518ad16f0b0cc71f8f0ea2a89a73b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/6144_7168.png",
+      "bytes": 80339,
+      "sha256": "0b92c6c2518f74e2652b6e3195a8c20f310ddc33914914fdc16c0caa3594d422"
+    },
+    {
+      "path": "client/maps/hre/water-detail/6144_8192.png",
+      "bytes": 170700,
+      "sha256": "db985c133790267bdf95085678aa7b9d4978f6d42c5898abcf26607a9a88acbd"
+    },
+    {
+      "path": "client/maps/hre/water-detail/6144_9216.png",
+      "bytes": 102220,
+      "sha256": "f1937eaef629639e944d545abe9aa55a7bd0884505bf755d858b241bcd794f1a"
+    },
+    {
+      "path": "client/maps/hre/water-detail/7168_0.png",
+      "bytes": 64358,
+      "sha256": "6ed1df9f8fcbca1adb5a38be6ff2221847860dd31c2545022df4f110fa3a5198"
+    },
+    {
+      "path": "client/maps/hre/water-detail/7168_1024.png",
+      "bytes": 144911,
+      "sha256": "e4b350f68693b45fd2536746a98d144753dd08671f65828d8d9268e750e3c10d"
+    },
+    {
+      "path": "client/maps/hre/water-detail/7168_10240.png",
+      "bytes": 89596,
+      "sha256": "7e3e512859ef17fe453b46099db8d19fff723fc2029c051d37502b85767544c8"
+    },
+    {
+      "path": "client/maps/hre/water-detail/7168_11264.png",
+      "bytes": 180106,
+      "sha256": "62dddf91c7a318c0b2f231ace3c0d5aa843579ca8a70e46c9ac72cc615fb7d1a"
+    },
+    {
+      "path": "client/maps/hre/water-detail/7168_12288.png",
+      "bytes": 30352,
+      "sha256": "8cbb4d1f73527ec2cc7460c20baf32c553786c6df3fc5c38b5d03bb45a368ddc"
+    },
+    {
+      "path": "client/maps/hre/water-detail/7168_13312.png",
+      "bytes": 39875,
+      "sha256": "7b26945f200471b1efdcb33a6a940e561e23920fad5f0a5bc242bb47ae796a00"
+    },
+    {
+      "path": "client/maps/hre/water-detail/7168_2048.png",
+      "bytes": 46724,
+      "sha256": "7a12aa4c69476d6eedbec0306b161f1c0917d871e96fb29773804d07b002e73b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/7168_3072.png",
+      "bytes": 162012,
+      "sha256": "5fd342c830cdc7131bcf8370e8e6fd60c9ffa19cf4dcb19f6096156195315d19"
+    },
+    {
+      "path": "client/maps/hre/water-detail/7168_4096.png",
+      "bytes": 115069,
+      "sha256": "1135f3f5f7e44392bbbd02c0a8fbf7a757c1ec4bc43709148ec25b62d5381172"
+    },
+    {
+      "path": "client/maps/hre/water-detail/7168_5120.png",
+      "bytes": 154792,
+      "sha256": "9ee58cb9eac6039d90d6e0554dd468234bd73a7e2d9202672771a0a72b496cc6"
+    },
+    {
+      "path": "client/maps/hre/water-detail/7168_6144.png",
+      "bytes": 140476,
+      "sha256": "1623623bbc86dd130a4497ef2c6c312c4bed44a3848ebcc1ff1e8f37dc7f3c3e"
+    },
+    {
+      "path": "client/maps/hre/water-detail/7168_7168.png",
+      "bytes": 158454,
+      "sha256": "93e200bce54856c6ad6b7236f0a3c51df4a8c2fa4294bf1fe7ae790234ca92d7"
+    },
+    {
+      "path": "client/maps/hre/water-detail/7168_8192.png",
+      "bytes": 120945,
+      "sha256": "001ef8efaf8d21f4a94b177cc2ce3119209fa92ef6088cf7dbb3f6523ae1858b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/7168_9216.png",
+      "bytes": 103503,
+      "sha256": "b5a7bae42f1651d20350cea52c12aa00c2d44b14e636e69b30a3a525a409de6c"
+    },
+    {
+      "path": "client/maps/hre/water-detail/8192_0.png",
+      "bytes": 151900,
+      "sha256": "85b4a3d48facc5941482485791a43725207cd5540d8bcf829f2d36987e7ca577"
+    },
+    {
+      "path": "client/maps/hre/water-detail/8192_1024.png",
+      "bytes": 75983,
+      "sha256": "2329d0ca4b2e1a7b5e06eaa44127060f85f2bf094f2bd6734298a1df167c6b16"
+    },
+    {
+      "path": "client/maps/hre/water-detail/8192_10240.png",
+      "bytes": 142749,
+      "sha256": "4c75c59a2fa0cb32594650056bcc703cc3af2a92b61bfd26b18440ae18628c76"
+    },
+    {
+      "path": "client/maps/hre/water-detail/8192_11264.png",
+      "bytes": 112354,
+      "sha256": "6fa68b59183916e6b8de41eca62b4b1072caabd8eeb7e06e4667fb0371146702"
+    },
+    {
+      "path": "client/maps/hre/water-detail/8192_12288.png",
+      "bytes": 132289,
+      "sha256": "33928c0655d1abe2e4770dde46cc4d14381657224ac4150e640e39f0aa58d2a0"
+    },
+    {
+      "path": "client/maps/hre/water-detail/8192_13312.png",
+      "bytes": 15589,
+      "sha256": "679d5503e43b7a3be3cd53299d58169c32e960419386b7c72d00704cf8165954"
+    },
+    {
+      "path": "client/maps/hre/water-detail/8192_2048.png",
+      "bytes": 21255,
+      "sha256": "55c0a6b67ae5a1f3be6ce0418f9be15b9c3e721e1cf81a957e884c6314c89c68"
+    },
+    {
+      "path": "client/maps/hre/water-detail/8192_3072.png",
+      "bytes": 50495,
+      "sha256": "2f03e3ec4e30b144bb13ff22709528976e763ab0a5f8757154d633f434569e86"
+    },
+    {
+      "path": "client/maps/hre/water-detail/8192_4096.png",
+      "bytes": 150035,
+      "sha256": "0c3e7267a292a6085d3e20814a73f27c991a31e5dec01e691b2f54200189b19c"
+    },
+    {
+      "path": "client/maps/hre/water-detail/8192_5120.png",
+      "bytes": 155087,
+      "sha256": "fc6d24461daa6c9f2efe589e4a8aaec160f482f5169809dcc4c437dca67257f9"
+    },
+    {
+      "path": "client/maps/hre/water-detail/8192_6144.png",
+      "bytes": 44214,
+      "sha256": "a2079970896455d30c2730099c385fabe0414cbb2c7800c058dfce632c84aa03"
+    },
+    {
+      "path": "client/maps/hre/water-detail/8192_7168.png",
+      "bytes": 80361,
+      "sha256": "356bf7b7c64f9768df3a4f9a17aada342c2eab68cb5d46205a1de6f058e0ce32"
+    },
+    {
+      "path": "client/maps/hre/water-detail/8192_8192.png",
+      "bytes": 71287,
+      "sha256": "0a96e612eb064fa2c5a16a5744ef356a310c0bcadb527a559522575997d6a1a0"
+    },
+    {
+      "path": "client/maps/hre/water-detail/8192_9216.png",
+      "bytes": 109254,
+      "sha256": "238abde1f2d9389779d621d93a3ea74eb42cd1f374cb8d10fefbac68a6f7632b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/9216_0.png",
+      "bytes": 92894,
+      "sha256": "dbcce612bd3ef1cee216bd5771c2415af21dfb5566329b531d547fa47c61eb29"
+    },
+    {
+      "path": "client/maps/hre/water-detail/9216_1024.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/hre/water-detail/9216_10240.png",
+      "bytes": 111000,
+      "sha256": "c5b794674f62a577a9a10c5fc0d8a94be6e617e497c59f2c33765556309265f8"
+    },
+    {
+      "path": "client/maps/hre/water-detail/9216_11264.png",
+      "bytes": 142722,
+      "sha256": "116c93f63815afc0502eaa62db1b2a0c1824e2f1376e62dc8c6b63f77985233c"
+    },
+    {
+      "path": "client/maps/hre/water-detail/9216_12288.png",
+      "bytes": 121800,
+      "sha256": "e627cc913c73705aa8ba92d57cd03befe41a88c386d318e3e74c813237c766a1"
+    },
+    {
+      "path": "client/maps/hre/water-detail/9216_13312.png",
+      "bytes": 69428,
+      "sha256": "ed326e1d3bf95ebce4981b271fab6d81ee29b96b00b0da4d5500958657c01ebf"
+    },
+    {
+      "path": "client/maps/hre/water-detail/9216_2048.png",
+      "bytes": 42048,
+      "sha256": "011eb06829ba6467f975ab358784488751e30addc691df3a2abf5ea5b63c5641"
+    },
+    {
+      "path": "client/maps/hre/water-detail/9216_3072.png",
+      "bytes": 88113,
+      "sha256": "efc54ac716b99a2c2cac8f522c6f13b6f7950da8e02ee77996263a00420b2175"
+    },
+    {
+      "path": "client/maps/hre/water-detail/9216_4096.png",
+      "bytes": 111596,
+      "sha256": "12319727e5463c2dcd8179516436d000efb2cc248e9d08fca5360fac24d26b30"
+    },
+    {
+      "path": "client/maps/hre/water-detail/9216_5120.png",
+      "bytes": 121981,
+      "sha256": "29a4ffacafbfdcf1b8c180c7ee1857c53eb9ce19f111edd49a7ac32ae1ffe97e"
+    },
+    {
+      "path": "client/maps/hre/water-detail/9216_6144.png",
+      "bytes": 102035,
+      "sha256": "25135c36fc2e8f1baaee8a3a8405c8af3bff103fb22ee2efb79d4db5aee2d137"
+    },
+    {
+      "path": "client/maps/hre/water-detail/9216_7168.png",
+      "bytes": 94720,
+      "sha256": "acf1c3aee60a4a0f60c77056aad014b6bc2e83d4b6326e239de02661de28f2f5"
+    },
+    {
+      "path": "client/maps/hre/water-detail/9216_8192.png",
+      "bytes": 235509,
+      "sha256": "b38365e1bc6e088c3cf72ef976a2af093e34c1fdf7712f6cf68dd2f6bd3bc8f5"
+    },
+    {
+      "path": "client/maps/hre/water-detail/9216_9216.png",
+      "bytes": 97310,
+      "sha256": "9367d6388aa86228c6428033b1df025e07387f2e017c31a3238b794057270cc9"
+    },
+    {
+      "path": "client/maps/japan/0_0.png",
+      "bytes": 298235,
+      "sha256": "b82dedf5d2135b83c967265fabdb5baf5cb43ad358108ae9e2d1db52d42cc88d"
+    },
+    {
+      "path": "client/maps/japan/0_1024.png",
+      "bytes": 328652,
+      "sha256": "1d61b1d8cb2fb8e63c76e96f4d19d0aaf1fdc84f6004e231f64341d0e1ed4da5"
+    },
+    {
+      "path": "client/maps/japan/0_2048.png",
+      "bytes": 320072,
+      "sha256": "2b111c5aeabf5df1b083c1b380af49cafb053117989a576a8a87122273526264"
+    },
+    {
+      "path": "client/maps/japan/0_3072.png",
+      "bytes": 75820,
+      "sha256": "8a3426244f5d5e273145406d3955a0967e4ce0a3857e160fd9e916cbea4cc844"
+    },
+    {
+      "path": "client/maps/japan/0_4096.png",
+      "bytes": 135,
+      "sha256": "09bfda3935860e73f5388302ba4608063839809a441af72c7839fa624173b4ed"
+    },
+    {
+      "path": "client/maps/japan/1024_0.png",
+      "bytes": 194414,
+      "sha256": "57ef74fc4fb7f63adb5d826b9fd2a0a053d773dd779ba6c60da414793e7ac932"
+    },
+    {
+      "path": "client/maps/japan/1024_1024.png",
+      "bytes": 43394,
+      "sha256": "ebe41b861d95917f869a14c662f9b2ef4426963377b12961b31e68cee844c47b"
+    },
+    {
+      "path": "client/maps/japan/1024_2048.png",
+      "bytes": 190014,
+      "sha256": "ffdd97a1fd5dbc0626da745066878ab6abf4c07a7dadb0ff29aebefe1b22a455"
+    },
+    {
+      "path": "client/maps/japan/1024_3072.png",
+      "bytes": 162650,
+      "sha256": "dbc2a0a4ccf13a049ad6c0070df93e38d56e5209360a86e88854592660de79a4"
+    },
+    {
+      "path": "client/maps/japan/1024_4096.png",
+      "bytes": 135,
+      "sha256": "09bfda3935860e73f5388302ba4608063839809a441af72c7839fa624173b4ed"
+    },
+    {
+      "path": "client/maps/japan/2048_0.png",
+      "bytes": 94286,
+      "sha256": "62f1dfe58fa58269202a8844f4ee420eb675a6f1ed7a86f4ff072e5ed12efacd"
+    },
+    {
+      "path": "client/maps/japan/2048_1024.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/2048_2048.png",
+      "bytes": 228081,
+      "sha256": "63160e858141cf2a5b84fc6cc11bcb5485c617bf1893982929c1f963e557ce17"
+    },
+    {
+      "path": "client/maps/japan/2048_3072.png",
+      "bytes": 62320,
+      "sha256": "ce7fa3021d07cba8fe5941d629338da33b3acac11e5b78d7a96199ff3528a672"
+    },
+    {
+      "path": "client/maps/japan/2048_4096.png",
+      "bytes": 135,
+      "sha256": "09bfda3935860e73f5388302ba4608063839809a441af72c7839fa624173b4ed"
+    },
+    {
+      "path": "client/maps/japan/3072_0.png",
+      "bytes": 31758,
+      "sha256": "955cea15ee4eed125e049957f3e3a48b99a57e0ec24ccfb740bc0901c9270f24"
+    },
+    {
+      "path": "client/maps/japan/3072_1024.png",
+      "bytes": 32474,
+      "sha256": "1375e68e00df39eb231377a41ddeb6e9ead6c2e9ac972441d65bd1d8678d166a"
+    },
+    {
+      "path": "client/maps/japan/3072_2048.png",
+      "bytes": 294523,
+      "sha256": "4935fa635b83931feb79f58558f36ca93ddcca706841c96a812924f6c722d83d"
+    },
+    {
+      "path": "client/maps/japan/3072_3072.png",
+      "bytes": 47799,
+      "sha256": "0ad8e3179c2f3213dac08edfdeba6de23a7784533d69ec39694b8cd084fafaff"
+    },
+    {
+      "path": "client/maps/japan/3072_4096.png",
+      "bytes": 135,
+      "sha256": "09bfda3935860e73f5388302ba4608063839809a441af72c7839fa624173b4ed"
+    },
+    {
+      "path": "client/maps/japan/4096_0.png",
+      "bytes": 144176,
+      "sha256": "d481b171146699415ddae79d5daf37fe56111d0627025ab5d09b43b2dddb435d"
+    },
+    {
+      "path": "client/maps/japan/4096_1024.png",
+      "bytes": 147327,
+      "sha256": "cbd443fe44f26342d9708bb9fc327b08728ade4de3b4dc9a403325a453a69e00"
+    },
+    {
+      "path": "client/maps/japan/4096_2048.png",
+      "bytes": 51080,
+      "sha256": "8081d49a1a8ca359716e975f1d6f68b8f8f82c817fcccee3ebe02263a5e7dbde"
+    },
+    {
+      "path": "client/maps/japan/4096_3072.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/4096_4096.png",
+      "bytes": 135,
+      "sha256": "09bfda3935860e73f5388302ba4608063839809a441af72c7839fa624173b4ed"
+    },
+    {
+      "path": "client/maps/japan/5120_0.png",
+      "bytes": 93332,
+      "sha256": "0a43a336b769720c969973ba76211fed9fea64da875310783c6056091f75dec2"
+    },
+    {
+      "path": "client/maps/japan/5120_1024.png",
+      "bytes": 24217,
+      "sha256": "05e793ce2929a7464ffaceac699738f8074703a6fbce866f1aa590063ee53183"
+    },
+    {
+      "path": "client/maps/japan/5120_2048.png",
+      "bytes": 5865,
+      "sha256": "e35f830266421d455bc69dec55f4685812fb26ce6d342a77121a1dd6d7beff81"
+    },
+    {
+      "path": "client/maps/japan/5120_3072.png",
+      "bytes": 5865,
+      "sha256": "e35f830266421d455bc69dec55f4685812fb26ce6d342a77121a1dd6d7beff81"
+    },
+    {
+      "path": "client/maps/japan/5120_4096.png",
+      "bytes": 132,
+      "sha256": "5d4caf217a07d53332b390b0330937cfb367c7fc90971c65b734b44bb004be86"
+    },
+    {
+      "path": "client/maps/japan/selection.png",
+      "bytes": 130515,
+      "sha256": "76fc3e57980805202344b5f85d708c99e88d98fe725177e1f4d3db24901fbe57"
+    },
+    {
+      "path": "client/maps/japan/water-detail/0_0.png",
+      "bytes": 130415,
+      "sha256": "82c97d0fdf1de71ae70929a65fd6fd0c388673813964648587d830133fef6609"
+    },
+    {
+      "path": "client/maps/japan/water-detail/0_1024.png",
+      "bytes": 188950,
+      "sha256": "401c0186fde042b5442324cdfcb035db3b835bb61cf47726c9dfe613296b7904"
+    },
+    {
+      "path": "client/maps/japan/water-detail/0_10240.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/0_11264.png",
+      "bytes": 2591,
+      "sha256": "014edf9609f848d1122c9f40d92691cba4a2b1d3995a84869d86205c697f5ad9"
+    },
+    {
+      "path": "client/maps/japan/water-detail/0_2048.png",
+      "bytes": 114196,
+      "sha256": "79d08f093cf4a5a64903a9e07025241cf55ec52987ab48a696d433ec6cc5d568"
+    },
+    {
+      "path": "client/maps/japan/water-detail/0_3072.png",
+      "bytes": 138532,
+      "sha256": "4058bb9ada86be0ac844cf6d8a9327a5450e3d2b8c5b1237e24f834e7b651836"
+    },
+    {
+      "path": "client/maps/japan/water-detail/0_4096.png",
+      "bytes": 26485,
+      "sha256": "7b1e3042e85a1fd17b8a25d0ec9ba11636dd968fbb151cb6616492ffc807e8f1"
+    },
+    {
+      "path": "client/maps/japan/water-detail/0_5120.png",
+      "bytes": 44548,
+      "sha256": "91eb669d1a313ea82429d2f02055060172706e8773ac7e8dcbe8498cf46bd200"
+    },
+    {
+      "path": "client/maps/japan/water-detail/0_6144.png",
+      "bytes": 313737,
+      "sha256": "f173fee5c74bdee0fd2984a1e3a4ca9036f14559e575db2fdeb16e907826b931"
+    },
+    {
+      "path": "client/maps/japan/water-detail/0_7168.png",
+      "bytes": 43354,
+      "sha256": "7eb0226bce44d7376c3e1db0f2c4ff454468cef86db66e1dc1845e471df65cfd"
+    },
+    {
+      "path": "client/maps/japan/water-detail/0_8192.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/0_9216.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/10240_0.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/10240_1024.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/10240_10240.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/10240_11264.png",
+      "bytes": 2591,
+      "sha256": "014edf9609f848d1122c9f40d92691cba4a2b1d3995a84869d86205c697f5ad9"
+    },
+    {
+      "path": "client/maps/japan/water-detail/10240_2048.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/10240_3072.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/10240_4096.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/10240_5120.png",
+      "bytes": 33130,
+      "sha256": "791aaf67732c7d9efcc05aa09f6e81a5544e6d0038363c83f67a042c030dab60"
+    },
+    {
+      "path": "client/maps/japan/water-detail/10240_6144.png",
+      "bytes": 175946,
+      "sha256": "96d8962d52ecd1e9b12cc1a748fb8213ff54258ddce2d98c4fd9be5919441101"
+    },
+    {
+      "path": "client/maps/japan/water-detail/10240_7168.png",
+      "bytes": 197560,
+      "sha256": "b6477787d979cf8b55a8e6c7bfe36acb25613fd109abdca4d6b5d21a4fac01bc"
+    },
+    {
+      "path": "client/maps/japan/water-detail/10240_8192.png",
+      "bytes": 149913,
+      "sha256": "a72d4c09e418648e15aeacdb5987622d1423fb3d0543ac02e25f53da16792b7e"
+    },
+    {
+      "path": "client/maps/japan/water-detail/10240_9216.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/1024_0.png",
+      "bytes": 167430,
+      "sha256": "6c951bc236f548ea8d63ad37165ae5fb530eee1910759eda709efb880e4e877b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/1024_1024.png",
+      "bytes": 191554,
+      "sha256": "b220c5a42c80bd10910f7537587a9cdd0458374bc382f0a5cf1d19085cc69a86"
+    },
+    {
+      "path": "client/maps/japan/water-detail/1024_10240.png",
+      "bytes": 7101,
+      "sha256": "151676208752a159d6c7e51f5239fe553e244c9fb9d8b3b30a741046c10493f6"
+    },
+    {
+      "path": "client/maps/japan/water-detail/1024_11264.png",
+      "bytes": 2591,
+      "sha256": "014edf9609f848d1122c9f40d92691cba4a2b1d3995a84869d86205c697f5ad9"
+    },
+    {
+      "path": "client/maps/japan/water-detail/1024_2048.png",
+      "bytes": 232782,
+      "sha256": "5c8bb2076f9a2338e357ecc2cbfdc0c8cacda06cbcac97e7c96db82e0806f10d"
+    },
+    {
+      "path": "client/maps/japan/water-detail/1024_3072.png",
+      "bytes": 225260,
+      "sha256": "e227ff9de71f0c1cf66b9f378eceeb2a23a2cec5b8967ce27ade46d7bb2ba1c7"
+    },
+    {
+      "path": "client/maps/japan/water-detail/1024_4096.png",
+      "bytes": 255351,
+      "sha256": "8b9ac7e924b030272ed0f52835c3503b61b96893914d4e873bc34499df8f5497"
+    },
+    {
+      "path": "client/maps/japan/water-detail/1024_5120.png",
+      "bytes": 190843,
+      "sha256": "099bbfb32b974e2d6206aad540d4758fc1bd2d2c61d776bdd5c0209266dba813"
+    },
+    {
+      "path": "client/maps/japan/water-detail/1024_6144.png",
+      "bytes": 283447,
+      "sha256": "221e766aa262399d24a0344b1e1e4591d7ab81e8764a7696d66a9e17eb057314"
+    },
+    {
+      "path": "client/maps/japan/water-detail/1024_7168.png",
+      "bytes": 13011,
+      "sha256": "5891ce2ae23613af320bc518e8ced4d4dca4e92a676f8f9aa101d442c43518d7"
+    },
+    {
+      "path": "client/maps/japan/water-detail/1024_8192.png",
+      "bytes": 41192,
+      "sha256": "5b8774c7c347e655b4210a4d4bdacdf8963600df0ba3b05127b9d92c8fdefd2d"
+    },
+    {
+      "path": "client/maps/japan/water-detail/1024_9216.png",
+      "bytes": 10087,
+      "sha256": "cbfa845aa160132d3a5636abec866d2343798a0a5294153bc19d5aba19f76771"
+    },
+    {
+      "path": "client/maps/japan/water-detail/11264_0.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/11264_1024.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/11264_10240.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/11264_11264.png",
+      "bytes": 2591,
+      "sha256": "014edf9609f848d1122c9f40d92691cba4a2b1d3995a84869d86205c697f5ad9"
+    },
+    {
+      "path": "client/maps/japan/water-detail/11264_2048.png",
+      "bytes": 46519,
+      "sha256": "5381c197cd9ec7c859ac2e4205e35eb39260a830bde014212186fe40c28adf6c"
+    },
+    {
+      "path": "client/maps/japan/water-detail/11264_3072.png",
+      "bytes": 76126,
+      "sha256": "ac25efb1ce07c8dc5d5b82906e77f6fb43d42509ff5b46be828775a9e1e8684f"
+    },
+    {
+      "path": "client/maps/japan/water-detail/11264_4096.png",
+      "bytes": 115717,
+      "sha256": "e8b291f3b783d64f49cdf9e0aceaba1dcc693d13048741b871fa784e83b23687"
+    },
+    {
+      "path": "client/maps/japan/water-detail/11264_5120.png",
+      "bytes": 127089,
+      "sha256": "1688c170729fd2f9312fb143255b78fe3c4384f7c532be81c0029bedb65fcb4b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/11264_6144.png",
+      "bytes": 135202,
+      "sha256": "043c4fcb8c34c80c07483843131727630fc2bd14997a7f1439fe45538ed7d7f6"
+    },
+    {
+      "path": "client/maps/japan/water-detail/11264_7168.png",
+      "bytes": 45973,
+      "sha256": "e376973447f752002a6b2170fc48ffc9ef7ef9c239472e1b9e52a541ff823885"
+    },
+    {
+      "path": "client/maps/japan/water-detail/11264_8192.png",
+      "bytes": 23032,
+      "sha256": "21e057c359bdcc39ba69bab4e7e42ae7675ffcbeecfb9640837e620fea36ce83"
+    },
+    {
+      "path": "client/maps/japan/water-detail/11264_9216.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/12288_0.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/12288_1024.png",
+      "bytes": 28921,
+      "sha256": "80187152f537438fb0965f798e34205b99e88b4941ec3708a0793e731cd3f247"
+    },
+    {
+      "path": "client/maps/japan/water-detail/12288_10240.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/12288_11264.png",
+      "bytes": 2591,
+      "sha256": "014edf9609f848d1122c9f40d92691cba4a2b1d3995a84869d86205c697f5ad9"
+    },
+    {
+      "path": "client/maps/japan/water-detail/12288_2048.png",
+      "bytes": 94763,
+      "sha256": "0e546fb8a429745b15304c7c3662427441795f7e574c7bcd3d4abb626395c79c"
+    },
+    {
+      "path": "client/maps/japan/water-detail/12288_3072.png",
+      "bytes": 122513,
+      "sha256": "8fc896ad708ac3ae0d0f2f22b6da51f964e018bce593c8742a488b3a073dd24c"
+    },
+    {
+      "path": "client/maps/japan/water-detail/12288_4096.png",
+      "bytes": 94565,
+      "sha256": "71ffa3fe40aa25c6b83fc3c56227c3cb03a805ee2b7d88196b03159cafe8f222"
+    },
+    {
+      "path": "client/maps/japan/water-detail/12288_5120.png",
+      "bytes": 150585,
+      "sha256": "0bfa5ee2f46b83ddd84478a8089380f3501711a012bf216022f195dfa71fdfc6"
+    },
+    {
+      "path": "client/maps/japan/water-detail/12288_6144.png",
+      "bytes": 36695,
+      "sha256": "7de35eef31c91e0baa3f6376f2eae93a04234d745e9c3ec898414960414aa620"
+    },
+    {
+      "path": "client/maps/japan/water-detail/12288_7168.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/12288_8192.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/12288_9216.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/13312_0.png",
+      "bytes": 82084,
+      "sha256": "be68a5bb7926db8a50df2e386e78b8d861ebbfeacdad48e71e633e374f14ac52"
+    },
+    {
+      "path": "client/maps/japan/water-detail/13312_1024.png",
+      "bytes": 113070,
+      "sha256": "036fc73c91259d46dcdfa164ff252ee76cd8e15314849bc348f3b57d53291165"
+    },
+    {
+      "path": "client/maps/japan/water-detail/13312_10240.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/13312_11264.png",
+      "bytes": 2591,
+      "sha256": "014edf9609f848d1122c9f40d92691cba4a2b1d3995a84869d86205c697f5ad9"
+    },
+    {
+      "path": "client/maps/japan/water-detail/13312_2048.png",
+      "bytes": 134979,
+      "sha256": "e0a4a5044d73991621b8ce3e46fdfad1c4259d26c6bac73977701233651376a4"
+    },
+    {
+      "path": "client/maps/japan/water-detail/13312_3072.png",
+      "bytes": 21480,
+      "sha256": "80d8af51d2a26e3142917edb1009c34b8d64d755754225dd5d75f27322b81ce8"
+    },
+    {
+      "path": "client/maps/japan/water-detail/13312_4096.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/13312_5120.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/13312_6144.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/13312_7168.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/13312_8192.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/13312_9216.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/14336_0.png",
+      "bytes": 43325,
+      "sha256": "6867ee18f627363aa73f127f8271beccc835c06aac1e390c6f6838438dace9c4"
+    },
+    {
+      "path": "client/maps/japan/water-detail/14336_1024.png",
+      "bytes": 142720,
+      "sha256": "e7237223708e16988b6e092f7fe9734245010395f5dccbf02ce44da3cc0337d6"
+    },
+    {
+      "path": "client/maps/japan/water-detail/14336_10240.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/14336_11264.png",
+      "bytes": 2591,
+      "sha256": "014edf9609f848d1122c9f40d92691cba4a2b1d3995a84869d86205c697f5ad9"
+    },
+    {
+      "path": "client/maps/japan/water-detail/14336_2048.png",
+      "bytes": 86989,
+      "sha256": "bdfa80bba33569d0031fa3396fc27ace194da5d2531451b42d713c34aac920e3"
+    },
+    {
+      "path": "client/maps/japan/water-detail/14336_3072.png",
+      "bytes": 30443,
+      "sha256": "1d3ba01f1b46ddf0e3b4845312023b7abf31d15220ab5c948c541ac660e0098e"
+    },
+    {
+      "path": "client/maps/japan/water-detail/14336_4096.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/14336_5120.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/14336_6144.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/14336_7168.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/14336_8192.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/14336_9216.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/15360_0.png",
+      "bytes": 13608,
+      "sha256": "7ddd2c4276b4413d7e033b269f204f9ac2f190ef4c708a9548e4b08a59a5ce65"
+    },
+    {
+      "path": "client/maps/japan/water-detail/15360_1024.png",
+      "bytes": 55873,
+      "sha256": "d7788a5ab5999be29707f3648e4692436b30455187992594bb71b47825c54d91"
+    },
+    {
+      "path": "client/maps/japan/water-detail/15360_10240.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/15360_11264.png",
+      "bytes": 2591,
+      "sha256": "014edf9609f848d1122c9f40d92691cba4a2b1d3995a84869d86205c697f5ad9"
+    },
+    {
+      "path": "client/maps/japan/water-detail/15360_2048.png",
+      "bytes": 130470,
+      "sha256": "c0a425e1904902fce22951ca05f3cabab6eb7cbe3264e3b2c83751bb2dbd7a12"
+    },
+    {
+      "path": "client/maps/japan/water-detail/15360_3072.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/15360_4096.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/15360_5120.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/15360_6144.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/15360_7168.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/15360_8192.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/15360_9216.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/16384_0.png",
+      "bytes": 4962,
+      "sha256": "eee84ab72b2baddab662976c3d785dd5e7d6d288532cda5dca66de82f91a66d2"
+    },
+    {
+      "path": "client/maps/japan/water-detail/16384_1024.png",
+      "bytes": 15087,
+      "sha256": "69e3388fc8a363cdb2a4ec2b308c6cecc39c262e5cb813d3e554e2fab94e9691"
+    },
+    {
+      "path": "client/maps/japan/water-detail/16384_10240.png",
+      "bytes": 4962,
+      "sha256": "eee84ab72b2baddab662976c3d785dd5e7d6d288532cda5dca66de82f91a66d2"
+    },
+    {
+      "path": "client/maps/japan/water-detail/16384_11264.png",
+      "bytes": 1992,
+      "sha256": "8c8cd57044e6054184e321bbe7b86f66266977351bedff97b38ffe7e6b827f03"
+    },
+    {
+      "path": "client/maps/japan/water-detail/16384_2048.png",
+      "bytes": 27824,
+      "sha256": "ab51efb1d7c10e604759b08d2448b3931349d61a6d4af77ca7d7c5620360e76b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/16384_3072.png",
+      "bytes": 4962,
+      "sha256": "eee84ab72b2baddab662976c3d785dd5e7d6d288532cda5dca66de82f91a66d2"
+    },
+    {
+      "path": "client/maps/japan/water-detail/16384_4096.png",
+      "bytes": 4962,
+      "sha256": "eee84ab72b2baddab662976c3d785dd5e7d6d288532cda5dca66de82f91a66d2"
+    },
+    {
+      "path": "client/maps/japan/water-detail/16384_5120.png",
+      "bytes": 4962,
+      "sha256": "eee84ab72b2baddab662976c3d785dd5e7d6d288532cda5dca66de82f91a66d2"
+    },
+    {
+      "path": "client/maps/japan/water-detail/16384_6144.png",
+      "bytes": 4962,
+      "sha256": "eee84ab72b2baddab662976c3d785dd5e7d6d288532cda5dca66de82f91a66d2"
+    },
+    {
+      "path": "client/maps/japan/water-detail/16384_7168.png",
+      "bytes": 4962,
+      "sha256": "eee84ab72b2baddab662976c3d785dd5e7d6d288532cda5dca66de82f91a66d2"
+    },
+    {
+      "path": "client/maps/japan/water-detail/16384_8192.png",
+      "bytes": 4962,
+      "sha256": "eee84ab72b2baddab662976c3d785dd5e7d6d288532cda5dca66de82f91a66d2"
+    },
+    {
+      "path": "client/maps/japan/water-detail/16384_9216.png",
+      "bytes": 4962,
+      "sha256": "eee84ab72b2baddab662976c3d785dd5e7d6d288532cda5dca66de82f91a66d2"
+    },
+    {
+      "path": "client/maps/japan/water-detail/2048_0.png",
+      "bytes": 201486,
+      "sha256": "b0ea3d992bb90be58b470595ced4e72305b81ad4fc4fe1e812da89c325fe6509"
+    },
+    {
+      "path": "client/maps/japan/water-detail/2048_1024.png",
+      "bytes": 154188,
+      "sha256": "be97759e3853e044bbc2197b9a3460566a411ff9b762e7918004bd5a6342cc78"
+    },
+    {
+      "path": "client/maps/japan/water-detail/2048_10240.png",
+      "bytes": 91195,
+      "sha256": "a8b2792dd55240de18e3afdd8233a3c9fa30224b34eb2090231bc6c0e364bb98"
+    },
+    {
+      "path": "client/maps/japan/water-detail/2048_11264.png",
+      "bytes": 2591,
+      "sha256": "014edf9609f848d1122c9f40d92691cba4a2b1d3995a84869d86205c697f5ad9"
+    },
+    {
+      "path": "client/maps/japan/water-detail/2048_2048.png",
+      "bytes": 142126,
+      "sha256": "e8f1c5c01fbf0e8d0948189aed82445396dfc1e780f52cb8be31051c206d9339"
+    },
+    {
+      "path": "client/maps/japan/water-detail/2048_3072.png",
+      "bytes": 149916,
+      "sha256": "9b4275ef539c1b7f053498f8417906a4f4298ca233b7d061be2869c0f7d3baf8"
+    },
+    {
+      "path": "client/maps/japan/water-detail/2048_4096.png",
+      "bytes": 192654,
+      "sha256": "bab7910a154b63940bd0c9b473fbc1a37df5a9439328a7897145823e213b1133"
+    },
+    {
+      "path": "client/maps/japan/water-detail/2048_5120.png",
+      "bytes": 189411,
+      "sha256": "530f1d60668bfd01ff1db513c36cd0cf3cc11439a259e687687e3c79470b7268"
+    },
+    {
+      "path": "client/maps/japan/water-detail/2048_6144.png",
+      "bytes": 220470,
+      "sha256": "cc37e2c96292e9802ea167408291f2e2a277d7cddfee6ea58e1085f1fd6a46a6"
+    },
+    {
+      "path": "client/maps/japan/water-detail/2048_7168.png",
+      "bytes": 78947,
+      "sha256": "78b088519c32a2f1465250deacb89c8df421324817f6dd95478adc0a6a32cf41"
+    },
+    {
+      "path": "client/maps/japan/water-detail/2048_8192.png",
+      "bytes": 242533,
+      "sha256": "2f6fad868705396b15ebbc8389b1ddf0f526fbfc39e3b70293e72d5f96526777"
+    },
+    {
+      "path": "client/maps/japan/water-detail/2048_9216.png",
+      "bytes": 160184,
+      "sha256": "b24a855d60ef47dfead3b14b40b95bbc28139c11b7cfb37f3cbbdda3294357d5"
+    },
+    {
+      "path": "client/maps/japan/water-detail/3072_0.png",
+      "bytes": 98128,
+      "sha256": "2c093f86506ad21351be1c29ca82510be452532722bee45256e0354fffaabb16"
+    },
+    {
+      "path": "client/maps/japan/water-detail/3072_1024.png",
+      "bytes": 179378,
+      "sha256": "2fd10025e7b628b18ce396ac09d0924bef39251fcd01078392029293503f3e29"
+    },
+    {
+      "path": "client/maps/japan/water-detail/3072_10240.png",
+      "bytes": 46811,
+      "sha256": "000be85546ad44ec8359a66f10bc342acf56543c76a7dd4a55cca3b82f663063"
+    },
+    {
+      "path": "client/maps/japan/water-detail/3072_11264.png",
+      "bytes": 2591,
+      "sha256": "014edf9609f848d1122c9f40d92691cba4a2b1d3995a84869d86205c697f5ad9"
+    },
+    {
+      "path": "client/maps/japan/water-detail/3072_2048.png",
+      "bytes": 64775,
+      "sha256": "4196d8b596f04837ccb5b9ac3718dfac33d2ff7d0695d390e0fd71d22c92bbd2"
+    },
+    {
+      "path": "client/maps/japan/water-detail/3072_3072.png",
+      "bytes": 12426,
+      "sha256": "f3a963dcd1a98e8e4c6b0b2d8e940be4f7a3becdfa8074c55397a303557ff2c2"
+    },
+    {
+      "path": "client/maps/japan/water-detail/3072_4096.png",
+      "bytes": 48184,
+      "sha256": "9abfdb92cfa529605a7e8da3d38743630f4dea23742898c4edc2f3ef8fd4b2e9"
+    },
+    {
+      "path": "client/maps/japan/water-detail/3072_5120.png",
+      "bytes": 52425,
+      "sha256": "48767e76a874e27db173b172a240c56a5da3931fc8a053035c14c408bc24fd16"
+    },
+    {
+      "path": "client/maps/japan/water-detail/3072_6144.png",
+      "bytes": 17723,
+      "sha256": "5b86efda5e22e6e085b37844b8e5505838d61ec8cf46cb1ec5cf6288a54fc8e5"
+    },
+    {
+      "path": "client/maps/japan/water-detail/3072_7168.png",
+      "bytes": 85576,
+      "sha256": "1088554c90fb0fd52c3dcc28260a3a4c5a2aeb4bc966d41a62a6f497e6477d68"
+    },
+    {
+      "path": "client/maps/japan/water-detail/3072_8192.png",
+      "bytes": 147993,
+      "sha256": "9f1cfff59bd4c4a4797cd792b638e05675b62f74cda0bd7264fa3f6feb3a7bc3"
+    },
+    {
+      "path": "client/maps/japan/water-detail/3072_9216.png",
+      "bytes": 140088,
+      "sha256": "d72607ef55fa54741ed09d5db7b44c5985a10cfdba9fc9a2b014299d8f8af312"
+    },
+    {
+      "path": "client/maps/japan/water-detail/4096_0.png",
+      "bytes": 203609,
+      "sha256": "e5d614dc9ba4ba3e4168b407dfa6bbacbf498dff1b9fc146d595886109badf79"
+    },
+    {
+      "path": "client/maps/japan/water-detail/4096_1024.png",
+      "bytes": 101232,
+      "sha256": "1adf2df2370746245ab7aabbd8d20f17f89eb3017238674bcdbbbb81383e3a6b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/4096_10240.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/4096_11264.png",
+      "bytes": 2591,
+      "sha256": "014edf9609f848d1122c9f40d92691cba4a2b1d3995a84869d86205c697f5ad9"
+    },
+    {
+      "path": "client/maps/japan/water-detail/4096_2048.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/4096_3072.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/4096_4096.png",
+      "bytes": 13588,
+      "sha256": "b8afe4cc737e5edaeb6debfe070ff8c80c17a0726b9e0a55892709474ccf9401"
+    },
+    {
+      "path": "client/maps/japan/water-detail/4096_5120.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/4096_6144.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/4096_7168.png",
+      "bytes": 121880,
+      "sha256": "3d04d16dad6c929b03506233c8aa2b4452fd62b875edb3506c97e88deabd52f1"
+    },
+    {
+      "path": "client/maps/japan/water-detail/4096_8192.png",
+      "bytes": 247641,
+      "sha256": "1cd81dd850ca1d0ea87a9b6c5ad8b8bd85fbc41f31091827c2403e270ac0b82f"
+    },
+    {
+      "path": "client/maps/japan/water-detail/4096_9216.png",
+      "bytes": 74111,
+      "sha256": "cdfc09ca9b884bfbe3726d6b0854fad8ee3312aab3a89e003402558f8a184098"
+    },
+    {
+      "path": "client/maps/japan/water-detail/5120_0.png",
+      "bytes": 200874,
+      "sha256": "503ba7e0d7fa5facc6eeb54c84debb8527efe299113576233a5e93ea86179314"
+    },
+    {
+      "path": "client/maps/japan/water-detail/5120_1024.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/5120_10240.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/5120_11264.png",
+      "bytes": 2591,
+      "sha256": "014edf9609f848d1122c9f40d92691cba4a2b1d3995a84869d86205c697f5ad9"
+    },
+    {
+      "path": "client/maps/japan/water-detail/5120_2048.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/5120_3072.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/5120_4096.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/5120_5120.png",
+      "bytes": 6892,
+      "sha256": "9de5e9c256ce2ca3f551d3dbe1a918255923e0c34fdd80e3f89ee601b6b6c784"
+    },
+    {
+      "path": "client/maps/japan/water-detail/5120_6144.png",
+      "bytes": 57604,
+      "sha256": "a61d583e32dfead0bbad728a91b13f2c4567254f8abf2560301c4e036311493f"
+    },
+    {
+      "path": "client/maps/japan/water-detail/5120_7168.png",
+      "bytes": 166128,
+      "sha256": "4d76ede466ae71c7ddc9c8d6e6a6fc05826f991d27b52b3851488aa41cf572af"
+    },
+    {
+      "path": "client/maps/japan/water-detail/5120_8192.png",
+      "bytes": 204939,
+      "sha256": "eeee634605591f856659afefd3898263136e31b4a1fc7c537a1d9651ac30187b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/5120_9216.png",
+      "bytes": 20037,
+      "sha256": "a69d8b620609dbc7768a2a3646917ded291edcfff5d8fe24cc0914335b9b4a56"
+    },
+    {
+      "path": "client/maps/japan/water-detail/6144_0.png",
+      "bytes": 144925,
+      "sha256": "8fb2b37dadec51829264ac21c58dd87ec9dcf5427151309e8a299fda8f1335ca"
+    },
+    {
+      "path": "client/maps/japan/water-detail/6144_1024.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/6144_10240.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/6144_11264.png",
+      "bytes": 2591,
+      "sha256": "014edf9609f848d1122c9f40d92691cba4a2b1d3995a84869d86205c697f5ad9"
+    },
+    {
+      "path": "client/maps/japan/water-detail/6144_2048.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/6144_3072.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/6144_4096.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/6144_5120.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/6144_6144.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/6144_7168.png",
+      "bytes": 129889,
+      "sha256": "f3d96d5923dd5fb6177e108d1f1df52a58fae3d05fe623cd695700b42a1249ff"
+    },
+    {
+      "path": "client/maps/japan/water-detail/6144_8192.png",
+      "bytes": 181089,
+      "sha256": "13abe9b16205bfc8f90e02cea2efb607bdc78b2e0426e5f8fa7d19ee63789cec"
+    },
+    {
+      "path": "client/maps/japan/water-detail/6144_9216.png",
+      "bytes": 19715,
+      "sha256": "ef02535f1af2ca08de31ac4cb561f3686444a2f3f3ac61af0881539cdc62831b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/7168_0.png",
+      "bytes": 113182,
+      "sha256": "f8b3c0c01fe554d1b74ff90d6ff6ecc3e673246acaa45c1792ddf7853a765af3"
+    },
+    {
+      "path": "client/maps/japan/water-detail/7168_1024.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/7168_10240.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/7168_11264.png",
+      "bytes": 2591,
+      "sha256": "014edf9609f848d1122c9f40d92691cba4a2b1d3995a84869d86205c697f5ad9"
+    },
+    {
+      "path": "client/maps/japan/water-detail/7168_2048.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/7168_3072.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/7168_4096.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/7168_5120.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/7168_6144.png",
+      "bytes": 15208,
+      "sha256": "959804858aa63a3b408556aa50cf971a3551da469c43789c9a0414d159bec0bf"
+    },
+    {
+      "path": "client/maps/japan/water-detail/7168_7168.png",
+      "bytes": 177193,
+      "sha256": "b62e632cf1904e2dd2b2d614f957c9c2a055e25ae7439a1b766c39a3dd952ff1"
+    },
+    {
+      "path": "client/maps/japan/water-detail/7168_8192.png",
+      "bytes": 176398,
+      "sha256": "c2fbcbdcacface20088233952cc2def974824d42493d657c6f8be3f31afffeb9"
+    },
+    {
+      "path": "client/maps/japan/water-detail/7168_9216.png",
+      "bytes": 25666,
+      "sha256": "082dd94a13c249097303160e2e79686b7dac14c300a8a7fa5c9fe919fc12c80a"
+    },
+    {
+      "path": "client/maps/japan/water-detail/8192_0.png",
+      "bytes": 91786,
+      "sha256": "7a4fa3329617301b2ad9ec42b333317b43d0470f67ccdd3dc04f0e1e8a15d40b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/8192_1024.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/8192_10240.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/8192_11264.png",
+      "bytes": 2591,
+      "sha256": "014edf9609f848d1122c9f40d92691cba4a2b1d3995a84869d86205c697f5ad9"
+    },
+    {
+      "path": "client/maps/japan/water-detail/8192_2048.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/8192_3072.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/8192_4096.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/8192_5120.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/8192_6144.png",
+      "bytes": 141425,
+      "sha256": "126683d278f2fd42dd8e7b4fa39aa5c337750aed7207c202c58138067e461393"
+    },
+    {
+      "path": "client/maps/japan/water-detail/8192_7168.png",
+      "bytes": 166611,
+      "sha256": "05db673c01f857686ae1eeaeaeb5c503f16ff34192770dfe8807df7f2279d5cc"
+    },
+    {
+      "path": "client/maps/japan/water-detail/8192_8192.png",
+      "bytes": 158887,
+      "sha256": "d5e51dd74685d8c7f7f350739cc6e58464c74bdc5faa2d61fd4706565f4c2163"
+    },
+    {
+      "path": "client/maps/japan/water-detail/8192_9216.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/9216_0.png",
+      "bytes": 57004,
+      "sha256": "182496820878bb84ec96267bd8bae39af57215868710a0f533e0e7174c341357"
+    },
+    {
+      "path": "client/maps/japan/water-detail/9216_1024.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/9216_10240.png",
+      "bytes": 19194,
+      "sha256": "a0401f5780f58a4f63968687a2d7bca27da6ca7dacaa182dd10d3a90b1a46fe3"
+    },
+    {
+      "path": "client/maps/japan/water-detail/9216_11264.png",
+      "bytes": 2591,
+      "sha256": "014edf9609f848d1122c9f40d92691cba4a2b1d3995a84869d86205c697f5ad9"
+    },
+    {
+      "path": "client/maps/japan/water-detail/9216_2048.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/9216_3072.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/9216_4096.png",
+      "bytes": 6503,
+      "sha256": "2aee1894e68dd3e4a2fecabbe353460ee6800240567c20f0bfbb5350379b4f7b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/9216_5120.png",
+      "bytes": 38914,
+      "sha256": "59400826571b054229249fed00d542ead8edca8f45c194718910918b2a6cba3a"
+    },
+    {
+      "path": "client/maps/japan/water-detail/9216_6144.png",
+      "bytes": 84393,
+      "sha256": "2d39a0c7e49d1013eb2ede3e32ca526442369dd2e37363715f6cbf813b8e069c"
+    },
+    {
+      "path": "client/maps/japan/water-detail/9216_7168.png",
+      "bytes": 205100,
+      "sha256": "9290fe12e5b67cfd8332132b531310eef2fbd9af9f01c09154a0cc164e62210b"
+    },
+    {
+      "path": "client/maps/japan/water-detail/9216_8192.png",
+      "bytes": 133310,
+      "sha256": "a0388bb1102b0df163f36b93fe34f9696cfe63d53c38e1524f758eaea6d7de68"
+    },
+    {
+      "path": "client/maps/japan/water-detail/9216_9216.png",
+      "bytes": 30743,
+      "sha256": "c995adcec9d0342b37d05915a983be0735183b8d1f33a8475188f992998beed6"
+    },
+    {
+      "path": "client/music.json",
+      "bytes": 149,
+      "sha256": "9dcef7a9b8b89c69025efb1dcee39afee3a0859370b75a181ea5fc03654f07c5"
+    },
+    {
       "path": "client/music/battle1.mp3",
       "bytes": 2848809,
       "sha256": "236a006d0d8d58d6ee55df958cfc246b10d5eb697f2f92b8c05cdde6dfcc87e0"
@@ -4431,11 +6746,6 @@
       "path": "client/music/defeat_music.mp3",
       "bytes": 247420,
       "sha256": "659a0ea8d287be1f4bbb99fd11fab6e9ce09dba37efc8c0b20042fa9a4036273"
-    },
-    {
-      "path": "client/music.json",
-      "bytes": 149,
-      "sha256": "9dcef7a9b8b89c69025efb1dcee39afee3a0859370b75a181ea5fc03654f07c5"
     },
     {
       "path": "client/presentation.json",

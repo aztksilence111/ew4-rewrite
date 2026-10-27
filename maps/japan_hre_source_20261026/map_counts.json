@@ -1,0 +1,21 @@
+{
+  "definition": "Full rectangular grid, including water and edge cells",
+  "maps": {
+    "japan": {
+      "gridWidth": 267,
+      "gridHeight": 217,
+      "totalCells": 57939,
+      "landCells": 13967,
+      "waterCells": 43972,
+      "approximateStepKm": 8
+    },
+    "hre": {
+      "gridWidth": 201,
+      "gridHeight": 261,
+      "totalCells": 52461,
+      "landCells": 38237,
+      "waterCells": 14224,
+      "approximateStepKm": 8
+    }
+  }
+}

@@ -11,9 +11,10 @@ public sealed partial class ClientGame
             throw new RuleViolation("client.player_turn", "Player does not own the active turn");
         var change = command.Op switch
         {
-            "player_ai_start" => PlayerAi.Start(world, world.Revision),
+            "player_ai_start" => PlayerAi.Start(world, world.Revision, current.Rules.Ai),
             "player_ai_stop" => PlayerAi.Stop(world, world.Revision, current.Session.PlayerFaction),
-            "player_ai_config" => PlayerAi.Configure(world, world.Revision, command.Offer ?? "", command.Policy, command.Units, command.Cell, command.AutoBattle, command.Goals),
+            "player_ai_config" => PlayerAi.Configure(world, world.Revision, command.Offer ?? "", command.Policy, command.Units, command.Cell, command.AutoBattle, command.Goals,
+                command.TaskId, command.Kind, command.Radius, command.Line, command.DeployFirst, current.Rules.Ai),
             _ => throw new RuleViolation("client.command", "Unknown player AI command")
         };
         Commit(change);
@@ -29,7 +30,7 @@ public sealed partial class ClientGame
         if (!PlayerAi.Pending(world))
         {
             if (!PlayerAi.Automatic(world)) throw new RuleViolation("player_ai.inactive", "Player AI is not running");
-            Commit(PlayerAi.BeginEnd(world, world.Revision, rules.Turns));
+            Commit(PlayerAi.BeginEnd(world, world.Revision, rules.Turns, rules.Ai));
             return null;
         }
         var step = PlayerAi.PlanStep(world, rules.Ai);

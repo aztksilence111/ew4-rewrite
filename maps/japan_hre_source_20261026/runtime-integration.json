@@ -1,0 +1,24 @@
+{
+  "maps": [
+    {
+      "map": "japan",
+      "cells": 57939,
+      "buildings": 410,
+      "farms": 153,
+      "highCellBuildings": 238
+    },
+    {
+      "map": "hre",
+      "cells": 52461,
+      "buildings": 647,
+      "farms": 262,
+      "highCellBuildings": 246
+    }
+  ],
+  "scenarios": [
+    "conquest7",
+    "conquest8",
+    "conquest9"
+  ],
+  "errors": 0
+}

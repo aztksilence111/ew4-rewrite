@@ -17,3 +17,4 @@
 @media(hover:hover){.map-mode-button:hover img{filter:brightness(1.13)}.map-mode-button:hover .map-mode-tip{visibility:visible}}
 #map-view-controls:not(.open) #map-mode-options .map-mode-tip{visibility:hidden}
 @media(prefers-reduced-motion:reduce){.map-mode-arrow,#map-mode-options .map-mode-button,#map-view-controls.open #map-mode-options .map-mode-button,#map-view-controls:not(.open) #map-mode-options .map-mode-button:first-child{transition:none}}
+#play .map-mode-button:hover,#play .map-mode-button:active,#play .map-mode-button:hover img,#play .map-mode-button:active img{filter:none}

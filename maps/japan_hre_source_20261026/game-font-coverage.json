@@ -1,0 +1,12 @@
+{
+  "maps": ["japan", "hre"],
+  "buildings": 642,
+  "uniqueCityCharacters": 478,
+  "actualWoff2SubsetsChecked": 13,
+  "missingGlyphs": [],
+  "primaryFamily": "EW4 UI Kai",
+  "fallbacks": {"U+90F7": "EW4 Kai"},
+  "reportedCharactersVerified": ["诹", "冶", "乡", "驒"],
+  "cause": "City canvas rasterized before deferred font subsets were ready",
+  "fix": "Await current map city/geographic text subsets before installing a new map or switching language"
+}

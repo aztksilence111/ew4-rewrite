@@ -39,6 +39,23 @@ public sealed record AiControlPresentation
     public string TextColor { get; init; } = "#303b36";
     public string ButtonTextColor { get; init; } = "#ffffff";
     public string SelectionColor { get; init; } = "#ffe995";
+    public string[] TaskColors { get; init; } = ["#ffe995", "#55d9e8", "#cf8cf3", "#ffad62", "#8ee17b", "#f38eb6", "#83afff", "#e3d36f", "#73d5b5", "#dba6ff", "#f0b69d", "#b3d86b", "#96c9ed", "#e89fe1", "#babdf7", "#dae7a0"];
+    public string[] TaskKinds { get; init; } = ["进攻地点", "防守地点", "沿线进攻", "沿线防守"];
+    public string TaskText { get; init; } = "任务{number}";
+    public string PreviousTaskText { get; init; } = "上一个任务";
+    public string NextTaskText { get; init; } = "下一个任务";
+    public string AddTaskText { get; init; } = "新增任务";
+    public string DeleteTaskText { get; init; } = "删除当前任务";
+    public string RadiusText { get; init; } = "防守范围";
+    public string LineText { get; init; } = "绘制部署线";
+    public string DeployFirstText { get; init; } = "部署完成后进攻";
+    public string DefendGoalText { get; init; } = "指定防守地点";
+    public string AttackGoalText { get; init; } = "指定进攻目标";
+    public string TransferredText { get; init; } = "已转入{count}支部队";
+    public string DeployingText { get; init; } = "部署中";
+    public string AdvancingText { get; init; } = "推进中";
+    public string DefendingText { get; init; } = "防守中";
+    public string UnassignedText { get; init; } = "{count}支无可用站位";
     public string BadgeText { get; init; } = "AI";
     public string BadgeColor { get; init; } = "#343e38";
     public string BadgeTextColor { get; init; } = "#fff4c5";
@@ -78,6 +95,13 @@ public sealed record AiControlPresentation
             || new[] { value.PanelColor, value.HeaderColor, value.TextColor, value.ButtonTextColor, value.SelectionColor,
                 value.BadgeColor, value.BadgeTextColor, value.BadgeBorderColor }.Any(s => s == null || !Regex.IsMatch(s, "^#[0-9a-fA-F]{6}$")))
             throw new RuleViolation("extension.ai_control", "Invalid AI control labels or colors");
+        if (value.TaskColors == null || value.TaskColors.Length != PlayerAi.MaximumTasks || value.TaskColors.Distinct(StringComparer.OrdinalIgnoreCase).Count() != value.TaskColors.Length
+            || value.TaskColors.Any(s => s == null || !Regex.IsMatch(s, "^#[0-9a-fA-F]{6}$"))
+            || value.TaskKinds == null || value.TaskKinds.Length != 4
+            || value.TaskKinds.Concat(new[] { value.TaskText, value.PreviousTaskText, value.NextTaskText, value.AddTaskText, value.DeleteTaskText,
+                value.RadiusText, value.LineText, value.DeployFirstText, value.DefendGoalText, value.AttackGoalText, value.TransferredText,
+                value.DeployingText, value.AdvancingText, value.DefendingText, value.UnassignedText }).Any(s => string.IsNullOrWhiteSpace(s) || s.Length > 80))
+            throw new RuleViolation("extension.ai_control", "Invalid AI task presentation");
         foreach (var path in new[] { value.PanelImage, value.ButtonImage, value.BadgeImage, value.PressedButtonImage, value.ConfirmImage }.OfType<string>())
         {
             if (!path.StartsWith("client/", StringComparison.Ordinal) || path.Contains('\\') || path.Contains(':') || path.Split('/').Any(p => p.Length == 0 || p is "." or "..") || !path.EndsWith(".png", StringComparison.Ordinal))

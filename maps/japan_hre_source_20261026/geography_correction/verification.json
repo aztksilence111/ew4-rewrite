@@ -1,0 +1,433 @@
+{
+  "checks": 1142,
+  "errors": 0,
+  "scope": "Real geography at coarse hex resolution; no claim of exact historical shoreline or every city independently surveyed",
+  "maps": {
+    "japan": {
+      "city_count": 177,
+      "maximum_city_shift_km": 9.305,
+      "median_city_shift_km": 2.863,
+      "cities_over_10km": 0,
+      "previous_cities_over_10km": 54,
+      "lowland_controls": [
+        {
+          "name": "京都盆地",
+          "cell": 40434,
+          "classification": "plain"
+        },
+        {
+          "name": "大阪平原",
+          "cell": 41498,
+          "classification": "plain"
+        },
+        {
+          "name": "奈良盆地",
+          "cell": 41768,
+          "classification": "plain"
+        },
+        {
+          "name": "甲府盆地",
+          "cell": 40201,
+          "classification": "plain"
+        },
+        {
+          "name": "松本盆地",
+          "cell": 37259,
+          "classification": "plain"
+        },
+        {
+          "name": "长野盆地",
+          "cell": 35661,
+          "classification": "hill"
+        },
+        {
+          "name": "东京周边平原",
+          "cell": 41283,
+          "classification": "plain"
+        },
+        {
+          "name": "浓尾平原",
+          "cell": 40715,
+          "classification": "plain"
+        }
+      ],
+      "river_controls": [
+        {
+          "name": "信浓川",
+          "reference": [
+            138.83,
+            37.45
+          ],
+          "distance_km": 0.478
+        },
+        {
+          "name": "木曾川",
+          "reference": [
+            136.94,
+            35.392
+          ],
+          "distance_km": 0.141
+        },
+        {
+          "name": "淀川",
+          "reference": [
+            135.518,
+            34.716
+          ],
+          "distance_km": 0.83
+        },
+        {
+          "name": "北上川",
+          "reference": [
+            141.133,
+            39.693
+          ],
+          "distance_km": 0.499
+        },
+        {
+          "name": "汉江",
+          "reference": [
+            126.936,
+            37.519
+          ],
+          "distance_km": 0.519
+        }
+      ],
+      "corridors": [
+        {
+          "name": "甲府盆地",
+          "reference": [
+            [
+              138.45,
+              35.66
+            ],
+            [
+              138.57,
+              35.66
+            ],
+            [
+              138.69,
+              35.64
+            ]
+          ],
+          "cells": [
+            40200,
+            40201,
+            40468,
+            40469
+          ],
+          "raw_classes": [
+            "plain",
+            "plain",
+            "plain",
+            "hill"
+          ]
+        },
+        {
+          "name": "松本—安昙野谷地",
+          "reference": [
+            [
+              137.87,
+              36.42
+            ],
+            [
+              137.97,
+              36.24
+            ],
+            [
+              137.98,
+              36.12
+            ]
+          ],
+          "cells": [
+            36458,
+            36725,
+            36993,
+            37259,
+            37526,
+            37792
+          ],
+          "raw_classes": [
+            "plain",
+            "hill",
+            "hill",
+            "plain",
+            "plain",
+            "hill"
+          ]
+        },
+        {
+          "name": "长野盆地",
+          "reference": [
+            [
+              138.13,
+              36.57
+            ],
+            [
+              138.2,
+              36.65
+            ],
+            [
+              138.31,
+              36.77
+            ]
+          ],
+          "cells": [
+            35927,
+            35928,
+            35929,
+            35662,
+            35396
+          ],
+          "raw_classes": [
+            "hill",
+            "plain",
+            "hill",
+            "plain",
+            "hill"
+          ]
+        }
+      ],
+      "river_names": [
+        "主要支流水系",
+        "信浓川",
+        "利根川",
+        "北上川",
+        "十胜川",
+        "吉野川",
+        "四万十川",
+        "图们江",
+        "多摩川",
+        "大同江",
+        "大和川",
+        "大淀川",
+        "天盐川",
+        "天龙川",
+        "富士川",
+        "揖斐川",
+        "最上川",
+        "木曾川",
+        "汉江",
+        "洛东江",
+        "淀川",
+        "熊野川",
+        "球磨川",
+        "石狩川",
+        "筑后川",
+        "荒川",
+        "钏路川",
+        "锦江",
+        "长良川",
+        "阿武隈川",
+        "阿贺野川",
+        "雄物川",
+        "鸭绿江"
+      ]
+    },
+    "hre": {
+      "city_count": 266,
+      "maximum_city_shift_km": 6.906,
+      "median_city_shift_km": 2.963,
+      "cities_over_10km": 0,
+      "previous_cities_over_10km": 22,
+      "lowland_controls": [
+        {
+          "name": "斯特拉斯堡莱茵河谷",
+          "cell": 31417,
+          "classification": "plain"
+        },
+        {
+          "name": "弗赖堡莱茵河谷边缘",
+          "cell": 33428,
+          "classification": "hill"
+        },
+        {
+          "name": "因斯布鲁克因河谷",
+          "cell": 36073,
+          "classification": "hill"
+        },
+        {
+          "name": "萨尔茨堡盆地",
+          "cell": 34280,
+          "classification": "plain"
+        },
+        {
+          "name": "林茨多瑙河谷",
+          "cell": 32482,
+          "classification": "hill"
+        },
+        {
+          "name": "波河平原",
+          "cell": 43295,
+          "classification": "plain"
+        },
+        {
+          "name": "柏林周边平原",
+          "cell": 18805,
+          "classification": "plain"
+        }
+      ],
+      "river_controls": [
+        {
+          "name": "美因河",
+          "reference": [
+            8.678,
+            50.105
+          ],
+          "distance_km": 0.154
+        },
+        {
+          "name": "因河",
+          "reference": [
+            11.397,
+            47.271
+          ],
+          "distance_km": 0.323
+        },
+        {
+          "name": "伏尔塔瓦河",
+          "reference": [
+            14.414,
+            50.086
+          ],
+          "distance_km": 0.18
+        },
+        {
+          "name": "内卡河",
+          "reference": [
+            8.695,
+            49.412
+          ],
+          "distance_km": 0.287
+        },
+        {
+          "name": "摩泽尔河",
+          "reference": [
+            6.629,
+            49.76
+          ],
+          "distance_km": 0.111
+        }
+      ],
+      "corridors": [
+        {
+          "name": "因斯布鲁克因河谷",
+          "reference": [
+            [
+              11.15,
+              47.27
+            ],
+            [
+              11.4,
+              47.27
+            ],
+            [
+              11.7,
+              47.32
+            ]
+          ],
+          "cells": [
+            36071,
+            36072,
+            36073,
+            36074,
+            36075,
+            35875
+          ],
+          "raw_classes": [
+            "hill",
+            "hill",
+            "hill",
+            "hill",
+            "hill",
+            "hill"
+          ]
+        },
+        {
+          "name": "上莱茵河谷",
+          "reference": [
+            [
+              7.62,
+              48.22
+            ],
+            [
+              7.75,
+              48.58
+            ],
+            [
+              8.05,
+              49.02
+            ]
+          ],
+          "cells": [
+            32622,
+            32420,
+            32220,
+            32018,
+            31818,
+            31617,
+            31417,
+            31216,
+            31016,
+            30815,
+            30615,
+            30414,
+            30214,
+            30013
+          ],
+          "raw_classes": [
+            "plain",
+            "plain",
+            "plain",
+            "plain",
+            "plain",
+            "plain",
+            "plain",
+            "plain",
+            "plain",
+            "plain",
+            "plain",
+            "plain",
+            "plain",
+            "plain"
+          ]
+        }
+      ],
+      "river_names": [
+        "主要支流水系",
+        "伊萨尔河",
+        "伏尔塔瓦河",
+        "内卡河",
+        "因河",
+        "塞纳河",
+        "多瑙河",
+        "奥得河",
+        "威悉河",
+        "富尔达河",
+        "德拉瓦河",
+        "恩斯河",
+        "提契诺河",
+        "摩拉瓦河",
+        "摩泽尔河",
+        "斯海尔德河",
+        "施普雷河",
+        "易北河",
+        "波河",
+        "穆尔河",
+        "维斯瓦河",
+        "罗讷河",
+        "美因河",
+        "莱希河",
+        "莱茵河",
+        "萨勒河",
+        "萨尔察赫河",
+        "萨瓦河",
+        "阿尔诺河",
+        "阿达河",
+        "阿迪杰河",
+        "韦拉河",
+        "默兹河"
+      ]
+    }
+  }
+}

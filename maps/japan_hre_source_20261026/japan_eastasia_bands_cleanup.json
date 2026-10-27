@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-26",
+  "scope": "Japan relief appearance using installed East Asia assets",
+  "removedTargets": [
+    "build/japan-eastasia-bands-20261026",
+    "build/japan-hre-source-20261026/browser"
+  ],
+  "removedFiles": 116,
+  "removedBytes": 19144741,
+  "remainingTargets": 0,
+  "errors": 0,
+  "preflight": "Git, tracked paths, absolute paths, reparse points and active processes inspected; no active target processes or reparse points",
+  "invariants": {
+    "hreHashChanges": [],
+    "eastasiaReferenceHashChanges": [],
+    "buildingsUnchanged": true,
+    "mountainShapeIndexChanges": 1638,
+    "terrainKindsAndRiversUnchanged": true
+  },
+  "verification": {
+    "landforms": 873,
+    "relief": 20759,
+    "geographic": 1142,
+    "compact": 775,
+    "native": 139227,
+    "browser": 305,
+    "browserViews": 10,
+    "errors": 0
+  },
+  "preserved": "Map deliverables, original references, source code, player data and concurrent work"
+}

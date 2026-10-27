@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-27",
+  "targets": [
+    {
+      "path": "build/eastasia-coast-fix-20261027",
+      "files": 437,
+      "bytes": 39833999.0
+    },
+    {
+      "path": "build/curved-map-text-20261025",
+      "files": 37,
+      "bytes": 24711966.0
+    },
+    {
+      "path": "build/map-review-tests-20261027",
+      "files": 0,
+      "bytes": null
+    },
+    {
+      "path": "build/map-review-runtime-20261027/saves/startup-assets/46c1985bcda12ee017bc02481eb0c7fbdf79e6d2a286698337e21b6f886b3a76",
+      "files": 1,
+      "bytes": 168.0
+    }
+  ],
+  "files": 475.0,
+  "bytes": 64546133.0,
+  "remaining": 0,
+  "errors": 0,
+  "retainedRuntimePid": 25804,
+  "stoppedScratchPid": 35252,
+  "protectedFilesChanged": 0,
+  "installedModsPreserved": true
+}

@@ -1,0 +1,333 @@
+{
+  "date": "2026-10-27",
+  "method": "Independent Chinese character positions over actual sea areas; complete English paths retained",
+  "japaneseCharacters": 4,
+  "hreCharacters": 5,
+  "glyphs": [
+    {
+      "renderer": "canvas",
+      "key": "japan",
+      "name": "濑户内海",
+      "language": "zh",
+      "ink": 3140,
+      "edge": 0,
+      "drawn": [
+        "濑",
+        "户",
+        "内",
+        "海"
+      ],
+      "characters": [
+        {
+          "character": "濑",
+          "ink": 1085,
+          "visible": true
+        },
+        {
+          "character": "户",
+          "ink": 461,
+          "visible": true
+        },
+        {
+          "character": "内",
+          "ink": 690,
+          "visible": true
+        },
+        {
+          "character": "海",
+          "ink": 904,
+          "visible": true
+        }
+      ],
+      "fontFailures": []
+    },
+    {
+      "renderer": "canvas",
+      "key": "japan",
+      "name": "濑户内海",
+      "language": "en",
+      "ink": 1141,
+      "edge": 0,
+      "drawn": [],
+      "characters": [
+        {
+          "character": "濑",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "户",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "内",
+          "ink": 411,
+          "visible": true
+        },
+        {
+          "character": "海",
+          "ink": 0,
+          "visible": true
+        }
+      ],
+      "fontFailures": []
+    },
+    {
+      "renderer": "canvas",
+      "key": "hre",
+      "name": "利古里亚海",
+      "language": "zh",
+      "ink": 8426,
+      "edge": 0,
+      "drawn": [
+        "利",
+        "古",
+        "里",
+        "亚",
+        "海"
+      ],
+      "characters": [
+        {
+          "character": "利",
+          "ink": 1765,
+          "visible": true
+        },
+        {
+          "character": "古",
+          "ink": 1292,
+          "visible": true
+        },
+        {
+          "character": "里",
+          "ink": 1779,
+          "visible": true
+        },
+        {
+          "character": "亚",
+          "ink": 1602,
+          "visible": true
+        },
+        {
+          "character": "海",
+          "ink": 1988,
+          "visible": true
+        }
+      ],
+      "fontFailures": []
+    },
+    {
+      "renderer": "canvas",
+      "key": "hre",
+      "name": "利古里亚海",
+      "language": "en",
+      "ink": 4721,
+      "edge": 0,
+      "drawn": [],
+      "characters": [
+        {
+          "character": "利",
+          "ink": 87,
+          "visible": true
+        },
+        {
+          "character": "古",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "里",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "亚",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "海",
+          "ink": 0,
+          "visible": true
+        }
+      ],
+      "fontFailures": []
+    },
+    {
+      "renderer": "pixi",
+      "key": "japan",
+      "name": "濑户内海",
+      "language": "zh",
+      "ink": 3140,
+      "edge": 0,
+      "drawn": [
+        "濑",
+        "户",
+        "内",
+        "海"
+      ],
+      "characters": [
+        {
+          "character": "濑",
+          "ink": 1085,
+          "visible": true
+        },
+        {
+          "character": "户",
+          "ink": 461,
+          "visible": true
+        },
+        {
+          "character": "内",
+          "ink": 690,
+          "visible": true
+        },
+        {
+          "character": "海",
+          "ink": 904,
+          "visible": true
+        }
+      ],
+      "fontFailures": []
+    },
+    {
+      "renderer": "pixi",
+      "key": "japan",
+      "name": "濑户内海",
+      "language": "en",
+      "ink": 1141,
+      "edge": 0,
+      "drawn": [],
+      "characters": [
+        {
+          "character": "濑",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "户",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "内",
+          "ink": 411,
+          "visible": true
+        },
+        {
+          "character": "海",
+          "ink": 0,
+          "visible": true
+        }
+      ],
+      "fontFailures": []
+    },
+    {
+      "renderer": "pixi",
+      "key": "hre",
+      "name": "利古里亚海",
+      "language": "zh",
+      "ink": 8426,
+      "edge": 0,
+      "drawn": [
+        "利",
+        "古",
+        "里",
+        "亚",
+        "海"
+      ],
+      "characters": [
+        {
+          "character": "利",
+          "ink": 1765,
+          "visible": true
+        },
+        {
+          "character": "古",
+          "ink": 1292,
+          "visible": true
+        },
+        {
+          "character": "里",
+          "ink": 1779,
+          "visible": true
+        },
+        {
+          "character": "亚",
+          "ink": 1602,
+          "visible": true
+        },
+        {
+          "character": "海",
+          "ink": 1988,
+          "visible": true
+        }
+      ],
+      "fontFailures": []
+    },
+    {
+      "renderer": "pixi",
+      "key": "hre",
+      "name": "利古里亚海",
+      "language": "en",
+      "ink": 4721,
+      "edge": 0,
+      "drawn": [],
+      "characters": [
+        {
+          "character": "利",
+          "ink": 87,
+          "visible": true
+        },
+        {
+          "character": "古",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "里",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "亚",
+          "ink": 0,
+          "visible": true
+        },
+        {
+          "character": "海",
+          "ink": 0,
+          "visible": true
+        }
+      ],
+      "fontFailures": []
+    }
+  ],
+  "errors": [],
+  "missing": [],
+  "published": {
+    "pid": 25804,
+    "url": "http://127.0.0.1:5585",
+    "activeMod": "7901bbefe89657b6394351a4aa9676473b5f142c930859e7ba199ac1d8fdf33a",
+    "baseRevision": "c612c9dda5d5acc48ca985075ade5ff97027e4db5fef911abf3f364371bb53f8",
+    "protectedFiles": 8,
+    "protectedFileChanges": 0,
+    "publishedResourceDifferences": 0,
+    "japanCharacters": 4,
+    "hreCharacters": 5,
+    "packageSha256": "46a5489e0a9182a8b8e832703683a0aa52e96a4dc27714b789fa4474b73cc8a9",
+    "eastasiaPreview": {
+      "width": 6000,
+      "path": "maps/eastasia_rewrite/eastasia_full_preview.jpg",
+      "sha256": "0ca08db25798508327eff1c04705ab45ed9101861b90d6f9675d829f67824663",
+      "height": 4355
+    },
+    "curvedRegression": {
+      "missing": 0,
+      "checks": 2168,
+      "renderedLabels": 1044,
+      "cases": 6,
+      "errors": 0
+    }
+  }
+}

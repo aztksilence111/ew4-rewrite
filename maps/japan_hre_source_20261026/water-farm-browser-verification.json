@@ -1,0 +1,585 @@
+{
+  "checks": 111,
+  "errors": [],
+  "missing": [],
+  "maps": [
+    {
+      "renderer": "pixi",
+      "map": "japan",
+      "levels": {
+        "1": 43,
+        "2": 37,
+        "3": 73
+      },
+      "farms": 153,
+      "validImages": true,
+      "dry": true,
+      "styles": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "loadedDetails": 16,
+      "detailTiles": 204,
+      "detailZoom": 0.55,
+      "mouths": 144,
+      "unresolved": []
+    },
+    {
+      "renderer": "pixi",
+      "map": "hre",
+      "levels": {
+        "1": 88,
+        "2": 51,
+        "3": 123
+      },
+      "farms": 262,
+      "validImages": true,
+      "dry": true,
+      "styles": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "loadedDetails": 12,
+      "detailTiles": 182,
+      "detailZoom": 0.55,
+      "mouths": 80,
+      "unresolved": []
+    },
+    {
+      "renderer": "canvas",
+      "map": "japan",
+      "levels": {
+        "1": 43,
+        "2": 37,
+        "3": 73
+      },
+      "farms": 153,
+      "validImages": true,
+      "dry": true,
+      "styles": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "loadedDetails": 4,
+      "detailTiles": 204,
+      "detailZoom": 0.55,
+      "mouths": 144,
+      "unresolved": []
+    },
+    {
+      "renderer": "canvas",
+      "map": "hre",
+      "levels": {
+        "1": 88,
+        "2": 51,
+        "3": 123
+      },
+      "farms": 262,
+      "validImages": true,
+      "dry": true,
+      "styles": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "loadedDetails": 2,
+      "detailTiles": 182,
+      "detailZoom": 0.55,
+      "mouths": 80,
+      "unresolved": []
+    }
+  ],
+  "views": [
+    {
+      "renderer": "pixi",
+      "key": "japan",
+      "width": 1440,
+      "height": 900,
+      "name": "石卷港",
+      "colors": 6895,
+      "retained": 26,
+      "details": 26,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "japan",
+      "width": 1440,
+      "height": 900,
+      "name": "函馆港",
+      "colors": 7088,
+      "retained": 38,
+      "details": 38,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "japan",
+      "width": 1440,
+      "height": 900,
+      "name": "敦贺港",
+      "colors": 7123,
+      "retained": 50,
+      "details": 50,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "japan",
+      "width": 1440,
+      "height": 900,
+      "name": "小木港",
+      "colors": 3489,
+      "retained": 54,
+      "details": 54,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "japan",
+      "width": 1440,
+      "height": 900,
+      "name": "吉野川",
+      "colors": 8866,
+      "retained": 64,
+      "details": 64,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "japan",
+      "width": 390,
+      "height": 844,
+      "name": "石卷港",
+      "colors": 3095,
+      "retained": 64,
+      "details": 64,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "japan",
+      "width": 390,
+      "height": 844,
+      "name": "函馆港",
+      "colors": 3443,
+      "retained": 64,
+      "details": 64,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "japan",
+      "width": 390,
+      "height": 844,
+      "name": "敦贺港",
+      "colors": 3740,
+      "retained": 64,
+      "details": 64,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "japan",
+      "width": 390,
+      "height": 844,
+      "name": "小木港",
+      "colors": 1461,
+      "retained": 64,
+      "details": 64,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "japan",
+      "width": 390,
+      "height": 844,
+      "name": "吉野川",
+      "colors": 3736,
+      "retained": 64,
+      "details": 64,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "hre",
+      "width": 1440,
+      "height": 900,
+      "name": "埃姆登港",
+      "colors": 5424,
+      "retained": 64,
+      "details": 28,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "hre",
+      "width": 1440,
+      "height": 900,
+      "name": "比萨外港",
+      "colors": 5356,
+      "retained": 64,
+      "details": 40,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "hre",
+      "width": 1440,
+      "height": 900,
+      "name": "泰瑟尔锚地",
+      "colors": 3132,
+      "retained": 64,
+      "details": 44,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "hre",
+      "width": 1440,
+      "height": 900,
+      "name": "加来港",
+      "colors": 2651,
+      "retained": 64,
+      "details": 52,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "hre",
+      "width": 1440,
+      "height": 900,
+      "name": "波河",
+      "colors": 3423,
+      "retained": 64,
+      "details": 62,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "hre",
+      "width": 1440,
+      "height": 900,
+      "name": "意大利北部",
+      "colors": 7583,
+      "retained": 64,
+      "details": 62,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "hre",
+      "width": 390,
+      "height": 844,
+      "name": "埃姆登港",
+      "colors": 2353,
+      "retained": 64,
+      "details": 62,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "hre",
+      "width": 390,
+      "height": 844,
+      "name": "比萨外港",
+      "colors": 2314,
+      "retained": 64,
+      "details": 62,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "hre",
+      "width": 390,
+      "height": 844,
+      "name": "泰瑟尔锚地",
+      "colors": 2243,
+      "retained": 64,
+      "details": 62,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "hre",
+      "width": 390,
+      "height": 844,
+      "name": "加来港",
+      "colors": 1740,
+      "retained": 64,
+      "details": 62,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "hre",
+      "width": 390,
+      "height": 844,
+      "name": "波河",
+      "colors": 1272,
+      "retained": 64,
+      "details": 62,
+      "overflow": false
+    },
+    {
+      "renderer": "pixi",
+      "key": "hre",
+      "width": 390,
+      "height": 844,
+      "name": "意大利北部",
+      "colors": 3910,
+      "retained": 64,
+      "details": 62,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "japan",
+      "width": 1440,
+      "height": 900,
+      "name": "石卷港",
+      "colors": 6945,
+      "retained": 8,
+      "details": 8,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "japan",
+      "width": 1440,
+      "height": 900,
+      "name": "函馆港",
+      "colors": 6943,
+      "retained": 12,
+      "details": 12,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "japan",
+      "width": 1440,
+      "height": 900,
+      "name": "敦贺港",
+      "colors": 6960,
+      "retained": 16,
+      "details": 16,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "japan",
+      "width": 1440,
+      "height": 900,
+      "name": "小木港",
+      "colors": 3639,
+      "retained": 20,
+      "details": 20,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "japan",
+      "width": 1440,
+      "height": 900,
+      "name": "吉野川",
+      "colors": 8989,
+      "retained": 22,
+      "details": 22,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "japan",
+      "width": 390,
+      "height": 844,
+      "name": "石卷港",
+      "colors": 3091,
+      "retained": 22,
+      "details": 22,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "japan",
+      "width": 390,
+      "height": 844,
+      "name": "函馆港",
+      "colors": 3568,
+      "retained": 22,
+      "details": 22,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "japan",
+      "width": 390,
+      "height": 844,
+      "name": "敦贺港",
+      "colors": 3814,
+      "retained": 22,
+      "details": 22,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "japan",
+      "width": 390,
+      "height": 844,
+      "name": "小木港",
+      "colors": 1503,
+      "retained": 22,
+      "details": 22,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "japan",
+      "width": 390,
+      "height": 844,
+      "name": "吉野川",
+      "colors": 3815,
+      "retained": 22,
+      "details": 22,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "hre",
+      "width": 1440,
+      "height": 900,
+      "name": "埃姆登港",
+      "colors": 4885,
+      "retained": 28,
+      "details": 6,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "hre",
+      "width": 1440,
+      "height": 900,
+      "name": "比萨外港",
+      "colors": 5459,
+      "retained": 32,
+      "details": 10,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "hre",
+      "width": 1440,
+      "height": 900,
+      "name": "泰瑟尔锚地",
+      "colors": 3418,
+      "retained": 36,
+      "details": 14,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "hre",
+      "width": 1440,
+      "height": 900,
+      "name": "加来港",
+      "colors": 2859,
+      "retained": 40,
+      "details": 18,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "hre",
+      "width": 1440,
+      "height": 900,
+      "name": "波河",
+      "colors": 3675,
+      "retained": 42,
+      "details": 20,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "hre",
+      "width": 1440,
+      "height": 900,
+      "name": "意大利北部",
+      "colors": 7455,
+      "retained": 42,
+      "details": 20,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "hre",
+      "width": 390,
+      "height": 844,
+      "name": "埃姆登港",
+      "colors": 2514,
+      "retained": 42,
+      "details": 20,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "hre",
+      "width": 390,
+      "height": 844,
+      "name": "比萨外港",
+      "colors": 2406,
+      "retained": 42,
+      "details": 20,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "hre",
+      "width": 390,
+      "height": 844,
+      "name": "泰瑟尔锚地",
+      "colors": 2527,
+      "retained": 42,
+      "details": 20,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "hre",
+      "width": 390,
+      "height": 844,
+      "name": "加来港",
+      "colors": 1963,
+      "retained": 42,
+      "details": 20,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "hre",
+      "width": 390,
+      "height": 844,
+      "name": "波河",
+      "colors": 1372,
+      "retained": 42,
+      "details": 20,
+      "overflow": false
+    },
+    {
+      "renderer": "canvas",
+      "key": "hre",
+      "width": 390,
+      "height": 844,
+      "name": "意大利北部",
+      "colors": 3912,
+      "retained": 42,
+      "details": 20,
+      "overflow": false
+    }
+  ]
+}

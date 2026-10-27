@@ -1,0 +1,2688 @@
+{
+  "japan": {
+    "changes": 36,
+    "levels": {
+      "1": 53,
+      "2": 83,
+      "3": 5,
+      "4": 23,
+      "5": 8,
+      "6": 3,
+      "7": 2
+    },
+    "cities": [
+      {
+        "id": "japan-004535cbb32b",
+        "name": "福山",
+        "cell": 40138,
+        "level": 2
+      },
+      {
+        "id": "japan-0148baa97eef",
+        "name": "村上",
+        "cell": 30341,
+        "level": 2
+      },
+      {
+        "id": "japan-0193d9e778ce",
+        "name": "日田",
+        "cell": 42777,
+        "level": 2
+      },
+      {
+        "id": "japan-04b8c744f903",
+        "name": "上田",
+        "cell": 36729,
+        "level": 2
+      },
+      {
+        "id": "japan-052d1e74b705",
+        "name": "苫小牧",
+        "cell": 13293,
+        "level": 1
+      },
+      {
+        "id": "japan-086568f0d007",
+        "name": "奈良",
+        "cell": 41769,
+        "level": 5
+      },
+      {
+        "id": "japan-093e2eb072d3",
+        "name": "全州",
+        "cell": 28592,
+        "level": 4
+      },
+      {
+        "id": "japan-0f3788b1d37b",
+        "name": "会宁",
+        "cell": 3013,
+        "level": 1
+      },
+      {
+        "id": "japan-10e8a37faf89",
+        "name": "柳川",
+        "cell": 43037,
+        "level": 2
+      },
+      {
+        "id": "japan-1173c22dee64",
+        "name": "延冈",
+        "cell": 46787,
+        "level": 2
+      },
+      {
+        "id": "japan-14a09f070b21",
+        "name": "室兰",
+        "cell": 14087,
+        "level": 1
+      },
+      {
+        "id": "japan-14f2ea922e26",
+        "name": "足利",
+        "cell": 38344,
+        "level": 2
+      },
+      {
+        "id": "japan-15e9c6f29a5a",
+        "name": "安土",
+        "cell": 40172,
+        "level": 2
+      },
+      {
+        "id": "japan-168370264845",
+        "name": "岛原",
+        "cell": 44637,
+        "level": 2
+      },
+      {
+        "id": "japan-16f0eef46bd0",
+        "name": "八户",
+        "cell": 22362,
+        "level": 2
+      },
+      {
+        "id": "japan-17cab6bf6af2",
+        "name": "富山",
+        "cell": 34582,
+        "level": 2
+      },
+      {
+        "id": "japan-18a0dec1187e",
+        "name": "福知山",
+        "cell": 38559,
+        "level": 2
+      },
+      {
+        "id": "japan-18c94d9b2cd5",
+        "name": "严原对马",
+        "cell": 37421,
+        "level": 2
+      },
+      {
+        "id": "japan-1b005f67eab8",
+        "name": "滨松",
+        "cell": 43392,
+        "level": 2
+      },
+      {
+        "id": "japan-1b845b199c12",
+        "name": "稚内",
+        "cell": 1823,
+        "level": 1
+      },
+      {
+        "id": "japan-1bd3913c11ee",
+        "name": "汉城",
+        "cell": 20854,
+        "level": 7
+      },
+      {
+        "id": "japan-1d3b7f126363",
+        "name": "新庄",
+        "cell": 28750,
+        "level": 2
+      },
+      {
+        "id": "japan-1d8d167345b0",
+        "name": "山口",
+        "cell": 39582,
+        "level": 5
+      },
+      {
+        "id": "japan-1e3dc9930f8f",
+        "name": "德岛",
+        "cell": 43354,
+        "level": 2
+      },
+      {
+        "id": "japan-1e966657ee58",
+        "name": "小诸",
+        "cell": 37264,
+        "level": 2
+      },
+      {
+        "id": "japan-207defb2b5df",
+        "name": "江陵",
+        "cell": 21944,
+        "level": 2
+      },
+      {
+        "id": "japan-213fc1711506",
+        "name": "出水",
+        "cell": 47572,
+        "level": 1
+      },
+      {
+        "id": "japan-226f27dc1c1e",
+        "name": "仙台",
+        "cell": 31425,
+        "level": 4
+      },
+      {
+        "id": "japan-2519c82d502f",
+        "name": "久慈",
+        "cell": 23966,
+        "level": 1
+      },
+      {
+        "id": "japan-277149735026",
+        "name": "厩桥",
+        "cell": 37539,
+        "level": 2
+      },
+      {
+        "id": "japan-282357f3f425",
+        "name": "唐津",
+        "cell": 41431,
+        "level": 2
+      },
+      {
+        "id": "japan-28ba0990f181",
+        "name": "大村",
+        "cell": 43565,
+        "level": 2
+      },
+      {
+        "id": "japan-2ad7ec2628c9",
+        "name": "大馆",
+        "cell": 22618,
+        "level": 1
+      },
+      {
+        "id": "japan-2da32a9523d2",
+        "name": "高山",
+        "cell": 36984,
+        "level": 2
+      },
+      {
+        "id": "japan-2e0f35666ed0",
+        "name": "岩见泽",
+        "cell": 11161,
+        "level": 1
+      },
+      {
+        "id": "japan-2e90fe09775d",
+        "name": "宇和岛",
+        "cell": 44931,
+        "level": 2
+      },
+      {
+        "id": "japan-2f6f4f76203c",
+        "name": "新潟",
+        "cell": 31137,
+        "level": 2
+      },
+      {
+        "id": "japan-2fdc792060fa",
+        "name": "西乡隐岐",
+        "cell": 32668,
+        "level": 1
+      },
+      {
+        "id": "japan-3012d62a6bb8",
+        "name": "忠州",
+        "cell": 24333,
+        "level": 3
+      },
+      {
+        "id": "japan-331b9bf89206",
+        "name": "府内",
+        "cell": 43852,
+        "level": 3
+      },
+      {
+        "id": "japan-3694d948575b",
+        "name": "新宫",
+        "cell": 46039,
+        "level": 2
+      },
+      {
+        "id": "japan-3943633f8546",
+        "name": "留萌",
+        "cell": 7959,
+        "level": 1
+      },
+      {
+        "id": "japan-39593bf65a53",
+        "name": "佐贺",
+        "cell": 42502,
+        "level": 2
+      },
+      {
+        "id": "japan-3d59003f6eab",
+        "name": "饫肥",
+        "cell": 50518,
+        "level": 1
+      },
+      {
+        "id": "japan-3eb80aa598ac",
+        "name": "天盐",
+        "cell": 3959,
+        "level": 1
+      },
+      {
+        "id": "japan-3ff91de9fe54",
+        "name": "札幌",
+        "cell": 11423,
+        "level": 1
+      },
+      {
+        "id": "japan-40449bd5f16e",
+        "name": "小仓",
+        "cell": 40642,
+        "level": 2
+      },
+      {
+        "id": "japan-4180450f7169",
+        "name": "和歌山",
+        "cell": 43094,
+        "level": 3
+      },
+      {
+        "id": "japan-4278c40172ad",
+        "name": "浦河",
+        "cell": 16508,
+        "level": 1
+      },
+      {
+        "id": "japan-42aac5edcb27",
+        "name": "咸兴",
+        "cell": 11523,
+        "level": 4
+      },
+      {
+        "id": "japan-430a09242932",
+        "name": "大阪",
+        "cell": 41498,
+        "level": 6
+      },
+      {
+        "id": "japan-4331fcbe6c2a",
+        "name": "长冈",
+        "cell": 33001,
+        "level": 2
+      },
+      {
+        "id": "japan-43f77c790ff2",
+        "name": "庆州",
+        "cell": 30485,
+        "level": 4
+      },
+      {
+        "id": "japan-4433b5e76e83",
+        "name": "大邱",
+        "cell": 29676,
+        "level": 2
+      },
+      {
+        "id": "japan-4686d29e3c83",
+        "name": "津",
+        "cell": 42310,
+        "level": 2
+      },
+      {
+        "id": "japan-483a998c99d8",
+        "name": "岐阜",
+        "cell": 39646,
+        "level": 4
+      },
+      {
+        "id": "japan-48d58bedfb35",
+        "name": "出云",
+        "cell": 35863,
+        "level": 2
+      },
+      {
+        "id": "japan-48e92dc57a51",
+        "name": "元山",
+        "cell": 14723,
+        "level": 2
+      },
+      {
+        "id": "japan-4956aaf77207",
+        "name": "高知",
+        "cell": 44409,
+        "level": 4
+      },
+      {
+        "id": "japan-49734da65f56",
+        "name": "晋州",
+        "cell": 32338,
+        "level": 2
+      },
+      {
+        "id": "japan-4b2b9888bdec",
+        "name": "挂川",
+        "cell": 43662,
+        "level": 2
+      },
+      {
+        "id": "japan-4c5053d1aa70",
+        "name": "俱知安",
+        "cell": 11416,
+        "level": 1
+      },
+      {
+        "id": "japan-4f47eebc74fd",
+        "name": "七尾",
+        "cell": 32979,
+        "level": 1
+      },
+      {
+        "id": "japan-4fe146f0dbad",
+        "name": "广岛",
+        "cell": 39594,
+        "level": 4
+      },
+      {
+        "id": "japan-5046809f56df",
+        "name": "川越",
+        "cell": 39945,
+        "level": 2
+      },
+      {
+        "id": "japan-5499852e832c",
+        "name": "伊势",
+        "cell": 43380,
+        "level": 2
+      },
+      {
+        "id": "japan-550e930475e6",
+        "name": "冈山",
+        "cell": 40145,
+        "level": 4
+      },
+      {
+        "id": "japan-56a49b7f01ab",
+        "name": "相马",
+        "cell": 33293,
+        "level": 1
+      },
+      {
+        "id": "japan-585f3ad22902",
+        "name": "骏府",
+        "cell": 43133,
+        "level": 5
+      },
+      {
+        "id": "japan-5fb7d3c5f5ee",
+        "name": "人吉",
+        "cell": 47309,
+        "level": 1
+      },
+      {
+        "id": "japan-608ce6520d9c",
+        "name": "开城",
+        "cell": 18714,
+        "level": 4
+      },
+      {
+        "id": "japan-688894b17f43",
+        "name": "网走",
+        "cell": 10124,
+        "level": 1
+      },
+      {
+        "id": "japan-6ce4b309a25e",
+        "name": "清洲",
+        "cell": 40447,
+        "level": 1
+      },
+      {
+        "id": "japan-6dfa5d1c4fc7",
+        "name": "大垣",
+        "cell": 39644,
+        "level": 2
+      },
+      {
+        "id": "japan-6fa97e16d1ec",
+        "name": "函馆",
+        "cell": 16218,
+        "level": 2
+      },
+      {
+        "id": "japan-70e7d4de7d91",
+        "name": "京都",
+        "cell": 40434,
+        "level": 7
+      },
+      {
+        "id": "japan-717a6eb3bc92",
+        "name": "松本",
+        "cell": 37259,
+        "level": 2
+      },
+      {
+        "id": "japan-71df9e7ef57f",
+        "name": "鹿儿岛",
+        "cell": 49708,
+        "level": 5
+      },
+      {
+        "id": "japan-74ee5d92a46d",
+        "name": "小樽",
+        "cell": 10618,
+        "level": 1
+      },
+      {
+        "id": "japan-75022a30d1b9",
+        "name": "北见",
+        "cell": 10653,
+        "level": 1
+      },
+      {
+        "id": "japan-76249096c873",
+        "name": "带广",
+        "cell": 13846,
+        "level": 1
+      },
+      {
+        "id": "japan-77ea1a29a55b",
+        "name": "能代",
+        "cell": 22345,
+        "level": 1
+      },
+      {
+        "id": "japan-78864cfe7d1f",
+        "name": "敦贺",
+        "cell": 38037,
+        "level": 2
+      },
+      {
+        "id": "japan-7a1366f17fee",
+        "name": "松阪",
+        "cell": 42844,
+        "level": 2
+      },
+      {
+        "id": "japan-7ce1a2a0e0e0",
+        "name": "鸟取",
+        "cell": 36680,
+        "level": 2
+      },
+      {
+        "id": "japan-7ce5e9490253",
+        "name": "宫之浦屋久岛",
+        "cell": 55044,
+        "level": 1
+      },
+      {
+        "id": "japan-7df42f7b677b",
+        "name": "白河",
+        "cell": 35685,
+        "level": 2
+      },
+      {
+        "id": "japan-7e89d753d1fd",
+        "name": "高松",
+        "cell": 41480,
+        "level": 4
+      },
+      {
+        "id": "japan-7f01198990b6",
+        "name": "纹别",
+        "cell": 7712,
+        "level": 1
+      },
+      {
+        "id": "japan-80bde8ec3982",
+        "name": "熊本",
+        "cell": 44908,
+        "level": 5
+      },
+      {
+        "id": "japan-83d82fba18b2",
+        "name": "平泉",
+        "cell": 28494,
+        "level": 1
+      },
+      {
+        "id": "japan-87f04863ce74",
+        "name": "津山",
+        "cell": 38278,
+        "level": 2
+      },
+      {
+        "id": "japan-890879394177",
+        "name": "青森",
+        "cell": 20486,
+        "level": 1
+      },
+      {
+        "id": "japan-8985a81e3ecb",
+        "name": "安州",
+        "cell": 10967,
+        "level": 1
+      },
+      {
+        "id": "japan-89fac6a778b3",
+        "name": "江户",
+        "cell": 41283,
+        "level": 6
+      },
+      {
+        "id": "japan-8b5588dbea95",
+        "name": "石卷",
+        "cell": 31164,
+        "level": 1
+      },
+      {
+        "id": "japan-8bd4ee6c786e",
+        "name": "福岛",
+        "cell": 33288,
+        "level": 2
+      },
+      {
+        "id": "japan-8d3c19ba984a",
+        "name": "根室",
+        "cell": 14408,
+        "level": 1
+      },
+      {
+        "id": "japan-8f6e0bad4480",
+        "name": "横手",
+        "cell": 26619,
+        "level": 1
+      },
+      {
+        "id": "japan-908eb10b2193",
+        "name": "钏路",
+        "cell": 14661,
+        "level": 1
+      },
+      {
+        "id": "japan-91399a4cead4",
+        "name": "米泽",
+        "cell": 32217,
+        "level": 4
+      },
+      {
+        "id": "japan-928b853919ae",
+        "name": "八王子",
+        "cell": 41010,
+        "level": 1
+      },
+      {
+        "id": "japan-93c5c75972bb",
+        "name": "水户",
+        "cell": 39157,
+        "level": 2
+      },
+      {
+        "id": "japan-951d3d11e742",
+        "name": "弘前",
+        "cell": 21016,
+        "level": 4
+      },
+      {
+        "id": "japan-96a841179a39",
+        "name": "花卷",
+        "cell": 26893,
+        "level": 1
+      },
+      {
+        "id": "japan-9b4a4c6c7f3a",
+        "name": "气仙沼",
+        "cell": 29299,
+        "level": 1
+      },
+      {
+        "id": "japan-9d49fb7ee284",
+        "name": "海参崴",
+        "cell": 1972,
+        "level": 1
+      },
+      {
+        "id": "japan-9dc69c2a9be2",
+        "name": "东莱",
+        "cell": 33151,
+        "level": 2
+      },
+      {
+        "id": "japan-9ea4f9302407",
+        "name": "佐仓",
+        "cell": 41554,
+        "level": 2
+      },
+      {
+        "id": "japan-a4b0cdc649a2",
+        "name": "磐城",
+        "cell": 36494,
+        "level": 2
+      },
+      {
+        "id": "japan-a50ac60141ad",
+        "name": "下关",
+        "cell": 39842,
+        "level": 2
+      },
+      {
+        "id": "japan-a57e7a404d7e",
+        "name": "海州",
+        "cell": 17637,
+        "level": 2
+      },
+      {
+        "id": "japan-a637d9d6a0dd",
+        "name": "原州",
+        "cell": 22732,
+        "level": 2
+      },
+      {
+        "id": "japan-a6b48d5f7d22",
+        "name": "明石",
+        "cell": 40958,
+        "level": 1
+      },
+      {
+        "id": "japan-a6c4f5f55baf",
+        "name": "镜城",
+        "cell": 5947,
+        "level": 2
+      },
+      {
+        "id": "japan-a71565f6e962",
+        "name": "月山富田",
+        "cell": 36401,
+        "level": 2
+      },
+      {
+        "id": "japan-a87443fc6a89",
+        "name": "鹤冈",
+        "cell": 28478,
+        "level": 2
+      },
+      {
+        "id": "japan-a8d7df454d96",
+        "name": "山形",
+        "cell": 30885,
+        "level": 4
+      },
+      {
+        "id": "japan-a92b92db0665",
+        "name": "宫古",
+        "cell": 26636,
+        "level": 1
+      },
+      {
+        "id": "japan-ac8fb43b7fe4",
+        "name": "长崎",
+        "cell": 44365,
+        "level": 4
+      },
+      {
+        "id": "japan-ae238fc7d078",
+        "name": "伊贺上野",
+        "cell": 41773,
+        "level": 2
+      },
+      {
+        "id": "japan-ae7984d27168",
+        "name": "饭田",
+        "cell": 40192,
+        "level": 2
+      },
+      {
+        "id": "japan-afa1204e6563",
+        "name": "江界",
+        "cell": 6176,
+        "level": 1
+      },
+      {
+        "id": "japan-b02e9873cc86",
+        "name": "久留米",
+        "cell": 42505,
+        "level": 2
+      },
+      {
+        "id": "japan-b079359374e5",
+        "name": "忍",
+        "cell": 39145,
+        "level": 2
+      },
+      {
+        "id": "japan-b2de4d43140b",
+        "name": "罗州",
+        "cell": 31522,
+        "level": 2
+      },
+      {
+        "id": "japan-b318183bc270",
+        "name": "长万部",
+        "cell": 12745,
+        "level": 1
+      },
+      {
+        "id": "japan-b3b5c3b85572",
+        "name": "旭川",
+        "cell": 9301,
+        "level": 1
+      },
+      {
+        "id": "japan-b5cde014b7b0",
+        "name": "福江",
+        "cell": 43551,
+        "level": 1
+      },
+      {
+        "id": "japan-b8097bb4f5a7",
+        "name": "平壤",
+        "cell": 13369,
+        "level": 6
+      },
+      {
+        "id": "japan-b86e7e25aa57",
+        "name": "诹访",
+        "cell": 38328,
+        "level": 2
+      },
+      {
+        "id": "japan-bc665764b7e7",
+        "name": "会津若松",
+        "cell": 33815,
+        "level": 4
+      },
+      {
+        "id": "japan-bd94d8242670",
+        "name": "江差",
+        "cell": 15410,
+        "level": 1
+      },
+      {
+        "id": "japan-c0900ff96c6e",
+        "name": "金泽",
+        "cell": 34575,
+        "level": 5
+      },
+      {
+        "id": "japan-c3553cd5c441",
+        "name": "沼田",
+        "cell": 36472,
+        "level": 2
+      },
+      {
+        "id": "japan-c4d61691de15",
+        "name": "济州",
+        "cell": 37922,
+        "level": 2
+      },
+      {
+        "id": "japan-c510d4c0458a",
+        "name": "秋田",
+        "cell": 24479,
+        "level": 4
+      },
+      {
+        "id": "japan-c66f1ea36834",
+        "name": "春日山",
+        "cell": 33527,
+        "level": 4
+      },
+      {
+        "id": "japan-c94990b67786",
+        "name": "义州",
+        "cell": 7217,
+        "level": 2
+      },
+      {
+        "id": "japan-c9ee215a050b",
+        "name": "馆山",
+        "cell": 44485,
+        "level": 2
+      },
+      {
+        "id": "japan-cae82d044d00",
+        "name": "名古屋",
+        "cell": 40715,
+        "level": 4
+      },
+      {
+        "id": "japan-d4ba99fd6108",
+        "name": "小田原",
+        "cell": 42608,
+        "level": 5
+      },
+      {
+        "id": "japan-d53fbe366670",
+        "name": "田边",
+        "cell": 45231,
+        "level": 2
+      },
+      {
+        "id": "japan-d57aea81b6fc",
+        "name": "中村",
+        "cell": 46269,
+        "level": 2
+      },
+      {
+        "id": "japan-d89836d10e09",
+        "name": "镰仓",
+        "cell": 42613,
+        "level": 3
+      },
+      {
+        "id": "japan-d8f437f2924b",
+        "name": "清州",
+        "cell": 25395,
+        "level": 2
+      },
+      {
+        "id": "japan-dc2fd3bbfe41",
+        "name": "酒田",
+        "cell": 27678,
+        "level": 2
+      },
+      {
+        "id": "japan-dc3b9db18f14",
+        "name": "萩",
+        "cell": 38780,
+        "level": 1
+      },
+      {
+        "id": "japan-ddbd34dd8fe8",
+        "name": "西之表",
+        "cell": 53982,
+        "level": 1
+      },
+      {
+        "id": "japan-e028c8d8ca2a",
+        "name": "一乘谷",
+        "cell": 36705,
+        "level": 4
+      },
+      {
+        "id": "japan-e12222240aa0",
+        "name": "龟山丹波",
+        "cell": 40165,
+        "level": 2
+      },
+      {
+        "id": "japan-e153083446be",
+        "name": "洲本",
+        "cell": 42291,
+        "level": 2
+      },
+      {
+        "id": "japan-e31a94f98cd4",
+        "name": "盛冈",
+        "cell": 25559,
+        "level": 4
+      },
+      {
+        "id": "japan-e32782d90967",
+        "name": "郷之浦壹岐",
+        "cell": 39827,
+        "level": 1
+      },
+      {
+        "id": "japan-e5872a184e88",
+        "name": "八代",
+        "cell": 46241,
+        "level": 2
+      },
+      {
+        "id": "japan-e8a513e8a9a4",
+        "name": "宇都宫",
+        "cell": 37816,
+        "level": 2
+      },
+      {
+        "id": "japan-e927401b0a1e",
+        "name": "长野",
+        "cell": 35661,
+        "level": 2
+      },
+      {
+        "id": "japan-e9c5b34509a7",
+        "name": "博多",
+        "cell": 41170,
+        "level": 5
+      },
+      {
+        "id": "japan-e9d01ad03ff2",
+        "name": "土浦",
+        "cell": 40221,
+        "level": 1
+      },
+      {
+        "id": "japan-ecad2ef8926c",
+        "name": "松山",
+        "cell": 42532,
+        "level": 4
+      },
+      {
+        "id": "japan-ed709c7e4ad3",
+        "name": "公州",
+        "cell": 25924,
+        "level": 2
+      },
+      {
+        "id": "japan-ed7969d67332",
+        "name": "松前",
+        "cell": 17010,
+        "level": 2
+      },
+      {
+        "id": "japan-ef8be2a71cc0",
+        "name": "冈崎",
+        "cell": 41785,
+        "level": 2
+      },
+      {
+        "id": "japan-f0eaba41800e",
+        "name": "大津",
+        "cell": 40436,
+        "level": 3
+      },
+      {
+        "id": "japan-f1266127096a",
+        "name": "甲府",
+        "cell": 40201,
+        "level": 4
+      },
+      {
+        "id": "japan-f2d61530ed75",
+        "name": "杂太佐渡",
+        "cell": 30061,
+        "level": 1
+      },
+      {
+        "id": "japan-f65e9acad0f4",
+        "name": "鱼津",
+        "cell": 34051,
+        "level": 1
+      },
+      {
+        "id": "japan-f8e921cf901f",
+        "name": "郡山",
+        "cell": 34620,
+        "level": 2
+      },
+      {
+        "id": "japan-f9d046a61622",
+        "name": "姬路",
+        "cell": 40154,
+        "level": 4
+      },
+      {
+        "id": "japan-fabf7c19f4cd",
+        "name": "都城",
+        "cell": 49981,
+        "level": 2
+      },
+      {
+        "id": "japan-fd4f338366c0",
+        "name": "余市",
+        "cell": 10349,
+        "level": 1
+      },
+      {
+        "id": "japan-sengoku-0aa570d1c080",
+        "name": "羽衣石",
+        "cell": 36676,
+        "level": 1
+      },
+      {
+        "id": "japan-sengoku-1a60c5c69d7a",
+        "name": "备中松山",
+        "cell": 39074,
+        "level": 2
+      },
+      {
+        "id": "japan-sengoku-33152b6681ac",
+        "name": "后濑山",
+        "cell": 38299,
+        "level": 2
+      },
+      {
+        "id": "japan-sengoku-386c23a359eb",
+        "name": "韮山",
+        "cell": 43407,
+        "level": 2
+      },
+      {
+        "id": "japan-sengoku-5cb0ec534fa1",
+        "name": "宫津",
+        "cell": 37493,
+        "level": 2
+      },
+      {
+        "id": "japan-sengoku-a5f2d8765e0e",
+        "name": "久留里",
+        "cell": 43421,
+        "level": 1
+      }
+    ]
+  },
+  "hre": {
+    "changes": 54,
+    "levels": {
+      "1": 47,
+      "2": 115,
+      "3": 50,
+      "4": 30,
+      "5": 13,
+      "6": 6,
+      "7": 5
+    },
+    "cities": [
+      {
+        "id": "hre-02305068d83e",
+        "name": "阿雷佐",
+        "cell": 48741,
+        "level": 2
+      },
+      {
+        "id": "hre-024162f00084",
+        "name": "马里博尔",
+        "cell": 38325,
+        "level": 2
+      },
+      {
+        "id": "hre-02716cda13e7",
+        "name": "尼特拉",
+        "cell": 32115,
+        "level": 2
+      },
+      {
+        "id": "hre-03939d877cc1",
+        "name": "菲拉赫",
+        "cell": 38106,
+        "level": 2
+      },
+      {
+        "id": "hre-05d4ca799afe",
+        "name": "热舒夫",
+        "cell": 25515,
+        "level": 2
+      },
+      {
+        "id": "hre-0679cb11e61a",
+        "name": "康斯坦茨",
+        "cell": 34646,
+        "level": 3
+      },
+      {
+        "id": "hre-087b96ca82af",
+        "name": "莱格尼察",
+        "cell": 22849,
+        "level": 2
+      },
+      {
+        "id": "hre-09d42a3487e5",
+        "name": "科尔贝格",
+        "cell": 13194,
+        "level": 2
+      },
+      {
+        "id": "hre-09e72687e1d1",
+        "name": "埃尔布隆格",
+        "cell": 12622,
+        "level": 2
+      },
+      {
+        "id": "hre-0a801d6d507c",
+        "name": "苏黎世",
+        "cell": 35444,
+        "level": 4
+      },
+      {
+        "id": "hre-0a8dba1e4287",
+        "name": "里米尼",
+        "cell": 46738,
+        "level": 2
+      },
+      {
+        "id": "hre-0ab3c4c50f95",
+        "name": "弗罗茨瓦夫",
+        "cell": 23058,
+        "level": 4
+      },
+      {
+        "id": "hre-0c2da3d7ddba",
+        "name": "热那亚",
+        "cell": 45294,
+        "level": 6
+      },
+      {
+        "id": "hre-0ccc0ac239c0",
+        "name": "塞克什白堡",
+        "cell": 35737,
+        "level": 2
+      },
+      {
+        "id": "hre-0d4d942dad8d",
+        "name": "欧塞尔",
+        "cell": 33186,
+        "level": 2
+      },
+      {
+        "id": "hre-0ed127e973d7",
+        "name": "科布伦茨",
+        "cell": 25588,
+        "level": 2
+      },
+      {
+        "id": "hre-0f2d50d336df",
+        "name": "布鲁日",
+        "cell": 21933,
+        "level": 6
+      },
+      {
+        "id": "hre-0f597c8d9270",
+        "name": "斯海尔托亨博斯",
+        "cell": 20745,
+        "level": 2
+      },
+      {
+        "id": "hre-104bd913a524",
+        "name": "维罗纳",
+        "cell": 42099,
+        "level": 4
+      },
+      {
+        "id": "hre-111d9f109dee",
+        "name": "帕尔马",
+        "cell": 44102,
+        "level": 3
+      },
+      {
+        "id": "hre-115ee15b84a1",
+        "name": "斯图加特",
+        "cell": 30827,
+        "level": 4
+      },
+      {
+        "id": "hre-13d009e2ef5a",
+        "name": "阿奎莱亚",
+        "cell": 40916,
+        "level": 1
+      },
+      {
+        "id": "hre-17184da08c14",
+        "name": "施韦比施哈尔",
+        "cell": 29828,
+        "level": 2
+      },
+      {
+        "id": "hre-1793e2bfef23",
+        "name": "哥德堡",
+        "cell": 1507,
+        "level": 1
+      },
+      {
+        "id": "hre-17e88664f0c2",
+        "name": "圣加仑",
+        "cell": 35452,
+        "level": 2
+      },
+      {
+        "id": "hre-18e18ef17401",
+        "name": "博尔扎诺",
+        "cell": 38686,
+        "level": 2
+      },
+      {
+        "id": "hre-199154443bef",
+        "name": "伯尔尼",
+        "cell": 36840,
+        "level": 3
+      },
+      {
+        "id": "hre-1bdae8666437",
+        "name": "第戎",
+        "cell": 35009,
+        "level": 3
+      },
+      {
+        "id": "hre-1d5125cfeee4",
+        "name": "沃尔姆斯",
+        "cell": 28006,
+        "level": 3
+      },
+      {
+        "id": "hre-1da972c748a4",
+        "name": "格罗宁根",
+        "cell": 15934,
+        "level": 2
+      },
+      {
+        "id": "hre-20df8d1b017b",
+        "name": "里伯",
+        "cell": 9321,
+        "level": 1
+      },
+      {
+        "id": "hre-20e52bb82ae0",
+        "name": "希尔德斯海姆",
+        "cell": 19781,
+        "level": 2
+      },
+      {
+        "id": "hre-23ed944a8199",
+        "name": "奥洛穆茨",
+        "cell": 28086,
+        "level": 3
+      },
+      {
+        "id": "hre-244f469aed47",
+        "name": "托伦",
+        "cell": 16637,
+        "level": 3
+      },
+      {
+        "id": "hre-2477f3c37584",
+        "name": "欧里亚克",
+        "cell": 42216,
+        "level": 1
+      },
+      {
+        "id": "hre-253074920124",
+        "name": "格涅兹诺",
+        "cell": 18237,
+        "level": 1
+      },
+      {
+        "id": "hre-25c029307060",
+        "name": "都灵",
+        "cell": 43072,
+        "level": 4
+      },
+      {
+        "id": "hre-26906036176a",
+        "name": "巴登",
+        "cell": 31020,
+        "level": 1
+      },
+      {
+        "id": "hre-26fe648bc53b",
+        "name": "布尔日",
+        "cell": 35184,
+        "level": 1
+      },
+      {
+        "id": "hre-274cac635a25",
+        "name": "弗赖辛",
+        "cell": 32258,
+        "level": 2
+      },
+      {
+        "id": "hre-27e36432552c",
+        "name": "梅斯",
+        "cell": 29394,
+        "level": 4
+      },
+      {
+        "id": "hre-28637a8f291d",
+        "name": "埃格尔",
+        "cell": 33142,
+        "level": 2
+      },
+      {
+        "id": "hre-290368c0f7bd",
+        "name": "扎达尔",
+        "cell": 46363,
+        "level": 2
+      },
+      {
+        "id": "hre-2ab2967436fa",
+        "name": "梅尔克",
+        "cell": 32693,
+        "level": 1
+      },
+      {
+        "id": "hre-2c0496fee015",
+        "name": "鲁昂",
+        "cell": 27137,
+        "level": 5
+      },
+      {
+        "id": "hre-2c57c9dd221f",
+        "name": "罗滕堡",
+        "cell": 29028,
+        "level": 1
+      },
+      {
+        "id": "hre-2e47fc18d8d0",
+        "name": "代尔夫特",
+        "cell": 19532,
+        "level": 2
+      },
+      {
+        "id": "hre-2fc6cec42f0e",
+        "name": "萨格勒布",
+        "cell": 40741,
+        "level": 2
+      },
+      {
+        "id": "hre-307b6d213fd7",
+        "name": "明斯特",
+        "cell": 20163,
+        "level": 3
+      },
+      {
+        "id": "hre-3083ccf67be3",
+        "name": "奥帕瓦",
+        "cell": 26885,
+        "level": 2
+      },
+      {
+        "id": "hre-30ba812101f1",
+        "name": "特鲁瓦",
+        "cell": 31584,
+        "level": 2
+      },
+      {
+        "id": "hre-314761f50699",
+        "name": "尚贝里",
+        "cell": 41045,
+        "level": 2
+      },
+      {
+        "id": "hre-34e7a03d7a7b",
+        "name": "巴塞尔",
+        "cell": 34831,
+        "level": 4
+      },
+      {
+        "id": "hre-351ea241c2a1",
+        "name": "奈梅亨",
+        "cell": 20348,
+        "level": 2
+      },
+      {
+        "id": "hre-352a944a522f",
+        "name": "讷韦尔",
+        "cell": 35795,
+        "level": 1
+      },
+      {
+        "id": "hre-3571efdbc083",
+        "name": "不来梅",
+        "cell": 16756,
+        "level": 3
+      },
+      {
+        "id": "hre-37b94ac9bc25",
+        "name": "阿尔勒",
+        "cell": 47060,
+        "level": 2
+      },
+      {
+        "id": "hre-390e74c94f56",
+        "name": "卡尔马",
+        "cell": 4756,
+        "level": 1
+      },
+      {
+        "id": "hre-397c38c3e629",
+        "name": "威尼斯",
+        "cell": 42112,
+        "level": 7
+      },
+      {
+        "id": "hre-3abf3064f9e3",
+        "name": "佛罗伦萨",
+        "cell": 47729,
+        "level": 6
+      },
+      {
+        "id": "hre-3bc523a9063e",
+        "name": "弗伦斯堡",
+        "cell": 11134,
+        "level": 1
+      },
+      {
+        "id": "hre-3c5eb8faaa15",
+        "name": "阿纳姆",
+        "cell": 19947,
+        "level": 1
+      },
+      {
+        "id": "hre-3cf0677c301d",
+        "name": "比尔森",
+        "cell": 27851,
+        "level": 1
+      },
+      {
+        "id": "hre-3d775be64b96",
+        "name": "吕伐登",
+        "cell": 15927,
+        "level": 1
+      },
+      {
+        "id": "hre-3dc782d8153a",
+        "name": "莱比锡",
+        "cell": 22615,
+        "level": 4
+      },
+      {
+        "id": "hre-3dfc6114b04e",
+        "name": "勃兰登堡",
+        "cell": 18999,
+        "level": 1
+      },
+      {
+        "id": "hre-3ea9b17fa750",
+        "name": "卡利什",
+        "cell": 20855,
+        "level": 2
+      },
+      {
+        "id": "hre-3ede18d5fcf2",
+        "name": "德累斯顿",
+        "cell": 23632,
+        "level": 3
+      },
+      {
+        "id": "hre-405c20c7e4f5",
+        "name": "罗斯托克",
+        "cell": 13568,
+        "level": 2
+      },
+      {
+        "id": "hre-40662d08548c",
+        "name": "奥胡斯",
+        "cell": 6518,
+        "level": 1
+      },
+      {
+        "id": "hre-40a4bde1aa03",
+        "name": "阿亨",
+        "cell": 23967,
+        "level": 3
+      },
+      {
+        "id": "hre-40b5f032bde4",
+        "name": "奥斯纳布吕克",
+        "cell": 19363,
+        "level": 2
+      },
+      {
+        "id": "hre-41c05e21b7a4",
+        "name": "卢布尔雅那",
+        "cell": 40123,
+        "level": 2
+      },
+      {
+        "id": "hre-42ca490e6e25",
+        "name": "维也纳",
+        "cell": 32703,
+        "level": 6
+      },
+      {
+        "id": "hre-437d8b460a76",
+        "name": "克雷姆斯",
+        "cell": 32092,
+        "level": 2
+      },
+      {
+        "id": "hre-44a54185bf14",
+        "name": "南锡",
+        "cell": 30800,
+        "level": 3
+      },
+      {
+        "id": "hre-44e1a269fe21",
+        "name": "基尔",
+        "cell": 12748,
+        "level": 2
+      },
+      {
+        "id": "hre-44f5f3af6698",
+        "name": "奎德林堡",
+        "cell": 20997,
+        "level": 1
+      },
+      {
+        "id": "hre-4535dd344877",
+        "name": "维也纳新城",
+        "cell": 34108,
+        "level": 2
+      },
+      {
+        "id": "hre-45638e40ef6c",
+        "name": "代特莫尔德",
+        "cell": 20374,
+        "level": 1
+      },
+      {
+        "id": "hre-45787def9e3d",
+        "name": "特伦托",
+        "cell": 40090,
+        "level": 3
+      },
+      {
+        "id": "hre-46579456e238",
+        "name": "阿尔巴",
+        "cell": 44281,
+        "level": 2
+      },
+      {
+        "id": "hre-469ba21df86d",
+        "name": "赫尔辛堡",
+        "cell": 6940,
+        "level": 1
+      },
+      {
+        "id": "hre-46dad70ea144",
+        "name": "多德雷赫特",
+        "cell": 20338,
+        "level": 2
+      },
+      {
+        "id": "hre-4799cdc2ffbf",
+        "name": "卢塞恩",
+        "cell": 36446,
+        "level": 2
+      },
+      {
+        "id": "hre-48640634df8c",
+        "name": "普拉",
+        "cell": 43937,
+        "level": 1
+      },
+      {
+        "id": "hre-4a0e0330102a",
+        "name": "那慕尔",
+        "cell": 24760,
+        "level": 2
+      },
+      {
+        "id": "hre-4b44549b5f2d",
+        "name": "乌得勒支",
+        "cell": 19538,
+        "level": 4
+      },
+      {
+        "id": "hre-4de88066eef4",
+        "name": "布里克森",
+        "cell": 37885,
+        "level": 2
+      },
+      {
+        "id": "hre-505341aa41b9",
+        "name": "根特",
+        "cell": 22540,
+        "level": 6
+      },
+      {
+        "id": "hre-52814e9b28b7",
+        "name": "帕绍",
+        "cell": 31670,
+        "level": 3
+      },
+      {
+        "id": "hre-5306b3093b58",
+        "name": "兰斯",
+        "cell": 28570,
+        "level": 4
+      },
+      {
+        "id": "hre-55261b57d586",
+        "name": "布雷西亚",
+        "cell": 41689,
+        "level": 3
+      },
+      {
+        "id": "hre-55dc2a5a619f",
+        "name": "布雷达",
+        "cell": 20942,
+        "level": 2
+      },
+      {
+        "id": "hre-55e0f4b93222",
+        "name": "图尔奈",
+        "cell": 23943,
+        "level": 3
+      },
+      {
+        "id": "hre-560a74d9b91d",
+        "name": "拉文纳",
+        "cell": 45528,
+        "level": 2
+      },
+      {
+        "id": "hre-5661d4343447",
+        "name": "贝桑松",
+        "cell": 35621,
+        "level": 3
+      },
+      {
+        "id": "hre-58509204e307",
+        "name": "莱顿",
+        "cell": 19131,
+        "level": 3
+      },
+      {
+        "id": "hre-5881b0e892ce",
+        "name": "伊普尔",
+        "cell": 22935,
+        "level": 2
+      },
+      {
+        "id": "hre-588b67bb443b",
+        "name": "里尔",
+        "cell": 23740,
+        "level": 4
+      },
+      {
+        "id": "hre-5b2097d86a07",
+        "name": "伊夫雷亚",
+        "cell": 41667,
+        "level": 1
+      },
+      {
+        "id": "hre-5b24b5fef24d",
+        "name": "奥尔什丁",
+        "cell": 13636,
+        "level": 1
+      },
+      {
+        "id": "hre-5ccc4e85b57d",
+        "name": "纳博讷",
+        "cell": 48249,
+        "level": 1
+      },
+      {
+        "id": "hre-5ecf450b59c7",
+        "name": "兹诺伊莫",
+        "cell": 30689,
+        "level": 1
+      },
+      {
+        "id": "hre-60adc0bb7ef3",
+        "name": "波雷奇",
+        "cell": 42728,
+        "level": 1
+      },
+      {
+        "id": "hre-6127a40b87c2",
+        "name": "诺瓦拉",
+        "cell": 41875,
+        "level": 2
+      },
+      {
+        "id": "hre-623e35ce7adb",
+        "name": "费拉拉",
+        "cell": 44115,
+        "level": 4
+      },
+      {
+        "id": "hre-63302af5dada",
+        "name": "克拉根福",
+        "cell": 38111,
+        "level": 2
+      },
+      {
+        "id": "hre-638dbd7ce69d",
+        "name": "赫拉德茨",
+        "cell": 26264,
+        "level": 2
+      },
+      {
+        "id": "hre-63ae57b5eee0",
+        "name": "林茨",
+        "cell": 32482,
+        "level": 3
+      },
+      {
+        "id": "hre-64f5ae2eb955",
+        "name": "杜伊斯堡",
+        "cell": 21763,
+        "level": 2
+      },
+      {
+        "id": "hre-6708e8142509",
+        "name": "佩奇",
+        "cell": 39556,
+        "level": 2
+      },
+      {
+        "id": "hre-681cf9f60b76",
+        "name": "马尔堡",
+        "cell": 24192,
+        "level": 2
+      },
+      {
+        "id": "hre-6b6da41cd31f",
+        "name": "锡耶纳",
+        "cell": 49137,
+        "level": 4
+      },
+      {
+        "id": "hre-6bbcc623102d",
+        "name": "什未林",
+        "cell": 15170,
+        "level": 1
+      },
+      {
+        "id": "hre-6c1dfde68166",
+        "name": "维斯比",
+        "cell": 1353,
+        "level": 2
+      },
+      {
+        "id": "hre-6ff35a64fa9d",
+        "name": "布拉格",
+        "cell": 26654,
+        "level": 7
+      },
+      {
+        "id": "hre-7058a828d2c6",
+        "name": "维滕贝格",
+        "cell": 20808,
+        "level": 2
+      },
+      {
+        "id": "hre-70caef63cc93",
+        "name": "阿拉斯",
+        "cell": 24741,
+        "level": 3
+      },
+      {
+        "id": "hre-72072078b101",
+        "name": "弗赖堡",
+        "cell": 33428,
+        "level": 2
+      },
+      {
+        "id": "hre-75b0bf868e1c",
+        "name": "弗里堡",
+        "cell": 37239,
+        "level": 2
+      },
+      {
+        "id": "hre-75c82d76b3ec",
+        "name": "杰尔",
+        "cell": 34323,
+        "level": 2
+      },
+      {
+        "id": "hre-767877be73ff",
+        "name": "阿斯蒂",
+        "cell": 43679,
+        "level": 2
+      },
+      {
+        "id": "hre-77473169c911",
+        "name": "塔博尔",
+        "cell": 28867,
+        "level": 2
+      },
+      {
+        "id": "hre-775a2535646c",
+        "name": "米兰",
+        "cell": 41881,
+        "level": 7
+      },
+      {
+        "id": "hre-775b342f540c",
+        "name": "列日",
+        "cell": 24364,
+        "level": 3
+      },
+      {
+        "id": "hre-78c17cdc9d7b",
+        "name": "埃斯泰尔戈姆",
+        "cell": 33729,
+        "level": 2
+      },
+      {
+        "id": "hre-795819a9e399",
+        "name": "巴斯蒂亚",
+        "cell": 51128,
+        "level": 1
+      },
+      {
+        "id": "hre-79e888770bb2",
+        "name": "马格德堡",
+        "cell": 19996,
+        "level": 4
+      },
+      {
+        "id": "hre-7a8738150054",
+        "name": "斯德丁",
+        "cell": 15598,
+        "level": 4
+      },
+      {
+        "id": "hre-7cc45355aad0",
+        "name": "特里尔",
+        "cell": 27388,
+        "level": 4
+      },
+      {
+        "id": "hre-7cfabe63ded2",
+        "name": "汉堡",
+        "cell": 15158,
+        "level": 4
+      },
+      {
+        "id": "hre-7dd36def8f55",
+        "name": "摩德纳",
+        "cell": 44712,
+        "level": 2
+      },
+      {
+        "id": "hre-7def041ebcce",
+        "name": "卢布林",
+        "cell": 21498,
+        "level": 3
+      },
+      {
+        "id": "hre-801469e72907",
+        "name": "施特拉尔松德",
+        "cell": 12771,
+        "level": 2
+      },
+      {
+        "id": "hre-81016af57719",
+        "name": "肖普朗",
+        "cell": 34313,
+        "level": 2
+      },
+      {
+        "id": "hre-812a0c6e5735",
+        "name": "格尔利茨",
+        "cell": 23241,
+        "level": 2
+      },
+      {
+        "id": "hre-834674910ac7",
+        "name": "塞格德",
+        "cell": 38569,
+        "level": 2
+      },
+      {
+        "id": "hre-84de5a2995d4",
+        "name": "石勒苏益格",
+        "cell": 11939,
+        "level": 1
+      },
+      {
+        "id": "hre-853405e76ca6",
+        "name": "柯尼斯堡",
+        "cell": 10620,
+        "level": 3
+      },
+      {
+        "id": "hre-889e00037f71",
+        "name": "科莫",
+        "cell": 40674,
+        "level": 2
+      },
+      {
+        "id": "hre-89c1206e78c5",
+        "name": "班亚卢卡",
+        "cell": 43969,
+        "level": 1
+      },
+      {
+        "id": "hre-8ac3b4c1abdc",
+        "name": "奥斯塔",
+        "cell": 40657,
+        "level": 1
+      },
+      {
+        "id": "hre-8b2daf85a8b9",
+        "name": "艾森纳赫",
+        "cell": 23804,
+        "level": 2
+      },
+      {
+        "id": "hre-8b3727eb72c7",
+        "name": "维斯马",
+        "cell": 14166,
+        "level": 2
+      },
+      {
+        "id": "hre-8c39a225103d",
+        "name": "格勒诺布尔",
+        "cell": 42249,
+        "level": 2
+      },
+      {
+        "id": "hre-8c4a85802d35",
+        "name": "安特卫普",
+        "cell": 22144,
+        "level": 4
+      },
+      {
+        "id": "hre-8c6fa2a6e21f",
+        "name": "卡塞尔",
+        "cell": 22590,
+        "level": 2
+      },
+      {
+        "id": "hre-8e6b29f8a244",
+        "name": "奥尔良",
+        "cell": 32367,
+        "level": 3
+      },
+      {
+        "id": "hre-8faa07e87cb8",
+        "name": "库尔",
+        "cell": 37261,
+        "level": 1
+      },
+      {
+        "id": "hre-90eeb9db4c96",
+        "name": "富尔达",
+        "cell": 25004,
+        "level": 2
+      },
+      {
+        "id": "hre-927eed91e4dc",
+        "name": "格但斯克",
+        "cell": 12214,
+        "level": 4
+      },
+      {
+        "id": "hre-92eb79db5c00",
+        "name": "多勒",
+        "cell": 36017,
+        "level": 2
+      },
+      {
+        "id": "hre-944eb0b23878",
+        "name": "格拉茨",
+        "cell": 36513,
+        "level": 3
+      },
+      {
+        "id": "hre-94e9eb3bb612",
+        "name": "兰茨胡特",
+        "cell": 31860,
+        "level": 3
+      },
+      {
+        "id": "hre-965e62dac0db",
+        "name": "米德尔堡",
+        "cell": 20932,
+        "level": 2
+      },
+      {
+        "id": "hre-973698242c1e",
+        "name": "魏玛",
+        "cell": 23812,
+        "level": 1
+      },
+      {
+        "id": "hre-974094afc429",
+        "name": "比萨",
+        "cell": 47721,
+        "level": 4
+      },
+      {
+        "id": "hre-979ab26625fc",
+        "name": "克莱沃",
+        "cell": 20552,
+        "level": 1
+      },
+      {
+        "id": "hre-999d70c87c11",
+        "name": "斯波莱托",
+        "cell": 51162,
+        "level": 1
+      },
+      {
+        "id": "hre-9a80f035f329",
+        "name": "帕德博恩",
+        "cell": 21177,
+        "level": 2
+      },
+      {
+        "id": "hre-9a8219216510",
+        "name": "罗斯基勒",
+        "cell": 8341,
+        "level": 2
+      },
+      {
+        "id": "hre-9ae32c9dc5d3",
+        "name": "伦讷博恩霍尔姆",
+        "cell": 10172,
+        "level": 1
+      },
+      {
+        "id": "hre-9aebcea30a5b",
+        "name": "布鲁塞尔",
+        "cell": 23349,
+        "level": 5
+      },
+      {
+        "id": "hre-9afb5e574e7e",
+        "name": "马斯特里赫特",
+        "cell": 23562,
+        "level": 2
+      },
+      {
+        "id": "hre-9b3d6fbe8833",
+        "name": "慕尼黑",
+        "cell": 33261,
+        "level": 4
+      },
+      {
+        "id": "hre-9b81f0162839",
+        "name": "吕讷堡",
+        "cell": 16167,
+        "level": 2
+      },
+      {
+        "id": "hre-9be9af81522e",
+        "name": "贝加莫",
+        "cell": 41082,
+        "level": 2
+      },
+      {
+        "id": "hre-9d1d81c0e9ef",
+        "name": "的里雅斯特",
+        "cell": 41322,
+        "level": 2
+      },
+      {
+        "id": "hre-9e09305b41a7",
+        "name": "布雷根茨",
+        "cell": 35254,
+        "level": 2
+      },
+      {
+        "id": "hre-9e51ba6e9dde",
+        "name": "纽伦堡",
+        "cell": 28834,
+        "level": 6
+      },
+      {
+        "id": "hre-9e8d05151b41",
+        "name": "卢卡",
+        "cell": 47320,
+        "level": 3
+      },
+      {
+        "id": "hre-9f191934df41",
+        "name": "多特蒙德",
+        "cell": 21769,
+        "level": 3
+      },
+      {
+        "id": "hre-9f97ae764a4f",
+        "name": "奥格斯堡",
+        "cell": 32451,
+        "level": 5
+      },
+      {
+        "id": "hre-a01ab02b7927",
+        "name": "耶拿",
+        "cell": 24015,
+        "level": 1
+      },
+      {
+        "id": "hre-a0d74ff858e2",
+        "name": "佩鲁贾",
+        "cell": 49952,
+        "level": 3
+      },
+      {
+        "id": "hre-a0f122795b19",
+        "name": "迈森",
+        "cell": 23228,
+        "level": 2
+      },
+      {
+        "id": "hre-a312056f4b9f",
+        "name": "阿维尼翁",
+        "cell": 46258,
+        "level": 4
+      },
+      {
+        "id": "hre-a36ede9b95d9",
+        "name": "沙特尔",
+        "cell": 30556,
+        "level": 2
+      },
+      {
+        "id": "hre-a3e6ed983a3c",
+        "name": "布达",
+        "cell": 34738,
+        "level": 5
+      },
+      {
+        "id": "hre-a6b6185d18c0",
+        "name": "斯特拉斯堡",
+        "cell": 31417,
+        "level": 5
+      },
+      {
+        "id": "hre-a71a316659f9",
+        "name": "萨尔茨堡",
+        "cell": 34280,
+        "level": 3
+      },
+      {
+        "id": "hre-a76426f16955",
+        "name": "图宾根",
+        "cell": 31831,
+        "level": 2
+      },
+      {
+        "id": "hre-a941d09a1305",
+        "name": "因戈尔施塔特",
+        "cell": 31049,
+        "level": 2
+      },
+      {
+        "id": "hre-a94f0614b3e2",
+        "name": "德布勒森",
+        "cell": 33958,
+        "level": 2
+      },
+      {
+        "id": "hre-a95495eadf80",
+        "name": "鲁汶",
+        "cell": 23353,
+        "level": 3
+      },
+      {
+        "id": "hre-a9c11d2ee308",
+        "name": "代芬特尔",
+        "cell": 19145,
+        "level": 1
+      },
+      {
+        "id": "hre-a9fbd3ad822d",
+        "name": "弗里茨拉尔",
+        "cell": 23191,
+        "level": 1
+      },
+      {
+        "id": "hre-ac52e32fb49a",
+        "name": "安科纳",
+        "cell": 48154,
+        "level": 2
+      },
+      {
+        "id": "hre-acc827c0336a",
+        "name": "雷焦艾米利亚",
+        "cell": 44507,
+        "level": 2
+      },
+      {
+        "id": "hre-ad40faf6f8f2",
+        "name": "梅赫伦",
+        "cell": 22747,
+        "level": 3
+      },
+      {
+        "id": "hre-adab933694e6",
+        "name": "欧登塞",
+        "cell": 9132,
+        "level": 2
+      },
+      {
+        "id": "hre-afad73346281",
+        "name": "柏林",
+        "cell": 18604,
+        "level": 2
+      },
+      {
+        "id": "hre-afd7e8c22184",
+        "name": "维埃纳",
+        "cell": 41035,
+        "level": 2
+      },
+      {
+        "id": "hre-b14ba2562fc0",
+        "name": "维尔茨堡",
+        "cell": 27618,
+        "level": 3
+      },
+      {
+        "id": "hre-b47171ae6145",
+        "name": "博洛尼亚",
+        "cell": 45318,
+        "level": 5
+      },
+      {
+        "id": "hre-b501a21c8009",
+        "name": "卢森堡",
+        "cell": 27786,
+        "level": 3
+      },
+      {
+        "id": "hre-b57dd58c90ac",
+        "name": "桑多梅日",
+        "cell": 23502,
+        "level": 2
+      },
+      {
+        "id": "hre-b7254b727889",
+        "name": "乌迪内",
+        "cell": 40111,
+        "level": 2
+      },
+      {
+        "id": "hre-b7cfc13e87c8",
+        "name": "马尔默",
+        "cell": 8550,
+        "level": 1
+      },
+      {
+        "id": "hre-b862da356899",
+        "name": "奥得河畔法兰克福",
+        "cell": 19216,
+        "level": 2
+      },
+      {
+        "id": "hre-ba7e3396e3c3",
+        "name": "日内瓦",
+        "cell": 39038,
+        "level": 4
+      },
+      {
+        "id": "hre-bab8066a3bf2",
+        "name": "因斯布鲁克",
+        "cell": 36073,
+        "level": 3
+      },
+      {
+        "id": "hre-bafb2290ba2c",
+        "name": "曼托瓦",
+        "cell": 42901,
+        "level": 3
+      },
+      {
+        "id": "hre-bcb18ce6291c",
+        "name": "克莱蒙",
+        "cell": 39812,
+        "level": 2
+      },
+      {
+        "id": "hre-c04c3b4a8763",
+        "name": "马赛",
+        "cell": 48474,
+        "level": 4
+      },
+      {
+        "id": "hre-c21768d21ffa",
+        "name": "雷根斯堡",
+        "cell": 30251,
+        "level": 5
+      },
+      {
+        "id": "hre-c2bbe43c3fe6",
+        "name": "兹沃勒",
+        "cell": 18341,
+        "level": 1
+      },
+      {
+        "id": "hre-c35905b5c2de",
+        "name": "哥本哈根",
+        "cell": 8144,
+        "level": 5
+      },
+      {
+        "id": "hre-c371bc2f548c",
+        "name": "埃尔福特",
+        "cell": 23810,
+        "level": 3
+      },
+      {
+        "id": "hre-c3cdacf0e22c",
+        "name": "海尔布隆",
+        "cell": 29823,
+        "level": 2
+      },
+      {
+        "id": "hre-c5589526ebd9",
+        "name": "锡永",
+        "cell": 39050,
+        "level": 2
+      },
+      {
+        "id": "hre-c64a62b6e280",
+        "name": "里耶卡",
+        "cell": 42334,
+        "level": 2
+      },
+      {
+        "id": "hre-c6faa0e32986",
+        "name": "海布",
+        "cell": 26836,
+        "level": 2
+      },
+      {
+        "id": "hre-c766458243ed",
+        "name": "克桑滕",
+        "cell": 21157,
+        "level": 1
+      },
+      {
+        "id": "hre-c92072eeb67b",
+        "name": "皮亚琴察",
+        "cell": 43292,
+        "level": 3
+      },
+      {
+        "id": "hre-c993a73fb10c",
+        "name": "布拉迪斯拉发",
+        "cell": 32910,
+        "level": 3
+      },
+      {
+        "id": "hre-c9dc5746cd35",
+        "name": "施派尔",
+        "cell": 29012,
+        "level": 3
+      },
+      {
+        "id": "hre-caa757973491",
+        "name": "科隆",
+        "cell": 23573,
+        "level": 7
+      },
+      {
+        "id": "hre-cae0371b4e1d",
+        "name": "汉诺威",
+        "cell": 19176,
+        "level": 3
+      },
+      {
+        "id": "hre-caead76419b8",
+        "name": "布尔诺",
+        "cell": 29488,
+        "level": 4
+      },
+      {
+        "id": "hre-cc2bf8aa2498",
+        "name": "格赖夫斯瓦尔德",
+        "cell": 13578,
+        "level": 1
+      },
+      {
+        "id": "hre-cc667ed17fa5",
+        "name": "博韦",
+        "cell": 27347,
+        "level": 1
+      },
+      {
+        "id": "hre-ccd919ecbb35",
+        "name": "维琴察",
+        "cell": 41702,
+        "level": 3
+      },
+      {
+        "id": "hre-cd085ab6e329",
+        "name": "帕维亚",
+        "cell": 42885,
+        "level": 4
+      },
+      {
+        "id": "hre-cd4e828a39a7",
+        "name": "华沙",
+        "cell": 18669,
+        "level": 2
+      },
+      {
+        "id": "hre-cec279141b0e",
+        "name": "班贝格",
+        "cell": 27426,
+        "level": 3
+      },
+      {
+        "id": "hre-d14afd7cebd1",
+        "name": "艾克斯",
+        "cell": 47671,
+        "level": 2
+      },
+      {
+        "id": "hre-d14c8f09bb2e",
+        "name": "帕多瓦",
+        "cell": 42309,
+        "level": 4
+      },
+      {
+        "id": "hre-d21fe8940ce4",
+        "name": "奥尔堡",
+        "cell": 3702,
+        "level": 2
+      },
+      {
+        "id": "hre-d2b2a20da857",
+        "name": "凡尔登",
+        "cell": 29185,
+        "level": 2
+      },
+      {
+        "id": "hre-d2e24980e158",
+        "name": "乌尔姆",
+        "cell": 32242,
+        "level": 3
+      },
+      {
+        "id": "hre-d45defa77a26",
+        "name": "尼斯",
+        "cell": 47489,
+        "level": 2
+      },
+      {
+        "id": "hre-d6556c2fa016",
+        "name": "亚眠",
+        "cell": 25942,
+        "level": 3
+      },
+      {
+        "id": "hre-d7f43cebda1f",
+        "name": "吕贝克",
+        "cell": 14160,
+        "level": 5
+      },
+      {
+        "id": "hre-da948ad4fc2f",
+        "name": "亚历山德里亚",
+        "cell": 43683,
+        "level": 2
+      },
+      {
+        "id": "hre-dc83d8c5f251",
+        "name": "费尔登",
+        "cell": 17363,
+        "level": 1
+      },
+      {
+        "id": "hre-ddd839b21e36",
+        "name": "瑙姆堡",
+        "cell": 23213,
+        "level": 2
+      },
+      {
+        "id": "hre-ddee29311df8",
+        "name": "哈勒姆",
+        "cell": 18329,
+        "level": 3
+      },
+      {
+        "id": "hre-dfab06fbd6ea",
+        "name": "法兰克福",
+        "cell": 26401,
+        "level": 5
+      },
+      {
+        "id": "hre-e035d996e367",
+        "name": "不伦瑞克",
+        "cell": 19584,
+        "level": 3
+      },
+      {
+        "id": "hre-e0da1a161fda",
+        "name": "特雷维索",
+        "cell": 41307,
+        "level": 2
+      },
+      {
+        "id": "hre-e0f09cdf4e89",
+        "name": "普沃茨克",
+        "cell": 17853,
+        "level": 2
+      },
+      {
+        "id": "hre-e22f6ab54fbe",
+        "name": "利托梅日采",
+        "cell": 25244,
+        "level": 2
+      },
+      {
+        "id": "hre-e34fb6d642e7",
+        "name": "维堡",
+        "cell": 5507,
+        "level": 2
+      },
+      {
+        "id": "hre-e3ada83e2fca",
+        "name": "洛桑",
+        "cell": 38037,
+        "level": 3
+      },
+      {
+        "id": "hre-e3ae859624e9",
+        "name": "奥波莱",
+        "cell": 24473,
+        "level": 2
+      },
+      {
+        "id": "hre-e5abbe9bed9e",
+        "name": "韦尔切利",
+        "cell": 42275,
+        "level": 2
+      },
+      {
+        "id": "hre-e77848c27316",
+        "name": "美因茨",
+        "cell": 26800,
+        "level": 5
+      },
+      {
+        "id": "hre-e827cc5ce250",
+        "name": "巴黎",
+        "cell": 29358,
+        "level": 7
+      },
+      {
+        "id": "hre-e878e0cdc29e",
+        "name": "波恩",
+        "cell": 24177,
+        "level": 3
+      },
+      {
+        "id": "hre-ec02a2282b72",
+        "name": "科尔马",
+        "cell": 33021,
+        "level": 2
+      },
+      {
+        "id": "hre-ecdc668629a1",
+        "name": "海牙",
+        "cell": 19331,
+        "level": 3
+      },
+      {
+        "id": "hre-ed4b9958681e",
+        "name": "布杰约维采",
+        "cell": 30473,
+        "level": 2
+      },
+      {
+        "id": "hre-ee4d50440549",
+        "name": "阿姆斯特丹",
+        "cell": 18532,
+        "level": 2
+      },
+      {
+        "id": "hre-ee629d628d06",
+        "name": "隆德",
+        "cell": 8150,
+        "level": 2
+      },
+      {
+        "id": "hre-ef5d104cd455",
+        "name": "波兹南",
+        "cell": 18834,
+        "level": 4
+      },
+      {
+        "id": "hre-ef70434fe2c3",
+        "name": "克雷莫纳",
+        "cell": 43095,
+        "level": 4
+      },
+      {
+        "id": "hre-f0637698896e",
+        "name": "明登",
+        "cell": 19370,
+        "level": 2
+      },
+      {
+        "id": "hre-f12445c1a7dd",
+        "name": "贝尔格莱德",
+        "cell": 43198,
+        "level": 4
+      },
+      {
+        "id": "hre-f39a8d826bb8",
+        "name": "施泰尔",
+        "cell": 33489,
+        "level": 2
+      },
+      {
+        "id": "hre-f4cf512107f9",
+        "name": "克拉科夫",
+        "cell": 26099,
+        "level": 5
+      },
+      {
+        "id": "hre-f7f7447b9cb6",
+        "name": "萨沃纳",
+        "cell": 45491,
+        "level": 2
+      },
+      {
+        "id": "hre-fa41ee299264",
+        "name": "韦克舍",
+        "cell": 4142,
+        "level": 1
+      },
+      {
+        "id": "hre-fbb027f160cc",
+        "name": "约灵",
+        "cell": 2296,
+        "level": 1
+      },
+      {
+        "id": "hre-ff3a249091f0",
+        "name": "里昂",
+        "cell": 40231,
+        "level": 5
+      }
+    ]
+  }
+}

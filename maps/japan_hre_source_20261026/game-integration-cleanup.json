@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-27",
+  "targets": 6,
+  "files": 3331.0,
+  "bytes": 311616580.0,
+  "remaining": 0,
+  "errors": 0,
+  "activeKey": "b4de40053671cb64dc18d8f6c11bb855b69629ab65dd339872192a530de7dbe4",
+  "results": [
+    {
+      "path": "build/map-review-tests-20261027",
+      "files": 3308,
+      "bytes": 310253326,
+      "remaining": false
+    },
+    {
+      "path": "maps/japan_hre_source_20261026/game-japan-overview.jpg",
+      "files": 1,
+      "bytes": 239170,
+      "remaining": false
+    },
+    {
+      "path": "maps/japan_hre_source_20261026/game-hre-overview.jpg",
+      "files": 1,
+      "bytes": 537206,
+      "remaining": false
+    },
+    {
+      "path": "build/map-review-runtime-20261027/saves/startup-assets/e4259c987c42c85025a4a7276988d4b5c600d5cd409847e10d6cbe57733edac6",
+      "files": 1,
+      "bytes": 168,
+      "remaining": false
+    },
+    {
+      "path": "build/map-review-runtime-20261027/mods/24e061dffe1ba8b23ec7a2ccd7ca4c6a7d6f5a66428757ff51154381f7215e2d",
+      "files": 10,
+      "bytes": 293355,
+      "remaining": false
+    },
+    {
+      "path": "build/map-review-runtime-20261027/mods/2bb751c524dfb42f00276f72e07b23c86707b421eef4b2e8a57c9e051ba39fc4",
+      "files": 10,
+      "bytes": 293355,
+      "remaining": false
+    }
+  ]
+}

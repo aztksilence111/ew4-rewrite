@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>日本与神罗 · 建筑规划 V1</title>
+  <link rel="stylesheet" href="viewer.css">
+</head>
+<body>
+  <header>
+    <h1>建筑规划 <small>V1</small></h1>
+    <nav class="tabs" aria-label="地图">
+      <button id="japan-tab" role="tab" aria-selected="true" data-map="japan">日本</button>
+      <button id="hre-tab" role="tab" aria-selected="false" data-map="hre">神圣罗马帝国</button>
+    </nav>
+    <div class="zoom-tools">
+      <button id="minus" title="缩小" aria-label="缩小">−</button>
+      <input id="zoom" type="range" min="50" max="1000" value="100" aria-label="地图缩放">
+      <button id="plus" title="放大" aria-label="放大">+</button>
+      <button id="fit" title="适合窗口" aria-label="适合窗口">⛶</button>
+    </div>
+  </header>
+  <main>
+    <section class="map-surface" aria-label="建筑分布图">
+      <canvas id="map" tabindex="0" aria-label="建筑规划地图"></canvas>
+      <output id="map-status" aria-live="polite"></output>
+    </section>
+    <aside>
+      <div class="filters">
+        <input id="search" type="search" placeholder="地点、地区" aria-label="搜索地点或地区">
+        <select id="region" aria-label="地区"><option value="">全部地区</option></select>
+        <div class="kinds">
+          <label><input type="checkbox" value="city" checked><i class="city">●</i>城市</label>
+          <label><input type="checkbox" value="industry" checked><i class="industry">■</i>工厂</label>
+          <label><input type="checkbox" value="stable" checked><i class="stable">◆</i>马厩</label>
+          <label><input type="checkbox" value="port" checked><i class="port">▲</i>港口</label>
+        </div>
+      </div>
+      <div id="selected" hidden></div>
+      <div class="list-title"><span id="count"></span><a id="data-link" href="japan_points.json">点位数据</a></div>
+      <div id="list" role="list" aria-label="候选地点"></div>
+      <nav id="downloads" aria-label="高清图"></nav>
+    </aside>
+  </main>
+  <script src="viewer-data.js"></script>
+  <script src="viewer.js"></script>
+</body>
+</html>

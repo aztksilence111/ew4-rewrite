@@ -1,0 +1,228 @@
+{
+  "date": "2026-10-26",
+  "stage": "settlement placement proposal, no runtime changes",
+  "maps": {
+    "japan": {
+      "total": 263,
+      "counts": {
+        "city": 175,
+        "industry": 21,
+        "stable": 26,
+        "port": 41
+      },
+      "images": [
+        {
+          "file": "japan_overview.jpg",
+          "points": 263,
+          "labels": 263,
+          "missing_labels": [],
+          "label_overlaps": 0,
+          "width": 5000,
+          "height": 4116,
+          "max_label_leader_pixels": 257
+        },
+        {
+          "file": "japan_central.jpg",
+          "points": 102,
+          "labels": 102,
+          "missing_labels": [],
+          "label_overlaps": 0,
+          "width": 3400,
+          "height": 3150,
+          "max_label_leader_pixels": 125
+        },
+        {
+          "file": "japan_north.jpg",
+          "points": 56,
+          "labels": 56,
+          "missing_labels": [],
+          "label_overlaps": 0,
+          "width": 3400,
+          "height": 2821,
+          "max_label_leader_pixels": 136
+        },
+        {
+          "file": "japan_south.jpg",
+          "points": 77,
+          "labels": 77,
+          "missing_labels": [],
+          "label_overlaps": 0,
+          "width": 3400,
+          "height": 3899,
+          "max_label_leader_pixels": 125
+        },
+        {
+          "file": "japan_korea.jpg",
+          "points": 23,
+          "labels": 23,
+          "missing_labels": [],
+          "label_overlaps": 0,
+          "width": 3400,
+          "height": 5613,
+          "max_label_leader_pixels": 21
+        }
+      ],
+      "out_of_frame": 0,
+      "duplicate_names": 0,
+      "duplicate_ids": 0,
+      "surface_mismatches": 0,
+      "symbol_overlaps": 0,
+      "coast_adjustments": 45,
+      "maximum_coast_adjustment_approx_km": 14.21,
+      "warnings": [],
+      "rivers": [
+        "ishikari",
+        "tone"
+      ],
+      "projection": "15 degree clockwise reference-registered equirectangular; provisional",
+      "bounds": [
+        -603,
+        -587,
+        763,
+        465
+      ],
+      "game_hex_snapping_verified": false,
+      "sea_navigation_verified": false,
+      "city_spacing": {
+        "japan_cities": 151,
+        "korea_cities": 23,
+        "japan_median_nearest_city_km": 39.0,
+        "korea_median_nearest_city_km": 72.1
+      }
+    },
+    "hre": {
+      "total": 385,
+      "counts": {
+        "city": 266,
+        "industry": 36,
+        "stable": 46,
+        "port": 37
+      },
+      "images": [
+        {
+          "file": "hre_overview.jpg",
+          "points": 385,
+          "labels": 385,
+          "missing_labels": [],
+          "label_overlaps": 0,
+          "width": 5000,
+          "height": 5734,
+          "max_label_leader_pixels": 202
+        },
+        {
+          "file": "hre_northwest.jpg",
+          "points": 102,
+          "labels": 102,
+          "missing_labels": [],
+          "label_overlaps": 0,
+          "width": 3400,
+          "height": 3444,
+          "max_label_leader_pixels": 160
+        },
+        {
+          "file": "hre_alps.jpg",
+          "points": 113,
+          "labels": 113,
+          "missing_labels": [],
+          "label_overlaps": 0,
+          "width": 3400,
+          "height": 3340,
+          "max_label_leader_pixels": 184
+        },
+        {
+          "file": "hre_east.jpg",
+          "points": 98,
+          "labels": 98,
+          "missing_labels": [],
+          "label_overlaps": 0,
+          "width": 3400,
+          "height": 4077,
+          "max_label_leader_pixels": 184
+        }
+      ],
+      "out_of_frame": 0,
+      "duplicate_names": 0,
+      "duplicate_ids": 0,
+      "surface_mismatches": 0,
+      "symbol_overlaps": 0,
+      "coast_adjustments": 36,
+      "maximum_coast_adjustment_approx_km": 8.48,
+      "warnings": [
+        "须德海坎彭港：须德海历史岸线待重建"
+      ],
+      "rivers": [
+        "danube",
+        "donau",
+        "elbe",
+        "maas",
+        "oder",
+        "po",
+        "rhin",
+        "rhine",
+        "rhône",
+        "seine",
+        "vistula",
+        "weser"
+      ],
+      "projection": "spherical Lambert conformal conic; lon0=12, lat0=50, parallels=44/56",
+      "bounds": [
+        -800000,
+        -850000,
+        800000,
+        900000
+      ],
+      "game_hex_snapping_verified": false,
+      "sea_navigation_verified": false,
+      "crop": {
+        "previous_bounds": [
+          -1050000,
+          -900000,
+          1050000,
+          1080000
+        ],
+        "current_bounds": [
+          -800000,
+          -850000,
+          800000,
+          900000
+        ],
+        "frame_area_reduction_percent": 32.66,
+        "outside_after_crop": [
+          {
+            "name": "克里斯蒂安桑",
+            "group": "北德与丹麦",
+            "lon": 8.0,
+            "lat": 58.15,
+            "kind": "city",
+            "reason": "外围裁切；原始候选保留"
+          }
+        ]
+      }
+    }
+  },
+  "sources": [
+    {
+      "file": "../source_cache/ne_10m_land.zip",
+      "sha256": "e547d749445eaa0964aba76738090ec88f5e63c4585122170f98c67a7ea922dc",
+      "url": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_land.zip",
+      "license": "Natural Earth public domain"
+    },
+    {
+      "file": "../source_cache/ne_10m_lakes.zip",
+      "sha256": "0803a06f9c3cb4671d89b68c48b142aad9366ba40f665245e12a913fbc61722a",
+      "url": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_lakes.zip",
+      "license": "Natural Earth public domain"
+    },
+    {
+      "file": "../source_cache/ne_10m_rivers_lake_centerlines.zip",
+      "sha256": "ded71b01870855ccfe19b51f2ec14c9bb48fae23c0e9f3c11974d426433b5c38",
+      "url": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_rivers_lake_centerlines.zip",
+      "license": "Natural Earth public domain"
+    }
+  ],
+  "limits": [
+    "人工地理初选，不是设施史考证；地名与设施启用年份须依剧本复核",
+    "海岸基于现代Natural Earth，须德海与河口有历史修正待办",
+    "未制作政治边界、地形阻行、禁航海区、最终六角格或性能验收"
+  ]
+}

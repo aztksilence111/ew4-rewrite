@@ -1,0 +1,187 @@
+{
+  "previousGrid": [
+    283,
+    259
+  ],
+  "previousCells": 73297,
+  "grid": [
+    267,
+    217
+  ],
+  "cells": 57939,
+  "reductionPercent": 20.95,
+  "referenceStepKm": 8,
+  "removed": [
+    {
+      "id": "japan-df442858a13d",
+      "name": "国后泊",
+      "kind": "city"
+    },
+    {
+      "id": "japan-7d2994ffa7d6",
+      "name": "择捉纱那",
+      "kind": "city"
+    },
+    {
+      "id": "japan-4d7c947541e3",
+      "name": "色丹斜古丹",
+      "kind": "city"
+    },
+    {
+      "id": "japan-f31454baf21e",
+      "name": "国后泊港",
+      "kind": "port"
+    },
+    {
+      "id": "japan-9b093b760717",
+      "name": "择捉纱那港",
+      "kind": "port"
+    },
+    {
+      "id": "japan-5cdd9675e020",
+      "name": "色丹港",
+      "kind": "port"
+    },
+    {
+      "id": "japan-11b64d5064e6",
+      "name": "齿舞岛群泊地",
+      "kind": "port"
+    },
+    {
+      "id": "japan-776773ff35d2",
+      "name": "名濑奄美",
+      "kind": "city"
+    },
+    {
+      "id": "japan-82a91d8a2261",
+      "name": "龟津德之岛",
+      "kind": "city"
+    },
+    {
+      "id": "japan-acd49de0b54d",
+      "name": "首里",
+      "kind": "city"
+    },
+    {
+      "id": "japan-34bf684c3254",
+      "name": "奄美名濑港",
+      "kind": "port"
+    },
+    {
+      "id": "japan-08104d835cc4",
+      "name": "那霸港",
+      "kind": "port"
+    }
+  ],
+  "newSites": [
+    {
+      "id": "japan-sengoku-a5f2d8765e0e",
+      "name": "久留里",
+      "lon": 140.09,
+      "lat": 35.28755555555556,
+      "kind": "city",
+      "group": "关东",
+      "surface": "land",
+      "minimumSpacing": 4,
+      "castleReference": "久留里城",
+      "referenceUrl": "https://samurai.ufirst.jp/sengoku-map/zh/",
+      "notes": [
+        "补旧国城市支点；与其他陆建至少4格，具体启用年代由剧本决定"
+      ]
+    },
+    {
+      "id": "japan-sengoku-5cb0ec534fa1",
+      "name": "宫津",
+      "lon": 135.19830555555555,
+      "lat": 35.53655555555555,
+      "kind": "city",
+      "group": "近畿",
+      "surface": "land",
+      "minimumSpacing": 4,
+      "castleReference": "宮津城",
+      "referenceUrl": "https://samurai.ufirst.jp/sengoku-map/zh/",
+      "notes": [
+        "补旧国城市支点；与其他陆建至少4格，具体启用年代由剧本决定"
+      ]
+    },
+    {
+      "id": "japan-sengoku-386c23a359eb",
+      "name": "韮山",
+      "lon": 138.95555555555555,
+      "lat": 35.05369444444444,
+      "kind": "city",
+      "group": "中部",
+      "surface": "land",
+      "minimumSpacing": 4,
+      "castleReference": "韮山城",
+      "referenceUrl": "https://samurai.ufirst.jp/sengoku-map/zh/",
+      "notes": [
+        "补旧国城市支点；与其他陆建至少4格，具体启用年代由剧本决定"
+      ]
+    },
+    {
+      "id": "japan-sengoku-0aa570d1c080",
+      "name": "羽衣石",
+      "lon": 133.89845833333334,
+      "lat": 35.43731111111111,
+      "kind": "city",
+      "group": "中国",
+      "surface": "land",
+      "minimumSpacing": 4,
+      "castleReference": "羽衣石城",
+      "referenceUrl": "https://samurai.ufirst.jp/sengoku-map/zh/",
+      "notes": [
+        "补旧国城市支点；与其他陆建至少4格，具体启用年代由剧本决定"
+      ]
+    },
+    {
+      "id": "japan-sengoku-1a60c5c69d7a",
+      "name": "备中松山",
+      "lon": 133.62230278,
+      "lat": 34.80907778,
+      "kind": "city",
+      "group": "中国",
+      "surface": "land",
+      "minimumSpacing": 4,
+      "castleReference": "松山城 (備中国)",
+      "referenceUrl": "https://samurai.ufirst.jp/sengoku-map/zh/",
+      "notes": [
+        "补旧国城市支点；与其他陆建至少4格，具体启用年代由剧本决定"
+      ]
+    },
+    {
+      "id": "japan-sengoku-33152b6681ac",
+      "name": "后濑山",
+      "lon": 135.73907777777777,
+      "lat": 35.4882,
+      "kind": "city",
+      "group": "近畿",
+      "surface": "land",
+      "minimumSpacing": 4,
+      "castleReference": "後瀬山城",
+      "referenceUrl": "https://samurai.ufirst.jp/sengoku-map/zh/",
+      "notes": [
+        "补旧国城市支点；与其他陆建至少4格，具体启用年代由剧本决定"
+      ]
+    }
+  ],
+  "converted": [
+    "伊贺马厩→伊贺上野城",
+    "相川工厂→杂太佐渡城"
+  ],
+  "castleAnchors": 26,
+  "buildings": 257,
+  "hreChangedFiles": [
+    "elevation.json",
+    "hre.bin",
+    "hre.map.json",
+    "map.json",
+    "overview.jpg",
+    "preview.jpg",
+    "terrain.jpg",
+    "verification.json"
+  ],
+  "checks": 776,
+  "errors": 0,
+  "source": "https://samurai.ufirst.jp/sengoku-map/zh/"
+}

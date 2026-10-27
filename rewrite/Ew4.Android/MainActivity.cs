@@ -45,13 +45,22 @@ public sealed class MainActivity : Activity
                 else yield return full;
             }
         }
+        string PackageRevision()
+        {
+            var info = ApplicationInfo!;
+            var paths = new[] { info.SourceDir! }.Concat(info.SplitSourceDirs ?? []).Order(StringComparer.Ordinal);
+            return System.Text.Json.JsonSerializer.Serialize(new {
+                updated = PackageManager!.GetPackageInfo(PackageName!, PackageInfoFlags.MetaData)!.LastUpdateTime,
+                files = paths.Select(p => { var file = new FileInfo(p); return new { file.FullName, file.Length, file.LastWriteTimeUtc }; }).ToArray()
+            });
+        }
         byte[] ContentRead(string path) => Read(path.StartsWith("client/", StringComparison.Ordinal) ? "www/content/" + path[7..]
             : path.StartsWith("legacy/", StringComparison.Ordinal) ? "data/" + path[7..]
             : path.StartsWith("frontend/", StringComparison.Ordinal) ? "www/" + path[9..] : path);
-        store = new Lazy<ModStore>(() => new ModStore(StartupAssets.Prepare(new ModBase(ContentRead, Walk("original").Concat(Walk("www/content").Select(p => "client/" + p[12..]))
+        store = new Lazy<ModStore>(() => new ModStore(StartupAssets.PreparePackage(ContentRead, () => Walk("original").Concat(Walk("www/content").Select(p => "client/" + p[12..]))
             .Concat(Walk("data").Select(p => "legacy/" + p[5..]))
             .Concat(Walk("rewrite"))
-            .Concat(["frontend/conquest-pages.json", "frontend/city-names.json"])),
+            .Concat(["frontend/conquest-pages.json", "frontend/city-names.json"]), PackageRevision(),
             Path.Combine(FilesDir!.AbsolutePath, "startup-assets")).Content,
             Path.Combine(FilesDir!.AbsolutePath, "content-mods"), Path.Combine(FilesDir.AbsolutePath, "saves")), LazyThreadSafetyMode.PublicationOnly);
         web = new WebView(this);
