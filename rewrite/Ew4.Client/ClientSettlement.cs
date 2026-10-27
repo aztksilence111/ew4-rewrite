@@ -20,6 +20,11 @@ public sealed partial class ClientGame
     }
     private GameSession SettleBattle(GameSession session, WorldState? previous = null)
     {
+        if (session.World.Story != null)
+        {
+            session = session with { World = StoryPlayback.BindEnding(session.World) };
+            if (session.World.Outcome != BattleOutcome.Continue && StoryPlayback.BlocksSettlement(session.World)) return session;
+        }
         if (string.IsNullOrEmpty(session.BattleId))
         {
             // Old saves have no run identity. One conservative migration identity per scenario/player
@@ -62,7 +67,8 @@ public sealed partial class ClientGame
         var victory = Require().Rules.Turns.Victory;
         var custom = session.World.ScenarioVictory ?? victory.Custom;
         int? roundLimit = custom == null ? victory.RoundLimit : custom.RoundLimit;
-        string? failureDescriptionKey = session.World.LocalMultiplayer == null && result.Outcome == "Defeat"
+        bool customEnding = session.World.Story?.Runs.Any(r => r.Kind == "ending" && r.Completed && r.Result != "cancelled") == true;
+        string? failureDescriptionKey = !customEnding && session.World.LocalMultiplayer == null && result.Outcome == "Defeat"
             ? roundLimit.HasValue && session.World.Round > roundLimit.Value ? "desc_failure 2" : "desc_failure 1" : null;
         return new { result.Id, result.Scenario, result.Outcome, result.Round, result.Stars,
             result.MinimumRatingRound, result.HighestRatingRound, result.AwardMedals, result.CollectedMedals,

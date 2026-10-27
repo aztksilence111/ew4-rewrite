@@ -305,11 +305,17 @@ public static class WorldTurns
         var siteUnits = state.Units.Where(u => u.CommanderId != null).GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => g.First());
         var production = state.Cells.Select((c, i) => (c, i)).Where(p => p.c.Owner == faction.Id).Select(p =>
             new ProductionSite(SiteIncome(p.c, p.i, rules, siteUnits.GetValueOrDefault(p.i)))).ToArray();
-        return EconomyProduction.Calculate(production, faction.IncomeMultiplier, faction.IncomeBonus);
+        var income = EconomyProduction.Calculate(production, faction.IncomeMultiplier, faction.IncomeBonus);
+        return WorldArmyCapacity.IsOverLimit(state, faction.Id)
+            ? new(income.Money / 2, income.Industry / 2, income.Food / 2) : income;
     }
 
-    internal static long FactionUpkeep(WorldState state, string factionId) => state.Units.Where(u => u.Owner == factionId
-        && !u.Support.Logistics && !u.Combatant.Has(Ew4Combat.Skill(22))).Sum(u => u.Support.FoodConsumption);
+    internal static long FactionUpkeep(WorldState state, string factionId)
+    {
+        long upkeep = state.Units.Where(u => u.Owner == factionId
+            && !u.Support.Logistics && !u.Combatant.Has(Ew4Combat.Skill(22))).Sum(u => u.Support.FoodConsumption);
+        return WorldArmyCapacity.IsOverLimit(state, factionId) ? checked(upkeep * 2) : upkeep;
+    }
 
     private static WorldState StartFaction(WorldState state, WorldTurnRules rules, List<WorldNotice> notices)
     {

@@ -1,10 +1,13 @@
 {
   "name": "ew4-frontend-build",
   "private": true,
-  "scripts": { "build": "node build.cjs" },
+  "scripts": {
+    "build": "node build.cjs"
+  },
   "devDependencies": {
     "acorn": "8.15.0",
     "esbuild": "0.25.12",
+    "lucide-static": "1.62.0",
     "postcss": "8.5.6",
     "ws": "8.18.3"
   }

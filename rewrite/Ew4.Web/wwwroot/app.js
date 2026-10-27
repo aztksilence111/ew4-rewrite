@@ -50,7 +50,7 @@ function requestRender(){
   if(!renderRequest)renderRequest=requestAnimationFrame(render);
 }
 function suspendRendering(){cancelAnimationFrame(renderRequest);renderRequest=0;}
-window.ew4SetAppVisible=visible=>{appVisible=visible;music?.setVisible(visible);if(visible)requestRender();else suspendRendering();};
+window.ew4SetAppVisible=visible=>{appVisible=visible;music?.setVisible(visible);storyPlayer.setVisible(visible);if(visible)requestRender();else suspendRendering();};
 document.addEventListener('visibilitychange',()=>{if(document.hidden)suspendRendering();else requestRender();});
 new MutationObserver(requestRender).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden']});
 for(const event of ['pointerdown','pointermove','pointerup','wheel','input','change','click'])document.addEventListener(event,requestRender,{passive:true});
@@ -103,7 +103,8 @@ const localMultiplayerUi = new Ew4LocalMultiplayer.LocalMultiplayer({rpc,detail:
   text:(...args)=>originalTextRenderer.element(...args),ready:()=>!busy&&!aiRunning&&!skipAi&&!sessionTransition&&$('pause').hidden&&$('loading-screen').hidden
     && battlefield.state===state&&[...images.values()].every(img=>img.complete),
   restart:next=>start(next.scenario,next.startCountry,next.localMultiplayer.humanFactions)});
-let tutorial, tutorialRect;
+const storyPlayer=new Ew4StoryUI.Player({act,notice,prepare:text=>Ew4OriginalUI.prepareText(text)});
+let tutorial, tutorialRect, pendingStoryTutorial;
 let settings={music:50,sound:50,speed:2,hd:true,screen:100,eventSize:100,cityLanguage:'en',geographicLanguage:'en',localMultiplayer:false,autoTurnFast:true,followAi:false};
 try { settings={...settings,...JSON.parse(localStorage.getItem('ew4.settings')||'{}')}; } catch (_) {}
 // Local Web previews start silent even when a previous test saved audible volumes.
@@ -192,6 +193,7 @@ async function showMain() {
     if(state)await rpc('leave',{revision:state.revision});
     state=undefined;selected=undefined;selection=undefined;selectionRequest++;tutorial=null;tutorialRect=null;
     refreshDialogue();
+    storyPlayer.sync(null);pendingStoryTutorial=null;
     music?.menu();
     battleDialogues.length=0;
     detailReturn=null;victoryUi.reset();localMultiplayerUi.sync(null);
@@ -214,6 +216,10 @@ async function rpc(route, args = {}) {
   const result = await response.json();
   if (!result.ok) throw Error(failure(result.code, result.message || result.error) || '游戏数据载入失败');
   const data=result.data,next=route==='action'?(args.op==='ai_batch'?data.state:data):null;
+  if(next?.presentationOnly){
+    if(!state||next.baseRevision!==state.revision)return rpc('action',{op:'state'});
+    return {...state,...next,notices:[]};
+  }
   if(next&&(next.baseRevision!=null||!next.cells&&next.cellUpdates)){
     if(!state||next.baseRevision!=null&&next.baseRevision!==state.revision){
       const full=await rpc('action',{op:'state'});
@@ -371,6 +377,7 @@ function battleLibraries(next,center){
   return [...new Set([...next.units,...(state?.units||[])].filter(nearby).map(u=>visualProfile(u,next)?.library).filter(Boolean))];
 }
 async function installState(next, center = false) {
+  if(center)storyPlayer.reset();
   closeSingleAction();
   const resetPause=center;
   if(resetPause)mapViews.reset();
@@ -659,7 +666,7 @@ function updateHudText(host,value,font,color,size) {
 }
 function refreshDialogue(){
   const host=$('dialogue'),talk=state?.dialoguePresentation;
-  if(!state?.dialogue||state.scenarioPopup||stageIntroOpen){
+  if(!state?.dialogue||state.scenarioPopup||state.story||stageIntroOpen){
     host.hidden=true;dialoguePresentationKey=null;dialoguePresentationTask=null;return;
   }
   const key=JSON.stringify([state.dialogue,talk?.name,talk?.portrait,talk?.left]);
@@ -695,7 +702,7 @@ function refreshHud() {
   const capacityStatus=limit==null?'normal':count>limit?'over':count===limit?'full':'normal';
   const capacityText=count+'/'+(limit??'--'),capacityValue=$('army-capacity-value');
   if(capacity.dataset.status!==capacityStatus){capacity.dataset.status=capacityStatus;capacityValue.ew4HudText=null;}
-  updateHudText(capacityValue,capacityText,'font_char_2_hd',capacityStatus==='over'?'#ff9b91':capacityStatus==='full'?'#f5cf70':'#ffffff',Math.min(14,140/capacityText.length));
+  updateHudText(capacityValue,capacityText,'font_char_2_hd',capacityStatus==='over'?'#ff5b50':capacityStatus==='full'?'#f5cf70':'#ffffff',Math.min(14,140/capacityText.length));
   const roundValue=$('army-capacity-round');
   updateHudText(roundValue,state.round,'font_char_2_hd','#ffffff',16);
   for(const value of [capacityValue,roundValue]){
@@ -703,7 +710,7 @@ function refreshHud() {
     if(glyphs){glyphs.style.transform='';const width=glyphs.getBoundingClientRect().width,available=value.getBoundingClientRect().width;
       if(width>available)glyphs.style.transform='scale('+available/width+')';}
   }
-  capacity.title=capacity.ariaLabel=player.name+'部队 '+capacityText+(capacityStatus==='over'?'，超过上限，无法继续招募':capacityStatus==='full'?'，已达上限':'')+'，回合 '+state.round;
+  capacity.title=capacity.ariaLabel=player.name+'部队 '+capacityText+(capacityStatus==='over'?'，超过上限，资源产出减半，粮食消耗翻倍':capacityStatus==='full'?'，已达上限':'')+'，回合 '+state.round;
   placeArmyCapacityHud();
   $('end-turn').disabled = busy || !!state.playerAi?.endingTurn || !active.human || state.phase !== 'Active' || !!state.dialogue;
   $('undo-move').hidden = !active.human;
@@ -721,6 +728,7 @@ function refreshHud() {
   $('skip-ai').disabled = skipAi;
   refreshAiProgress();
   refreshDialogue();
+  storyPlayer.sync(state.story,stageIntroOpen,busy).catch(error=>notice(error.message));
   $('scenario-event').hidden = !state.scenarioPopup || stageIntroOpen;
   if(state.scenarioPopup){
     const popup=state.scenarioPopup;
@@ -768,12 +776,17 @@ async function act(op, extra = {}) {
     await runAi();return;
   }
   closeSingleAction();
-  busy = true; refreshHud();
+  const storyCommand=op.startsWith('story_');let presentationOnly=false;
+  busy = true;if(storyCommand)storyPlayer.sync(state.story,stageIntroOpen,true);else refreshHud();
   try {
     const next = await rpc('action', {op, revision:state.revision, unit:selected?.id, ...extra});
-    await installState(next);
-  } finally { busy = false; refreshHud(); }
-  if (op === 'end' || op === 'dialogue' || op === 'event_choice' || op === 'player_ai_start'&&state?.playerAi?.autoBattle) await runAi();
+    presentationOnly=!!next.presentationOnly;
+    if(presentationOnly){state=next;await storyPlayer.sync(state.story,stageIntroOpen,true);}
+    else await installState(next);
+  } finally { busy = false;if(storyCommand&&presentationOnly)storyPlayer.sync(state.story,stageIntroOpen,false);else refreshHud(); }
+  if(presentationOnly)return;
+  if(!state?.story&&pendingStoryTutorial){const saved=pendingStoryTutorial;pendingStoryTutorial=null;await beginTutorial(saved.checkpoint);}
+  if (op === 'end' || op === 'dialogue' || op === 'event_choice' || op.startsWith('story_') || op === 'player_ai_start'&&state?.playerAi?.autoBattle) await runAi();
   }catch(error){if(turnMeasurement)turnMeasurement.failed=true;throw error;}
   finally{
     if(timedTurn){
@@ -933,7 +946,8 @@ function detailWindow(title,width,height,confirm,onClose){
   const generation=++detailRevision;
   menus.dismissSkillTip();detailReturn=onClose;
   const dialog=$('detail-modal').firstElementChild;dialog.style.width=width+'px';dialog.style.height=height+'px';
-  dialog.classList.remove('native-dialog');
+  dialog.classList.remove('native-dialog','country-selection-dialog');
+  $('detail-modal').classList.remove('country-selection-modal');
   dialog.style.removeProperty('--ui-scale');
   const titleText=({headquarters_label:'指挥部',tutorial_label:'教程',country_label:'选择国家',recruit_label:'招募',info_label:'信息',defense_label:'防御'})[title]||manifest.strings[title]||title;
   $('detail-title').replaceChildren(labelImage(title,titleText,$('detail-title')));$('detail-content').replaceChildren();$('detail-content').nativeLayout=null;$('detail-content').className='';$('detail-modal').hidden=false;
@@ -1224,6 +1238,7 @@ function drawStrategicMap(time=performance.now()) {
 function render(time,forceBattlefield=false) {
   renderRequest=0;
   if(document.hidden||!appVisible)return;
+  if(state?.story&&!stageIntroOpen&&!forceBattlefield)return;
   renderDirty=false;lastRenderTime=time;
   const playVisible=state&&!$('play').hidden;
   const menuVisible=!$('menu').hidden;
@@ -1257,6 +1272,7 @@ function render(time,forceBattlefield=false) {
 }
 async function tutorialUi(id,row=-1){if(id)await tutorial?.notify({type:'ui',id,row});}
 async function beginTutorial(checkpoint){
+  if(state?.story){pendingStoryTutorial={checkpoint};return;}
   $('tutorial-talk').hidden=true;$('tutorial-focus').hidden=true;tutorialRect=null;
   const source=manifest.tutorials?.[state.scenario];if(!source){tutorial=null;return;}
   tutorial=new Ew4Tutorial.Runner(source,async command=>{
@@ -1335,7 +1351,7 @@ canvas.addEventListener('wheel',e=>{e.preventDefault();if(!followingAi())zoom(Ma
 }
 bindMapInput();
 function zoom(factor,x=viewport.w/2,y=viewport.h/2){cameraInputUntil=performance.now()+120;const before=screenToWorld(x,y);view.zoom*=factor;clampView();const after=screenToWorld(x,y);view.x+=before.x-after.x;view.y+=before.y-after.y;clampView();}
-document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=async()=>{if(!startupReady)return;mode=Number(b.dataset.mode);if(mode===4){menus.tutorialMenu();return;}$('main-menu').hidden=true;$('scenario-menu').hidden=false;$('countries').hidden=true;$('conquest-pagination').hidden=mode!==2;$('scenario-menu').classList.toggle('campaign-mode',mode===1);menuArt.apply(mode);$('mode-title').replaceChildren(labelImage(b.dataset.label,b.getAttribute('aria-label')));if(!await menus.open(mode))scenarioList();});
+document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=async()=>{if(!startupReady)return;mode=Number(b.dataset.mode);if(mode===4){menus.tutorialMenu();return;}$('main-menu').hidden=true;$('scenario-menu').hidden=false;$('countries').hidden=true;$('conquest-pagination').hidden=mode!==2;$('scenario-menu').classList.toggle('campaign-mode',mode===1);menuArt.apply(mode);$('mode-title').replaceChildren(labelImage(b.dataset.label,b.getAttribute('aria-label'),$('mode-title')));if(!await menus.open(mode))scenarioList();});
 $('conquest-prev').onclick=()=>turnConquestPage(-1);
 $('conquest-next').onclick=()=>turnConquestPage(1);
 $('cancel-country').onclick=()=>{cancelBattlePreload();$('countries').hidden=true;};
@@ -1370,7 +1386,7 @@ function openSettings(){for(const [id,key] of [['music-volume','music'],['sound-
 $('main-settings').onclick=()=>{if(startupReady)openSettings();};$('pause-settings').onclick=openSettings;
 $('close-settings').onclick=()=>$('settings').hidden=true;
 $('confirm-settings').onclick=()=>$('settings').hidden=true;
-for(const [id,key] of [['music-volume','music'],['sound-volume','sound'],['game-speed','speed'],['screen-size','screen'],['event-size','eventSize']])$(id).oninput=e=>{settings[key]=Number(e.target.value);if(key==='music')music?.resume();persistSettings();sizeUi();};
+for(const [id,key] of [['music-volume','music'],['sound-volume','sound'],['game-speed','speed'],['screen-size','screen'],['event-size','eventSize']])$(id).oninput=e=>{settings[key]=Number(e.target.value);if(key==='music')music?.activate(true);persistSettings();sizeUi();};
 $('hd-mode').onchange=e=>{settings.hd=e.target.checked;persistSettings();};
 for(const [id,key] of [['skip-turn-fast','autoTurnFast'],['follow-ai','followAi']])$(id).onchange=e=>{
   settings[key]=e.target.checked;persistSettings();
@@ -1415,6 +1431,7 @@ $('restart').onclick=async()=>{
 $('return-menu').onclick=()=>{if(busy&&!aiRunning){notice('请等待当前行动完成');return;}return showMain();};
 window.ew4Back=()=>{
   if(aiControl.closeMission(true))return 'handled';
+  if(!storyPlayer.host.hidden){storyPlayer.back();return 'handled';}
   if(mapViews.close())return 'handled';
   if(pendingAction){closeSingleAction();return 'handled';}
   const visible=id=>!$(id).hidden;

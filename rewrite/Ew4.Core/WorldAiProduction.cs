@@ -7,6 +7,7 @@ namespace Ew4.Core;
 public sealed record ProductionOfferGroup(string Id, IReadOnlyList<string> HighestFirst, bool Naval = false);
 public sealed record WorldProductionRules
 {
+    public bool EmergencyDisband { get; init; }
     public IReadOnlyDictionary<string, RecruitmentOffer> Offers { get; init; } = new Dictionary<string, RecruitmentOffer>();
     public IReadOnlyList<ProductionOfferGroup> Groups { get; init; } = Array.Empty<ProductionOfferGroup>();
     public IReadOnlyDictionary<string, RecruitmentOffer> Fortresses { get; init; } = new Dictionary<string, RecruitmentOffer>();
@@ -59,6 +60,7 @@ public sealed record WorldProductionRules
 }
 
 public abstract record WorldProductionCommand(long ExpectedRevision);
+public sealed record AiDisbandCommand(long ExpectedRevision, string UnitId) : WorldProductionCommand(ExpectedRevision);
 public sealed record AiRecruitCommand(long ExpectedRevision, int Cell, string OfferId, string NewUnitId,
     bool Fortress = false, string? RelocateUnitId = null, int? Relocation = null) : WorldProductionCommand(ExpectedRevision);
 public sealed record AiInstallationCommand(long ExpectedRevision, string UnitId, string RecipeId) : WorldProductionCommand(ExpectedRevision);
@@ -85,6 +87,8 @@ public static partial class WorldAi
     {
         var faction = WorldActions.Ready(state, state.Revision);
         ai.Validate(); production.Validate(); turns.Validate();
+        if (EmergencyDisbandCandidate(state, ai, production) is { } disband)
+            return new(state.Revision, state.AiRandomState, state.AiRandomState, "disband", new AiDisbandCommand(state.Revision, disband.Id));
         var random = new AiRandom(state.AiRandomState);
         var map = new HexMap(state.Width, state.Height);
         var owned = Enumerable.Range(0, state.Cells.Count).Where(i => state.Cells[i].Owner == faction.Id && state.Cells[i].Terrain.Active).ToArray();
@@ -125,7 +129,7 @@ public static partial class WorldAi
             long added = offer.Support.Logistics || offer.Template!.Has(Ew4Combat.Skill(22)) ? 0 : offer.Support.FoodConsumption;
             return food >= (decimal)upkeep + added;
         }
-        bool EligibleOffer(RecruitmentOffer offer) => !(armySize >= armyLimit)
+        bool EligibleOffer(RecruitmentOffer offer) => !(armySize >= armyLimit) && !faction.TurnUses.ContainsKey(EmergencyDisbandUse)
             && faction.Recruitment.ContainsKey(offer.Id) && CanPay(faction.Resources, offer.Cost)
             && CanSupply(offer)
             && (!offer.PerTurnLimit.HasValue || !faction.TurnUses.TryGetValue(offer.TurnGroup, out int count) || count < offer.PerTurnLimit);
@@ -163,7 +167,7 @@ public static partial class WorldAi
                 foreach (int cell in owned)
                 {
                     if (!groups.SelectMany(g => g.HighestFirst).Any(id => EligibleOffer(production.Offers[id])
-                        && WorldActions.CanRecruitValidated(state, faction, cell, production.Offers[id], 0, armySize, armyLimit))) continue;
+                        && WorldActions.CanRecruitValidated(state, faction, cell, production.Offers[id], 0))) continue;
                     WorldState projected = state;
                     string? relocating = null;
                     int? destination = null;
@@ -182,7 +186,7 @@ public static partial class WorldAi
                     }
                     var offers = groups.SelectMany(g => g.HighestFirst).Where(id => EligibleOffer(production.Offers[id])
                         && WorldActions.CanRecruitValidated(projected, faction, cell, production.Offers[id],
-                            At(cell).Length - (relocating == null ? 0 : 1), armySize, armyLimit)).ToArray();
+                            At(cell).Length - (relocating == null ? 0 : 1))).ToArray();
                     if (offers.Length == 0) continue;
                     projections[cell] = (projected, relocating, destination);
                     legal[cell] = new HashSet<string>(offers, StringComparer.Ordinal);
@@ -232,7 +236,7 @@ public static partial class WorldAi
             var sites = owned.Select(cell =>
             {
                 var allowed = production.Fortresses.Where(p => EligibleOffer(p.Value)
-                    && WorldActions.CanRecruitValidated(state, faction, cell, p.Value, At(cell).Length, armySize, armyLimit)).Select(p => p.Key).ToArray();
+                    && WorldActions.CanRecruitValidated(state, faction, cell, p.Value, At(cell).Length)).Select(p => p.Key).ToArray();
                 bool eligible = !state.Cells[cell].Terrain.Sea && state.Cells[cell].Environment == 0 && state.Cells[cell].BuildingKind == null
                     && state.Cells[cell].InstallationKind == null && At(cell).Length == 0
                     && !Neighbors(cell).Any(i => At(i).Any(u => u.Combatant.Profile.Category == production.FortressCategory));
@@ -274,7 +278,20 @@ public static partial class WorldAi
         WorldChange change;
         switch (command)
         {
+            case AiDisbandCommand disband:
+                if (EmergencyDisbandCandidate(state, ai, production)?.Id != disband.UnitId)
+                    throw new RuleViolation("ai.disband_unavailable", "Emergency disband conditions no longer permit this unit");
+                change = WorldDisband.ExecuteAi(state, state.Revision, disband.UnitId, DisbandConfiguration(state, production));
+                var uses = change.State.Factions.Single(f => f.Id == state.ActiveFaction).TurnUses
+                    .ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal);
+                uses[EmergencyDisbandUse] = 1;
+                change = change with { State = change.State with { Factions = change.State.Factions.Select(f => f.Id == state.ActiveFaction
+                    ? f with { TurnUses = uses } : f).ToArray() } };
+                break;
             case AiRecruitCommand recruit:
+                if (!WorldArmyCapacity.CanAdd(state, state.ActiveFaction)
+                    || state.Factions.Single(f => f.Id == state.ActiveFaction).TurnUses.ContainsKey(EmergencyDisbandUse))
+                    throw new RuleViolation("recruit.capacity", "AI recruitment would exceed faction army capacity");
                 if (!(recruit.Fortress ? production.Fortresses : production.Offers).TryGetValue(recruit.OfferId, out var offer))
                     throw new RuleViolation("ai.production_offer", "Unknown production offer");
                 if ((recruit.RelocateUnitId == null) != (recruit.Relocation == null))

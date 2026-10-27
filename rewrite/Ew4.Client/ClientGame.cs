@@ -22,6 +22,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
     private LegacyScenarioStart? game;
     private string? country;
     private JsonElement? tutorialCheckpoint;
+    private bool storyRestored;
     private readonly MovementHistory movementHistory = new();
     private WorldState? deliveredWorld, deltaBase;
     private long deliveredRevision = -1;
@@ -122,6 +123,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         next = next with { Session = SettleBattle(next.Session with { BattleId = Guid.NewGuid().ToString("N") }) };
         StoreAccount(next.Session.Account);
         game = next; country = command.Country;
+        storyRestored = false;
         tutorialCheckpoint = null;
         movementHistory.Reset(next.Session.World);
         AutoSave();
@@ -177,6 +179,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         state.Validate();
         StoreAccount(state.Account);
         game = start with { Session = state, Notices = recovered ? recovery.Notices : start.Notices }; country = slot.Country;
+        storyRestored = StoryPlayback.Current(state.World) != null;
         tutorialCheckpoint = slot.Tutorial;
         if (upgradedEquipment || recovered || upgradedCapacity) movementHistory.Reset(state.World);
         else movementHistory.Load(slot.MovementHistory, state.World);
@@ -205,6 +208,25 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         var current = Require(); var session = current.Session; var world = session.World; var rules = current.Rules;
         if (command.Op == "state") return View();
         if (command.Revision != session.Revision) throw new RuleViolation("client.stale", "State changed; refresh the command");
+        if (command.Op is "story_next" or "story_choice" or "story_skip")
+        {
+            var advanced = StoryPlayback.Advance(world, command.Offer!, command.Tag!, command.Op == "story_choice" ? command.Target : null,
+                command.Op == "story_skip", content.Extensions.Bus.Scripts);
+            if (!advanced.Notices.Any(n => n.Kind == "story.completed"))
+            {
+                long revision = checked(session.Revision + 1);
+                game = current with { Session = session with { World = advanced.State, Revision = revision }, Notices = advanced.Notices };
+                storyRestored = false;
+                return new { presentationOnly = true, baseRevision = session.Revision, revision, story = StoryView(advanced.State) };
+            }
+            if (advanced.State.PendingDialogue == null && advanced.State.Phase is not (TurnPhase.Active or TurnPhase.Finished))
+            {
+                var resumed = WorldTurns.Resume(advanced.State, advanced.State.Revision, rules.Turns);
+                advanced = new(resumed.State, advanced.Notices.Concat(resumed.Notices).ToArray());
+            }
+            Commit(advanced, autoSave: false); storyRestored = false; AutoSave(); return View();
+        }
+        if (StoryPlayback.Current(world) != null) throw new RuleViolation("story.pending", "请先完成当前剧情");
         if (command.Op == "ai_batch") return AiBatch();
         var active = world.Factions.Single(f => f.Id == world.ActiveFaction);
         if (command.Op.StartsWith("player_ai_", StringComparison.Ordinal)) return PlayerAiAction(command);
@@ -336,13 +358,13 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         return change with { State = PlayerAi.Reconcile(LocalMultiplayerGame.Resolve(change.State, current.Rules.Turns.Victory))
             with { Revision = checked(current.Session.World.Revision + 1) } };
     }
-    private void Commit(WorldChange change)
+    private void Commit(WorldChange change, bool autoSave = true)
     {
         var current = Require();
         movementBase = current.Session.World; executedMovements = change.Movements;
         change = PrepareChange(change);
         var session = SessionActions.CommitWorld(current.Session, current.Session.Revision, change);
-        InstallSession(current, session.State, change.Notices);
+        InstallSession(current, session.State, change.Notices, autoSave);
     }
     private void CommitSession(SessionChange change, string? playerUnit = null)
     {
@@ -353,7 +375,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         next.Validate();
         InstallSession(current, next, world.Notices);
     }
-    private void InstallSession(LegacyScenarioStart current, GameSession next, IReadOnlyList<WorldNotice> notices)
+    private void InstallSession(LegacyScenarioStart current, GameSession next, IReadOnlyList<WorldNotice> notices, bool autoSave = true)
     {
         var settled = SettleBattle(next, current.Session.World);
         StoreAccount(settled.Account);
@@ -362,9 +384,9 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         if (MovementHistory.EventTriggered(current.Session.World, next.World, notices)
             || next.World.ScenarioChoices.Count != current.Session.World.ScenarioChoices.Count
             || next.PlayerFaction != current.Session.PlayerFaction) movementHistory.Invalidate(next.World);
-        if(next.World.Round != current.Session.World.Round || next.World.ActiveFaction != current.Session.World.ActiveFaction || next.World.Outcome != current.Session.World.Outcome
+        if(autoSave && (next.World.Round != current.Session.World.Round || next.World.ActiveFaction != current.Session.World.ActiveFaction || next.World.Outcome != current.Session.World.Outcome
             || next.PlayerFaction != current.Session.PlayerFaction
-            || next.World.PendingDialogue != current.Session.World.PendingDialogue && next.World.ScenarioEvents.Count > 0)
+            || next.World.PendingDialogue != current.Session.World.PendingDialogue && next.World.ScenarioEvents.Count > 0))
             AutoSave();
     }
     private object Selection(int cell)
@@ -537,7 +559,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         {
             session.Revision, scenario = world.ScenarioId, map = content.MapNames[battle.MapId], world.Width, world.Height,
             stageIntro = StageIntro(world.ScenarioId), session.BattleId,
-            battleResult = BattleResultView(session),
+            battleResult = BattleResultView(session), story = StoryView(world),
             tutorialCheckpoint,
             cameraBounds = new { left = battle.Left * 64 - 52, top = (battle.Top - 1) * 54 - 20,
                 width = battle.Width * 64 + 72, height = (battle.Height - 1) * 54 + 112 },
@@ -549,7 +571,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             world.Round, phase = world.Phase.ToString(), outcome = world.Outcome.ToString(), world.ActiveFaction, session.PlayerFaction,
             startCountry = country, ending = world.ScenarioEnding, victoryRules = world.ScenarioVictory ?? current.Rules.Turns.Victory.Custom,
             localMultiplayer = LocalMultiplayerView(session),
-            dialogue = world.PendingDialogue == null ? null : WorldProvocations.Dialogue(world, world.PendingDialogue) is { } diplomatic
+            dialogue = world.PendingDialogue == null ? null : StoryPlayback.Current(world) != null ? "story" : WorldProvocations.Dialogue(world, world.PendingDialogue) is { } diplomatic
                 ? content.Label($"desc_{diplomatic.Kind} {diplomatic.Variant}")
                 : current.Rules.Dialogues.TryGetValue(world.PendingDialogue, out var dialogue) ? dialogue.Text : world.PendingDialogue,
             dialoguePresentation = DialoguePresentation(),

@@ -177,6 +177,7 @@ public sealed record WorldState
     public LocalMultiplayerState? LocalMultiplayer { get; init; }
     public ExtensionVictoryRules? ScenarioVictory { get; init; }
     public string? ScenarioEnding { get; init; }
+    public StoryState? Story { get; init; }
     public IReadOnlyList<ScriptedScenarioEvent> ScenarioEvents { get; init; } = Array.Empty<ScriptedScenarioEvent>();
     public IReadOnlyList<string> TriggeredScenarioEvents { get; init; } = Array.Empty<string>();
     public IReadOnlyDictionary<string, string> ScenarioChoices { get; init; } = new Dictionary<string, string>();
@@ -350,7 +351,8 @@ public sealed record WorldState
                     throw new RuleViolation("world.event", "Invalid scenario event rule");
         }
         ScenarioRules.Validate(this);
-        bool KnownDialogue(string id) => Events.Any(e => fired.Contains(e.Id) && e.DialogueId == id)
+        StoryValidation.State(this);
+        bool KnownDialogue(string id) => StoryPlayback.Known(this, id) || Events.Any(e => fired.Contains(e.Id) && e.DialogueId == id)
             || WorldProvocations.Dialogue(this, id) != null
             || ScenarioEvents.Any(e => e.Popup != null && TriggeredScenarioEvents.Contains(e.Id) && !ScenarioChoices.ContainsKey(e.Id) && ScenarioRules.DialogueId(e.Id) == id);
         if (PendingDialogue != null && !KnownDialogue(PendingDialogue))
@@ -401,6 +403,9 @@ public sealed record WorldState
         LocalMultiplayer = LocalMultiplayer == null ? null : LocalMultiplayer with { HumanFactions = LocalMultiplayer.HumanFactions.ToArray() },
         ScenarioVictory = ScenarioVictory == null ? null : ExtensionVictory.Copy(ScenarioVictory),
         ScenarioEvents = ScenarioEvents.Select(ScenarioRules.Copy).ToArray(), TriggeredScenarioEvents = TriggeredScenarioEvents.ToArray(),
+        Story = Story == null ? null : Story with { Runs = Story.Runs.Select(r => r with { Path = r.Path.ToArray(),
+            Choices = r.Choices.ToDictionary(p => p.Key, p => p.Value), Continuation = r.Continuation.Select(ScenarioRules.CopyEffect).ToArray(),
+            PendingEffects = r.PendingEffects.Select(ScenarioRules.CopyEffect).ToArray() }).ToArray() },
         ScenarioChoices = ScenarioChoices.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal),
         ScenarioEventProgress = ScenarioEventProgress.ToDictionary(p => p.Key, p => p.Value with { }, StringComparer.Ordinal),
         DestroyedScenarioUnits = DestroyedScenarioUnits.ToArray(), DeadScenarioCommanders = DeadScenarioCommanders.ToArray(),

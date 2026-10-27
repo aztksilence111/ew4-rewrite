@@ -1,0 +1,18 @@
+{
+  "id": "sample.council",
+  "steps": [
+    {"id": "decision", "background": "campaign", "actors": [
+      {"id": "a", "character": "napoleon", "pose": "portrait", "slot": "left", "scale": 0.55, "y": 0.74},
+      {"id": "b", "character": "wellesley", "pose": "portrait", "slot": "right", "scale": 0.55, "y": 0.74}
+    ], "speaker": "a", "text": "敌军正在重新集结。你认为我们应该如何应对？", "choices": [
+      {"id": "attack", "text": "拨款进攻（200金币）", "condition": {"type": "money", "compare": "ge", "value": 200}, "effects": [{"type": "money", "value": -200}], "next": "attack_reply"},
+      {"id": "defend", "text": "巩固防线，等待补给", "next": "defend_reply"},
+      {"id": "negotiate", "text": "派遣使者，争取停战", "next": "negotiated_end"}
+    ]},
+    {"id": "attack_reply", "speaker": "b", "text": "命令已经传下去了。炮兵将在步兵出发前展开。", "animations": [{"actor": "b", "type": "move", "x": 30, "durationMs": 400}], "next": "attack_end"},
+    {"id": "attack_end", "end": true, "result": "attack"},
+    {"id": "defend_reply", "speaker": "b", "text": "那就先让士兵们休整。粮车会在明天抵达。", "next": "defend_end"},
+    {"id": "defend_end", "end": true, "result": "defend"},
+    {"id": "negotiated_end", "end": true, "result": "negotiated"}
+  ]
+}

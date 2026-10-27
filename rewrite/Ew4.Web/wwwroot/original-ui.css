@@ -87,6 +87,8 @@ input,select,textarea{font-family:inherit;font-synthesis:none}
 .commander-ability>img{position:absolute;left:9px;top:3px;width:22px;height:21.5px}
 .commander-ability .ability-stars{position:absolute;left:49px;top:7px;height:14px;display:flex;gap:3.5px;max-width:126px;overflow:hidden}
 .ability-stars img{width:13.5px;height:12.5px;flex:none}
+.commander-ability .ability-stars-count{top:4px;height:19px;align-items:center}
+.ability-stars-count>.original-text{flex:none;max-width:106px}
 .commander-ranks{position:absolute;left:2px;top:103px;width:78px;height:85px;border:1px solid #888}
 .commander-ranks>div{position:relative;height:42px;border-bottom:1px solid #aaa}
 .rank-gauge{position:relative;display:inline-block;flex:none;width:28.5px;height:28.5px;vertical-align:middle}
@@ -143,7 +145,7 @@ input,select,textarea{font-family:inherit;font-synthesis:none}
 #conquest-page-number{display:flex;align-items:center;justify-content:center;height:24px}
 #scenarios .scenario-placeholder,#scenarios .scenario-fallback{background:#686866;border:1px solid #a5a39d;box-shadow:inset 0 0 0 2px #454543,inset 0 0 0 3px #85837f}
 @media(prefers-reduced-motion:reduce){#scenario-menu:not(.campaign-mode) .scenario-entry{animation:none}}
-#campaign-title>.original-text{transform:scale(1.3333);transform-origin:center}
+#campaign-title>.original-text{transform:none}
 #campaign-title .original-text{max-height:21px}
 #campaign-description{background:none;border:0;padding:0;left:74px;top:3px;width:267px;height:82px;overflow-x:hidden;overflow-y:auto;scrollbar-width:none;line-height:0;white-space:normal}
 #campaign-description>.original-text{display:block;max-width:none}
@@ -226,6 +228,11 @@ body:has(#play:not([hidden])>#pause:not([hidden])) :is(#pause,#settings,#detail-
 .native-caption{display:flex;align-items:flex-start;overflow:hidden}
 .native-caption>.original-text{flex-shrink:1}
 .native-frame{border:1px solid transparent;border-image-slice:2;border-image-width:1px;border-image-repeat:stretch}
+.modal.country-selection-modal{background:transparent}
+.country-selection-dialog .menu-bar{background:url("/content/ui/image_ui_hd/form_title_shadow.png") center/100% 100% no-repeat;border:0;box-shadow:none}
+.country-selection-dialog .country-selection-frame{border:2px solid transparent;border-image-slice:4;border-image-width:2px;border-image-repeat:stretch}
+.country-selection-dialog [data-native-id=group_select]{border-width:0;border-image-slice:20;border-image-width:10px}
+.country-selection-dialog [data-native-id=image_back]{overflow:hidden}
 .native-layout .native-command{border-width:0;border-image-width:8px;color:#ebe6e1;align-items:center;justify-content:center}
 .native-layout .native-command::before{top:6px}.native-layout .native-command::after{bottom:6px}
 .native-layout[data-layout=form_exchange] .native-tmp_button{color:#ebe6e1}

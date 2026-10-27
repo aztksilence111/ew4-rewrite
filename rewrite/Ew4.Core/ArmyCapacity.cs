@@ -53,4 +53,7 @@ public static class WorldArmyCapacity
 
     public static bool CanAdd(WorldState world, string faction, int? count = null, int? limit = null) =>
         !((count ?? world.Units.Count(u => u.Owner == faction)) >= (limit ?? Limit(world, faction)));
+
+    public static bool IsOverLimit(WorldState world, string faction) =>
+        world.Units.Count(u => u.Owner == faction) > Limit(world, faction);
 }

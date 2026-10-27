@@ -32,7 +32,7 @@
   }
   class Context extends Transform {
     constructor(canvas,onRestore){
-      super();this.canvas=canvas;this.gpu=true;this.stage=new PIXI.Container();this.pool=[];this.sources=new Map();this.sourcePixels=0;this.serial=0;this.quadMatrix=new PIXI.Matrix();
+      super();this.canvas=canvas;this.gpu=true;this.stage=new PIXI.Container();this.pool=[];this.sources=new Map();this.retiredSources=[];this.sourcePixels=0;this.serial=0;this.quadMatrix=new PIXI.Matrix();
       this.renderer=new PIXI.Renderer({view:canvas,width:1,height:1,resolution:1,backgroundColor:0x688e91,antialias:false,powerPreference:'high-performance'});
       this.stats={frames:0,quads:0,uploads:0,evictions:0,contextLosses:0,contextRestores:0};
       canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();this.lost=true;this.stats.contextLosses++;});
@@ -41,7 +41,7 @@
     begin(width,height){
       if(this.lost||this.renderer.gl.isContextLost())return false;
       if(this.renderer.width!==width||this.renderer.height!==height)this.renderer.resize(width,height);
-      this.cursor=0;this.lastObject=null;this.serial++;this.stack.length=0;this.resetTransform();this.globalAlpha=1;this.tint=0xffffff;this.globalCompositeOperation='source-over';
+      this.cursor=0;this.lastObject=null;this.serial++;this.frameOpen=true;this.stack.length=0;this.resetTransform();this.globalAlpha=1;this.tint=0xffffff;this.globalCompositeOperation='source-over';
       return true;
     }
     object(kind){
@@ -57,9 +57,9 @@
       return object;
     }
     texture(source,x,y,w,h){
-      this.captureSources?.add(source);
       let entry=this.sources.get(source);
       if(!entry){const base=new PIXI.BaseTexture(source,{scaleMode:PIXI.SCALE_MODES.LINEAR,mipmap:PIXI.MIPMAP_MODES.OFF});entry={base,frames:new Map(),pixels:base.width*base.height};this.sources.set(source,entry);this.sourcePixels+=entry.pixels;this.stats.uploads++;}
+      this.captureSources?.set(source,entry);
       entry.used=this.serial;
       const key=[x,y,w,h].join(',');let texture=entry.frames.get(key);
       if(!texture){texture=new PIXI.Texture(entry.base,new PIXI.Rectangle(x,y,w,h));entry.frames.set(key,texture);}
@@ -86,19 +86,20 @@
       const layer=this.object('layer'),m=this.matrix;
       layer.transform.setFromMatrix(this.quadMatrix.set(m.a,m.b,m.c,m.d,m.e,m.f));
       let missingSource=false;
-      for(const source of layer.sources||[])if(!this.sources.has(source)){missingSource=true;break;}
+      for(const [source,entry] of layer.sources||[])if(this.sources.get(source)!==entry){missingSource=true;break;}
       if(layer.signature!==signature||layer.rect!==rect||missingSource){
         const keys=['stage','pool','cursor','lastObject','matrix','stack','globalAlpha','globalCompositeOperation','tint','fillStyle','strokeStyle','lineWidth','captureSources'];
         const saved=keys.map(key=>this[key]);
         this.stage=layer;this.pool=layer.drawPool||(layer.drawPool=[]);this.cursor=0;this.lastObject=null;
-        this.matrix=new DOMMatrix();this.stack=[];this.globalAlpha=1;this.globalCompositeOperation='source-over';this.tint=0xffffff;this.captureSources=new Set();
+        this.matrix=new DOMMatrix();this.stack=[];this.globalAlpha=1;this.globalCompositeOperation='source-over';this.tint=0xffffff;this.captureSources=new Map();
         try{
           paint();const end=this.lastObject?layer.getChildIndex(this.lastObject)+1:0;
           if(layer.children.length>end)layer.removeChildren(end);
           layer.sources=this.captureSources;layer.signature=signature;layer.rect=rect;
         }finally{keys.forEach((key,i)=>{this[key]=saved[i];});}
       }
-      for(const source of layer.sources||[]){const entry=this.sources.get(source);if(entry)entry.used=this.serial;}
+      // A source can be reuploaded under the same key while old pooled layers still reference its previous textures.
+      for(const [source,entry] of layer.sources||[]){entry.used=this.serial;this.captureSources?.set(source,entry);}
     }
     drawPose(commands){
       const m=this.matrix,alpha=this.globalAlpha;
@@ -130,12 +131,19 @@
     end(){
       const end=this.lastObject?this.stage.getChildIndex(this.lastObject)+1:0;
       if(this.stage.children.length>end)this.stage.removeChildren(end);
-      if(!this.lost)this.renderer.render(this.stage);
+      try{if(!this.lost)this.renderer.render(this.stage);}
+      finally{this.frameOpen=false;for(const entry of this.retiredSources)this.destroySource(entry);this.retiredSources.length=0;}
       this.stats.frames++;
       // Evict only sources unused by this frame; atlas and text textures share a budget.
-      if(this.sourcePixels>48*1024*1024)for(const [source,entry] of this.sources){if(entry.used===this.serial)continue;this.sources.delete(source);this.sourcePixels-=entry.pixels;for(const t of entry.frames.values())t.destroy();entry.base.destroy();this.stats.evictions++;if(this.sourcePixels<=40*1024*1024)break;}
+      if(this.sourcePixels>48*1024*1024)for(const [source,entry] of this.sources){if(entry.used===this.serial)continue;this.release(source);this.stats.evictions++;if(this.sourcePixels<=40*1024*1024)break;}
     }
-    release(source){const e=this.sources.get(source);if(!e)return;this.sources.delete(source);this.sourcePixels-=e.pixels;for(const t of e.frames.values())t.destroy();e.base.destroy();}
+    destroySource(entry){for(const texture of entry.frames.values())texture.destroy();entry.base.destroy();}
+    release(source){
+      const entry=this.sources.get(source);if(!entry)return;
+      this.sources.delete(source);this.sourcePixels-=entry.pixels;
+      // Canvas-style draws queue sprites until end(); their textures must survive that submission.
+      if(this.frameOpen&&entry.used===this.serial)this.retiredSources.push(entry);else this.destroySource(entry);
+    }
   }
   function canvasContext(canvas){
     const draw=canvas.getContext('2d');

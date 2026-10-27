@@ -13,7 +13,7 @@ public sealed record ItemTradingRules
     public IReadOnlyDictionary<string, ItemTradeDefinition> Definitions { get; init; } = new Dictionary<string, ItemTradeDefinition>();
     public int CommercePercentPerLevel { get; init; } = 4;
     public int SaleBasePercent { get; init; } = 60;
-    public int? MaximumCommerceLevel { get; init; } = 5;
+    public int? MaximumCommerceLevel { get; init; }
     public int? MaximumDistinctItems { get; init; }
     public void Validate()
     {

@@ -44,7 +44,8 @@ public static class BattleSettlement
     public static GameSession Settle(GameSession session, int mode, string campaignKey, int minimumRound, int highestRound)
     {
         var world = session.World;
-        if (world.Phase != TurnPhase.Finished || world.Outcome == BattleOutcome.Continue || world.PendingDialogue != null) return session;
+        if (world.Phase != TurnPhase.Finished || world.Outcome == BattleOutcome.Continue || world.PendingDialogue != null
+            || StoryPlayback.BlocksSettlement(world)) return session;
         if (string.IsNullOrWhiteSpace(session.BattleId)) throw new RuleViolation("settlement.identity", "Battle identity is missing");
         bool won = world.Outcome == BattleOutcome.Victory;
         int stars = won && mode != 4 ? Stars(world.Round, minimumRound, highestRound) : 0;

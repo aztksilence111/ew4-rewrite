@@ -22,6 +22,10 @@ public sealed record ScenarioCondition
     public long Value { get; init; } = 1;
     public string? Script { get; init; }
     public string? Function { get; init; }
+    public string? Node { get; init; }
+    public string? Choice { get; init; }
+    public string? Result { get; init; }
+    public string Scope { get; init; } = "latest";
 }
 
 public sealed record ScenarioEffect
@@ -47,6 +51,7 @@ public sealed record ScenarioEffect
     public long Value { get; init; }
     public string? Script { get; init; }
     public string? Function { get; init; }
+    public string? Scene { get; init; }
 }
 
 public sealed record ScenarioEventChoice
@@ -97,7 +102,7 @@ public static class ScenarioRules
         : selector == "@active" ? world.ActiveFaction : selector;
     private static bool Owned(WorldState world, int cell, ScenarioCondition c) => world.Cells[cell].Owner is string owner
         && (c.Camp != null ? world.Factions.Single(f => f.Id == owner).Camp == c.Camp : owner == Faction(world, c.Faction));
-    private static bool Compare(long actual, string op, long value) => op switch
+    public static bool Compare(long actual, string op, long value) => op switch
     {
         "eq" => actual == value, "ne" => actual != value, "gt" => actual > value,
         "ge" => actual >= value, "lt" => actual < value, "le" => actual <= value,
@@ -139,6 +144,7 @@ public static class ScenarioRules
         }
         switch (c.Type)
         {
+            case "story_started": case "story_completed": case "story_choice": case "story_result": case "story_count": return StoryPlayback.Match(world, c);
             case "always": return true;
             case "faction_exists": return world.Factions.Any(f => f.Id == Faction(world, c.Faction));
             case "faction_active": return world.Factions.Any(f => f.Id == Faction(world, c.Faction) && !f.Defeated);
@@ -158,7 +164,7 @@ public static class ScenarioRules
             case "relation": return WorldDiplomacy.Relation(world, Faction(world, c.Faction), Faction(world, c.OtherFaction!)) == c.Relation;
             case "event_count": return Compare(world.ScenarioEventProgress.TryGetValue(c.Key!, out var progress) ? progress.Occurrences
                 : world.TriggeredScenarioEvents.Contains(c.Key!) ? 1 : 0, c.Compare, c.Value);
-            case "event_completed": return world.TriggeredScenarioEvents.Contains(c.Key!) && (world.ScenarioEvents.Single(e => e.Id == c.Key).Popup == null
+            case "event_completed": return !StoryPlayback.EventPending(world, c.Key!) && world.TriggeredScenarioEvents.Contains(c.Key!) && (world.ScenarioEvents.Single(e => e.Id == c.Key).Popup == null
                 || world.ScenarioChoices.ContainsKey(c.Key!));
             case "script": return Script(world, c.Script!, c.Function!, c.Value, "scenario.condition", scripts).Value != 0;
             default: return Compare(Number(), c.Compare, c.Value);
@@ -236,22 +242,28 @@ public static class ScenarioRules
     {
         var committed = new List<WorldNotice>();
         WorldState next;
-        try { next = Apply(state, effects, scripts, committed); }
+        try { next = Apply(state, effects, scripts, committed, ev.Id); }
         catch (RuleViolation error) when (error.Code == "scenario.resources" && ev.InsufficientResourcesEffects.Count > 0)
         {
             committed.Clear();
-            next = Apply(state, ev.InsufficientResourcesEffects, scripts, committed);
+            next = Apply(state, ev.InsufficientResourcesEffects, scripts, committed, ev.Id);
             committed.Add(new("scenario.insufficient_resources", ev.Id));
         }
         notices.AddRange(committed);
         return next;
     }
 
-    private static WorldState Apply(WorldState state, IEnumerable<ScenarioEffect> effects, IRuleScriptRuntime? scripts, List<WorldNotice> notices)
+    public static WorldState ApplyStoryEffects(WorldState state, IEnumerable<ScenarioEffect> effects, IRuleScriptRuntime? scripts,
+        List<WorldNotice> notices, string? sourceEvent = null) => Apply(state, effects, scripts, notices, sourceEvent);
+    private static WorldState Apply(WorldState state, IEnumerable<ScenarioEffect> effects, IRuleScriptRuntime? scripts, List<WorldNotice> notices, string? sourceEvent = null)
     {
         var next = state;
-        foreach (var e in effects)
+        var sequence = effects.ToArray();
+        for (int effectIndex = 0; effectIndex < sequence.Length; effectIndex++)
         {
+            var e = sequence[effectIndex];
+            if (e.Type == "play_story")
+                return StoryPlayback.Enqueue(next, e.Key!, e.Scene!, sourceEvent: sourceEvent, continuation: sequence.Skip(effectIndex + 1).ToArray());
             string owner = Faction(next, e.Faction);
             if (e.Type != "faction_create" && !next.Factions.Any(f => f.Id == owner))
                 throw new RuleViolation("scenario.faction_missing", "Create the faction before applying effects: " + owner);
@@ -374,7 +386,8 @@ public static class ScenarioRules
             {
                 if (c.Type is not ("always" or "all" or "any" or "not" or "round" or "money" or "industry" or "food" or "city_count" or "objective_count"
                     or "territory_count" or "unit_count" or "kill_count" or "unit_health" or "building_level" or "state" or "cells_owned" or "unit_at"
-                    or "unit_alive" or "unit_destroyed" or "commander_alive" or "commander_dead" or "faction_defeated" or "faction_exists" or "faction_active" or "faction_camp" or "active_faction" or "player_faction" or "event_completed" or "event_count" or "relation" or "script")
+                    or "unit_alive" or "unit_destroyed" or "commander_alive" or "commander_dead" or "faction_defeated" or "faction_exists" or "faction_active" or "faction_camp" or "active_faction" or "player_faction" or "event_completed" or "event_count" or "relation" or "script"
+                    or "story_started" or "story_completed" or "story_choice" or "story_result" or "story_count")
                     || c.Cells == null || c.Compare is not ("eq" or "ne" or "gt" or "ge" or "lt" or "le") || string.IsNullOrWhiteSpace(c.Faction)
                     || c.Type is "all" or "any" && c.Conditions.Count == 0 || c.Type == "not" && c.Conditions.Count != 1
                     || c.Type is "cells_owned" or "unit_at" or "building_level" && c.Cells.Count == 0
@@ -382,6 +395,9 @@ public static class ScenarioRules
                     || c.Type is "commander_alive" or "commander_dead" && string.IsNullOrWhiteSpace(c.Commander)
                     || c.Type is "state" or "event_completed" or "event_count" && string.IsNullOrWhiteSpace(c.Key)
                     || c.Type is "event_completed" or "event_count" && events.All(e => e.Id != c.Key)
+                    || c.Type.StartsWith("story_", StringComparison.Ordinal) && (string.IsNullOrWhiteSpace(c.Key) || c.Scope is not ("latest" or "any")
+                        || c.Type == "story_choice" && (string.IsNullOrWhiteSpace(c.Node) || string.IsNullOrWhiteSpace(c.Choice))
+                        || c.Type == "story_result" && string.IsNullOrWhiteSpace(c.Result))
                     || c.Type == "relation" && (string.IsNullOrWhiteSpace(c.OtherFaction) || c.Relation is not ("allied" or "neutral" or "hostile"))
                     || c.Camp != null && string.IsNullOrWhiteSpace(c.Camp) || c.Type == "faction_camp" && c.Camp == null
                     || c.Type != "script" && (c.Script != null || c.Function != null))
@@ -393,7 +409,9 @@ public static class ScenarioRules
                 if (e == null || e.Cells == null || string.IsNullOrWhiteSpace(e.Faction)
                     || e.Type is not ("money" or "industry" or "food" or "set_money" or "set_industry" or "set_food" or "camp" or "cells_owner"
                         or "unit_owner" or "morale" or "environment" or "environment_spread" or "heal" or "destroy_unit" or "state" or "add_state" or "victory" or "defeat" or "relation" or "faction_create" or "faction_revive" or "faction_identity"
-                        or "player_control" or "victory_rules" or "victory_default" or "ending")
+                        or "player_control" or "victory_rules" or "victory_default" or "ending" or "play_story")
+                    || e.Type == "play_story" && (!StoryValidation.Id(e.Key) || !StoryValidation.Id(e.Scene) || e.Script != null)
+                    || e.Type != "play_story" && e.Scene != null
                     || (e.Type == "victory_rules") != (e.VictoryRules != null)
                     || e.Type is "player_control" or "victory_rules" or "victory_default" or "ending" && e.Script != null
                     || e.Type == "ending" && (string.IsNullOrWhiteSpace(e.Key) || e.Key.Length > 128 || e.Key.Any(char.IsControl)
@@ -508,6 +526,7 @@ public static class ScenarioRules
         Popup = e.Popup == null ? null : e.Popup with { Choices = e.Popup.Choices.Select(c => c with {
             Condition = c.Condition == null ? null : Copy(c.Condition), Effects = c.Effects.Select(Copy).ToArray() }).ToArray() } };
     private static ScenarioCondition Copy(ScenarioCondition c) => c with { Cells = c.Cells.ToArray(), Conditions = c.Conditions.Select(Copy).ToArray() };
+    public static ScenarioEffect CopyEffect(ScenarioEffect e) => Copy(e);
     private static ScenarioEffect Copy(ScenarioEffect e) => e with { Cells = e.Cells.ToArray(),
         VictoryRules = e.VictoryRules == null ? null : ExtensionVictory.Copy(e.VictoryRules),
         Recruitment = e.Recruitment?.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal) };

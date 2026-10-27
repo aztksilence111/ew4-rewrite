@@ -21,16 +21,24 @@ public static class WorldDisband
         long Portion(long value) => checked((long)decimal.Floor((decimal)value * health / maximum / 2));
         return new(Portion(recruitmentCost.Money), Portion(recruitmentCost.Industry), Portion(recruitmentCost.Food));
     }
-    public static bool CanDisband(WorldState state, string unitId, DisbandRules rules) => rules.Enabled
+    public static bool CanDisband(WorldState state, string unitId, DisbandRules rules) => CanDisband(state, unitId, rules, true);
+
+    private static bool CanDisband(WorldState state, string unitId, DisbandRules rules, bool human) => rules.Enabled
         && state.Phase == TurnPhase.Active && state.PendingDialogue == null && state.ActiveFaction == rules.PlayerFaction
-        && state.Factions.Any(f => f.Id == rules.PlayerFaction && f.Human && !f.Defeated)
+        && state.Factions.Any(f => f.Id == rules.PlayerFaction && f.Human == human && !f.Defeated)
         && state.Units.Any(u => u.Id == unitId && u.Owner == rules.PlayerFaction && u.CommanderId == null
             && rules.RecruitmentCosts.ContainsKey(u.Combatant.Profile.Id));
 
     public static WorldChange Execute(WorldState state, long revision, string unitId, DisbandRules rules)
+        => ExecuteCore(state, revision, unitId, rules, true);
+
+    internal static WorldChange ExecuteAi(WorldState state, long revision, string unitId, DisbandRules rules)
+        => ExecuteCore(state, revision, unitId, rules, false);
+
+    private static WorldChange ExecuteCore(WorldState state, long revision, string unitId, DisbandRules rules, bool human)
     {
         var faction = WorldActions.Ready(state, revision);
-        if (!CanDisband(state, unitId, rules)) throw new RuleViolation("disband.unavailable", "Only your conquest units without a commander may be disbanded");
+        if (!CanDisband(state, unitId, rules, human)) throw new RuleViolation("disband.unavailable", "Only eligible conquest units without a commander may be disbanded");
         var unit = state.Units.Single(u => u.Id == unitId);
         var refund = Refund(unit, rules.RecruitmentCosts[unit.Combatant.Profile.Id]);
         var next = (state with

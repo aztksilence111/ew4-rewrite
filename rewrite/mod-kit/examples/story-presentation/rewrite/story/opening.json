@@ -1,0 +1,12 @@
+{
+  "id": "sample.opening",
+  "steps": [
+    {"id": "arrival", "background": "campaign", "text": "晨雾尚未散去，前线的急报已经送进指挥所。"},
+    {"id": "briefing", "actors": [
+      {"id": "a", "character": "napoleon", "pose": "portrait", "slot": "left", "scale": 0.55, "y": 0.74},
+      {"id": "b", "character": "wellesley", "pose": "portrait", "expression": "neutral", "slot": "right", "scale": 0.55, "y": 0.74}
+    ], "speaker": "a", "text": "先召集军官。我们必须在天亮之前决定下一步行动。", "animations": [{"actor": "a", "type": "fade", "durationMs": 400}]},
+    {"id": "reply", "speaker": "b", "text": "军官们已经到齐，补给情况也已核实。", "animations": [{"actor": "b", "type": "hop", "durationMs": 300, "amplitude": 10}]},
+    {"id": "finish", "end": true, "result": "ready"}
+  ]
+}

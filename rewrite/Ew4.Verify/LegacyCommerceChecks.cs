@@ -57,12 +57,13 @@ internal static class LegacyCommerceChecks
                     == (sample.GetProperty("expected")[i].GetInt32() != 0), "native availability includes equipped unique item ownership");
         }
         var defaults = new ItemTradingRules();
+        var nativePrices = defaults with { MaximumCommerceLevel = 5 };
         foreach (var sample in vectors.RootElement.GetProperty("prices").EnumerateArray())
         {
             int commerce = sample.GetProperty("map").GetBoolean() && sample.GetProperty("human").GetBoolean() && sample.GetProperty("commander").GetBoolean()
                 ? sample.GetProperty("commerce").GetInt32() : 0;
             long price = sample.GetProperty("price").GetInt64();
-            var actual = sample.GetProperty("kind").GetString() == "purchase" ? ItemTrading.PurchasePrice(price, commerce, defaults) : ItemTrading.SalePrice(price, commerce, defaults);
+            var actual = sample.GetProperty("kind").GetString() == "purchase" ? ItemTrading.PurchasePrice(price, commerce, nativePrices) : ItemTrading.SalePrice(price, commerce, nativePrices);
             Check(actual == new TradePrice(sample.GetProperty("expected")[0].GetInt64(), sample.GetProperty("expected")[1].GetInt32()), "native purchase/sale price and reported discount");
         }
         string assets = Path.Combine(root, "apk_work/original/assets");
@@ -128,8 +129,8 @@ internal static class LegacyCommerceChecks
         var many = empty;
         foreach (string id in dynamicItems.Keys) many = ItemTrading.Buy(many, many.Revision, dynamicMarket, id, 0, dynamicRules).Account;
         Check(many.Inventory.Count == 100 && many.Revision == 100 && many.Medals == 19900, "no 14-slot market or 28-slot inventory ceiling");
-        Check(ItemTrading.PurchasePrice(100, 6, defaults).Medals == 80
-            && ItemTrading.PurchasePrice(100, 6, defaults with { MaximumCommerceLevel = null }).Medals == 76, "commerce cap is policy");
+        Check(ItemTrading.PurchasePrice(100, 6, nativePrices).Medals == 80
+            && ItemTrading.PurchasePrice(100, 6, defaults).Medals == 76, "commerce extends beyond five unless explicitly capped");
         Reject(() => LegacyMarket.Read(new byte[115]), "legacy.market_record");
         Reject(() => LegacyTavern.Read(new byte[107]), "legacy.tavern_record");
         var invalid = new byte[108]; BinaryPrimitives.WriteInt32LittleEndian(invalid.AsSpan(100), 6);

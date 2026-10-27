@@ -18,6 +18,7 @@ public sealed class MainActivity : Activity
     private Lazy<ModStore>? store;
     private ImportBridge? bridge;
     private bool picking;
+    private bool exportingSaves;
     private FrameLayout? surface;
     private SafeInsets? safeInsets;
     private SystemBack? systemBack;
@@ -267,9 +268,55 @@ public sealed class MainActivity : Activity
         var intent = new Intent(Intent.ActionOpenDocument); intent.AddCategory(Intent.CategoryOpenable); intent.SetType("*/*");
         StartActivityForResult(intent, 441);
     });
+    private void PickSaveExport() => RunOnUiThread(() =>
+    {
+        if (exportingSaves || IsFinishing || store == null) return;
+        exportingSaves = true;
+        try
+        {
+            var intent = new Intent(Intent.ActionCreateDocument); intent.AddCategory(Intent.CategoryOpenable); intent.SetType("application/zip");
+            intent.PutExtra(Intent.ExtraTitle, "ew4-saves-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".zip");
+            StartActivityForResult(intent, 442);
+        }
+        catch (Exception error) { SaveExportFinished(false, "无法打开保存窗口：" + error.Message); }
+    });
+    private void SaveExportFinished(bool ok, string message) => RunOnUiThread(() =>
+    {
+        exportingSaves = false;
+        if (IsFinishing || IsDestroyed) return;
+        string result = System.Text.Json.JsonSerializer.Serialize(new { ok, message });
+        web?.EvaluateJavascript("window.ew4SaveExportFinished?.(" + result + ")", null);
+        if (message.Length > 0) Toast.MakeText(this, message, ToastLength.Long)?.Show();
+    });
+    private void ExportSaves(global::Android.Net.Uri uri)
+    {
+        exportingSaves = true;
+        string version = PackageManager!.GetPackageInfo(PackageName!, PackageInfoFlags.MetaData)!.VersionName ?? "";
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                SaveExportResult exported;
+                using (var output = ContentResolver!.OpenOutputStream(uri, "wt") ?? throw new IOException("无法写入文件"))
+                    exported = store!.Value.ExportSaves(output, version);
+                SaveExportFinished(true, "已导出 " + exported.Files + " 个存档及备份文件");
+            }
+            catch (Exception error)
+            {
+                try { global::Android.Provider.DocumentsContract.DeleteDocument(ContentResolver!, uri); } catch (Exception) { }
+                SaveExportFinished(false, "存档导出失败：" + error.Message);
+            }
+        });
+    }
     protected override void OnActivityResult(int requestCode, Result resultCode, Intent? data)
     {
         base.OnActivityResult(requestCode, resultCode, data);
+        if (requestCode == 442)
+        {
+            if (resultCode == Result.Ok && data?.Data is { } target && store != null) ExportSaves(target);
+            else SaveExportFinished(false, "");
+            return;
+        }
         if (requestCode != 441) return; picking = false;
         if (resultCode != Result.Ok || data?.Data is not { } uri || store == null) return;
         web?.EvaluateJavascript("window.ew4ModFileSelected?.()", null);
@@ -299,6 +346,8 @@ public sealed class MainActivity : Activity
     {
         [JavascriptInterface, Java.Interop.Export("choose")]
         public void Choose(string id, string name) => activity.Pick(id, name);
+        [JavascriptInterface, Java.Interop.Export("exportSaves")]
+        public void ExportSaves() => activity.PickSaveExport();
     }
     private sealed class LocalClient(Func<string, byte[]> read, Lazy<ModStore> store) : WebViewClient
     {
@@ -316,7 +365,7 @@ public sealed class MainActivity : Activity
                 byte[] bytes = path.StartsWith("/content/", StringComparison.Ordinal) ? store.Value.ReadContent(path[9..])
                     : path is "/conquest-pages.json" or "/city-names.json" ? store.Value.Read("frontend" + path) : read("www/" + path.TrimStart('/'));
                 if (!path.StartsWith("/content/", StringComparison.Ordinal)) bytes = store.Value.Frontend(bytes, Path.GetExtension(path));
-                string mime = Path.GetExtension(path) switch { ".html" => "text/html", ".js" => "text/javascript", ".css" => "text/css", ".json" => "application/json", ".png" => "image/png", ".mp3" => "audio/mpeg", ".wav" => "audio/wav", ".ogg" => "audio/ogg", ".woff2" => "font/woff2", ".ttf" => "font/ttf", ".otf" => "font/otf", _ => "application/octet-stream" };
+                string mime = Path.GetExtension(path) switch { ".html" => "text/html", ".js" => "text/javascript", ".css" => "text/css", ".json" => "application/json", ".png" => "image/png", ".svg" => "image/svg+xml", ".mp3" => "audio/mpeg", ".wav" => "audio/wav", ".ogg" => "audio/ogg", ".woff2" => "font/woff2", ".ttf" => "font/ttf", ".otf" => "font/otf", _ => "application/octet-stream" };
                 return new WebResourceResponse(mime, "UTF-8", 200, "OK", new Dictionary<string, string> { ["Cache-Control"] = "no-store" }, new MemoryStream(bytes));
             }
             catch (Exception error)

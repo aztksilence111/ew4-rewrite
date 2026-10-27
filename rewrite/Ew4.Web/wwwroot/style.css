@@ -48,6 +48,7 @@
 #army-capacity{position:absolute;z-index:2;left:50%;top:env(safe-area-inset-top,0px);width:144px;height:28px;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 16px 5px;background:transparent;color:#fff;transform:translateX(-50%) scale(var(--battle-hud-scale));transform-origin:top center;white-space:nowrap;letter-spacing:0}
 #army-capacity::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(to bottom,rgba(35,31,32,.38),rgba(35,31,32,.3) 55%,rgba(35,31,32,0));clip-path:polygon(0 0,100% 0,92% 100%,8% 100%);pointer-events:none}
 #army-capacity .army-capacity-icon{width:12px;height:18px;object-fit:contain;flex:none}
+#army-capacity[data-status="over"] .army-capacity-icon{filter:brightness(0) saturate(100%) invert(47%) sepia(85%) saturate(2490%) hue-rotate(332deg) brightness(106%) contrast(101%)}
 #army-capacity .army-capacity-hourglass{width:16px;height:19px;object-fit:contain;flex:none}
 #army-capacity-value,#army-capacity-round{min-width:0;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none}
 #army-capacity-value{width:48px}

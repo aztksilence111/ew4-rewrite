@@ -65,6 +65,24 @@ const base=process.argv[2]||'http://127.0.0.1:5577',folder=path.resolve(process.
         check(actual.status===status&&actual.label.includes(count+'/'+limit),'full/over status '+count);
         check(actual.fits,'long counters fit '+renderer);
       }
+      for(const [name,width,height] of [['desktop',1280,720],['portrait',390,844]]){
+        await page.setViewportSize({width,height});
+        await page.evaluate(()=>{const p=state.factions.find(f=>f.id===state.playerFaction);p.unitCount=49;p.unitLimit=49;refreshHud();
+          document.querySelector('.army-capacity-hourglass').style.backgroundColor='#000';$('army-capacity-round').style.backgroundColor='#000';});
+        await page.waitForTimeout(100);
+        const hourglass=await page.locator('.army-capacity-hourglass').screenshot(),round=await page.locator('#army-capacity-round').screenshot();
+        await page.evaluate(()=>{const p=state.factions.find(f=>f.id===state.playerFaction);p.unitCount=50;refreshHud();});
+        const redPixels=buffer=>{const png=PNG.sync.read(buffer);let count=0;for(let i=0;i<png.data.length;i+=4)if(png.data[i]>120&&png.data[i]>png.data[i+1]*1.4&&png.data[i]>png.data[i+2]*1.4)count++;return count;};
+        check(redPixels(await page.locator('.army-capacity-icon').screenshot())>4,'over capacity icon is visibly red '+renderer+'/'+name);
+        check(redPixels(await page.locator('#army-capacity-value').screenshot())>8,'over capacity count and limit are visibly red '+renderer+'/'+name);
+        check(hourglass.equals(await page.locator('.army-capacity-hourglass').screenshot()),'hourglass pixels unchanged '+renderer+'/'+name);
+        check(round.equals(await page.locator('#army-capacity-round').screenshot()),'round pixels unchanged '+renderer+'/'+name);
+        await page.evaluate(()=>{document.querySelector('.army-capacity-hourglass').style.backgroundColor='';$('army-capacity-round').style.backgroundColor='';});
+        check(await page.evaluate(()=>$('army-capacity').title.includes('资源产出减半，粮食消耗翻倍')),'penalty tooltip '+renderer+'/'+name);
+        await page.screenshot({path:path.join(folder,renderer+'-'+name+'-over.png')});
+        await page.evaluate(()=>{const p=state.factions.find(f=>f.id===state.playerFaction);p.unitCount=48;refreshHud();});
+        check(await page.evaluate(()=>getComputedStyle(document.querySelector('.army-capacity-icon')).filter==='none'&&$('army-capacity').dataset.status==='normal'),'icon restores after returning below capacity '+renderer+'/'+name);
+      }
       check(await page.evaluate(()=>{state.round=12345;refreshHud();const round=$('army-capacity-round');return round.ew4HudText==='12345'&&round.firstElementChild.getBoundingClientRect().width<=round.getBoundingClientRect().width+.5;}),'round updates and long round fits '+renderer);
       await page.close();
     }

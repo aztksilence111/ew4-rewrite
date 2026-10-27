@@ -21,12 +21,12 @@
       const result=state?.battleResult;
       if(!result){this.reset();return;}
       if(this.id!==result.id){this.reset();this.id=result.id;}
-      if(state.dialogue||state.scenarioPopup||this.dismissed===result.id||this.layout?.current()||this.pending)return;
+      if(state.story||state.dialogue||state.scenarioPopup||this.dismissed===result.id||this.layout?.current()||this.pending)return;
       let readyFrames=0;
       const present=()=>{
         this.pending=0;
         if(this.id!==result.id||this.dismissed===result.id)return;
-        if(this.state.dialogue||this.state.scenarioPopup)return;
+        if(this.state.story||this.state.dialogue||this.state.scenarioPopup)return;
         readyFrames=this.api.ready(this.state)?readyFrames+1:0;
         if(readyFrames>=2){this.open(this.state.battleResult);return;}
         this.pending=requestAnimationFrame(present);

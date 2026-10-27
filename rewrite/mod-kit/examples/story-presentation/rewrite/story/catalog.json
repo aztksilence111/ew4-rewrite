@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "sceneFiles": ["rewrite/story/opening.json", "rewrite/story/council.json", "rewrite/story/ending.json"],
+  "backgrounds": {"campaign": "client/ui/campaign_background.png"},
+  "characters": {
+    "napoleon": {
+      "name": "拿破仑",
+      "poses": {"portrait": {"width": 156, "height": 156, "image": "client/ui/commanders1_hd/Napoleon.png"}}
+    },
+    "wellesley": {
+      "name": "威灵顿",
+      "poses": {"portrait": {"width": 156, "height": 156, "layers": {
+        "body": {"default": "original", "parts": {"original": "client/ui/commanders2_hd/Wellesley.png"}}
+      }, "expressions": {"neutral": {"body": "original"}}}}
+    }
+  },
+  "bindings": {
+    "conquest1": {
+      "openingStory": {"key": "opening", "scene": "sample.opening"},
+      "endingStories": [
+        {"key": "ending.victory", "scene": "sample.ending", "outcome": "victory"},
+        {"key": "ending.special", "scene": "sample.ending", "outcome": "defeat", "ending": "failure.commander_lost"},
+        {"key": "ending.defeat", "scene": "sample.ending", "outcome": "defeat"}
+      ]
+    }
+  },
+  "theme": {"panel": "#0b1013", "text": "#f2f1e9", "accent": "#dac690", "opacity": 0.88, "dialoguePercent": 26, "fontSize": 24}
+}

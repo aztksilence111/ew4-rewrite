@@ -1,6 +1,16 @@
 using System.Text.Json;
 using Ew4.Core;
 
+if (args.ElementAtOrDefault(1) == "--commerce-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { commerceChecks = LegacyCommerceChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--story-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { storyChecks = StoryChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
 if (args.ElementAtOrDefault(1) == "--campaign-technology-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { campaignTechnologyChecks = CampaignTechnologyChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;

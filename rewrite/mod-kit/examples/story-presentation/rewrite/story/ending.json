@@ -1,0 +1,8 @@
+{
+  "id": "sample.ending",
+  "steps": [
+    {"id": "aftermath", "background": "campaign", "text": "炮声渐渐止息。幸存的人们走出掩体，望向远处仍在飘动的旗帜。"},
+    {"id": "farewell", "text": "这一场战斗已经结束。新的命令，正沿着漫长的道路送来。"},
+    {"id": "complete", "end": true, "result": "finished"}
+  ]
+}

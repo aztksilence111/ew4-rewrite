@@ -72,6 +72,7 @@ public sealed partial class ClientGame
     private void AutoSave()
     {
         var current = Require();
+        if (StoryPlayback.Current(current.Session.World) != null) return;
         int mode = content.Scenarios.Single(s => s.Id == current.Session.World.ScenarioId).Mode;
         if (mode is 1 or 2) Save(new ClientCommand(Slot: 0, Mode: mode, Tutorial: tutorialCheckpoint));
     }

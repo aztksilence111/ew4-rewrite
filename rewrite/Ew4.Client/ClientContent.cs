@@ -248,6 +248,7 @@ public sealed class ClientContent
                 var world = started.Session.World;
                 string revision = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(world.ContentRevision + ":" + Extensions.Revision)));
                 world = world with { ContentRevision = revision, ScenarioPlayerFaction = started.Session.PlayerFaction, DiplomacyNeutralCamps = turns.NeutralCamps.ToArray(),
+                    Story = Extensions.Stories == null ? null : new StoryState { Library = Extensions.Stories },
                     ScenarioEvents = (Extensions.ScenarioEvents.GetValueOrDefault(id) ?? [])
                         .Select(e => ScenarioFactions.BindTemplates(e, started.Session.PlayerFaction)).ToArray() };
                 world = world with { Units = world.Units.Select(unit => {
@@ -287,6 +288,15 @@ public sealed class ClientContent
                 foreach (string unit in world.Units.Select(u => u.Id).ToArray())
                     world = Extensions.Bus.Dispatch(world, "scenario.start", unit, new Ew4Random(world.RandomState));
                 world.Validate();
+                started = started with { Session = started.Session with { World = world } };
+            }
+            if (Extensions.Stories?.Bindings.GetValueOrDefault(id)?.OpeningStory is { } opening)
+            {
+                var world = started.Session.World;
+                string? pending = world.PendingDialogue;
+                var queue = world.QueuedDialogues;
+                world = StoryPlayback.Enqueue(world with { PendingDialogue = null, QueuedDialogues = [] }, opening.Key, opening.Scene, "opening");
+                world = world with { QueuedDialogues = (pending == null ? Array.Empty<string>() : new[] { pending }).Concat(queue).ToArray() };
                 started = started with { Session = started.Session with { World = world } };
             }
             var scenarioChange = ScenarioRules.Evaluate(started.Session.World, Extensions.Bus.Scripts);

@@ -1,0 +1,11 @@
+{
+  "conquest1": [
+    {"id": "sample.council_call", "condition": {"type": "story_completed", "key": "opening"}, "effects": [
+      {"type": "play_story", "key": "council", "scene": "sample.council"},
+      {"type": "state", "key": "scenario/sample_council_resumed", "value": 1}
+    ]},
+    {"id": "sample.attack", "condition": {"type": "story_result", "key": "council", "result": "attack"}, "effects": [{"type": "food", "value": 100}]},
+    {"id": "sample.defend", "condition": {"type": "story_choice", "key": "council", "node": "decision", "choice": "defend"}, "effects": [{"type": "food", "value": 200}]},
+    {"id": "sample.negotiated", "condition": {"type": "story_result", "key": "council", "result": "negotiated"}, "effects": [{"type": "ending", "key": "victory.negotiated", "outcome": "victory"}]}
+  ]
+}

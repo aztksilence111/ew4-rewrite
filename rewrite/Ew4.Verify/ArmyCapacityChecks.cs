@@ -12,6 +12,7 @@ internal static class ArmyCapacityChecks
     public static int Run(string root)
     {
         int checks = 0;
+        checks += AiDisbandChecks.Run();
         void Check(bool pass, string label) { checks++; if (!pass) throw new InvalidOperationException("Army capacity: " + label); }
         void Reject(Action action, string? code = null)
         {
@@ -56,10 +57,16 @@ internal static class ArmyCapacityChecks
         Check(WorldActions.CanRecruit(recruitmentWorld, 7, offer), "one last slot is available");
         var full = WorldActions.Recruit(recruitmentWorld, recruitmentWorld.Revision, 7, "last.slot", offer).State;
         Check(full.Units.Count(u => u.Owner == "winner") == 2 && WorldArmyCapacity.Limit(full, "winner") == 2, "recruit consumes last slot");
-        Check(!WorldActions.CanRecruit(full, 6, offer), "a different free site cannot bypass faction capacity");
+        Check(WorldActions.CanRecruit(full, 6, offer), "full capacity still permits normal recruitment");
         byte[] before = WorldSave.Encode(full);
-        Reject(() => WorldActions.Recruit(full, full.Revision, 6, "overflow", offer), "recruit.capacity");
-        Check(before.SequenceEqual(WorldSave.Encode(full)), "rejected recruitment leaves funds, units and RNG intact");
+        var overflow = WorldActions.Recruit(full, full.Revision, 6, "overflow", offer).State;
+        Check(overflow.Units.Count(u => u.Owner == "winner") == 3 && WorldArmyCapacity.IsOverLimit(overflow, "winner"),
+            "recruitment can cross capacity and activates the penalty");
+        Check(overflow.Factions.Single(f => f.Id == "winner").Resources.Money == full.Factions.Single(f => f.Id == "winner").Resources.Money - 1,
+            "over-capacity recruitment pays normal cost");
+        Check(before.SequenceEqual(WorldSave.Encode(full)), "successful recruitment preserves prior snapshot");
+        Check(!WorldArmyCapacity.IsOverLimit(full, "winner") && !WorldArmyCapacity.IsOverLimit(fixture, "winner"),
+            "exact capacity and unlimited worlds have no penalty");
         var lost = full with { Cells = full.Cells.Select((c, i) => i == 7 ? c with { Owner = "loser" } : c).ToArray() };
         lost.Validate();
         Check(lost.Units.Count(u => u.Owner == "winner") == 2 && WorldArmyCapacity.Limit(lost, "winner") == 0, "lost cities lower cap without removing armies");
@@ -67,7 +74,7 @@ internal static class ArmyCapacityChecks
         var reinforced = full with { Units = full.Units.Append(actor with { Id = "scripted.reinforcement", Cell = 6 }).ToArray() };
         reinforced.Validate();
         Check(!WorldArmyCapacity.CanAdd(reinforced, "winner") && reinforced.Units.Count == full.Units.Count + 1,
-            "forced scenario reinforcements can exceed soft cap while recruitment stays blocked");
+            "forced scenario reinforcements exceed capacity and stop AI expansion");
         var expanded = full with { Cells = full.Cells.Select((c, i) => i == 0 ? c with { Owner = "winner", BuildingKind = "city", BuildingLevel = 1 } : c).ToArray() };
         Check(WorldArmyCapacity.Limit(expanded, "winner") == 4 && WorldActions.CanRecruit(expanded, 6, offer), "capturing a city immediately opens slots");
         var upgraded = WorldImprovements.UpgradeBuilding(full, full.Revision, 7, new() { Steps = [new("city", 1, 2, new(1, 0, 0))] }).State;
@@ -96,6 +103,34 @@ internal static class ArmyCapacityChecks
         var ai = new WorldAiRules { Tactics = new() { Grades = new Dictionary<string, float> { ["0"] = 1 } },
             ExperienceLevels = new Dictionary<string, int> { ["0"] = 0 } };
         var turns = new WorldTurnRules { Buildings = [new("city", 1, new(0, 0, 10))] };
+        foreach (bool human in new[] { false, true })
+        {
+            var economyRules = turns with { Buildings = [new("city", 1, new(11, 7, 31))] };
+            WorldState EconomyWorld(WorldState source, long food = 100) => source with {
+                Round = 2, ActiveFaction = "loser",
+                Factions = source.Factions.Select(f => f.Id == "winner" ? f with {
+                    Human = human, Resources = new(100, 100, food), IncomeBonus = new(2, 2, 2)
+                } : f).ToArray(),
+                Units = source.Units.Select(u => u.Owner == "winner" ? u with { Support = new() { FoodConsumption = 5 } } : u).ToArray()
+            };
+            FactionState Settle(WorldState source) => WorldTurns.EndTurn(source, source.Revision, economyRules).State.Factions.Single(f => f.Id == "winner");
+            Check(Settle(EconomyWorld(full)).Resources == new Resources(113, 109, 123), "exact capacity has full output and normal upkeep: " + human);
+            Check(Settle(EconomyWorld(overflow)).Resources == new Resources(106, 104, 86), "all output including bonuses halves, rounds down; total upkeep doubles: " + human);
+            var exempt = EconomyWorld(overflow) with { Units = EconomyWorld(overflow).Units.Select(u => u.Id == "overflow"
+                ? u with { Support = u.Support with { Logistics = true } } : u).ToArray() };
+            Check(Settle(exempt).Resources.Food == 96, "logistics exemption survives doubled upkeep: " + human);
+            Check(Settle(EconomyWorld(overflow with { Units = overflow.Units.Where(u => u.Id != "overflow").ToArray() })).Resources == new Resources(113, 109, 123),
+                "returning to capacity immediately clears penalty: " + human);
+            var restoredCapacity = overflow with { Cells = overflow.Cells.Select((c, i) => i == 5 ? c with { BuildingKind = "city", BuildingLevel = 1 } : c).ToArray() };
+            Check(!WorldArmyCapacity.IsOverLimit(restoredCapacity, "winner") && Settle(EconomyWorld(restoredCapacity)).Resources == new Resources(124, 116, 149),
+                "gaining building capacity restores production and upkeep: " + human);
+            var hungry = WorldTurns.EndTurn(EconomyWorld(overflow, 0), overflow.Revision, economyRules).State;
+            Check(hungry.Factions.Single(f => f.Id == "winner").Shortage == 2
+                && hungry.Units.Where(u => u.Owner == "winner").All(u => u.Morale.Effective == -1),
+                "over-capacity food shortage penalizes human and AI morale equally: " + human);
+            Check(Settle(EconomyWorld(overflow) with { Round = 1 }).Resources == new Resources(100, 100, 100),
+                "opening round keeps existing no-settlement behavior: " + human);
+        }
         foreach (string task in new[] { "recruit", "naval", "fortress" })
         {
             var production = new WorldProductionRules { Offers = new Dictionary<string, RecruitmentOffer> { [offer.Id] = offer },
@@ -110,6 +145,13 @@ internal static class ArmyCapacityChecks
             var forged = new AiProductionPlan(full.Revision, full.AiRandomState, full.AiRandomState, task,
                 new AiRecruitCommand(full.Revision, 6, offer.Id, "forged", task == "fortress"));
             Reject(() => WorldAi.ExecuteProduction(full, forged, production, ai), "recruit.capacity");
+            var overPlan = WorldAi.PlanProduction(overflow, ai, production, turns);
+            Check(overPlan is { AttemptedTask: null, Command: null }, task + " AI also skips recruitment after passive overflow");
+            var lastSlot = new AiProductionPlan(casualty.Revision, casualty.AiRandomState, casualty.AiRandomState, task,
+                new AiRecruitCommand(casualty.Revision, 6, offer.Id, "ai.last.slot", task == "fortress"));
+            var aiFull = WorldAi.ExecuteProduction(casualty, lastSlot, production, ai).State;
+            Check(aiFull.Units.Count(u => u.Owner == "winner") == 2 && !WorldArmyCapacity.IsOverLimit(aiFull, "winner"),
+                task + " AI can fill its last slot without triggering penalties");
         }
         var configuration = new ArmyCapacityConfiguration { FactionBases = new()
         {
@@ -132,8 +174,10 @@ internal static class ArmyCapacityChecks
         foreach (var choice in content.Scenarios.Where(s => s.Mode != 3))
         {
             var battle = content.Battle(choice.Id);
-            var sample = content.Start(choice.Id, choice.Mode == 2 ? battle.Factions.First(f => f.Camp != 4).CountryId : null).Session;
+            var scenario = content.Start(choice.Id, choice.Mode == 2 ? battle.Factions.First(f => f.Camp != 4).CountryId : null);
+            var sample = scenario.Session;
             sample.Validate();
+            Check(scenario.Rules.Production.Values.All(p => p.EmergencyDisband == (choice.Mode == 2)), "only conquest enables AI emergency disband: " + choice.Id);
             Check(sample.World.ArmyCapacity != null && WorldArmyCapacity.Limit(sample.World, sample.PlayerFaction) >= 0, "scenario capacity initializes: " + choice.Id);
             starts++;
         }

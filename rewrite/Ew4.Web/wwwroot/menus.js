@@ -3,6 +3,11 @@
   class Menus {
     constructor(api){this.api=api;this.chapter=null;this.rating=null;this.rosterRating=null;this.recruiting=false;this.tagDraft=null;this.tagSaving=false;
       addEventListener('resize',()=>requestAnimationFrame(()=>this.fitStageIntro()));
+      const stage=document.getElementById('menu-stage');
+      // Focus must scroll the sidebar, never the fixed menu artwork or header.
+      stage.addEventListener('scroll',()=>{stage.scrollTop=0;stage.scrollLeft=0;});
+      const campaignList=document.getElementById('campaign-battles');
+      campaignList.addEventListener('scroll',()=>{if(campaignList.scrollLeft)campaignList.scrollLeft=0;},{passive:true});
       document.getElementById('campaign-back').onclick=()=>{document.getElementById('campaign-screen').hidden=true;};
       document.getElementById('hq-back').onclick=()=>{
         if(this.closeHeadquartersFilter?.())return;
@@ -78,10 +83,13 @@
       await this.api.loadLibrary('strategicmap');this.chapter=chapter;
       // Chapter names are not all present in the limited title atlas. Use one complete
       // original font for the entire title instead of mixing different glyph designs.
-      document.getElementById('campaign-title').replaceChildren(this.lettering(chapter.name,'font_text_2_cn_hd','#ebe6e1'));
+      document.getElementById('campaign-title').replaceChildren(this.lettering(chapter.name,'font_text_2_cn_hd','#ebe6e1',300,'center',{size:16,singleLine:true,maxHeight:21,inkCenter:true}));
       const list=document.getElementById('campaign-battles');list.replaceChildren();
       const chapterArt=['france','coalition','holyroman','east','usa','uk'][chapter.id-1]||'france';
       list.style.setProperty('--chapter-entry-image','url("/content/ui/image_menu_hd/button_choosestage_'+chapterArt+'.png")');
+      const entryArt=this.manifest.atlases.image_menu_hd?.['button_choosestage_'+chapterArt+'.png'];
+      list.style.setProperty('--campaign-row-width',(entryArt?.w/2||164)+'px');
+      list.style.setProperty('--campaign-row-height',(entryArt?.h/2||45)+'px');
       for(const presentation of Object.values(this.catalog.presentations).filter(s=>s.chapter===chapter.id)){
         if(presentation.hidden&&!this.catalog.unlockedCampaigns?.includes(presentation.id))continue;
         const scenario=this.catalog.scenarios.find(s=>s.id===presentation.id);if(!scenario)continue;
@@ -107,17 +115,24 @@
       if(presentation.alternate&&presentation.countries.length){
         let chosen=0;const layout=new Ew4NativeUI.Layout({...this.api,detail:(title,width,height,_confirm,onClose)=>
           this.api.detail(title,width,height,()=>this.api.start(chosen?presentation.alternate:presentation.id,null),onClose)},'form_selcountry');
+        layout.body.parentElement.classList.add('country-selection-dialog');
+        layout.body.parentElement.parentElement.classList.add('country-selection-modal');
+        for(const side of ['btn_left','btn_right']){
+          const frame=layout.get(side+'/image_frame');
+          frame.replaceChildren();frame.classList.add('country-selection-frame');
+          frame.style.borderImageSource='url("'+Ew4NativeUI.resource(this.manifest,'common_lineframe_bold.png').file+'")';
+        }
         const select=index=>{
           chosen=index;const selected=layout.get(index?'btn_right':'btn_left'),marker=layout.get('group_select');
           Object.assign(marker.style,{left:selected.style.left,top:selected.style.top,width:selected.style.width,height:selected.style.height,pointerEvents:'none'});
-          layout.text('group_select/text_nation',this.api.catalog.countries[presentation.countries[index]]?.name||this.text('name_'+presentation.countries[index]));
+          layout.text('group_select/text_nation',this.api.catalog.countries[presentation.countries[index]]?.name||this.text('name_'+presentation.countries[index]),{color:'235,230,225,255'});
           for(const [i,id] of ['btn_left','btn_right'].entries())layout.get(id).setAttribute('aria-pressed',String(i===index));
         };
         presentation.countries.slice(0,2).forEach((country,index)=>{
           const side=index?'btn_right':'btn_left',name=this.api.catalog.countries[country]?.name||this.text('name_'+country);
           const image=layout.get(side+'/image_nation_'+(index+1));
           Object.assign(image.style,{width:'25.5px',height:'15px'});image.replaceChildren(this.countryFlag(country,25.5,15));
-          layout.text(side+'/text_nation_'+(index+1),name);layout.action(side,name,()=>select(index));
+          layout.text(side+'/text_nation_'+(index+1),name,{color:'235,230,225,255'});layout.action(side,name,()=>select(index));
         });
         select(0);
       }else await this.api.start(presentation.id,null);
@@ -378,7 +393,13 @@
       for(const [track,effect,value] of [['rank','hp',held?.healthBonus??definition.healthBonus],['title','recover',held?.healing??definition.healing]]){const row=document.createElement('div');row.append(this.progressionBadge(track,held?.learning[track]??{level:definition[track],experience:0}));const icon=this.api.uiImage('marker_'+effect+'_dark.png',17);icon.className='rank-effect';row.append(icon,this.lettering(value,'font_char_2_hd'));ranks.append(row);}body.append(ranks);
       const abilities=document.createElement('div');abilities.className='commander-abilities';const values=held?.learning.abilities||definition.abilities;
       for(const [key,icon] of [['infantry','upgrade_tag_infantry'],['cavalry','upgrade_tag_cavalry'],['artillery','upgrade_tag_artillery'],['naval','upgrade_tag_ship'],['fort','upgrade_tag_fortress'],['commerce','generalsinfo_trade'],['movement','generalsinfo_move'],['training','generalsinfo_training']]){
-        const row=document.createElement('div');row.className='commander-ability';row.setAttribute('aria-label',key+' '+(key==='training'?(held?.training??definition.training):values[key]));row.append(this.api.uiImage(icon+'.png',22,21.5));const stars=document.createElement('div');stars.className='ability-stars';for(let i=0;i<(key==='training'?(held?.training??definition.training):values[key]);i++)stars.append(this.api.uiImage('star_middle.png',13.5,12.5));row.append(stars);abilities.append(row);
+        const count=key==='training'?(held?.training??definition.training):values[key];
+        const row=document.createElement('div');row.className='commander-ability';row.dataset.ability=key;row.setAttribute('aria-label',key+' '+count);row.append(this.api.uiImage(icon+'.png',22,21.5));
+        const stars=document.createElement('div');stars.className='ability-stars';stars.dataset.value=String(count);
+        // Mod abilities are not limited to the original five-star artwork.
+        for(let i=0;i<(count>5?1:count);i++)stars.append(this.api.uiImage('star_middle.png',13.5,12.5));
+        if(count>5){stars.classList.add('ability-stars-count');stars.append(this.lettering('\u00d7'+count,'font_char_2_hd','#404040',106,'left',{size:12,singleLine:true,shrinkWidth:true,inkCenter:true,maxHeight:19}));}
+        row.append(stars);abilities.append(row);
       }body.append(abilities);
       if(held&&!this.deployment&&!held.battle){const regroup=this.api.button('',()=>this.regroup(held.id),equipment);regroup.className='native-command orange regroup';regroup.disabled=held.locked;regroup.setAttribute('aria-label',this.text('btn_regroup'));regroup.append(this.lettering(this.text('btn_regroup'),'font_text_3_cn_hd','#ebe6e1'));}
       const item=this.api.button('',()=>held?.battle?this.battleEquipment(held,()=>this.commanderInfo(definition,held,onClose)):this.equipment(held.id),equipment);item.className='native-command blue equip';item.disabled=!held||!!this.deployment||!!held.locked&&!held.battle;item.setAttribute('aria-label',this.text('btn_item'));item.append(this.lettering(this.text('btn_item'),'font_text_3_cn_hd','#ebe6e1'));

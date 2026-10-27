@@ -55,6 +55,9 @@ internal sealed class LegacyModImporter
             if (!ModFiles.RuntimePath(path)) throw new InvalidDataException("Unsupported extension file: " + path);
             ModFiles.Write(stage, path, source.Read(originalPath));
         }
+        // Legacy map sets are independent of the rewrite's built-in map extensions.
+        if ((resources.FullPackage || names.Contains("def_map.xml")) && !extensionPaths.Contains("rewrite/extension.json"))
+            ModFiles.WriteJson(stage, "rewrite/extension.json", new { schema = 1, apiVersion = 3 });
         resources.CompleteCityLabels();
         resources.CheckMapReferences();
         foreach (string name in names.Where(n => !n.Contains('/') && (n.EndsWith(".btl", StringComparison.Ordinal) || n.EndsWith(".xml", StringComparison.Ordinal) || n.EndsWith(".ini", StringComparison.Ordinal) || n.EndsWith(".bin", StringComparison.Ordinal))))

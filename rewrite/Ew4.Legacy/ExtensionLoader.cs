@@ -22,6 +22,7 @@ public sealed partial class ExtensionLoader
     public IReadOnlyDictionary<string, ExtensionLayout> Layouts { get; }
     public IReadOnlyDictionary<string, VictoryPresentation> VictoryPresentations { get; private init; } = new Dictionary<string, VictoryPresentation>();
     public IReadOnlyDictionary<string, ScriptedScenarioEvent[]> ScenarioEvents { get; }
+    public StoryLibrary? Stories { get; private init; }
     public bool Enabled => Revision.Length > 0;
     public int ApiVersion { get; private set; } = 1;
     public GeographyCatalog Geography { get; private init; } = GeographyCatalog.Empty;
@@ -44,7 +45,8 @@ public sealed partial class ExtensionLoader
         string? ScenarioEvents = null, string[]? Statuses = null, string? VictoryPresentation = null, string? LegacySkillParameters = null,
         string? CommanderDialogues = null, string? ItemBindings = null, string? DeploymentLimits = null, string? Metagame = null,
         string? StageIntroPresentation = null, string? FormationCounts = null, string? CampaignVisibility = null,
-        string? Geography = null, string? PauseObjectivesPresentation = null, string? MapColors = null, string? AiControl = null);
+        string? Geography = null, string? PauseObjectivesPresentation = null, string? MapColors = null, string? AiControl = null,
+        string? StoryPresentation = null);
     private sealed record CampaignVisibilityFile(int Schema, Dictionary<string, string>? Visibility);
     private sealed record LegacySkillFile(int Schema, Dictionary<string, Dictionary<string, double>> Skills);
     private sealed record DeploymentLimitFile([property: JsonNumberHandling(JsonNumberHandling.Strict)] int Schema,
@@ -205,6 +207,41 @@ public sealed partial class ExtensionLoader
         var scenarioEvents = m.ScenarioEvents == null ? new Dictionary<string, ScriptedScenarioEvent[]>() : Read<Dictionary<string, ScriptedScenarioEvent[]>>(m.ScenarioEvents);
         scenarioEvents = scenarioEvents.ToDictionary(p => p.Key, p => p.Value.Select(countries.Resolve).ToArray());
         foreach (var events in scenarioEvents.Values) Core.ScenarioRules.ValidateDefinitions(events);
+        StoryLibrary? stories = null;
+        if (m.StoryPresentation != null)
+        {
+            if (m.ApiVersion < 3) throw new RuleViolation("extension.version", "Story presentation requires API 3");
+            stories = Read<StoryLibrary>(m.StoryPresentation);
+            var scenes = stories.Scenes.ToDictionary(p => p.Key, p => p.Value);
+            foreach (string file in stories.SceneFiles)
+            {
+                var scene = Read<StoryScene>(file);
+                if (!scenes.TryAdd(scene.Id, scene)) throw new RuleViolation("story.scene", "Duplicate scene: " + scene.Id);
+            }
+            stories = stories with { SceneFiles = [], Scenes = scenes.ToDictionary(p => p.Key, p => p.Value with {
+                Steps = p.Value.Steps?.Select(step => step with { Choices = step.Choices.Select(choice => choice with {
+                    Effects = choice.Effects.Select(countries.Resolve).ToArray() }).ToArray() }).ToArray() }) };
+            StoryValidation.Library(stories);
+            foreach (var scene in stories.Scenes.Values)
+            {
+                var checks = new ScriptedScenarioEvent { Id = "__story_validation", Popup = new ScenarioPopup { Choices = scene.Steps!
+                    .SelectMany(s => s.Choices).Select((c, i) => new ScenarioEventChoice { Id = "choice" + i, Text = c.Text,
+                        Condition = c.Condition, Effects = c.Effects }).DefaultIfEmpty(new ScenarioEventChoice { Id = "ok", Text = "OK" }).ToArray() } };
+                Core.ScenarioRules.ValidateDefinitions(scenarioEvents.Values.SelectMany(e => e).GroupBy(e => e.Id).Select(g => g.First()).Append(checks).ToArray());
+            }
+            foreach (string media in StoryMedia(stories).Distinct())
+            {
+                var data = read(media);
+                if (data.Length is < 24 or > 16 * 1024 * 1024 || !data.Take(8).SequenceEqual(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 })
+                    || System.Buffers.Binary.BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan(16, 4)) is 0 or > 4096
+                    || System.Buffers.Binary.BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan(20, 4)) is 0 or > 4096)
+                    throw new RuleViolation("story.image", "Expected PNG up to 4096 pixels / 16 MiB: " + media);
+            }
+        }
+        foreach (var effect in scenarioEvents.Values.SelectMany(e => e).SelectMany(Core.ScenarioRules.Effects)
+            .Concat(stories?.Scenes.Values.SelectMany(s => s.Steps!).SelectMany(s => s.Choices).SelectMany(c => c.Effects) ?? []))
+            if (effect.Type == "play_story" && (stories == null || !stories.Scenes.ContainsKey(effect.Scene!)))
+                throw new RuleViolation("story.reference", "Unknown story scene: " + effect.Scene);
         var eventVictories = scenarioEvents.Values.SelectMany(v => v).SelectMany(Core.ScenarioRules.Effects)
             .Select(e => e.VictoryRules).OfType<ExtensionVictoryRules>().ToArray();
         foreach (string image in scenarioEvents.Values.SelectMany(v => v).Select(e => e.Popup?.Image)
@@ -258,7 +295,7 @@ public sealed partial class ExtensionLoader
             { ApiVersion = m.ApiVersion, VictoryPresentations = victoryScreens, LegacySkills = legacySkills, CommanderDialogues = commanderDialogues,
                 ItemBindings = items, DeploymentLimits = deploymentLimits, FormationCounts = formationCounts, CampaignVisibility = campaignVisibility,
                 Metagame = metagame, StageIntroPresentations = introScreens, PauseObjectivesPresentations = pauseScreens, Geography = geography,
-                MapColors = mapColors, AiControl = aiControl };
+                MapColors = mapColors, AiControl = aiControl, Stories = stories };
         bool Known(string id) => skills.ContainsKey(id) || id.StartsWith("ew4.skill.", StringComparison.Ordinal)
             && int.TryParse(id[10..], out int value) && value is >= 0 and < 40 || BuiltinTraits.Contains(id);
     }

@@ -5,6 +5,21 @@ using System.Text.Json.Nodes;
 using System.Xml.Linq;
 using Ew4.Mods;
 
+if (args.ElementAtOrDefault(1) == "--commander-stars-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { commanderStarChecks = CommanderStarChecks.Run(Path.GetFullPath(args[0]), Path.GetFullPath(args[2])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--legacy-map-extensions-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { legacyMapExtensionChecks = LegacyMapExtensionChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--save-export-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { saveExportChecks = SaveExportChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
 if (args.ElementAtOrDefault(1) == "--startup-performance-only")
 {
     StartupAssetChecks.Measure(Path.GetFullPath(args[0])); return;

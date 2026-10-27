@@ -1,0 +1,6 @@
+{
+  "schema": 1,
+  "apiVersion": 3,
+  "storyPresentation": "rewrite/story/catalog.json",
+  "scenarioEvents": "rewrite/story/events.json"
+}

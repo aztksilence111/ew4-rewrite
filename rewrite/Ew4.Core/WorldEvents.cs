@@ -90,6 +90,7 @@ public static class WorldEvents
     public static WorldState Acknowledge(WorldState state, string dialogue)
     {
         state.Validate();
+        if (StoryPlayback.Current(state) != null) throw new RuleViolation("story.command_required", "Advance the story through its own command");
         if (ScenarioRules.Pending(state) != null) throw new RuleViolation("scenario.choice_required", "Select an event choice");
         if (state.PendingDialogue == null || dialogue != state.PendingDialogue)
             throw new RuleViolation("event.dialogue_mismatch", "Dialogue acknowledgement does not match");

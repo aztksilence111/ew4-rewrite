@@ -129,7 +129,8 @@ public static class LegacyScenarioHost
             string variant = initialized.Records[i].Variant;
             if (!variants.TryGetValue(variant, out var policy))
             {
-                policy = LegacyAiCatalog.Production(variant, catalogs.Runtime, catalogs.Cards, catalogs.Buildings) with { Commanders = commanders };
+                policy = LegacyAiCatalog.Production(variant, catalogs.Runtime, catalogs.Cards, catalogs.Buildings) with {
+                    Commanders = commanders, EmergencyDisband = request.Mode == 2 };
                 variants.Add(variant, policy);
             }
             production.Add(ids[i], policy);
@@ -195,6 +196,7 @@ public static class LegacyScenarioHost
                 foreach (var property in element.EnumerateObject().OrderBy(p => p.Name, StringComparer.Ordinal))
                 {
                     // Optional runtime districts must not change the pre-existing source-content binding.
+                    if (property.Name == nameof(WorldProductionRules.EmergencyDisband)) continue;
                     if (property.Name == nameof(LocalMultiplayerState.ShareAlliedVictory)) continue;
                     if (property.Name == nameof(WorldState.Jurisdictions) && property.Value.ValueKind == JsonValueKind.Null) continue;
                     if (property.Name == nameof(WorldState.ArmyCapacity) && property.Value.ValueKind == JsonValueKind.Null) continue;
