@@ -91,7 +91,12 @@ public sealed record Combatant
     public float EvasionIgnoringBuilding { get; init; }
     public bool Has(string skill) => !Profile.LegacySkillOverrides.Contains(skill)
         && (Skills.Contains(skill) || Profile.SkillSlots.Any(s => s.Id == skill));
-    public void Validate() => PlanningScope.Validate(this, ValidateCore);
+    public void Validate()
+    {
+        if (FrozenCombatants.IsValidated(this)) return;
+        PlanningScope.Validate(this, ValidateCore);
+        FrozenCombatants.Validated(this);
+    }
     private void ValidateCore()
     {
         PlanningScope.Validate(Profile, Profile.Validate);

@@ -1,6 +1,16 @@
 using System.Text.Json;
 using Ew4.Core;
 
+if (args.ElementAtOrDefault(1) == "--display-effects-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { turnEntryChecks = WorldTurnEntryChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--diplomacy-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { diplomacyChecks = DiplomacyChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
 if (args.ElementAtOrDefault(1) == "--commerce-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { commerceChecks = LegacyCommerceChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
@@ -81,6 +91,13 @@ if (args.ElementAtOrDefault(1) == "--catalog-files-only")
 if (args.ElementAtOrDefault(1) == "--r-feedback-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { rFeedbackChecks = RFeedbackChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--snapshot-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { snapshotChecks = CombatantSnapshotChecks.Run() + ValidationReuseChecks.Run()
+        + SnapshotAllocationChecks.Run() + ExtensionPlanningChecks.Run(Path.GetFullPath(args[0])),
+        strategyChecks = AiStrategySelectionChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
 }
 
 if (args.ElementAtOrDefault(1) == "--performance-only")
@@ -168,7 +185,8 @@ if (args.Length == 2 && args[1] == "--equipment-only")
 }
 if (args.Length == 2 && args[1] == "--settlement-only")
 {
-    Console.WriteLine(JsonSerializer.Serialize(new { settlementChecks = BattleSettlementChecks.Run(root), victoryModChecks = VictoryModChecks.Run(root), errors = 0 })); return;
+    Console.WriteLine(JsonSerializer.Serialize(new { settlementChecks = BattleSettlementChecks.Run(root), victoryModChecks = VictoryModChecks.Run(root),
+        saveCompatibilityChecks = SaveCompatibilityChecks.Run(root), errors = 0 })); return;
 }
 if (args.Length == 2 && args[1] == "--scenario-only")
 {
@@ -284,6 +302,7 @@ int aiOfferPoolChecks = AiOfferPoolChecks.Run(root);
 int aiConstructionChecks = AiConstructionChecks.Run(root);
 int aiWorldProductionChecks = AiWorldProductionChecks.Run(root);
 int armyCapacityChecks = ArmyCapacityChecks.Run(root);
+int diplomacyChecks = DiplomacyChecks.Run(root);
 int commanderDeploymentChecks = CommanderDeploymentChecks.Run(root);
 int hazardDeathChecks = HazardDeathChecks.Run(root);
 int legacyImportChecks = LegacyImportChecks.Run(root);
@@ -314,7 +333,7 @@ int mapColorChecks = MapColorChecks.Run(root);
 int objectiveChecks = ObjectiveChecks.Run(root);
 int playerAiChecks = PlayerAiChecks.Run(root);
 var report = new { combatVectors = cases, ruleChecks = contracts, commanderChecks, animationChecks, catalogChecks, worldChecks, progressionChecks, aiChecks, lifecycleChecks, actionChecks, movementCommitChecks, turnSettlementChecks, worldTurnChecks, battleCommitChecks, battleChainChecks, combatContextChecks, improvementChecks, aiTacticalChecks, splashChecks, supportActionChecks, aiMovementChecks, aiStrategyChecks, aiStrategySelectionChecks, aiUnitChecks, aiProductionChecks, aiOfferPoolChecks, aiConstructionChecks, aiWorldProductionChecks, commanderDeploymentChecks, hazardDeathChecks, legacyImportChecks, legacyArmyImportChecks, legacyEventChecks, legacyBuildingChecks, legacyFactionChecks, legacyCombatChecks, legacyActionAiChecks, legacyCommerceChecks, sessionAccountChecks, rosterDeploymentChecks, legacyTechnologyChecks, legacyStartupChecks, worldTurnEntryChecks, mapCatalogChecks, legacyHostChecks, jurisdictionChecks, errors = 0,
-    armyCapacityChecks, objectiveChecks, playerAiChecks, autoJurisdictionChecks, extensionChecks, commanderDialogueChecks, commonSkillChecks, legacySkillParameterChecks, scenarioRuleChecks, mapColorChecks, limitations = new[] { "Headless scenario/session startup and core rules; rendering and Android require separate integration checks.",
+    armyCapacityChecks, diplomacyChecks, objectiveChecks, playerAiChecks, autoJurisdictionChecks, extensionChecks, commanderDialogueChecks, commonSkillChecks, legacySkillParameterChecks, scenarioRuleChecks, mapColorChecks, limitations = new[] { "Headless scenario/session startup and core rules; rendering and Android require separate integration checks.",
         "Native profile migration, commander purchase/cultivation, session tavern AI, tutorial controller, merge flows, full playthroughs and display/Android integration remain incomplete." } };
 Directory.CreateDirectory(Path.Combine(root, "rewrite/reports"));
 File.WriteAllText(Path.Combine(root, "rewrite/reports/core_validation.json"), JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true }) + "\n");

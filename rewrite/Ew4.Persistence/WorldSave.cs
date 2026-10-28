@@ -22,6 +22,13 @@ public static class WorldSave
                 if (info.Type == typeof(WorldState)) {
                     info.Properties.Single(p => p.Name == "armyCapacity").ShouldSerialize = (_, value) => value != null;
                     info.Properties.Single(p => p.Name == "story").ShouldSerialize = (_, value) => value != null;
+                    info.Properties.Single(p => p.Name == "demands").ShouldSerialize = (_, value) => value != null;
+                    info.Properties.Single(p => p.Name == "diplomacyAdjustments").ShouldSerialize = (_, value) => value != null;
+                }
+                if (info.Type == typeof(FactionState)) {
+                    info.Properties.Single(p => p.Name == "capital").ShouldSerialize = (_, value) => value != null;
+                    info.Properties.Single(p => p.Name == "homelandBuildings").ShouldSerialize = (_, value) => value != null;
+                    info.Properties.Single(p => p.Name == "turnSummary").ShouldSerialize = (_, value) => value != null;
                 }
                 if (info.Type == typeof(MovementCell)) {
                     info.Properties.Single(p => p.Name == "barrier").ShouldSerialize = (_, value) => (TerrainBarrier)value! != TerrainBarrier.None;

@@ -63,9 +63,18 @@ public static partial class WorldAi
             var context = WorldActions.MovementContext(state, mover, rules.Movement);
             int[]? components = null;
             var distanceFields = new Dictionary<string, IReadOnlyDictionary<int, long>>(StringComparer.Ordinal);
+            var forwardFields = new Dictionary<int, IReadOnlyDictionary<int, long>>();
+            int reverseSearches = 0;
             var reachable = Movement.Reachable(map, context.Cells, unit.Cell, context.Actor, rules.Movement.Search);
             if (reachable.Count <= 1) continue;
             var orderedLandings = reachable.Keys.OrderBy(i => i).ToArray();
+            bool landingMayDraw = orderedLandings.Any(i => !occupants.ContainsKey(i)
+                && (!rules.Strategy.Landing.AvoidHazards || state.Cells[i].Environment == 0)
+                && (rules.Strategy.Landing.AllowDistantAlliedLanding || map.Distance(unit.Cell, i) == 1)
+                && state.Cells[i] is { Owner: { } owner, BuildingKind: { } building }
+                && owner != faction.Id && WorldDiplomacy.Allied(state, owner, faction.Id)
+                && !rules.Strategy.Landing.ReservedAlliedBuildings.Contains(building)
+                && rules.Strategy.Landing.AlliedBuildingChance.ContainsKey(building));
             var strategyUnit = new AiStrategyUnit(unit.Combatant.Health, unit.Combatant.Profile.MaxHealth, unit.RemainingMovement,
                 facts.Category == rules.Tactics.NavalCategory, mover.Transport, unit.CommanderId != null, facts.AtSea, strength, threat);
             // Stable identifiers keep independent faction candidates unaffected by collection ordering.
@@ -91,6 +100,15 @@ public static partial class WorldAi
                 }
                 foreach (var goal in goals.OrderByDescending(g => AiStrategy.GoalScore(strategyUnit, g.Facts, rules.Strategy.Scoring)).ThenBy(g => g.Cell))
                 {
+                    // SelectDestination can consume draws at allied buildings. Only skip
+                    // nonpositive goals when no reachable landing can consume one.
+                    if (queries != null && !landingMayDraw)
+                    {
+                        long? earlyWeight = null;
+                        try { earlyWeight = AiStrategy.Weight(strategyUnit, goal.Facts, map.Distance(unit.Cell, goal.Cell), rules.Strategy.Scoring); }
+                        catch (OverflowException) { } // Preserve the original exception boundary for unreachable goals.
+                        if (earlyWeight <= 0) continue;
+                    }
                     var endpoints = new List<int>();
                     // HexMap.Within preserves ascending cell order, including edge maps.
                     foreach (int i in goal.Facts.HasUnit ? map.Within(goal.Cell, unit.Combatant.Profile.MaximumRange, true) : new[] { goal.Cell })
@@ -109,8 +127,30 @@ public static partial class WorldAi
                     if (!distanceFields.TryGetValue(fieldKey, out var distances))
                     {
                         if (distanceFields.Count >= 8) distanceFields.Clear();
-                        distanceFields[fieldKey] = distances = Movement.DistancesForAdvance(map, context.Cells, endpoints,
-                            context.Actor, rules.Movement.Search, unit.Cell, orderedLandings);
+                        // Many goals on a large map can reuse the transposed distance
+                        // queries. Bound retained arrays to eight million cells per decision.
+                        if (queries != null && reverseSearches >= 8 && map.Count >= 512
+                            && (long)orderedLandings.Length * map.Count <= 8_000_000)
+                        {
+                            var combined = new Dictionary<int, long>();
+                            foreach (int origin in orderedLandings)
+                            {
+                                if (!forwardFields.TryGetValue(origin, out var field))
+                                    forwardFields[origin] = field = Movement.DistancesFrom(map, context.Cells, origin, context.Actor, rules.Movement.Search);
+                                long nearest = long.MaxValue;
+                                foreach (int endpoint in endpoints)
+                                    if (field.TryGetValue(endpoint, out long value)) nearest = Math.Min(nearest, value);
+                                if (nearest != long.MaxValue) combined.Add(origin, nearest);
+                            }
+                            distances = combined;
+                        }
+                        else
+                        {
+                            reverseSearches++;
+                            distances = Movement.DistancesForAdvance(map, context.Cells, endpoints,
+                                context.Actor, rules.Movement.Search, unit.Cell, orderedLandings);
+                        }
+                        distanceFields[fieldKey] = distances;
                     }
                     if (!distances.TryGetValue(unit.Cell, out long sourceDistance)) continue;
                     var landings = new List<AiStrategyDestination>();

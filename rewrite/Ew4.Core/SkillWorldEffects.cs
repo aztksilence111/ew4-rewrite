@@ -165,19 +165,19 @@ public sealed partial class RuleEventBus
 
     public WorldState ExpireStatuses(WorldState world, string faction)
     {
-        foreach (var unit in world.Units.Where(u => u.Owner == faction).ToArray())
+        var units = world.Units.ToArray();
+        for (int i = 0; i < units.Length; i++)
         {
+            var unit = units[i];
+            if (unit.Owner != faction) continue;
             foreach (var status in unit.Combatant.Statuses.Where(s => s.RemainingTurns == 1))
                 world = world with { ExtensionState = ClearStatusState(world, unit.Id, status.Id) };
-            world = world with { Units = world.Units.Select(u => {
-                if (u.Id != unit.Id) return u;
-                var combatant = u.Combatant with { Statuses = u.Combatant.Statuses.Where(s => s.RemainingTurns > 1)
+            var combatant = unit.Combatant with { Statuses = unit.Combatant.Statuses.Where(s => s.RemainingTurns > 1)
                     .Select(s => s with { RemainingTurns = s.RemainingTurns - 1 }).ToArray() };
-                int limit = MovementBudget(combatant);
-                return u with { Combatant = combatant, ExtensionMovementLimit = limit, RemainingMovement = Math.Min(u.RemainingMovement, limit) };
-            }).ToArray() };
+            int limit = MovementBudget(combatant);
+            units[i] = unit with { Combatant = combatant, ExtensionMovementLimit = limit, RemainingMovement = Math.Min(unit.RemainingMovement, limit) };
         }
-        return world;
+        return world with { Units = units };
     }
 
     public int MovementBudget(Combatant unit)
@@ -202,16 +202,18 @@ public sealed partial class RuleEventBus
     public static IReadOnlyList<WorldNotice> ChangeNotices(WorldState before, WorldState after)
     {
         var notices = new List<WorldNotice>();
+        var nextUnits = after.Units.ToDictionary(u => u.Id, StringComparer.Ordinal);
+        var previousIds = before.Units.Select(u => u.Id).ToHashSet(StringComparer.Ordinal);
         foreach (var unit in before.Units)
         {
-            var next = after.Units.SingleOrDefault(u => u.Id == unit.Id);
+            var next = nextUnits.GetValueOrDefault(unit.Id);
             int damage = unit.Combatant.Health - (next?.Combatant.Health ?? 0);
             if (damage > 0) notices.Add(new("battle.damage", unit.Id, damage));
             else if (damage < 0) notices.Add(new("unit.healed", unit.Id, -(long)damage));
             if (next == null) notices.Add(new("unit.destroyed", unit.Id));
             else if (next.Cell != unit.Cell) notices.Add(new("unit.moved", unit.Id, next.Cell));
         }
-        foreach (var unit in after.Units.Where(u => !before.Units.Any(old => old.Id == u.Id))) notices.Add(new("unit.recruited", unit.Id));
+        foreach (var unit in after.Units.Where(u => !previousIds.Contains(u.Id))) notices.Add(new("unit.recruited", unit.Id));
         foreach (var commander in after.Commanders.Where(c => c.Withdrawn && before.Commanders.Any(old => old.Id == c.Id && !old.Withdrawn)))
             notices.Add(new("commander.withdrawn", commander.Id));
         foreach (var faction in after.Factions.Where(f => f.Defeated && before.Factions.Any(old => old.Id == f.Id && !old.Defeated)))

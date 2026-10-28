@@ -247,6 +247,12 @@
         this.visibleKey=visibleKey;this.visibleCells=this.cellsInRect(r);
         this.visibleUnits=this.unitIndex.query(r).filter(unit=>this.visible(point(unit.cell,this.state.width)));
       }
+      if(this.badgeOnly&&this.visibleUnits.length>2000){
+        const screenArea=Math.max(1,r.width*r.height*this.zoom*this.zoom),nativeSize=24*this.detailScale;
+        const compactSize=Math.max(8,Math.min(nativeSize,Math.sqrt(screenArea*1.5/this.visibleUnits.length)));
+        const blend=Math.min(1,(this.visibleUnits.length-2000)/2000);
+        this.markerScale=(nativeSize+(compactSize-nativeSize)*blend)/24/this.zoom;
+      }
       this.animated=arrowActive||!!this.selection||this.visibleUnits.some(u=>badgeAlpha(u,this.state,300)!==1||!this.badgeOnly&&(this.unitMotions.get(u.id)?.playing||u.burning>0||u.category==='fort'&&u.health>0&&u.maxHealth-u.health>=80||flagAnimated(u,this.state)&&this.factions.get(u.owner)?.flag&&!this.factions.get(u.owner)?.flagImage))||
         this.visibleCells.some(({site,cell})=>site.active&&(objectiveMarker(site,this.stationed.get(cell))||!this.badgeOnly&&facilityFlagAnimated(site,this.state)&&this.factions.get(site.owner)?.flag&&!this.factions.get(site.owner)?.flagImage&&!this.stationed.has(cell)));
       // Grid covers the ground/buildings, while units, flags and portraits stay above it.
@@ -557,6 +563,7 @@
     units() {
       const {draw,state,time}=this;
       this.visibleUnitMarkers=[];
+      if(this.badgeOnly){this.farBadgeUses=new Map();this.farBadgeBuilds=0;this.farBadgeBuildPixels=0;}
       // Native movement emitters render behind the unit bodies, using HD-to-map scale.
       const activeTrails=new Set();
       if(!this.badgeOnly)for(const [id,motion] of this.motions){const unit=this.unitById.get(id);if(!unit)continue;
@@ -565,23 +572,23 @@
       }
       this.api.effects?.finishTrails?.(activeTrails,time,this.badgeOnly);
       this.api.effects?.frame(draw,time,'ground',this.visibleRect);
-      const activeUnits=new Set(this.visibleUnits);
-      for(const id of this.motions.keys()){const unit=this.unitById.get(id);if(unit)activeUnits.add(unit);}
-      const units=this.motions.size?[...activeUnits].sort((a,b)=>this.unitOrder.get(a.id)-this.unitOrder.get(b.id)):this.visibleUnits;
+      let units=this.visibleUnits;
+      if(this.motions.size){const activeUnits=new Set(units);
+        for(const id of this.motions.keys()){const unit=this.unitById.get(id);if(unit)activeUnits.add(unit);}
+        units=[...activeUnits].sort((a,b)=>this.unitOrder.get(a.id)-this.unitOrder.get(b.id));}
       for(const unit of units){
         const motion=this.motions.get(unit.id),p=motion?pose(motion,state.width,time):point(unit.cell,state.width);
         if(!this.visible(p))continue;
         const profile=(!this.badgeOnly&&this.api.effects?.profile(unit.profile,this.factions.get(unit.owner)))||this.api.manifest.profiles[unit.profile];if(!profile)continue;
-        draw.save();
         const death=this.deaths?.get(unit.id),deathProgress=death?Math.max(0,Math.min(1,(time-death.started)/death.duration)):0;
-        if(deathProgress>=1){draw.restore();continue;}
+        if(deathProgress>=1)continue;
         // Far view exits before body libraries, poses, flames, damage effects or flags are evaluated.
         if(this.badgeOnly){
-          draw.translate(p.x,p.y);draw.scale(this.markerScale,this.markerScale);
-          this.unitBadge(unit,{x:0,y:0},profile,!!death);
+          this.unitBadge(unit,p,profile,!!death,this.markerScale);
           if(!death)this.visibleUnitMarkers.push({unit,p});
-          draw.restore();continue;
+          continue;
         }
+        draw.save();
         const lib=this.api.libraries.get(profile.library);
         if(!lib)this.requestLibrary(profile.library);
         const facing=motion?p.facing:this.facings.get(unit.id)??(unit.facing===0?-1:1),sea=state.cells[p.cell??unit.cell]?.sea;
@@ -615,9 +622,15 @@
       this.libraryRequests.add(name);
       this.api.loadLibrary(name).then(()=>{this.libraryRequests.delete(name);this.api.requestFrame?.();},()=>{this.libraryRequests.delete(name);this.failedLibraries.add(name);});
     }
-    unitBadge(unit,p,profile,death){
+    unitBadge(unit,p,profile,death,scale=1){
       const {draw,state,time}=this,color=badgeColor(state,unit.owner);
-      draw.save();draw.globalAlpha*=death?1:badgeAlpha(unit,state,time);
+      if(this.badgeOnly&&!death&&!unit.aiControlled&&draw.globalAlpha===1){
+        const badge=this.farBadge(unit,profile,color,badgeAlpha(unit,state,time));
+        if(badge){draw.drawImage(badge.canvas,p.x+badge.left*scale,p.y+badge.top*scale,badge.width*scale,badge.height*scale);return;}
+      }
+      draw.save();
+      if(scale!==1){draw.translate(p.x,p.y);draw.scale(scale,scale);p={x:0,y:0};}
+      draw.globalAlpha*=death?1:badgeAlpha(unit,state,time);
       this.api.sprite('buildings','hpbar_'+color+'.png',p.x,p.y);
       const arc=!death&&this.healthArc(unit.health,unit.maxHealth);
       if(arc)draw.drawImage(arc,p.x-12,p.y-12,24,24);
@@ -629,6 +642,34 @@
         if(badge instanceof HTMLCanvasElement||badge.complete&&badge.naturalWidth)draw.drawImage(badge,p.x+(config.badgeX??-10),p.y+(config.badgeY??-27),config.badgeWidth||20,config.badgeHeight||12);
       }
       draw.restore();
+    }
+    farBadge(unit,profile,color,alpha=1){
+      const revision=this.api.imageRevision||0;
+      if(this.farBadgeRevision!==revision||this.farBadgeManifest!==this.api.manifest){for(const badge of this.farBadges?.values()||[])this.draw.release?.(badge.canvas);this.farBadges=new Map();this.farBadgePixels=0;this.farBadgeRevision=revision;this.farBadgeManifest=this.api.manifest;}
+      const key=[color,profile.unitIndex,unit.health,unit.maxHealth,alpha].join(':');
+      if(this.farBadges.has(key))return this.farBadges.get(key);
+      const uses=(this.farBadgeUses?.get(key)||0)+1;this.farBadgeUses?.set(key,uses);
+      if(uses<2||this.farBadgeBuilds>=8)return null;
+      const names=['hpbar_'+color+'.png','mark_unit_'+profile.unitIndex+'.png'];
+      let left=-12,top=-12,right=12,bottom=12;
+      for(const name of names){const hd=this.api.manifest.atlases.buildings_hd?.[name],atlas=hd?'buildings_hd':'buildings',sprite=hd||this.api.manifest.atlases.buildings?.[name],ratio=hd?2:1;
+        const texture=this.api.image('images/'+atlas+'.png');if(!sprite||!texture?.complete||!texture.naturalWidth)return null;
+        left=Math.min(left,-sprite.refx/ratio);top=Math.min(top,-sprite.refy/ratio);right=Math.max(right,(sprite.w-sprite.refx)/ratio);bottom=Math.max(bottom,(sprite.h-sprite.refy)/ratio);
+      }
+      left=Math.floor(left)-1;top=Math.floor(top)-1;right=Math.ceil(right)+1;bottom=Math.ceil(bottom)+1;
+      const width=right-left,height=bottom-top;if(width*height>16384)return null;
+      if(this.farBadgeBuildPixels+width*height*16>256*1024)return null;
+      this.farBadgeBuilds++;this.farBadgeBuildPixels+=width*height*16;
+      const canvas=document.createElement('canvas');canvas.width=width*4;canvas.height=height*4;
+      const draw=canvas.getContext('2d');draw.scale(4,4);draw.translate(-left,-top);draw.globalAlpha=alpha;
+      this.api.sprite('buildings',names[0],0,0,1,draw);
+      const arc=this.healthArc(unit.health,unit.maxHealth);if(arc)draw.drawImage(arc,-12,-12,24,24);
+      this.api.sprite('buildings',names[1],0,0,1,draw);
+      // One texture per complete badge prevents thousands of atlas/ring batch switches.
+      while(this.farBadges.size&&(this.farBadges.size>=128||this.farBadgePixels+canvas.width*canvas.height>2*1024*1024)){
+        const oldest=this.farBadges.keys().next().value,entry=this.farBadges.get(oldest);this.draw.release?.(entry.canvas);this.farBadgePixels-=entry.canvas.width*entry.canvas.height;this.farBadges.delete(oldest);}
+      this.farBadgePixels+=canvas.width*canvas.height;
+      const badge={canvas,left,top,width,height};this.farBadges.set(key,badge);return badge;
     }
     aiBadge(){
       const p=this.state.aiPresentation||{},key=JSON.stringify([p.badgeText,p.badgeColor,p.badgeTextColor,p.badgeBorderColor]);
@@ -717,6 +758,7 @@
       const {state}=this;
       if(this.badgeOnly){
         for(const {unit,p} of this.visibleUnitMarkers||[]){
+          if(!unit.commanderImage)continue;
           this.draw.save();this.draw.translate(p.x,p.y);this.draw.scale(this.markerScale,this.markerScale);
           if(unit.commanderImage){
             this.api.sprite('commandermark','board_smallgenerals.png',0,-14);

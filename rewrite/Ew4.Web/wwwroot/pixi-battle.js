@@ -72,7 +72,11 @@
       if(!(sw>0&&sh>0&&dw&&dh))return;
       const s=this.object('sprite'),m=this.matrix;
       s.texture=this.texture(source,sx,sy,sw,sh);s.tint=this.tint;
-      s.transform.setFromMatrix(this.quadMatrix.set(m.a*dw/sw,m.b*dw/sw,m.c*dh/sh,m.d*dh/sh,m.a*dx+m.c*dy+m.e,m.b*dx+m.d*dy+m.f));
+      if(m.b===0&&m.c===0){
+        const transform=s.transform;
+        transform.position.set(m.a*dx+m.e,m.d*dy+m.f);transform.scale.set(m.a*dw/sw,m.d*dh/sh);
+        transform.skew.set(0,0);transform.rotation=0;
+      }else s.transform.setFromMatrix(this.quadMatrix.set(m.a*dw/sw,m.b*dw/sw,m.c*dh/sh,m.d*dh/sh,m.a*dx+m.c*dy+m.e,m.b*dx+m.d*dy+m.f));
       this.stats.quads++;
     }
     drawPattern(source,scale,rect){

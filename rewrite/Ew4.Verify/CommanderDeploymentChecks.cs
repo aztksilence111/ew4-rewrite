@@ -125,7 +125,10 @@ internal static class CommanderDeploymentChecks
         Check(WorldCommanders.Assign(fortWorld, fortWorld.Revision, unit.Id, "leader", rules).State.Units.Single(u => u.Id == unit.Id).Combatant.Profile.Movement == 0,
             "commander cannot make configured immobile fortresses walk");
         var clone = restored.Copy();
-        ((string[])clone.Units.Single(u => u.Id == unit.Id).CommanderBase!.Combatant.Skills).AsSpan().Clear();
+        var copiedSkills = (ICollection<string>)clone.Units.Single(u => u.Id == unit.Id).CommanderBase!.Combatant.Skills;
+        Check(copiedSkills.IsReadOnly, "copied assignment base skills are immutable");
+        try { copiedSkills.Clear(); throw new InvalidOperationException("copied assignment base allowed mutation"); }
+        catch (NotSupportedException) { checks++; }
         ((IDictionary<string, float>)restored.Units.Single(u => u.Id == unit.Id).CommanderBase!.Combatant.Profile.DamageMultipliers)["infantry"] = 999;
         Check(clone.Units.Single(u => u.Id == unit.Id).CommanderBase!.Combatant.Profile.DamageMultipliers["infantry"] == 1,
             "world copies own nested assignment base collections");

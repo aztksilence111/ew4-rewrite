@@ -57,7 +57,7 @@ public sealed class MovementHistory
                 && !world.Units.Any(u => u.Id != m.Unit && u.Cell == c.Cell && u.Owner != c.Before)));
     }
     internal static bool EventTriggered(WorldState before, WorldState after, IReadOnlyList<WorldNotice>? notices)
-        => notices?.Any(n => n.Kind is "event.triggered" or "scenario.triggered" or "scenario.choice") == true
+        => notices?.Any(n => n.Kind is "event.triggered" or "scenario.triggered" or "scenario.choice" or "capital.captured") == true
             || !before.TriggeredEvents.SequenceEqual(after.TriggeredEvents)
             || !before.TriggeredScenarioEvents.SequenceEqual(after.TriggeredScenarioEvents)
             || before.ScenarioEventProgress.Count != after.ScenarioEventProgress.Count

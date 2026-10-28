@@ -124,8 +124,10 @@ internal static class EquipmentDescriptionChecks
             Check(Load().GetProperty("ok").GetBoolean(), "migrated save reloads");
             Check(JsonSerializer.Serialize(Saved(), ClientGame.Json) == JsonSerializer.Serialize(migrated, ClientGame.Json), "second load never stacks equipment corrections");
             Write(session with { ContentRevision = "foreign.content" });
-            var rejected = Load();
-            Check(!rejected.GetProperty("ok").GetBoolean() && rejected.GetProperty("code").GetString() == "save.content_revision", "unrelated content fingerprints remain rejected");
+            var reused = Load();
+            Check(reused.GetProperty("ok").GetBoolean(), "a changed fingerprint alone does not reject reusable content");
+            Check(JsonSerializer.Serialize(Saved().World.Units, ClientGame.Json) == JsonSerializer.Serialize(session.World.Units, ClientGame.Json),
+                "unrecognized historical binding preserves resolved equipment instead of applying guessed corrections");
         }
         return checks;
     }

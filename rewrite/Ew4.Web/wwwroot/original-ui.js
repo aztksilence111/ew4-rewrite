@@ -226,7 +226,7 @@
         for(const child of siblings){const css=getComputedStyle(child);width-=child.offsetWidth+px(css.marginLeft)+px(css.marginRight);}
         width-=siblings.length*px(style.columnGap);
       }
-      const font=number?'font_char_2_hd':element.closest('h1,h2')?'font_text_4_cn_hd':'font_text_2_cn_hd';
+      const font=element.closest('[data-original-font]')?.dataset.originalFont||(number?'font_char_2_hd':element.closest('h1,h2')?'font_text_4_cn_hd':'font_text_2_cn_hd');
       const bounded=(singleLine||paragraph)&&width>8?width:undefined;
       if(element.matches('.menu-bar>h1,.menu-bar>h2,.load-icon')){
         const height=element.clientHeight-px(style.paddingTop)-px(style.paddingBottom);

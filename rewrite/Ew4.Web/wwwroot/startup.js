@@ -5,9 +5,14 @@
   var match = navigator.userAgent.match(/(?:Chrome|Chromium)\/(\d+)/);
   var version = match ? match[1] : '未知';
   var minimum = window.Ew4FrontendTarget || 80;
+  function nativeStatus(state, message) {
+    try { if (window.Ew4ModImport && window.Ew4ModImport.startup) window.Ew4ModImport.startup(state, message); }
+    catch (error) { /* Native reporting must not prevent browser startup. */ }
+  }
   function fail(message) {
     if (complete || failed) return;
     failed = true;
+    nativeStatus('error', message);
     clearTimeout(timer);
     document.getElementById('startup-status').hidden = false;
     document.getElementById('startup-message').textContent = message + '\nWebView / Chromium：' + version +
@@ -18,13 +23,14 @@
   }
   function pending(label) {
     stage = label;
+    nativeStatus('pending', label);
     clearTimeout(timer);
     timer = setTimeout(function () { fail('载入超时：' + stage + '，可重试载入。'); }, 45000);
   }
   window.Ew4Startup = {
     pending: pending,
     stop: function () { clearTimeout(timer); },
-    ready: function () { complete = true; clearTimeout(timer); }
+    ready: function () { complete = true; clearTimeout(timer); nativeStatus('ready', ''); }
   };
   window.addEventListener('error', function (event) {
     if (event.target && event.target.tagName === 'SCRIPT') fail('脚本载入失败：' + event.target.src.split('/').pop());

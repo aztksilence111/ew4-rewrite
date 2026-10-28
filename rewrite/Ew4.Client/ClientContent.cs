@@ -15,6 +15,7 @@ public sealed class ClientContent
     public LegacyScenarioCatalogs Catalogs { get; }
     public ExtensionLoader Extensions { get; }
     public ArmyCapacityConfiguration ArmyCapacity { get; }
+    public DiplomacyConfiguration Diplomacy { get; }
     public CountryCatalog Countries { get; }
     public IReadOnlyDictionary<int, LegacyTerrainMap> Maps { get; }
     public IReadOnlyDictionary<int, string> MapNames { get; }
@@ -28,15 +29,22 @@ public sealed class ClientContent
     public IReadOnlyList<XElement> PrincessDefinitions { get; }
     public bool CorrectOriginalEquipment { get; }
     private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<int, string>> scenarioCityNames;
+    private readonly string catalogNewLine;
+    private ClientContent? legacyCatalogFormatting;
 
     public ClientContent(Func<string, byte[]> read, IEnumerable<string> battleFiles, bool correctOriginalEquipment = true, bool showHiddenCampaigns = true)
+        : this(read, battleFiles, correctOriginalEquipment, showHiddenCampaigns, "\r\n") { }
+
+    private ClientContent(Func<string, byte[]> read, IEnumerable<string> battleFiles, bool correctOriginalEquipment, bool showHiddenCampaigns, string catalogNewLine)
     {
+        this.catalogNewLine = catalogNewLine;
         var definitionsBundle = LegacyCatalogFiles.Load(read);
         var originalRead = read;
         bool correctItems = correctOriginalEquipment && definitionsBundle.ItemsMatchSource(read);
         if (definitionsBundle.IsSplit)
             read = path => path.StartsWith("original/", StringComparison.Ordinal) && definitionsBundle.Xml.TryGetValue(path[9..], out string? value)
-                ? System.Text.Encoding.UTF8.GetBytes(value) : originalRead(path);
+                // Keep the established Windows binding on every platform; old Android used LF.
+                ? System.Text.Encoding.UTF8.GetBytes(value.ReplaceLineEndings(catalogNewLine)) : originalRead(path);
         this.read = originalRead;
         string Text(string name)
         {
@@ -46,6 +54,7 @@ public sealed class ClientContent
         Countries = CountryCatalog.Load(read);
         Extensions = ExtensionLoader.Load(read, Countries);
         ArmyCapacity = ArmyCapacityConfiguration.Read(read);
+        Diplomacy = DiplomacyConfiguration.Read(read);
         var runtime = LegacyRuntimeCatalog.FromJson(Extensions.PatchCatalog(definitionsBundle.Catalog.ToJsonString()),
             correctItems, Extensions.LegacySkills, Extensions.ConfigureItem);
         CorrectOriginalEquipment = correctItems && LegacyEquipmentCorrections.IsOriginal(runtime.SourceHashes["def_item.xml"]);
@@ -145,6 +154,9 @@ public sealed class ClientContent
             throw new RuleViolation("extension.map_colors", "Map colors reference an unknown scenario");
         if (ArmyCapacity.FactionBases.Keys.Any(id => id != "*" && !Scenarios.Any(s => s.Id == id)))
             throw new RuleViolation("army.capacity_configuration", "Army capacity references an unknown scenario");
+        if (Diplomacy.ScenarioLocks.Keys.Concat(Diplomacy.ScenarioPairs.Keys).Concat(Diplomacy.ScenarioCapitals.Keys)
+            .Any(id => id != "*" && !Scenarios.Any(s => s.Id == id && s.Mode == 2)))
+            throw new RuleViolation("diplomacy.configuration", "Diplomacy locks require a conquest scenario");
         if (Extensions.Metagame.ShopSlots?.Any(s => s.Items?.Any(id => !Catalogs.Items.Rules().Definitions.ContainsKey(id)
                 || s.Pool == "consumable" && !Catalogs.Items.Rules().Definitions[id].Equipment.Consumable
                 || s.Pool == "equipment" && Catalogs.Items.Rules().Definitions[id].Equipment.Consumable) == true) == true)
@@ -172,7 +184,9 @@ public sealed class ClientContent
     public string Label(string key) => Strings.TryGetValue(key, out string? label) ? label : Strings.TryGetValue("name_" + key, out label) ? label : key;
     public string CountryName(string id) => Countries.Get(id)?.Name ?? Label(id);
     public CountryDefinition? Country(string id) => Countries.Get(id);
-    internal ClientContent WithoutEquipmentCorrections() => new(read, Scenarios.Select(s => s.Id + ".btl"), false);
+    internal ClientContent WithoutEquipmentCorrections() => new(read, Scenarios.Select(s => s.Id + ".btl"), false, true, catalogNewLine);
+    internal ClientContent WithLegacyCatalogFormatting() => legacyCatalogFormatting ??=
+        new(read, Scenarios.Select(s => s.Id + ".btl"), CorrectOriginalEquipment, true, "\n");
     public LegacyBattle Battle(string id)
     {
         if (!Scenarios.Any(s => s.Id == id)) throw new RuleViolation("client.scenario", "Unknown scenario");
@@ -323,6 +337,26 @@ public sealed class ClientContent
         var capacities = ArmyCapacity.Resolve(id, capacityCountries);
         var capacityWorld = started.Session.World with { ArmyCapacity = capacities };
         foreach (var cell in capacityWorld.Cells) WorldArmyCapacity.BuildingCapacity(capacityWorld, cell);
+        if (choice.Mode == 2)
+        {
+            var eventCapitals = capacityWorld.Factions.Where(f => f.Capital != null).Select(f => f.Id).ToHashSet(StringComparer.Ordinal);
+            var capitals = (Diplomacy.ScenarioCapitals.GetValueOrDefault("*") ?? []).Concat(Diplomacy.ScenarioCapitals.GetValueOrDefault(id) ?? []);
+            foreach (var entry in capitals)
+            {
+                var matches = capacityWorld.Factions.Where(f => f.Id == entry.Key || capacityCountries.GetValueOrDefault(f.Id) == entry.Key
+                    || entry.Key == "@player" && f.Id == started.Session.PlayerFaction).ToArray();
+                if (matches.Length == 0) throw new RuleViolation("diplomacy.capital", "Unknown capital faction: " + entry.Key);
+                foreach (var faction in matches.Where(f => !eventCapitals.Contains(f.Id))) capacityWorld = CapitalTreasury.SetCapital(capacityWorld, faction.Id, entry.Value);
+            }
+            foreach (var faction in capacityWorld.Factions.Where(f => f.Capital == null).ToArray())
+            {
+                var native = battle.EffectiveSites.Where(s => s.BuildingKind == 0 && Catalogs.Buildings.Capitals.ContainsKey(s.State8)
+                    && capacityWorld.Cells[s.Cell].Owner == faction.Id).OrderBy(s => s.State8).ThenBy(s => s.Cell).FirstOrDefault();
+                if (native != null) capacityWorld = CapitalTreasury.SetCapital(capacityWorld, faction.Id, native.Cell);
+            }
+            capacityWorld = DemandDiplomacy.Initialize(capacityWorld with { Demands = new DemandState {
+                Seed = capacityWorld.RandomState, Rules = Diplomacy.ResolveRules(id, capacityCountries, started.Session.PlayerFaction) } });
+        }
         started = started with { Session = started.Session with { World = capacityWorld } };
         return started;
     }

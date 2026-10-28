@@ -12,7 +12,7 @@ namespace Ew4.Android;
 
 [Activity(Label = "欧陆战争4 重构", MainLauncher = true, Exported = true,
     ScreenOrientation = ScreenOrientation.SensorLandscape, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize)]
-public sealed class MainActivity : Activity
+public sealed partial class MainActivity : Activity
 {
     private WebView? web;
     private Lazy<ModStore>? store;
@@ -27,16 +27,19 @@ public sealed class MainActivity : Activity
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
-#if EW4_DIAGNOSTICS
-        WebView.SetWebContentsDebuggingEnabled(true);
-#endif
+        CreateStartupSurface();
         var assets = Assets!;
-        byte[] Read(string path)
+        Stream Open(string path)
         {
-            try { using var stream = assets.Open(path); using var bytes = new MemoryStream(); stream.CopyTo(bytes); return bytes.ToArray(); }
+            try { return assets.Open(path); }
             catch (Java.IO.FileNotFoundException error) { throw new FileNotFoundException(path, error); }
             catch (Java.IO.IOException error) { throw new IOException(path, error); }
         }
+        byte[] Read(string path)
+        {
+            using var stream = Open(path); using var bytes = new MemoryStream(); stream.CopyTo(bytes); return bytes.ToArray();
+        }
+        assetRead = Read;
         IEnumerable<string> Walk(string path)
         {
             foreach (string name in assets.List(path) ?? [])
@@ -55,73 +58,47 @@ public sealed class MainActivity : Activity
                 files = paths.Select(p => { var file = new FileInfo(p); return new { file.FullName, file.Length, file.LastWriteTimeUtc }; }).ToArray()
             });
         }
-        byte[] ContentRead(string path) => Read(path.StartsWith("client/", StringComparison.Ordinal) ? "www/content/" + path[7..]
+        string ContentPath(string path) => path.StartsWith("client/", StringComparison.Ordinal) ? "www/content/" + path[7..]
             : path.StartsWith("legacy/", StringComparison.Ordinal) ? "data/" + path[7..]
-            : path.StartsWith("frontend/", StringComparison.Ordinal) ? "www/" + path[9..] : path);
-        store = new Lazy<ModStore>(() => new ModStore(StartupAssets.PreparePackage(ContentRead, () => Walk("original").Concat(Walk("www/content").Select(p => "client/" + p[12..]))
+            : path.StartsWith("frontend/", StringComparison.Ordinal) ? "www/" + path[9..] : path;
+        string filesRoot = FilesDir!.AbsolutePath;
+        store = new Lazy<ModStore>(() => new ModStore(StartupAssets.PreparePackage(p => Read(ContentPath(p)), () => Walk("original").Concat(Walk("www/content").Select(p => "client/" + p[12..]))
             .Concat(Walk("data").Select(p => "legacy/" + p[5..]))
             .Concat(Walk("rewrite"))
             .Concat(["frontend/conquest-pages.json", "frontend/city-names.json"]), PackageRevision(),
-            Path.Combine(FilesDir!.AbsolutePath, "startup-assets")).Content,
-            Path.Combine(FilesDir!.AbsolutePath, "content-mods"), Path.Combine(FilesDir.AbsolutePath, "saves")), LazyThreadSafetyMode.PublicationOnly);
-        web = new WebView(this);
-        web.Settings.JavaScriptEnabled = true;
-        web.Settings.DomStorageEnabled = true;
-        // The shared music player gates initial playback on interaction and pauses
-        // in the background. WebView's additional gesture gate loses asynchronous
-        // scene/resource transitions on some Android versions.
-        web.Settings.MediaPlaybackRequiresUserGesture = false;
-        web.Settings.AllowFileAccess = false;
-        web.Settings.AllowContentAccess = false;
-        web.Settings.MixedContentMode = MixedContentHandling.NeverAllow;
-        web.Settings.SetSupportZoom(false);
-        bridge = new ImportBridge(this); web.AddJavascriptInterface(bridge, "Ew4ModImport");
-        web.SetWebViewClient(new LocalClient(Read, store));
-        web.SetWebChromeClient(new LocalChrome());
-        surface = new FrameLayout(this);
-        surface.SetBackgroundColor(global::Android.Graphics.Color.Black);
-        surface.AddView(web, new FrameLayout.LayoutParams(-1, -1));
+            Path.Combine(filesRoot, "startup-assets"), p => SetStartupStage(p.Message + (p.Total > 0 ? $"（{p.Completed}/{p.Total}）" : "")), p => Open(ContentPath(p))).Content,
+            Path.Combine(filesRoot, "content-mods"), Path.Combine(filesRoot, "saves")), LazyThreadSafetyMode.PublicationOnly);
         safeInsets = new SafeInsets(this);
-        surface.SetOnApplyWindowInsetsListener(safeInsets);
-        SetContentView(surface);
-        var loading = new ProgressBar(this) { Indeterminate = true };
-        surface.AddView(loading, new FrameLayout.LayoutParams(64, 64, GravityFlags.Center));
+        surface!.SetOnApplyWindowInsetsListener(safeInsets);
         if (OperatingSystem.IsAndroidVersionAtLeast(33))
         {
             systemBack = new SystemBack(this);
             OnBackInvokedDispatcher.RegisterOnBackInvokedCallback(0, systemBack);
         }
         EnterFullscreen();
-        StartGame(loading);
+        if (!previousStartupIncomplete) StartGame();
     }
-    private void StartGame(ProgressBar loading)
+    private void StartGame()
     {
-        if (starting || store == null) return;
+        if (starting || store == null || destroyed) return;
         starting = true;
+        startupComplete = false;
+        startupHasFailed = false;
+        startupPanel!.Visibility = ViewStates.Visible;
+        startupContinue!.Visibility = ViewStates.Gone;
+        startupSpinner!.Visibility = ViewStates.Visible;
+        SetStartupStage("检查游戏资源");
         _ = Task.Run(() =>
         {
             try
             {
+                ReadPreviousExit();
                 _ = store.Value;
-                RunOnUiThread(() =>
-                {
-                    if (IsFinishing || IsDestroyed) return;
-                    starting = false;
-                    surface?.RemoveView(loading); loading.Dispose();
-                    web?.LoadUrl("https://ew4.local/index.html");
-                });
+                if (!destroyed) RunOnUiThread(CreateGameWebView);
             }
             catch (Exception error)
             {
-                RunOnUiThread(() =>
-                {
-                    if (IsFinishing || IsDestroyed) return;
-                    starting = false;
-                    using var dialog = new AlertDialog.Builder(this);
-                    dialog.SetTitle("游戏资源检查失败")!.SetMessage(error.Message)!
-                        .SetPositiveButton("重试", (_, _) => StartGame(loading))!
-                        .SetNegativeButton("退出", (_, _) => Finish())!.SetCancelable(false)!.Show();
-                });
+                StartupFailed("资源检查失败", error);
             }
         });
     }
@@ -181,7 +158,11 @@ public sealed class MainActivity : Activity
 #pragma warning disable CS0672
     public override void OnBackPressed() => NavigateBack();
 #pragma warning restore CS0672
-    private void NavigateBack() => web?.EvaluateJavascript("window.ew4Back?.()", new BackResult(this));
+    private void NavigateBack()
+    {
+        if (web == null || startupPanel?.Visibility == ViewStates.Visible) ConfirmExit();
+        else web.EvaluateJavascript("window.ew4Back?.()", new BackResult(this));
+    }
     private void ConfirmExit()
     {
         if (IsFinishing || exitDialog?.IsShowing == true) return;
@@ -193,13 +174,13 @@ public sealed class MainActivity : Activity
     }
     protected override void OnDestroy()
     {
+        destroyed = true;
         if (OperatingSystem.IsAndroidVersionAtLeast(33) && systemBack != null)
             OnBackInvokedDispatcher.UnregisterOnBackInvokedCallback(systemBack);
         systemBack?.Dispose(); systemBack = null;
         exitDialog?.Dismiss(); exitDialog?.Dispose(); exitDialog = null;
         surface?.SetOnApplyWindowInsetsListener(null); safeInsets?.Dispose(); safeInsets = null;
-        web?.RemoveJavascriptInterface("Ew4ModImport"); bridge?.Dispose(); bridge = null;
-        web?.Destroy(); web?.Dispose(); web = null;
+        ReleaseWebView();
         surface?.Dispose(); surface = null;
         base.OnDestroy();
     }
@@ -348,9 +329,41 @@ public sealed class MainActivity : Activity
         public void Choose(string id, string name) => activity.Pick(id, name);
         [JavascriptInterface, Java.Interop.Export("exportSaves")]
         public void ExportSaves() => activity.PickSaveExport();
+        [JavascriptInterface, Java.Interop.Export("startup")]
+        public void Startup(string state, string message)
+        {
+            if (activity.web != null && ReferenceEquals(activity.bridge, this)) activity.FrontendStartup(state, message);
+        }
     }
-    private sealed class LocalClient(Func<string, byte[]> read, Lazy<ModStore> store) : WebViewClient
+    private sealed class LocalClient(MainActivity activity, Func<string, byte[]> read, Lazy<ModStore> store) : WebViewClient
     {
+        public override void OnPageStarted(WebView? view, string? url, global::Android.Graphics.Bitmap? favicon)
+        {
+            if (view != activity.web || url != "https://ew4.local/index.html" || activity.destroyed) return;
+            activity.startupComplete = false; activity.startupHasFailed = false; activity.starting = true;
+            activity.startupPanel!.Visibility = ViewStates.Visible;
+            activity.startupSpinner!.Visibility = ViewStates.Visible;
+            activity.startupContinue!.Visibility = ViewStates.Gone;
+            activity.SetStartupStage("载入游戏页面");
+        }
+        public override void OnPageFinished(WebView? view, string? url)
+        {
+            if (view == activity.web && url == "https://ew4.local/index.html" && !activity.destroyed && !activity.startupHasFailed)
+                activity.startupPanel!.Visibility = ViewStates.Gone;
+        }
+        public override void OnReceivedError(WebView? view, IWebResourceRequest? request, WebResourceError? error)
+        {
+            if (view == activity.web && request?.IsForMainFrame == true) activity.StartupFailed("游戏页面载入失败", new IOException(error?.Description?.ToString()));
+        }
+        public override bool OnRenderProcessGone(WebView? view, RenderProcessGoneDetail? detail)
+        {
+            if (view == activity.web)
+            {
+                activity.ReleaseWebView();
+                activity.StartupFailed("网页进程已退出", new IOException(detail?.DidCrash() == true ? "WebView 渲染进程崩溃" : "系统终止了 WebView 渲染进程"));
+            }
+            return true;
+        }
         public override bool ShouldOverrideUrlLoading(WebView? view, IWebResourceRequest? request) => request?.Url?.Host != "ew4.local";
         public override WebResourceResponse? ShouldInterceptRequest(WebView? view, IWebResourceRequest? request)
         {

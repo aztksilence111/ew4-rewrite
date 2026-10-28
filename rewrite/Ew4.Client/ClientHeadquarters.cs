@@ -21,14 +21,13 @@ public sealed partial class ClientGame
         }
         else account = new PlayerAccount { Id = "local", ContentRevision = content.Catalogs.Accounts.SourceRevision,
             Medals = content.Extensions.Metagame.InitialMedals, Badges = content.Extensions.Metagame.InitialBadges };
-        bool migrated = content.Catalogs.Accounts.CanMigrateFrom(account.ContentRevision);
+        ValidateReusableAccount(account);
+        bool migrated = account.ContentRevision != content.Catalogs.Accounts.SourceRevision;
         if (migrated) account = account with { ContentRevision = content.Catalogs.Accounts.SourceRevision,
             Revision = checked(account.Revision + 1) };
         if (account.CommanderOffers.Count == 0)
             for (int group = 0; group < 3; group++) account = DrawCommanders(account, group);
         account.Validate();
-        if (account.ContentRevision != content.Catalogs.Accounts.SourceRevision)
-            throw new RuleViolation("account.content", "Local account requires a content migration");
         foreach (var owned in account.Roster) AccountCommanders.Resolve(owned, content.Catalogs.Accounts.Rules());
         var balances = account.RefreshBalances.ToDictionary(p => p.Key, p => p.Value);
         foreach (var (key, policy) in content.Extensions.Metagame.Refresh.Where(p => p.Value.Limit.HasValue))

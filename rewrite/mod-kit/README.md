@@ -1,5 +1,7 @@
 # EW4 rewrite 离线 Mod 工具包
 
+征服的宣战、核心地区、势力组合概率、首都国库缴获和原版风格UI覆盖，见[外交接口](docs/porting/DIPLOMACY.md)。战役不开放；农田不计核心。核心、名称、国旗、颜色、首都和新势力初始国库均可独立修改。
+
 API 3 [通用禁行地形](docs/porting/GEOGRAPHY.md)：任意地图可配置禁行雪山及禁航海洋，附[双地图示例](examples/impassable-geography/README.md)及 `geography-template` 命令。
 
 将领、技能文字、兵种、装备、招募、建筑、地形、战斗和成长等已拆为独立 JSON，

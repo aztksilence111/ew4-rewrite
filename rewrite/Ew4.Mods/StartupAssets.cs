@@ -20,7 +20,7 @@ public static class StartupAssets
 
     // Only use this for installed, immutable package assets. Editable directories must use Prepare.
     public static StartupAssetResult PreparePackage(Func<string, byte[]> read, Func<IEnumerable<string>> files,
-        string packageRevision, string cacheRoot, Action<ImportProgress>? report = null)
+        string packageRevision, string cacheRoot, Action<ImportProgress>? report = null, Func<string, Stream>? openRead = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(packageRevision);
         lock (Gate)
@@ -34,7 +34,7 @@ public static class StartupAssets
                 if (receipt?.Key == key && receipt.Files != null && receipt.CheckedFiles >= 0
                     && receipt.Fingerprint is { Length: 64 } && receipt.Fingerprint.All(char.IsAsciiHexDigit))
                 {
-                    var baseline = new ModBase(read, receipt.Files);
+                    var baseline = new ModBase(read, receipt.Files, openRead: openRead);
                     if (TryCached(baseline, ModFiles.Under(cacheRoot, receipt.Fingerprint), receipt.Fingerprint) is { } cached)
                     {
                         report?.Invoke(new("complete", "资源检查完成"));
@@ -44,7 +44,8 @@ public static class StartupAssets
             }
             catch (Exception error) when (error is IOException or UnauthorizedAccessException or JsonException or ArgumentException)
             { }
-            var source = new ModBase(read, files());
+            report?.Invoke(new("working", "读取资源目录"));
+            var source = new ModBase(read, files(), openRead: openRead);
             var result = PrepareCore(source, cacheRoot, report ?? (_ => { }), immutablePackage: true);
             string temporary = index + "." + Guid.NewGuid().ToString("N") + ".tmp";
             try
@@ -67,6 +68,7 @@ public static class StartupAssets
         report(new("working", "检查游戏资源"));
         var hashes = new Dictionary<string, string>(StringComparer.Ordinal);
         var originals = new Dictionary<string, byte[]>(StringComparer.Ordinal);
+        int hashed = 0;
         foreach (string path in baseline.Files)
         {
             if (path.StartsWith("original/", StringComparison.Ordinal))
@@ -75,6 +77,8 @@ public static class StartupAssets
                 hashes.Add(path, ModFiles.Hash(bytes)); originals.Add(path, bytes);
             }
             else hashes.Add(path, baseline.Hash(path));
+            if (++hashed % 128 == 0 || hashed == baseline.Files.Length)
+                report(new("working", "检查游戏资源", hashed, baseline.Files.Length));
         }
         JsonObject? reference = null;
         try
@@ -89,7 +93,7 @@ public static class StartupAssets
             .ToDictionary(p => (string)p!["path"]!, p => (string)p!["sha256"]!, StringComparer.Ordinal);
         bool originalChanges = expectedOriginals == null || originals.Keys.Any(p => !expectedOriginals.TryGetValue(p, out string? hash) || hash != hashes[p])
             || expectedOriginals.Keys.Any(p => !originals.ContainsKey(p));
-        bool LogicPath(string path) => path != ArmyCapacityConfiguration.Path && (path.StartsWith("original/", StringComparison.Ordinal) || path.StartsWith("legacy/", StringComparison.Ordinal)
+        bool LogicPath(string path) => path != ArmyCapacityConfiguration.Path && path != DiplomacyConfiguration.Path && (path.StartsWith("original/", StringComparison.Ordinal) || path.StartsWith("legacy/", StringComparison.Ordinal)
             || path.StartsWith("rewrite/", StringComparison.Ordinal) && !path.EndsWith(".png", StringComparison.Ordinal));
         var expectedLogic = reference?["files"]?.AsArray().Where(p => (string?)p?["path"] is string path && LogicPath(path) && ModFiles.RuntimePath(path))
             .ToDictionary(p => (string)p!["path"]!, p => (string)p!["sha256"]!, StringComparer.Ordinal);

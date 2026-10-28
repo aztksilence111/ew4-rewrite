@@ -69,10 +69,21 @@ internal static class AndroidPackageChecks
         var unknown = legacy with { ContentRevision = "unknown-rules" };
         File.WriteAllBytes(profile, JsonSerializer.SerializeToUtf8Bytes(unknown, ClientGame.Json));
         store = new ModStore(baseline, Path.Combine(run, "mods"), saves);
+        Request("catalog"); Request("headquarters");
+        var reused = JsonSerializer.Deserialize<PlayerAccount>(File.ReadAllBytes(profile), ClientGame.Json)!;
+        Check(reused.ContentRevision == content.Catalogs.Accounts.SourceRevision
+            && JsonSerializer.Serialize(reused with { ContentRevision = unknown.ContentRevision, Revision = unknown.Revision }, ClientGame.Json)
+                == JsonSerializer.Serialize(unknown, ClientGame.Json), "compatible account with unknown fingerprint preserves all fields");
+        var invalid = unknown with { Inventory = new Dictionary<string, long> { ["missing.item"] = 1 } };
+        byte[] invalidBytes = JsonSerializer.SerializeToUtf8Bytes(invalid, ClientGame.Json);
+        File.WriteAllBytes(profile, invalidBytes);
+        store = new ModStore(baseline, Path.Combine(run, "mods"), saves);
         for (int retry = 0; retry < 2; retry++)
         {
             var rejected = JsonNode.Parse(store.Dispatch("/api/catalog", "{}"))!;
-            Check((bool?)rejected["ok"] == false && (string?)rejected["code"] == "account.content", "unknown account remains rejected on retry");
+            Check((bool?)rejected["ok"] == false && (string?)rejected["code"] == "save.missing_definition",
+                "account referencing a missing item remains rejected on retry");
+            Check(File.ReadAllBytes(profile).SequenceEqual(invalidBytes), "rejection preserves the incompatible account");
         }
         var missing = new ModStore(new ModBase(p => p == "legacy/items.json" ? throw new FileNotFoundException(p) : Read(p), files),
             Path.Combine(run, "missing-mods"), Path.Combine(run, "missing-saves"));

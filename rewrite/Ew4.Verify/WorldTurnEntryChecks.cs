@@ -41,9 +41,23 @@ internal static class WorldTurnEntryChecks
         var paid = WorldTurns.Resume(secondRound, secondRound.Revision, economic);
         var funds = paid.State.Factions.Single(f => f.Id == secondRound.ActiveFaction).Resources;
         Check(funds != secondRound.Factions.Single(f => f.Id == secondRound.ActiveFaction).Resources, "later-round income occurs before after-faction dialogue");
+        var summary = paid.State.Factions.Single(f => f.Id == secondRound.ActiveFaction).TurnSummary!;
+        Check(summary.Round == 2 && summary.Income == new Resources(11, 7, 5), "summary records turn production rather than stock");
+        Check(entry.State.Factions.Single(f => f.Id == initial.ActiveFaction).TurnSummary!.Income == new Resources(0, 0, 0), "opening round does not claim an income payment");
         var paidRestore = WorldSave.Decode(WorldSave.Encode(paid.State), paid.State.ContentRevision);
         var paidAgain = WorldTurns.Resume(paidRestore, paidRestore.Revision, economic, paidRestore.PendingDialogue!);
         Check(paidAgain.State.Factions.Single(f => f.Id == secondRound.ActiveFaction).Resources == funds, "save/resume never pays income twice");
+        Check(paidAgain.State.Factions.Single(f => f.Id == secondRound.ActiveFaction).TurnSummary == summary, "save/resume retains original production summary");
+        var capped = WorldTurns.Resume(secondRound, secondRound.Revision, economic with { ResourceCap = 9 });
+        var cappedFaction = capped.State.Factions.Single(f => f.Id == secondRound.ActiveFaction);
+        Check(cappedFaction.TurnSummary!.Income.Money == 11 && cappedFaction.Resources.Money == 9, "summary is production before storage cap");
+        var overLimit = secondRound with { ArmyCapacity = new() { BaseCapacity = 0, Buildings = new Dictionary<string, int[]>() },
+            Units = secondRound.Units.Select(u => u.Owner == secondRound.ActiveFaction ? u with { Support = u.Support with { FoodConsumption = 7 } } : u).ToArray() };
+        var overPaid = WorldTurns.Resume(overLimit, overLimit.Revision, economic);
+        var overSummary = overPaid.State.Factions.Single(f => f.Id == secondRound.ActiveFaction).TurnSummary!;
+        Check(overSummary.Income == new Resources(5, 3, 2) && overSummary.FoodConsumption == 14, "summary includes overflow income penalty and doubled upkeep");
+        Check(overLimit.Factions.All(f => f.TurnSummary == null), "settlement summary does not mutate input");
+        Check(!System.Text.Encoding.UTF8.GetString(WorldSave.Encode(basis)).Contains("turnSummary"), "legacy state omits absent summary");
         try { WorldTurns.Resume(initial, initial.Revision, rules with { RoundEvents = (RoundEventTiming)99 }); }
         catch (RuleViolation error) { Check(error.Code == "turn.configuration", "invalid timing rejected"); return checks; }
         throw new InvalidOperationException("Invalid timing was accepted");

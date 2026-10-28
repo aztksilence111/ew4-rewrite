@@ -62,18 +62,22 @@ const base=process.argv[2]||'http://127.0.0.1:5492',folder=path.resolve(process.
             const undo=[wrap(battlefield,'unitAnimation',()=>calls.body++),wrap(battlefield,'motionPose',()=>calls.pose++),wrap(battlefield,'flag',()=>calls.flag++),
               wrap(effects,'trail',()=>calls.trail++),wrap(effects,'element',()=>calls.damage++),wrap(effects,'profile',()=>calls.profile++),
               wrap(battlefield,'healthArc',()=>calls.health++),
-              wrap(battlefield.api,'sprite',(atlas,name,x,y)=>{
+              wrap(battlefield,'unitBadge',(unit,p,profile,death,scale=1)=>{
+                const m=ctx.getTransform();calls.badges.push({x:m.a*p.x+m.e,y:m.d*p.y+m.f,size:Math.abs(m.a)*scale/viewport.dpr});
+              }),
+              wrap(battlefield.api,'sprite',(atlas,name,x,y,scale,target)=>{
+                if(target&&target!==ctx)return;
                 if(name.startsWith('morale_'))calls.morale++;
                 if(name==='ship_mark.png')calls.transport++;
                 if(name.startsWith('rank_'))calls.rank++;
-                if(!/^hpbar_|^board_smallgenerals/.test(name))return;
+                if(!/^board_smallgenerals/.test(name))return;
                 const m=ctx.getTransform(),entry={x:m.a*x+m.e,y:m.d*y+m.f,size:Math.abs(m.a)/viewport.dpr};
-                (name.startsWith('hpbar_')?calls.badges:calls.portraits).push(entry);
+                calls.portraits.push(entry);
               }),wrap(ctx,'drawImage',(source,...args)=>{
                 if(![...battlefield.cityLabels.values()].includes(source))return;
                 const m=ctx.getTransform();calls.labels.push({width:args[2]*m.a/viewport.dpr,height:args[3]*m.d/viewport.dpr});
               })];
-            try{render(performance.now());suspendRendering();}finally{undo.reverse().forEach(f=>f());state=originalState;}
+            try{render(performance.now(),true);suspendRendering();}finally{undo.reverse().forEach(f=>f());state=originalState;}
             const pixels=ctx.gpu?ctx.renderer.extract.pixels():ctx.getImageData(0,0,canvas.width,canvas.height).data;
             const colors=new Set();for(let i=0;i<pixels.length;i+=4*101)colors.add(pixels[i]+','+pixels[i+1]+','+pixels[i+2]);
             return {relativeZoom,zoom:view.zoom,reference,badgeOnly:battlefield.badgeOnly,calls,colors:colors.size,
@@ -109,7 +113,7 @@ const base=process.argv[2]||'http://127.0.0.1:5492',folder=path.resolve(process.
             const samples=[],old=battlefield.unitBadge;
             battlefield.unitBadge=function(u,p,...args){if(u.id===unit.id){const m=ctx.getTransform();samples.push({x:(m.a*p.x+m.e)/viewport.dpr,y:(m.d*p.y+m.f)/viewport.dpr});}return old.call(this,u,p,...args);};
             try{
-              for(const elapsed of [0,500,1000]){render(started+elapsed);suspendRendering();}
+              for(const elapsed of [0,500,1000]){render(started+elapsed,true);suspendRendering();}
             }finally{battlefield.unitBadge=old;motions.clear();}
             const from=point(route.path[0]),to=point(route.path[1]);
             const expected={dx:(to.x-from.x)*view.zoom,dy:(to.y-from.y)*view.zoom};
@@ -129,13 +133,13 @@ const base=process.argv[2]||'http://127.0.0.1:5492',folder=path.resolve(process.
             const sameArc=battlefield.healthArc(100,100)===arc;
             return {route:route.path,samples,expected,idle,smoothEdges,sameArc};
           });
+          report.behavior=behavior;
           check(behavior.samples.length===3,'moving badge sampled at three exact times');
           const [a,b,c]=behavior.samples;
           check(Math.abs(c.x-a.x-behavior.expected.dx)<.01&&Math.abs(c.y-a.y-behavior.expected.dy)<.01,'badge follows the actual first path segment');
           check(Math.abs(b.x-(a.x+c.x)/2)<.01&&Math.abs(b.y-(a.y+c.y)/2)<.01,'badge interpolates at half movement');
           check(behavior.idle.frames===0&&!behavior.idle.animated&&behavior.idle.bodyCalls===0,'hidden body animations cannot keep the render loop alive');
           check(behavior.smoothEdges>40&&behavior.sameArc,'health arc has antialiased alpha edges and reuses its texture');
-          report.behavior=behavior;
         }
       }
       await page.close();

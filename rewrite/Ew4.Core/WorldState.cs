@@ -16,11 +16,15 @@ public sealed record WorldLimits
     }
 }
 
+public sealed record FactionTurnSummary(int Round, Resources Income, long FoodConsumption);
+
 public sealed record FactionState
 {
     public string Id { get; init; } = "";
     public string Name { get; init; } = "";
     public FactionAppearance? Appearance { get; init; }
+    public IReadOnlyList<int>? HomelandBuildings { get; init; }
+    public FactionCapital? Capital { get; init; }
     public string Camp { get; init; } = "";
     public bool Human { get; init; }
     public PlayerAiControl? PlayerAi { get; init; }
@@ -31,6 +35,7 @@ public sealed record FactionState
     public float IncomeMultiplier { get; init; } = 1;
     public float AiEvasionBonus { get; init; }
     public Resources IncomeBonus { get; init; } = new(0, 0, 0);
+    public FactionTurnSummary? TurnSummary { get; init; }
     public IReadOnlyDictionary<string, long> Kills { get; init; } = new Dictionary<string, long>();
     public IReadOnlyDictionary<string, RecruitmentGrant> Recruitment { get; init; } = new Dictionary<string, RecruitmentGrant>();
     public IReadOnlyDictionary<string, int> TurnUses { get; init; } = new Dictionary<string, int>();
@@ -168,6 +173,8 @@ public sealed record WorldState
     public IReadOnlyList<NeutralHostility> NeutralHostilities { get; init; } = Array.Empty<NeutralHostility>();
     public IReadOnlyList<DiplomaticRelation> DiplomaticRelations { get; init; } = Array.Empty<DiplomaticRelation>();
     public IReadOnlyList<string> DiplomacyNeutralCamps { get; init; } = Array.Empty<string>();
+    public DemandState? Demands { get; init; }
+    public IReadOnlyList<FactionPairAdjustment>? DiplomacyAdjustments { get; init; }
     public ProvocationRules? Provocations { get; init; }
     public IReadOnlyList<UnitState> Units { get; init; } = Array.Empty<UnitState>();
     public IReadOnlyList<CommanderRuntime> Commanders { get; init; } = Array.Empty<CommanderRuntime>();
@@ -212,6 +219,7 @@ public sealed record WorldState
             return ids;
         }
         var factionIds = Ids(Factions.Select(f => f.Id));
+        DemandDiplomacy.Validate(this);
         if (Provocations is { } provocations && (string.IsNullOrWhiteSpace(provocations.NeutralCamp)
             || provocations.CombatantCamps == null || provocations.CombatantCamps.Count == 0
             || provocations.CombatantCamps.Any(string.IsNullOrWhiteSpace)
@@ -252,9 +260,20 @@ public sealed record WorldState
         foreach (var faction in Factions)
         {
             ScenarioFactions.ValidateAppearance(faction.Appearance);
+            if (faction.Capital is { } capital && (capital.Cell < 0 || capital.Cell >= Cells.Count || !DemandDiplomacy.Counts(Cells[capital.Cell])))
+                throw new RuleViolation("scenario.capital", "Invalid faction capital");
+            if (faction.HomelandBuildings is { } homeland && (homeland.Count > Cells.Count || homeland.Distinct().Count() != homeland.Count
+                || homeland.Any(i => i < 0 || i >= Cells.Count || !DemandDiplomacy.Counts(Cells[i]))))
+                throw new RuleViolation("scenario.homeland", "Invalid faction homeland building list");
             if (faction.Resources.Money < int.MinValue || faction.Resources.Industry < int.MinValue || faction.Resources.Food < int.MinValue)
                 throw new RuleViolation("world.faction", "Opening debt exceeds the serialized signed balance range");
             faction.IncomeBonus.Validate();
+            if (faction.TurnSummary is { } summary)
+            {
+                summary.Income.Validate();
+                if (summary.Round < 1 || summary.Round > Round || summary.FoodConsumption < 0)
+                    throw new RuleViolation("world.turn_summary", "Invalid faction turn summary");
+            }
             if (string.IsNullOrWhiteSpace(faction.Camp) || faction.Shortage < 0
                 || float.IsNaN(faction.IncomeMultiplier) || float.IsInfinity(faction.IncomeMultiplier) || faction.IncomeMultiplier < 0
                 || float.IsNaN(faction.AiEvasionBonus) || faction.AiEvasionBonus < 0 || faction.AiEvasionBonus > 1)
@@ -370,18 +389,31 @@ public sealed record WorldState
             throw new RuleViolation("world.commander_base", "Invalid unassigned support base");
     }
 
-    private static Combatant CopyCombatant(Combatant value) => value with
+    private static UnitState CopyUnit(UnitState value)
     {
-        Skills = value.Skills.ToArray(), SkillSlots = value.SkillSlots.ToArray(), Statuses = value.Statuses.ToArray(),
-        Profile = FrozenUnitProfiles.Copy(value.Profile)
-    };
+        var combatant = FrozenCombatants.Copy(value.Combatant);
+        var control = value.PlayerControl?.Goals == null ? value.PlayerControl
+            : value.PlayerControl with { Goals = value.PlayerControl.Goals.ToArray() };
+        var commanderBase = value.CommanderBase;
+        if (commanderBase != null)
+        {
+            var original = FrozenCombatants.Copy(commanderBase.Combatant);
+            if (!ReferenceEquals(original, commanderBase.Combatant)) commanderBase = commanderBase with { Combatant = original };
+        }
+        // All other UnitState fields are values or sealed immutable records.
+        return ReferenceEquals(combatant, value.Combatant) && ReferenceEquals(control, value.PlayerControl)
+            && ReferenceEquals(commanderBase, value.CommanderBase) ? value
+            : value with { Combatant = combatant, PlayerControl = control, CommanderBase = commanderBase };
+    }
 
     public WorldState Copy() => this with
     {
         ArmyCapacity = ArmyCapacity?.Copy(),
+        DiplomacyAdjustments = DiplomacyAdjustments?.ToArray(),
         ExtensionState = ExtensionState.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal),
         Factions = Factions.Select(f => f with
         {
+            HomelandBuildings = f.HomelandBuildings?.ToArray(),
             Recruitment = f.Recruitment.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal),
             TurnUses = f.TurnUses.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal),
             PlayerAi = f.PlayerAi?.Copy(),
@@ -395,9 +427,8 @@ public sealed record WorldState
         Provocations = Provocations == null ? null : Provocations with { CombatantCamps = Provocations.CombatantCamps.ToArray() },
         NeutralHostilities = NeutralHostilities.ToArray(),
         DiplomaticRelations = DiplomaticRelations.ToArray(), DiplomacyNeutralCamps = DiplomacyNeutralCamps.ToArray(),
-        Units = Units.Select(u => u with { Combatant = CopyCombatant(u.Combatant),
-            PlayerControl = u.PlayerControl == null ? null : u.PlayerControl with { Goals = u.PlayerControl.Goals?.ToArray() },
-            CommanderBase = u.CommanderBase == null ? null : u.CommanderBase with { Combatant = CopyCombatant(u.CommanderBase.Combatant) } }).ToArray(),
+        Demands = Demands?.Copy(),
+        Units = Units.Select(CopyUnit).ToArray(),
         Commanders = Commanders.ToArray(), CommanderOffers = CommanderOffers.ToArray(),
         Events = Events.Select(e => e with { Rules = e.Rules.ToArray() }).ToArray(),
         LocalMultiplayer = LocalMultiplayer == null ? null : LocalMultiplayer with { HumanFactions = LocalMultiplayer.HumanFactions.ToArray() },

@@ -167,6 +167,34 @@ public static class Movement
         return distances;
     }
 
+    internal static IReadOnlyDictionary<int, long> DistancesFrom(HexMap map, IReadOnlyList<MovementCell> cells,
+        int origin, MovementActor actor, MovementRules rules)
+    {
+        map.Check(origin);
+        if (cells.Count != map.Count || actor.FullBudget < 1 || actor.Remaining < 0 || actor.Remaining > actor.FullBudget)
+            throw new RuleViolation("movement.state", "Map/actor movement state is inconsistent");
+        var distances = new DistanceField(map.Count);
+        if (!cells[origin].CanTraverse()) return distances;
+        using var queue = new DistanceQueue();
+        distances.Set(origin, 0); queue.Add((0, origin));
+        while (queue.Count > 0)
+        {
+            var current = queue.RemoveMin();
+            if (distances[current.Cell] != current.Cost) continue;
+            for (int direction = 0; direction < 6; direction++)
+            {
+                int next = map.Neighbor(current.Cell, direction);
+                if (next < 0 || !cells[next].CanTraverse()) continue;
+                int? cost = EntryCost(cells[current.Cell], cells[next], (direction + 3) % 6, actor, rules);
+                if (!cost.HasValue || cost.Value > actor.FullBudget && !rules.AllowOverdrawnEntry) continue;
+                long total = checked(current.Cost + cost.Value);
+                if (distances.TryGetValue(next, out long old) && old <= total) continue;
+                distances.Set(next, total); queue.Add((total, next));
+            }
+        }
+        return distances;
+    }
+
     // Only finalized requested distances escape. Once the origin is settled,
     // every strictly closer landing has already been settled, including zero edges.
     internal static IReadOnlyDictionary<int, long> DistancesForAdvance(HexMap map, IReadOnlyList<MovementCell> cells,

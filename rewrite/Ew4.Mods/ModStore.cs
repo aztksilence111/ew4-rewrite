@@ -197,7 +197,7 @@ public sealed partial class ModStore
         var names = baseline.Files.Union(m.Files.Keys).Where(p => p.StartsWith("original/", StringComparison.Ordinal) || p.StartsWith("legacy/", StringComparison.Ordinal)
                 || p.StartsWith("rewrite/", StringComparison.Ordinal) && !p.EndsWith(".png", StringComparison.Ordinal)
                 || p == "client/countries.json" && m.Files.ContainsKey(p))
-            .Where(p => p != Ew4.Legacy.ArmyCapacityConfiguration.Path)
+            .Where(p => p != Ew4.Legacy.ArmyCapacityConfiguration.Path && p != Ew4.Legacy.DiplomacyConfiguration.Path)
             .Where(p => !p.EndsWith(".btl", StringComparison.Ordinal) || m.Scenarios.Contains(Path.GetFileNameWithoutExtension(p))).Order(StringComparer.Ordinal);
         return ModFiles.Hash(System.Text.Encoding.UTF8.GetBytes(string.Join('\n', names.Select(p => p + ":" + ModFiles.Hash(read(p))))));
     }

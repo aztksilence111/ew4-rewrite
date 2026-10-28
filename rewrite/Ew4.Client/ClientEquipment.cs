@@ -1,10 +1,40 @@
 using Ew4.Core;
 using Ew4.Legacy;
+using Ew4.Persistence;
 
 namespace Ew4.Client;
 
 public sealed partial class ClientGame
 {
+    private GameSession ReadCompatibleSession(ClientSlot slot, LegacyScenarioStart current)
+    {
+        IEnumerable<ClientContent> Candidates()
+        {
+            if (content.CorrectOriginalEquipment) yield return content.WithoutEquipmentCorrections();
+            var legacy = content.WithLegacyCatalogFormatting();
+            yield return legacy;
+            if (legacy.CorrectOriginalEquipment) yield return legacy.WithoutEquipmentCorrections();
+        }
+        foreach (var candidate in Candidates())
+        {
+            var prior = candidate.Start(slot.Scenario, slot.Country, localPlayers: slot.LocalPlayers, technologySnapshot: slot.TechnologySnapshot);
+            GameSession state;
+            try
+            {
+                // Authenticate all three bindings and both checksums before migrating.
+                state = SessionSave.Decode(slot.Session, new(prior.Session.ContentRevision, prior.Session.World.ContentRevision, prior.Session.Account.ContentRevision));
+            }
+            catch (RuleViolation error) when (error.Code == "save.content_revision") { continue; }
+            return UpgradeEquipment(state, prior, current);
+        }
+        using var document = System.Text.Json.JsonDocument.Parse(slot.Session);
+        var payload = document.RootElement.GetProperty("payload");
+        var world = payload.GetProperty("world").GetProperty("payload");
+        var snapshot = SessionSave.Decode(slot.Session, new(payload.GetProperty("contentRevision").GetString()!,
+            world.GetProperty("contentRevision").GetString()!, payload.GetProperty("account").GetProperty("contentRevision").GetString()!));
+        return ReuseSnapshot(snapshot, current);
+    }
+
     private static GameSession UpgradeEquipment(GameSession state, LegacyScenarioStart prior, LegacyScenarioStart current)
     {
         Dictionary<string, Commander> Definitions(RosterDeploymentRules roster, WorldCommanderRules scenario)
@@ -50,6 +80,8 @@ public sealed partial class ClientGame
         var next = state with
         {
             ContentRevision = current.Session.ContentRevision,
+            Account = state.Account.ContentRevision == current.Session.Account.ContentRevision ? state.Account
+                : state.Account with { ContentRevision = current.Session.Account.ContentRevision, Revision = checked(state.Account.Revision + 1) },
             World = state.World with { ContentRevision = current.Session.World.ContentRevision, Units = units, Commanders = commanders }
         };
         next.Validate();

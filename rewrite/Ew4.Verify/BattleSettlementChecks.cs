@@ -152,6 +152,38 @@ internal static class BattleSettlementChecks
         Check(generalView.GetProperty("battleResult").GetProperty("generals").GetArrayLength() == 1, "deployed owned general projected");
         Check(generalView.GetProperty("battleResult").GetProperty("generals")[0].GetProperty("image").GetString()!.EndsWith(".png"), "original commander portrait key");
 
+        foreach (var outcome in new[] { BattleOutcome.Victory, BattleOutcome.Defeat })
+        {
+            var terminal = Finish(basis with { BattleId = "terminal-dialogue-" + outcome }, 10, outcome);
+            terminal = terminal with { World = terminal.World with { PendingDialogue = "terminal.first", QueuedDialogues = ["terminal.last"],
+                Events = [new() { Id = "terminal.first", DialogueId = "terminal.first" }, new() { Id = "terminal.last", DialogueId = "terminal.last" }],
+                TriggeredEvents = ["terminal.first", "terminal.last"] } };
+            Slot(terminal, 3);
+            var waiting = Call("load", new { slot = 3 });
+            Check(waiting.GetProperty("battleResult").ValueKind == JsonValueKind.Null, "terminal dialogue delays " + outcome + " settlement");
+            long beforeMedals = waiting.GetProperty("medals").GetInt64();
+            var firstAck = Call("action", new { op = "dialogue", revision = waiting.GetProperty("revision").GetInt64() });
+            Check(firstAck.GetProperty("dialogue").GetString() == "terminal.last"
+                && firstAck.GetProperty("battleResult").ValueKind == JsonValueKind.Null, "terminal dialogue queue advances before " + outcome + " settlement");
+            host = new ClientGame(content, profile);
+            var savedAck = Call("load", new { mode = 1 });
+            Check(savedAck.GetProperty("dialogue").GetString() == "terminal.last", "terminal dialogue acknowledgement autosaves");
+            var lastAck = Call("action", new { op = "dialogue", revision = savedAck.GetProperty("revision").GetInt64() });
+            Check(lastAck.GetProperty("dialogue").ValueKind == JsonValueKind.Null
+                && lastAck.GetProperty("battleResult").GetProperty("outcome").GetString() == outcome.ToString(), "last terminal dialogue releases " + outcome + " settlement");
+            Check(lastAck.GetProperty("round").GetInt32() == 10 && lastAck.GetProperty("phase").GetString() == "Finished"
+                && lastAck.GetProperty("activeFaction").GetString() == waiting.GetProperty("activeFaction").GetString(), "terminal acknowledgement does not resume turns");
+            long afterMedals = lastAck.GetProperty("medals").GetInt64();
+            Check(outcome != BattleOutcome.Defeat || afterMedals == beforeMedals, "terminal defeat gives no victory award");
+            using var rejected = JsonDocument.Parse(host.Dispatch("/api/action", JsonSerializer.Serialize(new { op = "end", revision = lastAck.GetProperty("revision").GetInt64() }, ClientGame.Json)));
+            Check(!rejected.RootElement.GetProperty("ok").GetBoolean(), "terminal gameplay stays blocked");
+            host = new ClientGame(content, profile);
+            var terminalRestore = Call("load", new { mode = 1 });
+            Check(terminalRestore.GetProperty("dialogue").ValueKind == JsonValueKind.Null
+                && terminalRestore.GetProperty("battleResult").GetProperty("id").GetString() == "terminal-dialogue-" + outcome
+                && terminalRestore.GetProperty("medals").GetInt64() == afterMedals, "terminal settlement autosaves and reloads without duplicate reward");
+        }
+
         File.WriteAllText(Path.Combine(folder, "completed-state.json"), moved.GetRawText());
         File.WriteAllText(Path.Combine(folder, "defeat-state.json"), lost.GetRawText());
         File.WriteAllText(Path.Combine(folder, "checks.json"), JsonSerializer.Serialize(new { checks, errors = 0, profile }, new JsonSerializerOptions { WriteIndented = true }));

@@ -221,13 +221,20 @@ public static class WorldTurns
         var occupied = new HashSet<int>(state.Units.Where(u => u.Owner == faction).Select(u => u.Cell));
         var selectedCells = Enumerable.Range(0, state.Cells.Count).Where(i => state.Cells[i].Owner == faction || occupied.Contains(i)).ToArray();
         var sites = new HexMap(state.Width, state.Height);
+        var workingUnits = state.Units.ToArray();
+        state = state with { Units = workingUnits };
+        var unitSlots = workingUnits.Select((u, i) => (u.Id, i)).ToDictionary(p => p.Id, p => p.i);
+        var unitsByCell = workingUnits.Where(u => u.Owner == faction).ToLookup(u => u.Cell, u => u.Id);
+        var allOccupied = workingUnits.Select(u => u.Cell).ToHashSet();
+        var healers = workingUnits.Where(u => u.CommanderId != null && state.Cells[u.Cell].Terrain.Active)
+            .ToLookup(u => u.Cell);
         bool deaths = false;
         foreach (int cellId in selectedCells)
         {
             if (state.Factions.Single(f => f.Id == faction).Defeated) break;
             var cell = state.Cells[cellId];
             bool ownsLand = cell.Owner == faction;
-            var occupants = state.Units.Where(u => u.Owner == faction && u.Cell == cellId).ToArray();
+            var occupants = unitsByCell[cellId].Select(id => workingUnits[unitSlots[id]]).ToArray();
             if (!ownsLand && occupants.Length == 0) continue;
             var building = rules.Building(cell);
             var result = TurnSettlement.EndSite(new()
@@ -240,7 +247,9 @@ public static class WorldTurns
                     ConstructionTurns = u.Combatant.ConstructionTurns, Acted = u.Acted, ForceRecovery = u.ForceRecovery,
                     Shortage = state.Factions.Single(f => f.Id == faction).Shortage, HasCommander = u.CommanderId != null,
                     VeterancyHealing = rules.VeterancyHealing.TryGetValue(u.Veterancy, out int heal) ? heal : 0,
-                    FieldHealing = u.Support.FieldHealing, AdjacentHealing = AdjacentHealing(state, sites, u),
+                    FieldHealing = u.Support.FieldHealing, AdjacentHealing = checked((int)sites.Within(u.Cell, 1)
+                        .SelectMany(c => healers[c]).Where(h => WorldDiplomacy.Allied(state, h.Owner, u.Owner))
+                        .Sum(h => (long)h.Support.AdjacentHealing)),
                     TitleHealing = u.Support.TitleHealing, Burning = u.Burning
                 }).ToArray()
             }, random, rules.Settlement);
@@ -248,8 +257,8 @@ public static class WorldTurns
             state = state with { RandomState = random.State };
             foreach (var end in result.Units)
             {
-                var unit = state.Units.SingleOrDefault(u => u.Id == end.Id);
-                if (unit == null) continue;
+                if (!unitSlots.TryGetValue(end.Id, out int slot)) continue;
+                var unit = workingUnits[slot];
                 if (end.Health == 0)
                 {
                     notices.Add(new("hazard.unit_lost", unit.Id, unit.Cell));
@@ -257,18 +266,25 @@ public static class WorldTurns
                     state = death.State; notices.AddRange(death.Notices);
                     cells = state.Cells.ToArray();
                     state = state with { Cells = cells };
+                    // Death events can transfer factions, remove other units or change support.
+                    workingUnits = state.Units.ToArray();
+                    state = state with { Units = workingUnits };
+                    unitSlots = workingUnits.Select((u, i) => (u.Id, i)).ToDictionary(p => p.Id, p => p.i);
+                    unitsByCell = workingUnits.Where(u => u.Owner == faction).ToLookup(u => u.Cell, u => u.Id);
+                    allOccupied = workingUnits.Select(u => u.Cell).ToHashSet();
+                    healers = workingUnits.Where(u => u.CommanderId != null && state.Cells[u.Cell].Terrain.Active).ToLookup(u => u.Cell);
                     random = new Ew4Random(state.RandomState);
                     deaths = true;
                     continue;
                 }
-                int penalty = LocalPenalty(state, sites, cellId, unit.Owner, rules.NeutralCamps);
+                int penalty = LocalPenalty(state, sites, cellId, unit.Owner, rules.NeutralCamps, allOccupied);
                 int effective = TurnEconomy.Morale(unit.Morale.Baseline, unit.Morale.Duration, penalty,
                     state.Factions.Single(f => f.Id == faction).Shortage,
                     unit.Support.Logistics || unit.Combatant.Has(Ew4Combat.Skill(22)), unit.Combatant.Has(Ew4Combat.Skill(3)));
                 var updated = unit with { Burning = end.Burning, ForceRecovery = end.ForceRecovery,
                     Acted = true, RemainingMovement = 0, LocalPenalty = penalty, Morale = unit.Morale with { Effective = effective },
                     Combatant = unit.Combatant with { Health = end.Health, Morale = effective } };
-                state = state with { Units = state.Units.Select(u => u.Id == updated.Id ? updated : u).ToArray() };
+                workingUnits[slot] = updated;
             }
         }
         if (deaths) state = WorldDeaths.RefreshMorale(state, rules.NeutralCamps);
@@ -277,8 +293,7 @@ public static class WorldTurns
         if (rules.Extensions != null)
         {
             var before = state;
-            foreach (string id in state.Units.Where(u => u.Owner == faction).Select(u => u.Id).ToArray())
-                state = rules.Extensions.Dispatch(state, "turn.end", id, new Ew4Random(state.RandomState));
+            state = rules.Extensions.DispatchFactionTurn(state, faction, "turn.end");
             state = rules.Extensions.ExpireStatuses(state, faction);
             notices.AddRange(RuleEventBus.ChangeNotices(before, state));
         }
@@ -325,7 +340,8 @@ public static class WorldTurns
         var income = FactionIncome(state, faction, rules);
         bool openingDebt = faction.Resources.Money < 0 || faction.Resources.Industry < 0 || faction.Resources.Food < 0;
         var economy = TurnEconomy.Start(state.Round, faction.Resources, income, upkeep, rules.ResourceCap, faction.Shortage, openingDebt);
-        faction = faction with { Resources = economy.Resources, Shortage = economy.Shortage, TurnUses = new Dictionary<string, int>() };
+        faction = faction with { Resources = economy.Resources, Shortage = economy.Shortage, TurnUses = new Dictionary<string, int>(),
+            TurnSummary = new(state.Round, state.Round == 1 ? new(0, 0, 0) : income, state.Round == 1 ? 0 : upkeep) };
         var map = new HexMap(state.Width, state.Height);
         // Income uses pre-expansion territory, matching the native start-turn ordering.
         var expansion = Enumerable.Range(0, state.Cells.Count).Where(i => state.Cells[i].Owner == faction.Id && rules.Building(state.Cells[i])?.ClaimsNeighbors == true).ToArray();
@@ -367,8 +383,7 @@ public static class WorldTurns
         if (rules.Extensions != null)
         {
             var before = state;
-            foreach (string id in state.Units.Where(u => u.Owner == faction.Id).Select(u => u.Id).ToArray())
-                state = rules.Extensions.Dispatch(state, "turn.start", id, new Ew4Random(state.RandomState));
+            state = rules.Extensions.DispatchFactionTurn(state, faction.Id, "turn.start");
             notices.AddRange(RuleEventBus.ChangeNotices(before, state));
         }
         return state;

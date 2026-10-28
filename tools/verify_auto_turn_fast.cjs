@@ -26,8 +26,8 @@ const deferred=()=>{let resolve;const promise=new Promise(r=>{resolve=r;});retur
   });
   const ready=()=>page.waitForFunction(()=>startupReady,null,{timeout:60000});
   const idle=()=>page.waitForFunction(()=>!busy&&!aiRunning&&!aiTask&&!sessionTransition,null,{timeout:20000});
-  const finish=async()=>{await page.waitForFunction(()=>window.autoTurnDone,null,{timeout:180000});await page.evaluate(()=>autoTurn);await idle();};
-  const end=()=>page.evaluate(()=>{window.autoTurnDone=false;window.autoTurn=act('end').finally(()=>{autoTurnDone=true;});});
+  const finish=async()=>{await page.waitForFunction(()=>window.autoTurnDone,null,{timeout:180000});await page.evaluate(()=>autoTurn);await idle();await page.evaluate(()=>{if(turnUi.open)closeDetail();});};
+  const end=()=>page.evaluate(()=>{if(turnUi.open)closeDetail();window.autoTurnDone=false;window.autoTurn=act('end').finally(()=>{autoTurnDone=true;});});
   const saveSession=async slot=>{
     await page.evaluate(slot=>rpc('save',{slot,mode:2}),slot);
     return JSON.parse(await fs.readFile(path.join(profile,'saves/mode-2/slot-'+slot+'.json'),'utf8')).session;

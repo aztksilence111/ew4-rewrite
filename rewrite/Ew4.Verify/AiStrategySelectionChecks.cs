@@ -191,6 +191,32 @@ internal static class AiStrategySelectionChecks
         var poor = seaWorld with { Factions = seaWorld.Factions.Select(f => f with { Resources = new(0, 0, 0) }).ToArray() };
         Check(WorldAi.StrategicCandidates(poor, actorUnit.Id, seaRules).Candidates.Count == 0, "unaffordable transport never enters candidate plan");
 
+        // An unused extension keeps the original unpruned path as an oracle.
+        var fallbackBus = new RuleEventBus(new Dictionary<string, ExtensionSkill> { ["unused"] = new() { Id = "unused" } });
+        for (int sample = 0; sample < 64; sample++)
+        {
+            bool naval = sample % 2 == 0;
+            var ally = world.Factions[1] with { Id = "ally", Human = false };
+            var testActor = actorUnit with { Behavior = "default", Transport = !naval,
+                Combatant = actorUnit.Combatant with { AtSea = true, Health = 40 + sample % 61,
+                    Profile = actorUnit.Combatant.Profile with { Category = naval ? "naval" : "infantry" } } };
+            var testWorld = (world with { AiRandomState = (ulong)(sample + 1),
+                Factions = world.Factions.Append(ally).ToArray(), Units = [testActor, enemyUnit],
+                Cells = world.Cells.Select((c, i) => c with { Terrain = c.Terrain with { Sea = true },
+                    Owner = i == 0 ? testActor.Owner : i == 1 ? ally.Id : enemyUnit.Owner,
+                    BuildingKind = i == 1 ? "4" : c.BuildingKind,
+                    Environment = i == 1 && sample % 4 == 0 ? 1 : 0 }).ToArray() }).Copy();
+            var testRules = rules with { Strategy = rules.Strategy with {
+                Landing = rules.Strategy.Landing with { AlliedBuildingChance = sample % 3 == 0
+                    ? new Dictionary<string, int>() : new Dictionary<string, int> { ["4"] = 50 } },
+                Scoring = rules.Strategy.Scoring with { BaseScore = sample % 5 == 0 ? -500 : 10 } } };
+            var optimized = WorldAi.StrategicCandidates(testWorld, testActor.Id, testRules);
+            var fallbackPlan = WorldAi.StrategicCandidates(testWorld, testActor.Id,
+                testRules with { Movement = testRules.Movement with { Extensions = fallbackBus } });
+            Check(JsonSerializer.Serialize(optimized) == JsonSerializer.Serialize(fallbackPlan),
+                "Strategic pruning changed candidates/order/transport/allied landing RNG: " + sample);
+        }
+
         var random = new Random(1937);
         var map = new HexMap(6, 4);
         for (int sample = 0; sample < 12; sample++)
@@ -201,6 +227,7 @@ internal static class AiStrategySelectionChecks
             var moveRules = new MovementRules();
             var forward = Enumerable.Range(0, map.Count).Where(i => cells[i].Active && (mover.Category != "naval" || cells[i].Sea))
                 .ToDictionary(i => i, i => Movement.Reachable(map, cells, i, mover, moveRules));
+            var longForward = forward.Keys.ToDictionary(i => i, i => Movement.DistancesFrom(map, cells, i, mover, moveRules));
             foreach (int target in forward.Keys)
             {
                 var distances = Movement.DistancesTo(map, cells, [target], mover, moveRules);
@@ -211,6 +238,10 @@ internal static class AiStrategySelectionChecks
                     var sourceActor = Movement.AtOrigin(mover, cells[source]);
                     var sourceDistances = cells[source].Sea ? transportDistances : distances;
                     bool found = forward[source].TryGetValue(target, out var reached);
+                    bool forwardFound = longForward[source].TryGetValue(target, out long forwardCost);
+                    bool reverseFound = distances.TryGetValue(source, out long reverseCost);
+                    Check(forwardFound == reverseFound && (!forwardFound || forwardCost == reverseCost),
+                        "Transposed strategic distances differ on directed river/coast/terrain edges");
                     bool affordable = sourceDistances.TryGetValue(source, out long cost) && cost <= sourceActor.FullBudget;
                     Check(found == affordable && (!found || cost == sourceActor.FullBudget - reached!.Remaining), "reverse directed-edge routing agrees with origin-specific movement costs and turn budget");
                 }

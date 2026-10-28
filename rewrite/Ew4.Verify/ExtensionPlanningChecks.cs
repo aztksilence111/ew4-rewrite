@@ -65,7 +65,7 @@ internal static class ExtensionPlanningChecks
         try { ExtensionLoader.Load(Read); throw new InvalidOperationException("Missing script accepted"); }
         catch (FileNotFoundException) { checks++; }
 
-        var fixture = WorldChecks.Example();
+        var fixture = WorldChecks.Example().Copy();
         var actor = fixture.Units[0];
         var bus = new RuleEventBus(new Dictionary<string, ExtensionSkill>());
         var ai = new WorldAiRules { Movement = new() { Extensions = bus } };

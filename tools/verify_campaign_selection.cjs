@@ -69,6 +69,7 @@ function check(value, message) { assert.ok(value, message); report.checks++; }
           const beforeSize = await row.evaluate(el => ({ width: el.offsetWidth, height: el.offsetHeight }));
           await row.click();
           await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+          await page.locator('#campaign-battles').evaluate(el => Promise.all(el.getAnimations({ subtree: true }).map(a => a.finished.catch(() => {}))));
           check(await row.evaluate(el => {
             const r = el.getBoundingClientRect(), list = el.parentElement.getBoundingClientRect();
             return el.parentElement.scrollLeft === 0 && r.left >= list.left - 1 && r.top >= list.top - 1 && r.bottom <= list.bottom + 1 && document.getElementById('menu-stage').scrollTop === 0;
@@ -95,6 +96,7 @@ function check(value, message) { assert.ok(value, message); report.checks++; }
         const row = page.locator('[data-campaign="' + branch.id + '"]');
         await row.click();
         await page.evaluate(() => new Promise(resolve => requestAnimationFrame(resolve)));
+        await page.locator('#campaign-battles').evaluate(el => Promise.all(el.getAnimations({ subtree: true }).map(a => a.finished.catch(() => {}))));
         const menuFits = await row.evaluate(el => {
           const row = el.getBoundingClientRect(), list = el.parentElement.getBoundingClientRect();
           const header = document.querySelector('#campaign-screen>.menu-bar').getBoundingClientRect();

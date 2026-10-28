@@ -65,8 +65,10 @@ public static class ScenarioFactions
         var template = templateId == null ? new FactionState() : world.Factions.SingleOrDefault(f => f.Id == templateId)
             ?? throw new RuleViolation("scenario.faction_missing", "Unknown faction template");
         var created = template with { Id = effect.Faction, Name = effect.Name!, Camp = effect.Camp!, Human = false, Defeated = false,
+            HomelandBuildings = null,
+            Capital = effect.Capital is int capital ? new(capital) : null,
             Appearance = Appearance(template.Appearance, effect),
-            Resources = new(0, 0, 0), Shortage = 0, Kills = new Dictionary<string, long>(), TurnUses = new Dictionary<string, int>(),
+            Resources = effect.InitialResources ?? new(0, 0, 0), Shortage = 0, Kills = new Dictionary<string, long>(), TurnUses = new Dictionary<string, int>(),
             Recruitment = (effect.Recruitment ?? template.Recruitment).ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal),
             Survival = template.Survival with { ExcludedBuildings = template.Survival.ExcludedBuildings.ToArray() } };
         return world with { Factions = world.Factions.Append(created).ToArray() };

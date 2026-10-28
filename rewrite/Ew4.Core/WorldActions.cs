@@ -170,6 +170,9 @@ public static class WorldActions
         var next = projection ? PlanningScope.ProjectMovement(state, unit, destination, moved.RemainingMovement, claimed, ownership)
             : state with { Cells = claimed, Units = state.Units.Select(u => u.Id == unitId ? moved : u).ToArray(),
                 Revision = checked(state.Revision + 1) };
+        next = DemandDiplomacy.Captured(state, next, faction.Id, ownership.Changed);
+        var treasury = CapitalTreasury.Captured(state, next, faction.Id, ownership.Changed);
+        next = treasury.State; notices.AddRange(treasury.Notices);
         if (!projection) next = next.Copy();
         next.Validate();
         var previousOwners = ownership.Changed

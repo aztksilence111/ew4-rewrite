@@ -67,6 +67,9 @@ const pauseObjectives=new Ew4PauseObjectives.Panel({rpc,state:()=>state,notice,
   imagePath:name=>Ew4NativeUI.resource(manifest,name)?.file||'',
   repaintMenu:()=>{for(const element of document.querySelectorAll('#pause [data-label]'))element.replaceChildren(originalTextRenderer.forElement(element,element.getAttribute('aria-label')));
     $('turn').replaceChildren(originalTextRenderer.element('回合  '+state.round,'font_text_2_cn_hd','#404040',undefined,'center',{size:20}));}});
+const diplomacyUi=new Ew4Diplomacy.Panel({rpc,state:()=>state,presentation:()=>catalog?.diplomacyPresentation,notice,action:act,flag:flagSource,
+  busy:()=>busy,aiRunning:()=>aiRunning,blocked:()=>stageIntroOpen||sessionTransition||!!aiControl.mode,
+  prepare:text=>Ew4OriginalUI.prepareText(text),pause:stopAi,resume:()=>runAi().catch(e=>notice(e.message))});
 const battlefield = new Ew4Battlefield.Renderer({image,sprite,animation,libraries,loadLibrary,requestFrame:requestRender,get mapMode(){return mapViews.mode;},get cameraActive(){return pointers.size>0||performance.now()<cameraInputUntil;},get warmingPaused(){return aiRunning;},get visible(){return appVisible;},get imageRevision(){return imageRevision;},get effects(){return effects;},get manifest(){return manifest;},get cityLanguage(){return settings.cityLanguage;},get geographicLanguage(){return settings.geographicLanguage;},cityLabelSize:(name,cell)=>{
   const layout=originalTextRenderer.layout(cityLabelText(name,cell,state.map,settings.cityLanguage),'font_city_labels_hd');
   return {width:(layout.width+8)/2,height:(layout.height+10)/2};
@@ -87,6 +90,13 @@ const menus = new Ew4Menus.Menus({rpc,button,uiImage,countryImage,labels:labelIm
   get manifest(){return manifest;},get catalog(){return catalog;},refreshCatalog:async()=>{catalog=await rpc('catalog');},tutorialUi,popup:popupOpen,load:(slot,mode)=>load(slot,mode),deploy:(unit,commander)=>act('deploy',{unit,commander}),act,
   refresh:async()=>{if(state&&!$('play').hidden){await installState(await rpc('action',{op:'state',revision:state.revision}));}},get menuArt(){return menuArt;},closeDetail});
 let chosenScenario, chosenCountry, countryChoices = [], showGrid = false, selectedAt = 0;
+const turnUi=new Ew4TurnUI.Turns({
+  state:()=>state,get manifest(){return manifest;},rpc,button,detail:detailWindow,close:closeDetail,notice,
+  text:(...args)=>originalTextRenderer.element(...args),uiImage,portrait:name=>menus.portrait(name),
+  campaign:id=>catalog.scenarios.find(s=>s.id===id)?.mode===1,
+  ready:()=>!busy&&!aiRunning&&!sessionTransition&&!stageIntroOpen&&!$('play').hidden&&['detail-modal','pause','settings','loading-screen','diplomacy-modal'].every(id=>$(id).hidden),
+  end:()=>act('end'),resume:()=>{refreshHud();requestRender();void runAi();}
+});
 const victoryUi = new Ew4VictoryUI.Results({
   ready:next=>!busy&&!skipAi&&!sessionTransition&&$('pause').hidden&&$('loading-screen').hidden&&state===next&&battlefield.state===next&&[...images.values()].every(img=>img.complete),
   get manifest(){return manifest;},detail:detailWindow,button,uiImage,notice,tutorialUi,
@@ -183,6 +193,7 @@ function originalLabels() {
 }
 async function showMain() {
   mapViews.close();
+  diplomacyUi.reset();
   if(sessionTransition)return;
   sessionTransition=true;
   cancelBattlePreload();
@@ -332,7 +343,7 @@ async function chooseScenario(scenario) {
     countryChoices = countries;
     await loadLibrary('strategicmap');
     chosenScenario = scenario.id; chosenCountry = undefined; $('confirm-country').disabled = true;
-    $('countries').hidden = false; $('country-list').replaceChildren(); $('country-list').scrollTop = 0;
+    $('country-list').replaceChildren(); $('country-list').scrollTop = 0;
     for (const country of countries) {
       const row = button('', () => {
         chosenCountry = country.id;
@@ -344,8 +355,10 @@ async function chooseScenario(scenario) {
       const flag = countryImage(country.id,51,30,country); flag.className = 'country-flag';
       row.append(flag, labelImage('country_' + country.id, country.name));
     }
-    $('country-list').firstElementChild?.click();
-    menus.slideInSidebar($('country-list'));
+    await menus.transitionPage(()=>{
+      menus.camera=null;$('countries').hidden=false;$('country-list').firstElementChild?.click();
+      menus.slideInSidebar($('country-list'));
+    });
   } finally { busy = false; }
   preloadBattleResources();
 }
@@ -378,10 +391,12 @@ function battleLibraries(next,center){
 }
 async function installState(next, center = false) {
   if(center)storyPlayer.reset();
+  if(center)diplomacyUi.reset();
   closeSingleAction();
   const resetPause=center;
   if(resetPause)mapViews.reset();
   const previous=state;
+  const nextUnitIds=new Set(next.units.map(u=>u.id));
   center=center||!!(state&&(state.map!==next.map||state.scenario!==next.scenario||state.width!==next.width||state.height!==next.height||state.playerFaction!==next.playerFaction));
   if(center){effects?.clear();damageNumbers?.clear();facings.clear();deaths.clear();combatMotions.clear();battlefield.resetMotions();battleDialogues.length=0;unitNavigation.reset();}
   const keepUnit=center?null:selected?.id,keepCell=center?null:selection?.cell;
@@ -399,11 +414,12 @@ async function installState(next, center = false) {
       await playMovements(moves);
       playOccupationSound(next,moves);
     }
-    await playCombat(next.combat,new Set(state.units.filter(u=>!next.units.some(v=>v.id===u.id)).map(u=>u.id)));
+    await playCombat(next.combat,new Set(state.units.filter(u=>!nextUnitIds.has(u.id)).map(u=>u.id)));
   }
   if(!center&&!(aiRunning&&skipAi)){
     const destroyed=(next.notices||[]).filter(n=>n.kind==='unit.destroyed').map(n=>n.subject);
-    const victims=state.units.filter(u=>!next.units.some(v=>v.id===u.id)&&(next.combat||destroyed.includes(u.id)));
+    const destroyedIds=new Set(destroyed);
+    const victims=state.units.filter(u=>!nextUnitIds.has(u.id)&&(next.combat||destroyedIds.has(u.id)));
     if(victims.length){for(const unit of victims)beginDeath(unit.id);await presentationDelay(Math.max(0,...victims.map(u=>{const d=deaths.get(u.id);return d.started+d.duration-performance.now();})));}
   }
   deaths.clear();
@@ -437,6 +453,8 @@ async function installState(next, center = false) {
     }
   }
   state = next; selected = undefined; selection = undefined; selectionRequest++; $('selection').hidden = true;
+  if(!center)diplomacyUi.showCapitalNotices(next);
+  turnUi.observe(next,center);
   if(resetPause){pauseObjectives.reset();aiControl.reset();}
   else if(!$('pause').hidden)pauseObjectives.sync();
   music?.sync(next,center);
@@ -726,6 +744,7 @@ function refreshHud() {
   }
   $('skip-ai').hidden = active.human || state.phase === 'Finished' || !!state.dialogue || !!state.scenarioPopup || settings.autoTurnFast;
   $('skip-ai').disabled = skipAi;
+  diplomacyUi.sync();
   refreshAiProgress();
   refreshDialogue();
   storyPlayer.sync(state.story,stageIntroOpen,busy).catch(error=>notice(error.message));
@@ -764,7 +783,7 @@ function refreshHud() {
   localMultiplayerUi.sync(state);
 }
 async function act(op, extra = {}) {
-  if (busy || !state || stageIntroOpen) return;
+  if (busy || !state || stageIntroOpen || turnUi.open) return;
   const timedTurn=op==='end';
   const turnMeasurement=timedTurn?performanceLog.beginTurn(state,settings):null;
   try{
@@ -799,7 +818,7 @@ async function act(op, extra = {}) {
 }
 function runAi() {
   if(aiTask)return aiTask;
-  if(sessionTransition||aiControl.mode||!$('pause').hidden)return Promise.resolve();
+  if(sessionTransition||aiControl.mode||diplomacyUi.opened||turnUi.open||!$('pause').hidden)return Promise.resolve();
   aiTask=runAiLoop().finally(()=>{aiTask=null;});
   return aiTask;
 }
@@ -814,15 +833,23 @@ async function runAiLoop() {
   aiStopRequested=false;
   aiRunning = true; skipAi = settings.autoTurnFast;
   if(skipAi){clearAiPresentation();aiFocus=null;}
+  let progressOnly=false;
   try {
     busy=true;refreshHud();
-    while (aiCanContinue(state)&&$('pause').hidden&&!aiStopRequested) {
+    while (aiCanContinue(state)&&$('pause').hidden&&!diplomacyUi.opened&&!aiStopRequested) {
       if(fastSkipping()){
-        const batch=await rpc('action',{op:'ai_batch',revision:state.revision});
+        const batch=await rpc('action',{op:'ai_batch',revision:state.revision,compact:true});
         if(batch.baseRevision!==state.revision)throw Error('回合状态不同步');
+        if(batch.progressOnly){
+          const handoff=batch.activeFaction!==state.activeFaction;
+          state={...state,revision:batch.revision,activeFaction:batch.activeFaction};progressOnly=true;
+          if(handoff){refreshAiProgress();await presentAiProgress();}
+          continue;
+        }
         const next=batch.state;
         if(!next.cells){next.cells=state.cells.slice();for(const update of next.cellUpdates)next.cells[update.cell]=update.value;}
         delete next.cellUpdates;
+        progressOnly=false;
         if(batch.error||!aiCanContinue(next))await installState(next);
         else {
           const handoff=next.activeFaction!==state.activeFaction;
@@ -830,17 +857,23 @@ async function runAiLoop() {
           if(handoff)await presentAiProgress();
         }
         if(batch.error)throw Error(failure(batch.error.code,batch.error.message));
-      }else await installState(await rpc('action', {op:'ai', revision:state.revision}));
+      }else {
+        if(progressOnly){await installState(await rpc('action',{op:'state'}));progressOnly=false;}
+        await installState(await rpc('action', {op:'ai', revision:state.revision}));
+      }
       if(!skipAi&&$('pause').hidden)await new Promise(resolve => setTimeout(resolve, 180/settings.speed));
     }
   } catch (error) {
     if(performanceLog.turn)performanceLog.turn.failed=true;
-    try{await installState(await rpc('action',{op:'state'}));}catch(_){}
+    try{await installState(await rpc('action',{op:'state'}));progressOnly=false;}catch(_){}
     notice(error.message);
   }
-  finally { busy = false; aiRunning = false; skipAi = false; aiStopRequested=false; aiFocus=null; if(state)refreshHud();requestRender(); }
+  finally {
+    try{if(progressOnly)await installState(await rpc('action',{op:'state'}));}
+    finally{busy = false; aiRunning = false; skipAi = false; aiStopRequested=false; aiFocus=null; if(state)refreshHud();requestRender();}
+  }
 }
-function aiCanContinue(next){return !aiControl.mode&&!stageIntroOpen&&next&&!next.dialogue&&!next.scenarioPopup&&next.phase!=='Finished'&&
+function aiCanContinue(next){return !aiControl.mode&&!diplomacyUi.opened&&!stageIntroOpen&&next&&!turnUi.hasNewTurn(next)&&!next.dialogue&&!next.scenarioPopup&&next.phase!=='Finished'&&
   (!next.factions.find(f=>f.id===next.activeFaction).human||next.activeFaction===next.playerFaction&&next.playerAi?.enabled&&(next.playerAi.endingTurn||next.playerAi.autoBattle));}
 function refreshTerrainInfo(site){
   const host=$('terrain-info'),rows=Ew4Battlefield.terrainRows(site),key=JSON.stringify(rows);
@@ -1233,7 +1266,7 @@ function drawStrategicMap(time=performance.now()) {
   // Conquest overlays use an 80% backdrop; scenario centers remain in overlay coordinates.
   menuArt.drawStrategic(draw,definition,scale,camera.x,camera.y,textureScale);
   draw.translate(camera.x,camera.y);draw.scale(scale,scale);
-  const strategic=lib.byName.get(definition.name||('conquest '+chosenScenario.slice(8)));if(strategic)animation(lib,strategic,time/180,0,draw);draw.restore();
+  const strategic=lib.byName.get(definition.name||('conquest '+chosenScenario.slice(8)));if(strategic)animation(lib,strategic,menus.strategicTick(lib,time),0,draw);draw.restore();
 }
 function render(time,forceBattlefield=false) {
   renderRequest=0;
@@ -1242,7 +1275,8 @@ function render(time,forceBattlefield=false) {
   renderDirty=false;lastRenderTime=time;
   const playVisible=state&&!$('play').hidden;
   const menuVisible=!$('menu').hidden;
-  const covered=['pause','settings','detail-modal','mod-manager','loading-screen'].some(id=>!$(id).hidden);
+  if(playVisible)turnUi.tick();
+  const covered=['pause','settings','detail-modal','mod-manager','loading-screen','diplomacy-modal'].some(id=>!$(id).hidden);
   const animated=menuVisible&&(!$('campaign-screen').hidden||!$('countries').hidden)||playVisible&&!covered&&!fastSkipping()&&
     (battlefield.animated||motions.size||arrivals.size||deaths.size||combatMotions.size||effects?.instances.length||damageNumbers?.instances.length||selection);
   if(animated)renderRequest=requestAnimationFrame(render);
@@ -1354,7 +1388,7 @@ function zoom(factor,x=viewport.w/2,y=viewport.h/2){cameraInputUntil=performance
 document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=async()=>{if(!startupReady)return;mode=Number(b.dataset.mode);if(mode===4){menus.tutorialMenu();return;}$('main-menu').hidden=true;$('scenario-menu').hidden=false;$('countries').hidden=true;$('conquest-pagination').hidden=mode!==2;$('scenario-menu').classList.toggle('campaign-mode',mode===1);menuArt.apply(mode);$('mode-title').replaceChildren(labelImage(b.dataset.label,b.getAttribute('aria-label'),$('mode-title')));if(!await menus.open(mode))scenarioList();});
 $('conquest-prev').onclick=()=>turnConquestPage(-1);
 $('conquest-next').onclick=()=>turnConquestPage(1);
-$('cancel-country').onclick=()=>{cancelBattlePreload();$('countries').hidden=true;};
+$('cancel-country').onclick=()=>menus.transitionPage(()=>{cancelBattlePreload();$('countries').hidden=true;});
 $('confirm-country').onclick=()=>{if(chosenScenario&&chosenCountry&&!busy)start(chosenScenario,chosenCountry).catch(e=>notice(e.message));};
 $('menu-back').onclick=showMain;
 $('headquarters').onclick=()=>{if(startupReady)menus.headquarters().catch(e=>notice(e.message));};
@@ -1402,7 +1436,7 @@ $('close-detail').onclick=async()=>{closeDetail();await tutorialUi('winbtn_close
 $('show-grid').onchange=e=>{showGrid=e.target.checked;try{localStorage.setItem('ew4.showGrid',String(showGrid));}catch(_){notice('无法保存设定');}};
 $('menu-button').onclick=()=>{mapViews.close();aiControl.openPause();};
 $('resume').onclick=()=>{$('pause').hidden=true;if(!busy)runAi().catch(e=>notice(e.message));};
-$('end-turn').onclick=()=>act('end').catch(e=>notice(e.message));
+$('end-turn').onclick=()=>turnUi.confirmEnd();
 $('undo-move').onclick=()=>{if(!selected||!selection?.undo||$('undo-move').disabled)return;return act('undo',{unit:selected.id}).then(()=>tutorialUi('btn_undo')).catch(e=>notice(e.message));};
 $('next-unit').onclick=()=>findNextUnit().catch(e=>notice(e.message));
 $('skip-ai').onclick=()=>{
@@ -1430,6 +1464,7 @@ $('restart').onclick=async()=>{
 };
 $('return-menu').onclick=()=>{if(busy&&!aiRunning){notice('请等待当前行动完成');return;}return showMain();};
 window.ew4Back=()=>{
+  if(diplomacyUi.back())return 'handled';
   if(aiControl.closeMission(true))return 'handled';
   if(!storyPlayer.host.hidden){storyPlayer.back();return 'handled';}
   if(mapViews.close())return 'handled';

@@ -6,6 +6,13 @@ public sealed record AiStepPlan(AiProductionPlan Production, AiUnitPlan? Unit, A
 
 public static partial class WorldAi
 {
+    public static WorldChange ExecuteNextStep(WorldState state, WorldAiRules ai, WorldProductionRules production,
+        WorldTurnRules turns, WorldBattleRules battle)
+    {
+        using var step = PlanningScope.Begin(ai, production, turns, battle);
+        return ExecuteStep(state, PlanStep(state, ai, production, turns), ai, production, turns, battle);
+    }
+
     public static AiStepPlan PlanStep(WorldState state, WorldAiRules ai, WorldProductionRules production, WorldTurnRules turns)
     {
         using var planning = PlanningScope.Begin(ai, production, turns);

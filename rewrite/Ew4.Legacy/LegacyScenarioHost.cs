@@ -200,7 +200,12 @@ public static class LegacyScenarioHost
                     if (property.Name == nameof(LocalMultiplayerState.ShareAlliedVictory)) continue;
                     if (property.Name == nameof(WorldState.Jurisdictions) && property.Value.ValueKind == JsonValueKind.Null) continue;
                     if (property.Name == nameof(WorldState.ArmyCapacity) && property.Value.ValueKind == JsonValueKind.Null) continue;
+                    if (property.Name == nameof(WorldState.Demands) && property.Value.ValueKind == JsonValueKind.Null) continue;
+                    if (property.Name == nameof(WorldState.DiplomacyAdjustments) && property.Value.ValueKind == JsonValueKind.Null) continue;
                     if (property.Name == nameof(FactionState.Appearance) && property.Value.ValueKind == JsonValueKind.Null) continue;
+                    if (property.Name == nameof(FactionState.HomelandBuildings) && property.Value.ValueKind == JsonValueKind.Null) continue;
+                    if (property.Name == nameof(FactionState.TurnSummary) && property.Value.ValueKind == JsonValueKind.Null) continue;
+                    if (property.Name is nameof(FactionState.Capital) or nameof(ScenarioEffect.InitialResources) && property.Value.ValueKind == JsonValueKind.Null) continue;
                     if (property.Name == nameof(FactionState.DiplomacyWarned) && property.Value.ValueKind == JsonValueKind.False) continue;
                     if (property.Name == nameof(WorldState.Provocations) && property.Value.ValueKind == JsonValueKind.Null) continue;
                     if (property.Name is nameof(WorldState.LocalMultiplayer) or nameof(WorldState.ScenarioVictory) or nameof(WorldState.ScenarioEnding)

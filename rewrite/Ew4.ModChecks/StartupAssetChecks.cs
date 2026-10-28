@@ -28,12 +28,13 @@ internal static class StartupAssetChecks
         var baseline = new ModBase(Read, files, openRead: Open);
         var byteBaseline = new ModBase(Read, files);
         string? fingerprint = null;
-        foreach (string mode in new[] { "directory-bytes", "directory-stream", "package" }) for (int sample = 0; sample < 4; sample++)
+        foreach (string mode in new[] { "directory-bytes", "directory-stream", "package", "package-stream" }) for (int sample = 0; sample < 4; sample++)
         {
             GC.Collect(); reads = 0; bytes = 0;
             long allocated = GC.GetTotalAllocatedBytes(true);
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            var result = mode == "package" ? StartupAssets.PreparePackage(Read, () => files, "measurement-install-1", Path.Combine(cache, mode))
+            var result = mode.StartsWith("package", StringComparison.Ordinal) ? StartupAssets.PreparePackage(Read, () => files, "measurement-install-1", Path.Combine(cache, mode),
+                openRead: mode == "package-stream" ? Open : null)
                 : StartupAssets.Prepare(mode == "directory-stream" ? baseline : byteBaseline, Path.Combine(cache, mode));
             timer.Stop();
             fingerprint ??= result.Fingerprint;
@@ -77,6 +78,25 @@ internal static class StartupAssetChecks
         Check(packageWarm.Fingerprint == first.Fingerprint && packageWarm.Content.Revision == baseline.Revision
             && packageWarm.Content.SaveNamespace == null, "package shortcut preserves identities and stock saves");
         Check(packageWarm.CheckedFiles == first.CheckedFiles, "package receipt retains original validation coverage");
+        int streamedFiles = 0;
+        var streams = new List<Stream>();
+        Stream PackageOpen(string path)
+        {
+            streamedFiles++;
+            var stream = File.OpenRead(path.StartsWith("frontend/", StringComparison.Ordinal)
+                ? Path.Combine(root, "rewrite/Ew4.Web/wwwroot", path[9..]) : Path.Combine(data, path));
+            streams.Add(stream); return stream;
+        }
+        var streamed = StartupAssets.PreparePackage(PackageRead, () => files, "stream-install", Path.Combine(run, "stream-package"), openRead: PackageOpen);
+        Check(!streamed.CacheHit && streamed.Fingerprint == package.Fingerprint,
+            "streamed cold package hashes match the byte-array package identity");
+        Check(streamedFiles == baseline.Files.Count(p => !p.StartsWith("original/", StringComparison.Ordinal))
+            && streams.All(s => !s.CanRead), "cold package hashes non-original assets through disposed streams");
+        packageReads = 0; streamedFiles = 0;
+        var streamedWarm = StartupAssets.PreparePackage(PackageRead, () => throw new InvalidOperationException("Unexpected enumeration"),
+            "stream-install", Path.Combine(run, "stream-package"), openRead: PackageOpen);
+        Check(streamedWarm.CacheHit && packageReads == 0 && streamedFiles == 0,
+            "warm streamed package still skips all asset IO");
         packageReads = 0;
         StartupAssets.PreparePackage(PackageRead, PackageFiles, "install-2", packageCache);
         Check(packageReads > 0 && enumerations == 2, "new install identity rehashes even when version and contents match");

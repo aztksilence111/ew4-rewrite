@@ -3,6 +3,8 @@
 - PixiJS 7.4.3: MIT, https://github.com/pixijs/pixijs . Offline WebGL battlefield renderer; see `licenses/PixiJS-LICENSE.txt` and `wwwroot/vendor/PixiJS-LICENSE.txt`.
 
 - Lucide icons / lucide-static 1.62.0: ISC, https://lucide.dev . Story player toolbar icons; see `wwwroot/story-icons/LICENSE` (Android: `www/story-icons/LICENSE`).
+- Lucide icons / lucide-static 0.468.0: ISC, https://lucide.dev . Swords and scroll-text diplomacy icons rasterized to PNG; see `data/client/ui/diplomacy/LICENSE.txt` (Android: `www/content/ui/diplomacy/LICENSE.txt`).
+- Font Awesome Free 6.7.2 by Fonticons, Inc.: CC BY 4.0, https://fontawesome.com . Solid handshake icon rasterized in white to PNG; see `data/client/ui/diplomacy/FontAwesome-LICENSE.txt` (Android: `www/content/ui/diplomacy/FontAwesome-LICENSE.txt`).
 
 - AssetRipper.TextureDecoder 2.6.3: MIT, https://github.com/AssetRipper/TextureDecoder . Used only for ETC1 resource decoding.
 - StbImageSharp 2.30.15: public domain / MIT dual license, https://github.com/StbSharp/StbImageSharp . Managed image decoding.

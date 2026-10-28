@@ -25,8 +25,27 @@
 #campaign-battles{width:var(--campaign-row-width,164px);padding-left:0}
 #campaign-battles .country-entry{transform:none;margin-left:20px;width:var(--campaign-row-width,164px);height:var(--campaign-row-height,45px)}
 #campaign-battles .country-entry[aria-pressed=true]{transform:none;margin-left:0;width:var(--campaign-row-width,164px)}
+.selection-backplate{position:absolute;right:0;top:calc(23px + var(--menu-safe-top,0px));bottom:0;width:calc(116px + var(--menu-safe-right,0px));background:url("content/ui/image_menu_hd/choosestage_back.png") left top/100% 100% no-repeat;pointer-events:none}
+#campaign-battles{background:none}
+#campaign-battles{touch-action:pan-y;overscroll-behavior:contain;user-select:none;cursor:grab}
+#campaign-battles.dragging,#campaign-battles.dragging .country-entry{cursor:grabbing}
+#campaign-battles img{-webkit-user-drag:none}
+#country-list,#campaign-battles{z-index:1}
+#countries>.menu-bar,#campaign-screen>.menu-bar,#confirm-country,#campaign-confirm{z-index:2}
+#countries .country-entry,#campaign-battles .country-entry{transition:transform 160ms ease-out,margin-left 160ms ease-out;filter:none}
+#campaign-intro{left:calc(72px + var(--menu-safe-left,0px));right:calc(var(--campaign-row-width,164px) + var(--menu-safe-right,0px) + 8px);width:auto;max-width:none;height:88px}
+#campaign-intro::before{right:0;width:auto}
+#campaign-description{left:70px;right:0;top:0;width:auto;max-width:none;height:88px;background:#ebe6e1}
+.menu-transition-curtain{position:absolute;inset:0;z-index:20;background:#000;pointer-events:auto}
+.round-commanders{overflow-x:auto;overflow-y:hidden;align-items:center;scrollbar-width:none}
+.round-commander{position:relative;flex:0 0 46.5px;height:58px;background:#858580;overflow:hidden}
+.round-commander>img{width:46.5px;height:46.5px;object-fit:contain}
+.round-commander-name{position:absolute;bottom:0;left:0;width:100%;height:11.5px;display:flex;align-items:center;justify-content:center;background:url("content/ui/image_ui_hd/general_nameboard.png") center/100% 100% no-repeat}
+.round-commander.empty::before,.round-commander.empty::after{content:"";position:absolute;left:50%;top:23.25px;width:28px;height:.5px;background:#a7a7a2;transform:translateX(-50%)}
+.round-commander.empty::after{width:.5px;height:28px;top:9.25px}
+@media(prefers-reduced-motion:reduce){#countries .country-entry,#campaign-battles .country-entry{transition:none}}
 #confirm-country,#campaign-confirm{left:auto;right:calc(20px + var(--menu-safe-right,0px));top:auto;bottom:var(--menu-safe-bottom,0px)}
-#campaign-intro{top:auto;bottom:var(--menu-safe-bottom,0px);left:calc(42px + var(--menu-safe-left,0px))}
+#campaign-intro{top:auto;bottom:var(--menu-safe-bottom,0px);left:calc(72px + var(--menu-safe-left,0px))}
 #hq-recruit{left:auto;right:calc(18px + var(--menu-safe-right,0px))}
 #hq-screen.recruiting #hq-filters,#hq-screen.recruiting #hq-refresh{left:50%;transform:translateX(-50%)}
 #hq-roster{bottom:31px;height:auto}

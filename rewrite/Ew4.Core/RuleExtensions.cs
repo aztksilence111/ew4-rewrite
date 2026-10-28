@@ -97,6 +97,21 @@ public sealed partial class RuleEventBus
         return value;
     }
 
+    internal WorldState DispatchFactionTurn(WorldState world, string faction, string ev)
+    {
+        var ids = world.Units.Where(u => u.Owner == faction).Select(u => u.Id).ToArray();
+        var units = world.Units.ToDictionary(u => u.Id, StringComparer.Ordinal);
+        foreach (string id in ids)
+        {
+            if (!units.TryGetValue(id, out var unit) || !Bound(unit.Combatant)
+                .Any(p => p.Skill.Kind == "passive" && p.Skill.Effects.Any(e => e.Event == ev))) continue;
+            var previous = world.Units;
+            world = Dispatch(world, ev, id, new Ew4Random(world.RandomState));
+            if (!ReferenceEquals(previous, world.Units)) units = world.Units.ToDictionary(u => u.Id, StringComparer.Ordinal);
+        }
+        return world;
+    }
+
     public WorldState Dispatch(WorldState world, string ev, string unitId, Ew4Random random, string? onlyInstance = null, string? targetId = null,
         UnitState? eventSource = null, int? targetCell = null, WorldMoveRules? movement = null, SkillSlot? grantedSlot = null)
     {

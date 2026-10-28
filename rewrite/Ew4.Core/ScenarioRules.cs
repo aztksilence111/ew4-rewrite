@@ -43,6 +43,8 @@ public sealed record ScenarioEffect
     public string? Flag { get; init; }
     public string? FlagImage { get; init; }
     public string? Color { get; init; }
+    public Resources? InitialResources { get; init; }
+    public int? Capital { get; init; }
     public ExtensionVictoryRules? VictoryRules { get; init; }
     public string? Outcome { get; init; }
     public string? Unit { get; init; }
@@ -280,6 +282,14 @@ public static class ScenarioRules
                 case "faction_create": next = ScenarioFactions.Create(next, e); notices.Add(new("faction.created", owner)); break;
                 case "faction_revive": next = ScenarioFactions.Revive(next, owner); notices.Add(new("faction.revived", owner)); break;
                 case "faction_identity": next = ScenarioFactions.Identity(next, owner, e); notices.Add(new("faction.identity", owner)); break;
+                case "faction_homeland": case "faction_core": next = DemandDiplomacy.SetHomeland(next, owner, e.Cells); notices.Add(new("faction.homeland", owner)); break;
+                case "core_add": case "core_remove": next = DemandDiplomacy.ChangeCores(next, owner, e.Cells, e.Type); notices.Add(new("faction.cores", owner)); break;
+                case "faction_capital": next = CapitalTreasury.SetCapital(next, owner, e.Cells[0]); notices.Add(new("faction.capital", owner)); break;
+                case "surrender_modifier": case "loot_modifier":
+                    next = DemandDiplomacy.SetPair(next, owner, Faction(next, e.OtherFaction!), checked((int)value), e.Type == "loot_modifier"); break;
+                case "faction_surrender":
+                    var surrender = WorldEvents.Surrender(next, owner, Faction(next, e.OtherFaction!));
+                    next = surrender.State; notices.AddRange(surrender.Notices); break;
                 case "player_control":
                     next = ScenarioFactions.Control(next, owner); notices.Add(new("scenario.player_changed", owner)); break;
                 case "victory_rules": next = next with { ScenarioVictory = ExtensionVictory.Copy(e.VictoryRules!) }; break;
@@ -408,7 +418,8 @@ public static class ScenarioRules
             {
                 if (e == null || e.Cells == null || string.IsNullOrWhiteSpace(e.Faction)
                     || e.Type is not ("money" or "industry" or "food" or "set_money" or "set_industry" or "set_food" or "camp" or "cells_owner"
-                        or "unit_owner" or "morale" or "environment" or "environment_spread" or "heal" or "destroy_unit" or "state" or "add_state" or "victory" or "defeat" or "relation" or "faction_create" or "faction_revive" or "faction_identity"
+                        or "unit_owner" or "morale" or "environment" or "environment_spread" or "heal" or "destroy_unit" or "state" or "add_state" or "victory" or "defeat" or "relation" or "faction_create" or "faction_revive" or "faction_identity" or "faction_homeland"
+                        or "faction_core" or "core_add" or "core_remove" or "faction_capital" or "surrender_modifier" or "loot_modifier" or "faction_surrender"
                         or "player_control" or "victory_rules" or "victory_default" or "ending" or "play_story")
                     || e.Type == "play_story" && (!StoryValidation.Id(e.Key) || !StoryValidation.Id(e.Scene) || e.Script != null)
                     || e.Type != "play_story" && e.Scene != null
@@ -423,6 +434,12 @@ public static class ScenarioRules
                         || e.TemplateFaction != null && (string.IsNullOrWhiteSpace(e.TemplateFaction) || e.TemplateFaction == "@active")
                         || e.TemplateFaction == null && (e.Flag == null && e.FlagImage == null || e.Color == null) || e.Script != null)
                     || e.Type == "faction_identity" && (e.Name == null && e.Flag == null && e.FlagImage == null && e.Color == null || e.Script != null)
+                    || e.Type is "faction_homeland" or "faction_core" or "core_add" or "core_remove" && (e.Script != null || e.Cells.Distinct().Count() != e.Cells.Count)
+                    || e.Type == "faction_capital" && (e.Script != null || e.Cells.Count != 1)
+                    || e.Type is "surrender_modifier" or "loot_modifier" && (string.IsNullOrWhiteSpace(e.OtherFaction) || e.Script != null || e.Value < -100 || e.Value > 100)
+                    || e.Type == "faction_surrender" && (string.IsNullOrWhiteSpace(e.OtherFaction) || e.Script != null)
+                    || e.Type != "faction_create" && (e.InitialResources != null || e.Capital != null)
+                    || e.InitialResources is { } initialResources && (initialResources.Money < 0 || initialResources.Industry < 0 || initialResources.Food < 0)
                     || e.Type is not ("faction_create" or "faction_identity") && (e.Name != null || e.Flag != null || e.FlagImage != null || e.Color != null)
                     || e.Name != null && (string.IsNullOrWhiteSpace(e.Name) || e.Name.Length > 128 || e.Name.Any(char.IsControl))
                     || e.Type != "faction_create" && (e.TemplateFaction != null || e.Country != null || e.UnitVariant != null || e.Recruitment != null)
@@ -513,6 +530,11 @@ public static class ScenarioRules
                     || e.Cells.Any(i => i < 0 || i >= world.Cells.Count || !world.Cells[i].Terrain.CanTraverse())
                     || initial && e.Unit != null && world.Units.All(u => u.Id != e.Unit))
                     throw new RuleViolation("scenario.reference", "Unknown effect target in " + ev.Id);
+                if (e.Type is "faction_homeland" or "faction_core" or "core_add" or "core_remove" or "faction_capital"
+                    && e.Cells.Any(i => !DemandDiplomacy.Counts(world.Cells[i])))
+                    throw new RuleViolation("scenario.homeland", "Homeland can only contain eligible buildings in " + ev.Id);
+                if (e.Capital is int capital && (capital < 0 || capital >= world.Cells.Count || !DemandDiplomacy.Counts(world.Cells[capital])))
+                    throw new RuleViolation("scenario.capital", "Invalid initial faction capital in " + ev.Id);
                 if (e.VictoryRules != null) ExtensionVictory.ValidateTargets(e.VictoryRules, world, initial, id => !id.StartsWith("@", StringComparison.Ordinal) && KnownFaction(id));
             }
             if (ev.Popup != null && world.TriggeredScenarioEvents.Contains(ev.Id) && !world.ScenarioChoices.ContainsKey(ev.Id)

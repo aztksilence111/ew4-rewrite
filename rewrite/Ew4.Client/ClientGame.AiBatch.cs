@@ -6,7 +6,7 @@ namespace Ew4.Client;
 
 public sealed partial class ClientGame
 {
-    private object AiBatch()
+    private object AiBatch(bool compact = false)
     {
         var timer = Stopwatch.StartNew();
         var before = Require().Session;
@@ -30,9 +30,8 @@ public sealed partial class ClientGame
                 }
                 var rules = current.Rules;
                 var production = rules.Production[active.Id];
-                var plan = WorldAi.PlanStep(world, rules.Ai, production, rules.Turns);
                 // Keep the ordinary commit, event, settlement and autosave boundaries for every step.
-                Commit(WorldAi.ExecuteStep(world, plan, rules.Ai, production, rules.Turns, rules.Battle));
+                Commit(WorldAi.ExecuteNextStep(world, rules.Ai, production, rules.Turns, rules.Battle));
                 steps++;
                 if (Require().Session.World.ActiveFaction != before.World.ActiveFaction) break;
             } while (steps < 32 && timer.ElapsedMilliseconds < 250);
@@ -42,6 +41,17 @@ public sealed partial class ClientGame
             // Earlier steps may already be committed; always return their latest state with the error.
             error = new { code = e is RuleViolation rule ? rule.Code : "client.failure", message = e.Message };
         }
-        return new { state = View(cellDeltaFrom: steps == 0 ? null : before.World), baseRevision = before.Revision, steps, error };
+        var next = Require().Session;
+        // Only opt-in fast playback may omit intermediate pictures. Player control,
+        // event and error boundaries still return the full state.
+        if (compact && error == null && steps > 0 && next.World.Phase == TurnPhase.Active
+            && next.World.Round == before.World.Round
+            && next.PlayerFaction == before.PlayerFaction && next.World.PendingDialogue == null
+            && !next.World.Factions.Single(f => f.Id == next.World.ActiveFaction).Human
+            && ScenarioRules.Pending(next.World) == null && StoryPlayback.Current(next.World) == null
+            && next.World.Factions.Select(f => (f.Id, f.Name, f.Human, f.Appearance))
+                .SequenceEqual(before.World.Factions.Select(f => (f.Id, f.Name, f.Human, f.Appearance))))
+            return new { progressOnly = true, revision = next.Revision, activeFaction = next.World.ActiveFaction, baseRevision = before.Revision, steps };
+        return new { state = View(cellDeltaFrom: compact || steps == 0 ? null : before.World), baseRevision = before.Revision, steps, error };
     }
 }

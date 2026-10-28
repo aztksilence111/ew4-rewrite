@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="pause-objectives.css?v=20261027.1">
   <link rel="stylesheet" href="runtime-compat.css?v=20261024.1">
   <link rel="stylesheet" href="story-player.css?v=20261027.1">
+  <link rel="stylesheet" href="diplomacy.css?v=20261028.1">
 </head>
 <body>
   <section id="menu">
@@ -41,11 +42,13 @@
       </section>
       <section id="countries" hidden>
         <canvas id="strategic-map" width="1136" height="640" aria-label="征服战略地图"></canvas>
+        <div class="selection-backplate" aria-hidden="true"></div>
         <header class="menu-bar"><button id="cancel-country" class="back-icon" aria-label="返回" title="返回"></button><h1 data-label="country_label">选择国家</h1></header>
         <div id="country-list" aria-label="国家列表"></div><button id="confirm-country" aria-label="确认" title="确认" disabled></button>
       </section>
       <section id="campaign-screen" hidden>
         <canvas id="campaign-map" aria-label="战役战略地图"></canvas>
+        <div class="selection-backplate" aria-hidden="true"></div>
         <header class="menu-bar"><button id="campaign-back" class="back-icon" aria-label="返回剧本" title="返回"></button><h1 id="campaign-title"></h1></header>
         <div id="campaign-battles" class="country-sidebar" aria-label="战役列表"></div>
         <div id="campaign-intro"><div id="campaign-commander"></div><p id="campaign-description"></p></div>
@@ -142,10 +145,12 @@
   <script src="story-player.js?v=20261027.1"></script>
   <script src="pause-objectives.js?v=20261026.2"></script>
   <script src="ai-control.js?v=20261027.3"></script>
+  <script src="diplomacy.js?v=20261028.1"></script>
   <script src="local-multiplayer.js?v=20261021.3"></script>
   <script src="unit-navigation.js?v=20261023.3"></script>
   <script src="screen-layout.js?v=20261024.1"></script>
   <script src="performance.js"></script>
+  <script src="turn-ui.js?v=20261028.1"></script>
   <script src="app.js?v=20261027.3"></script>
   <script src="mods.js?v=20261020.4"></script>
   <script src="save-export.js?v=20261027.1"></script>

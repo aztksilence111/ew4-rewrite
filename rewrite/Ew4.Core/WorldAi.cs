@@ -78,10 +78,14 @@ public static partial class WorldAi
     private static long ThreatStrength(WorldState state, UnitState unit, WorldAiRules rules)
     {
         var map = new HexMap(state.Width, state.Height);
-        var factions = PlanningScope.Queries(state)?.Factions ?? state.Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
+        var queries = PlanningScope.Queries(state);
+        var factions = queries?.Factions ?? state.Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
         var faction = factions[unit.Owner];
         long threat = 0;
-        foreach (var enemy in state.Units)
+        var nearby = queries != null && (long)rules.Strategy.ThreatRadius * rules.Strategy.ThreatRadius < state.Units.Count
+            ? map.Within(unit.Cell, rules.Strategy.ThreatRadius).SelectMany(cell => queries.Occupants.GetValueOrDefault(cell) ?? [])
+            : state.Units;
+        foreach (var enemy in nearby)
         {
             var owner = factions[enemy.Owner];
             if (!WorldDiplomacy.Hostile(state, faction.Id, owner.Id, rules.NeutralCamps) || owner.Defeated) continue;
@@ -130,9 +134,10 @@ public static partial class WorldAi
         long sourceValue = AiTactics.Location(Site(state, unit.Cell, rules), originalFacts, rules.Tactics);
         AiCandidate<AiMoveCommand>? move = null, combo = null;
         var range = WorldActions.MovementRange(state, unit, rules.Movement);
+        var occupied = PlanningScope.Queries(state)?.Occupants;
         foreach (int cellId in range.Keys.OrderBy(i => i))
         {
-            if (cellId == unit.Cell || state.Units.Any(u => u.Cell == cellId)) continue;
+            if (cellId == unit.Cell || (occupied != null ? occupied.ContainsKey(cellId) : state.Units.Any(u => u.Cell == cellId))) continue;
             var site = state.Cells[cellId];
             var owner = site.Owner == null ? null : state.Factions.Single(f => f.Id == site.Owner);
             var relation = owner?.Id == faction.Id ? AiTerritoryRelation.Owned : owner != null && WorldDiplomacy.Allied(state, owner.Id, faction.Id) ? AiTerritoryRelation.Allied

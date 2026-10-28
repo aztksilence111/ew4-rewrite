@@ -48,7 +48,7 @@
       target.style.backgroundSize=mode===1?'100% 100%':'cover';
     }
     drawStrategic(draw,definition,scale,centerX=205,centerY=128,textureScale=1){
-      const {image,ratio}=this.strategic,cx=Number(definition.centerx||410),cy=Number(definition.centery||288);
+      const {image,ratio}=this.strategic,cx=Number(definition.centerx??410),cy=Number(definition.centery??288);
       const sourceHeight=this.strategic.height||image.naturalHeight/ratio;
       const width=image.naturalWidth/ratio*textureScale,height=sourceHeight*textureScale;
       draw.drawImage(image,0,0,image.naturalWidth,sourceHeight*ratio,centerX-cx*scale,centerY-cy*scale,width*scale,height*scale);
