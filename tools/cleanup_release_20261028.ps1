@@ -2,7 +2,7 @@ param([switch]$Execute)
 $ErrorActionPreference = 'Stop'
 $releaseWorkspace = (Resolve-Path (Split-Path $PSScriptRoot -Parent)).Path
 $releaseBatch = 'build/release-0.2.25-20261028'
-$targets = @("$releaseBatch/testing", 'build/diplomacy-20261028')
+$targets = @("$releaseBatch/testing", 'build/diplomacy-20261028', 'build/startup-assets-20261026/checks')
 $cutoff = [datetime]'2026-10-28T21:45:00'
 foreach ($project in Get-ChildItem (Join-Path $releaseWorkspace 'rewrite') -Directory -Filter 'Ew4.*') {
     foreach ($output in 'bin','obj') { $targets += "rewrite/$($project.Name)/$output" }
