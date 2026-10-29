@@ -124,6 +124,38 @@ internal static class DefeatedFactionChecks
             Check(parsed.RootElement.GetProperty("ok").GetBoolean(), route + ": " + parsed.RootElement.GetRawText()[..Math.Min(200, parsed.RootElement.GetRawText().Length)]);
             return parsed.RootElement.GetProperty("data").Clone();
         }
+        // Ordinary conquest removes a different faction while the attacker keeps its turn.
+        foreach (bool lastCity in new[] { false, true })
+        {
+            var conqueror = target with { Id = "normal.attacker", Cell = attackCell, CommanderId = null };
+            var defender = attacker with { Id = "normal.defender", Cell = targetCell, CommanderId = null };
+            var normalWorld = clientWorld with { ActiveFaction = player,
+                Units = clientWorld.Units.Where(u => u.Id != attacker.Id && u.Id != target.Id).Append(conqueror)
+                    .Concat(lastCity ? [] : new[] { defender }).ToArray(),
+                Cells = clientWorld.Cells.Select((c, i) => i == attackCell ? c with { Owner = player }
+                    : i == targetCell ? c with { Owner = swiss, Objective = false,
+                        BuildingKind = lastCity ? "city" : null, BuildingLevel = lastCity ? 1 : 0 } : c).ToArray() };
+            var host = Host(lastCity ? "normal-last-city" : "normal-last-unit", normalWorld);
+            var view = Call(host, "load", new { slot = 1 });
+            view = Call(host, "action", new { op = lastCity ? "move" : "attack", unit = conqueror.Id,
+                target = defender.Id, cell = targetCell, revision = view.GetProperty("revision").GetInt64() });
+            Check(view.GetProperty("factions").EnumerateArray().Single(f => f.GetProperty("id").GetString() == swiss)
+                .GetProperty("defeated").GetBoolean(), "ordinary " + (lastCity ? "last city capture" : "last unit kill") + " eliminates faction");
+            Check(view.GetProperty("activeFaction").GetString() == player && view.GetProperty("phase").GetString() == "Active",
+                "ordinary elimination keeps conqueror active");
+            view = Call(host, "action", new { op = "end", revision = view.GetProperty("revision").GetInt64() });
+            int batches = 0;
+            while (view.GetProperty("activeFaction").GetString() != player && view.GetProperty("phase").GetString() != "Finished")
+            {
+                Check(view.GetProperty("activeFaction").GetString() != swiss, "ordinary turn rotation skips defeated country");
+                Check(++batches <= 256, "ordinary elimination AI round terminates");
+                var batch = Call(host, "action", new { op = "ai_batch", revision = view.GetProperty("revision").GetInt64() });
+                Check(batch.GetProperty("error").ValueKind == JsonValueKind.Null, "ordinary elimination batch has no error");
+                view = batch.GetProperty("state");
+            }
+            Check(batches > 0 && view.GetProperty("activeFaction").GetString() == player,
+                "ordinary elimination completes a full AI round and returns to player");
+        }
         byte[]? singleWorld = null;
         foreach (string op in new[] { "ai", "ai_batch" })
         {

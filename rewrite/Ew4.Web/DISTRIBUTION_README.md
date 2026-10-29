@@ -10,6 +10,8 @@ Windows 10/11 x64用户：完整解压ZIP到可写文件夹，双击 `Start-Web.
 
 也可以在包目录的PowerShell中手动运行 `./Ew4.Web.exe --urls http://127.0.0.1:5191`，然后用浏览器打开该地址。需要自定义存档位置时附加 `--save-root "D:\EW4-saves"`；同一存档目录不要同时启动多个实例。
 
+Android与电脑版均固定提供 **设定 → 存档备份 → 导出存档**，主菜单及对局暂停后的设定内都可使用。Android选择系统保存位置，电脑版由浏览器下载ZIP。反馈问题时提供该ZIP、游戏版本、复现步骤及报错截图；ZIP保留原版／Mod账户、存档槽及备份的原始内容，即使存档无法读取也可导出，并附版本、平台、当前Mod、前端源码标识和逐文件SHA-256。不会改写原档，不包含已安装Mod资源或启动缓存；Mod相关问题仍需另提供原Mod文件或来源。此ZIP用于备份与排错，当前没有ZIP一键导入入口。
+
 开放技能/特性/胜负规则见[API 1/2指南](docs/porting/RULE_EXTENSIONS.md)，包含外置Lua、召唤、传送、范围效果、持续状态、移动力、动态技能位置及BTL VICT。制作流程见[Mod修改指南](docs/porting/README.md)，包内附[六技能示例](examples/common-skills/README.md)。旧Android安装包需升级到包含此接口的版本才能执行扩展。
 
 | 目录/文件 | 用途 |

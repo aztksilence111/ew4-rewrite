@@ -26,7 +26,7 @@ const base=process.argv[2]||'http://127.0.0.1:5592',folder=path.resolve(process.
     check(await page.locator('#open-diplomacy').isVisible(),'conquest exposes entry');
     const entry=await page.locator('#open-diplomacy').boundingBox(),undo=await page.locator('#undo-move').boundingBox();
     check(Math.abs(entry.x-undo.x)<1&&entry.y+entry.height<=undo.y-4,'entry above undo and aligned left');
-    check(await page.locator('.diplomacy-entry-face').evaluate(el=>getComputedStyle(el).backgroundImage.includes('/diplomacy/button.png')&&el.firstElementChild.complete&&el.firstElementChild.naturalWidth>0),'gray handshake available before first opening');
+    check(await page.locator('.diplomacy-entry-face').evaluate(el=>getComputedStyle(el,'::before').backgroundImage.includes('/diplomacy/button.png')&&el.firstElementChild.complete&&el.firstElementChild.naturalWidth>0),'gray handshake available before first opening');
     await page.screenshot({path:path.join(folder,'entry.png')});
     await page.locator('#open-diplomacy').click();await page.waitForFunction(()=>diplomacyUi.snapshot&&!diplomacyUi.dialog.hasAttribute('aria-busy'));
     check(await page.locator('.diplomacy-row').count()===await page.evaluate(()=>state.factions.length-1),'every other faction in list');

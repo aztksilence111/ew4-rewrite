@@ -125,6 +125,8 @@ public sealed partial class MainActivity
             web.Settings.AllowContentAccess = false;
             web.Settings.MixedContentMode = MixedContentHandling.NeverAllow;
             web.Settings.SetSupportZoom(false);
+            web.Settings.BuiltInZoomControls = false;
+            web.Settings.DisplayZoomControls = false;
             bridge = new ImportBridge(this); web.AddJavascriptInterface(bridge, "Ew4ModImport");
             web.SetWebViewClient(new LocalClient(this, assetRead!, store!));
             web.SetWebChromeClient(new LocalChrome());

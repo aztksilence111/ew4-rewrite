@@ -1,4 +1,5 @@
 :root{font-family:var(--ew4-font-family);color:#fff;background:#242424;letter-spacing:0;--ui-scale:1;--battle-scale:1}
+html,body{touch-action:pan-x pan-y;overscroll-behavior:none}
 *{-webkit-tap-highlight-color:transparent}
 /* Scaled dialogs must center in the viewport, even when their unscaled height is larger. */
 .modal{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}

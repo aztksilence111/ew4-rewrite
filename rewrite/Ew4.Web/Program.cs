@@ -10,6 +10,13 @@ string data = Path.GetFullPath(builder.Configuration["data-root"] ?? (root == nu
 string saves = builder.Configuration["save-root"] ?? (root == null
     ? Path.Combine(AppContext.BaseDirectory, "saves") : Path.Combine(root, "rewrite/local/web"));
 string frontend = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
+string applicationVersion = builder.Configuration["application-version"] ?? "development";
+string releaseInfo = Path.Combine(AppContext.BaseDirectory, "release-info.json");
+if (builder.Configuration["application-version"] == null && File.Exists(releaseInfo))
+{
+    using var release = System.Text.Json.JsonDocument.Parse(File.ReadAllBytes(releaseInfo));
+    applicationVersion = release.RootElement.GetProperty("version").GetString() ?? applicationVersion;
+}
 string ResourcePath(string path) => path.StartsWith("frontend/", StringComparison.Ordinal)
     ? Path.Combine(frontend, path[9..]) : Path.Combine(data, path);
 byte[] Read(string path) => File.ReadAllBytes(ResourcePath(path));
@@ -112,6 +119,25 @@ app.MapPost("/api/mod-prepare", async (HttpRequest request) =>
     { return Results.Json(new { error = e.Message }, statusCode: 400); }
     finally { if (temp != null) File.Delete(temp); }
 }).DisableAntiforgery();
+app.MapPost("/api/save-export", (HttpResponse response) =>
+{
+    FileStream? output = null;
+    try
+    {
+        output = new FileStream(Path.Combine(Path.GetTempPath(), "ew4-save-export-" + Guid.NewGuid().ToString("N")),
+            FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None, 65536, FileOptions.DeleteOnClose);
+        var exported = store.ExportSaves(output, applicationVersion, "web");
+        output.Position = 0;
+        response.Headers["X-EW4-Save-Files"] = exported.Files.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        response.Headers["X-EW4-Save-Bytes"] = exported.Bytes.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        return Results.File(output, "application/zip", "ew4-saves-" + DateTimeOffset.UtcNow.ToString("yyyyMMdd-HHmmss") + ".zip");
+    }
+    catch (Exception error) when (error is IOException or UnauthorizedAccessException or InvalidOperationException or ArgumentException)
+    {
+        output?.Dispose();
+        return Results.Json(new { error = "存档导出失败：" + error.Message }, statusCode: 400);
+    }
+});
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.MapMethods("/api/{route}", ["GET", "POST"], async (HttpRequest request) =>

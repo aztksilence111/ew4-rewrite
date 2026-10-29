@@ -8,7 +8,7 @@ public sealed record SaveExportResult(int Files, long Bytes);
 
 public sealed partial class ModStore
 {
-    public SaveExportResult ExportSaves(Stream output, string applicationVersion)
+    public SaveExportResult ExportSaves(Stream output, string applicationVersion, string platform = "unknown")
     {
         // Use the same lock as game actions so autosaves cannot change halfway through the archive.
         lock (gate)
@@ -23,7 +23,12 @@ public sealed partial class ModStore
             {
                 foreach (string file in files)
                 {
-                    if (!file.EndsWith(".json", StringComparison.OrdinalIgnoreCase) && !file.EndsWith(".json.bak", StringComparison.OrdinalIgnoreCase)) continue;
+                    string leaf = Path.GetFileName(file);
+                    if (leaf.EndsWith(".bak", StringComparison.OrdinalIgnoreCase)) leaf = leaf[..^4];
+                    if (leaf is not ("account.json" or "session.json") && !(leaf.Length == 11 && leaf.StartsWith("slot-", StringComparison.Ordinal)
+                        && leaf[5] is >= '0' and <= '6' && leaf.EndsWith(".json", StringComparison.Ordinal))) continue;
+                    if (file.StartsWith(root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
+                        || file.StartsWith(Path.Combine(saves, "startup-assets") + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) continue;
                     string name = "saves/" + Path.GetRelativePath(saves, file).Replace('\\', '/');
                     using var input = File.OpenRead(file);
                     using var target = archive.CreateEntry(name, CompressionLevel.Fastest).Open();
@@ -37,9 +42,19 @@ public sealed partial class ModStore
             finally { System.Buffers.ArrayPool<byte>.Shared.Return(buffer); }
             using (var info = archive.CreateEntry("export-info.json").Open())
                 JsonSerializer.Serialize(info, new { format = "ew4-save-export", version = 1, applicationVersion, createdAt = DateTimeOffset.UtcNow,
-                    baseRevision = baseline.Revision, saveNamespace = baseline.SaveNamespace,
+                    platform, frontendSource = ExportFrontendSource(), baseRevision = baseline.Revision, saveNamespace = baseline.SaveNamespace,
                     activeMod = activeManifest == null ? null : new { activeManifest.Id, activeManifest.Version, activeManifest.LogicRevision }, files = records }, ModFiles.Json);
             return new(records.Count, total);
         }
+    }
+
+    private string? ExportFrontendSource()
+    {
+        try
+        {
+            using var info = JsonDocument.Parse(baseline.Read("frontend/build-info.json"));
+            return info.RootElement.TryGetProperty("source", out var source) ? source.GetString() : null;
+        }
+        catch (Exception error) when (Recoverable(error)) { return null; }
     }
 }

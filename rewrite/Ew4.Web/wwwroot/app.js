@@ -43,15 +43,15 @@ const battleDialogues = [];
 const presentationWaiters = new Set();
 const motions = new Map(), facings = new Map(), arrivals = new Map(), combatMotions = new Map();
 const deaths = new Map();
-let renderRequest=0,renderDirty=true,lastRenderTime=-Infinity,appVisible=true,cameraInputUntil=0;
+let renderRequest=0,renderDirty=true,lastRenderTime=-Infinity,appVisible=true,cameraInputUntil=0,battlefieldNeedsFrame=true;
 function requestRender(){
   renderDirty=true;
   if(document.hidden||!appVisible)return;
   if(!renderRequest)renderRequest=requestAnimationFrame(render);
 }
 function suspendRendering(){cancelAnimationFrame(renderRequest);renderRequest=0;}
-window.ew4SetAppVisible=visible=>{appVisible=visible;music?.setVisible(visible);storyPlayer.setVisible(visible);if(visible)requestRender();else suspendRendering();};
-document.addEventListener('visibilitychange',()=>{if(document.hidden)suspendRendering();else requestRender();});
+window.ew4SetAppVisible=visible=>{appVisible=visible;music?.setVisible(visible);storyPlayer.setVisible(visible);if(visible){battlefieldNeedsFrame=true;requestRender();}else suspendRendering();};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)suspendRendering();else{battlefieldNeedsFrame=true;requestRender();}});
 new MutationObserver(requestRender).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden']});
 for(const event of ['pointerdown','pointermove','pointerup','wheel','input','change','click'])document.addEventListener(event,requestRender,{passive:true});
 const mapViews=new Ew4MapViews.Controls($('map-view-controls'),requestRender);
@@ -1288,10 +1288,10 @@ function render(time,forceBattlefield=false) {
   if(!playVisible||fastSkipping())return;
   const w=canvas.clientWidth,h=canvas.clientHeight;
   const dpr=settings.hd?Math.max(1,Math.min(window.devicePixelRatio||1,3,Math.sqrt(6*1024*1024/Math.max(1,w*h)))):1;
-  // Covered battlefields still need a fresh frame when their backing surface changes size.
+  // Covered battlefields still need a fresh frame after resize or surface restoration.
   const resized=canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)||viewport.w!==w||viewport.h!==h||viewport.dpr!==dpr;
-  if(covered&&!stageIntroOpen&&!resized&&!forceBattlefield)return;
-  if(!ctx){try{ctx=Ew4Pixi.createContext(canvas,()=>{battlefield.invalidateGround();requestRender();});if(canvas!==ctx.canvas){canvas=ctx.canvas;bindMapInput();}}catch(error){notice('绘图初始化失败：'+error.message);suspendRendering();return;}}
+  if(covered&&!stageIntroOpen&&!resized&&!forceBattlefield&&!battlefieldNeedsFrame)return;
+  if(!ctx){try{ctx=Ew4Pixi.createContext(canvas,()=>{battlefield.invalidateGround();battlefieldNeedsFrame=true;requestRender();});if(canvas!==ctx.canvas){canvas=ctx.canvas;bindMapInput();}}catch(error){notice('绘图初始化失败：'+error.message);suspendRendering();return;}}
   if(!ctx.begin(Math.round(w*dpr),Math.round(h*dpr)))return;
   viewport={w,h,dpr};updateAiCamera(time);clampView();ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#688e91';ctx.fillRect(0,0,w,h);
   ctx.translate(w/2,h/2);ctx.scale(view.zoom,view.zoom);ctx.translate(-view.x,-view.y);
@@ -1302,6 +1302,7 @@ function render(time,forceBattlefield=false) {
   effects?.frame(ctx,time,'foreground',battlefield.visibleRect);
   damageNumbers?.frame(ctx,time,battlefield.visibleRect);
   ctx.end();
+  battlefieldNeedsFrame=false;
   if(!animated&&battlefield.animated)requestRender();
 }
 async function tutorialUi(id,row=-1){if(id)await tutorial?.notify({type:'ui',id,row});}

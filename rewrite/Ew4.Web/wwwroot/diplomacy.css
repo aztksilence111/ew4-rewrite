@@ -1,5 +1,6 @@
 .diplomacy-entry{position:absolute;z-index:3;display:flex;align-items:flex-end;justify-content:flex-start;padding:0;background:none;border:0;transform:none;box-sizing:border-box}
-.diplomacy-entry-face{display:flex;align-items:center;justify-content:center;background-position:center;background-size:100% 100%;box-sizing:border-box;padding:4px;pointer-events:none}
+.diplomacy-entry-face{position:relative;display:flex;flex:none;align-items:center;justify-content:center;overflow:hidden;isolation:isolate;box-sizing:border-box;padding:4px;pointer-events:none}
+.diplomacy-entry-face::before{content:"";position:absolute;left:-1.851852%;top:-37.037037%;width:135.185185%;height:137.037037%;background:var(--diplomacy-entry-background) center/100% 100% no-repeat;z-index:-1}
 .diplomacy-entry-face>img{display:block;width:100%;height:100%;object-fit:contain}.diplomacy-entry[hidden],.diplomacy-modal[hidden],.diplomacy-list[hidden],.diplomacy-confirm[hidden],.diplomacy-result[hidden],.diplomacy-resources[hidden]{display:none!important}
 .diplomacy-entry:disabled{opacity:.45}.diplomacy-modal{z-index:14}
 .diplomacy-modal>.diplomacy-dialog{display:flex;flex-direction:column;transform:none;max-width:calc(100% - 16px);overflow:hidden;background:var(--diplomacy-row-color,#d5d5cf);color:var(--diplomacy-text-color,#41413e);border:1px solid var(--diplomacy-border-color,#999b94);border-image:none;box-shadow:none;font:var(--diplomacy-font-size,14px)/1.25 var(--ew4-font-family);letter-spacing:0;box-sizing:border-box}

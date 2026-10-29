@@ -279,7 +279,7 @@ public sealed partial class MainActivity : Activity
             {
                 SaveExportResult exported;
                 using (var output = ContentResolver!.OpenOutputStream(uri, "wt") ?? throw new IOException("无法写入文件"))
-                    exported = store!.Value.ExportSaves(output, version);
+                    exported = store!.Value.ExportSaves(output, version, "android");
                 SaveExportFinished(true, "已导出 " + exported.Files + " 个存档及备份文件");
             }
             catch (Exception error)

@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; media-src 'self' blob:; script-src 'self'; style-src 'self'; connect-src 'self'">
   <title>欧陆战争4</title>
   <link rel="stylesheet" href="style.css?v=20261027.3">
@@ -91,6 +91,7 @@
   <div id="settings" class="modal" hidden><div class="dialog settings-dialog">
     <header class="menu-bar"><button id="close-settings" class="close-icon" aria-label="关闭" title="关闭"></button><h2 data-label="settings_label">设定</h2></header>
     <div id="settings-content" tabindex="0" role="region" aria-label="设定选项">
+      <div id="save-export-row" class="setting-row"><span>存档备份</span><button id="save-export" class="native-command blue" type="button">导出存档</button></div>
       <div class="settings-audio">
         <label class="volume music"><span data-label="name_music">音乐</span><input id="music-volume" type="range" min="0" max="100" aria-label="音乐音量"></label>
         <label class="volume sound"><span data-label="name_sound">音效</span><input id="sound-volume" type="range" min="0" max="100" aria-label="音效音量"></label>
@@ -103,7 +104,6 @@
       <label class="setting-row"><span>过回合跟随行动部队</span><input id="follow-ai" type="checkbox" aria-label="过回合跟随行动部队"></label>
       <label class="setting-row screen"><span data-label="name_screen_extra">屏幕尺寸</span><input id="screen-size" type="range" min="80" max="100" value="100" aria-label="屏幕尺寸"></label>
       <label class="setting-row event-size"><span>事件弹窗大小</span><output id="event-size-value" for="event-size">100%</output><input id="event-size" type="range" min="60" max="180" step="1" value="100" aria-label="事件弹窗大小"></label>
-      <div id="save-export-row" class="setting-row" hidden><span>存档备份</span><button id="save-export" class="native-command blue" type="button">导出存档</button></div>
     </div>
     <div class="settings-footer"><button id="confirm-settings" class="confirm-corner" aria-label="确认设定" title="确认"></button></div>
   </div></div>
@@ -151,7 +151,7 @@
   <script src="screen-layout.js?v=20261024.1"></script>
   <script src="performance.js"></script>
   <script src="turn-ui.js?v=20261028.1"></script>
-  <script src="app.js?v=20261027.3"></script>
+  <script src="app.js?v=20261029.1"></script>
   <script src="mods.js?v=20261020.4"></script>
   <script src="save-export.js?v=20261027.1"></script>
 </body>

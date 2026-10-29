@@ -59,7 +59,7 @@
       style.setProperty('--diplomacy-action-hit',Math.max(44,p.buttonSize)+'px');
       for(const key of ['backgroundImage','titleImage','closeImage','patternImage','warBackground','demandBackground'])style.setProperty('--diplomacy-'+key.replace(/[A-Z]/g,m=>'-'+m.toLowerCase()),'url("'+this.path(p[key])+'")');
       style.backgroundImage=p.backgroundImage==='client/ui/image_ui_hd/form_back.png'?'none':'url("'+this.path(p.backgroundImage)+'")';style.backgroundSize='100% 100%';
-      this.dialog.dataset.originalFont=p.font;this.entryFace.style.backgroundImage='url("'+this.path(p.entryBackground)+'")';this.entryFace.firstElementChild.src=this.path(p.entryIcon);this.entry.title=this.entry.ariaLabel=p.title;
+      this.dialog.dataset.originalFont=p.font;this.entryFace.style.setProperty('--diplomacy-entry-background','url("'+this.path(p.entryBackground)+'")');this.entryFace.firstElementChild.src=this.path(p.entryIcon);this.entry.title=this.entry.ariaLabel=p.title;
       this.title.textContent=p.title;this.cancel.textContent=p.cancelText;this.submit.textContent=p.confirmText;
     }
     identity(f){const el=node('div','diplomacy-identity'),flag=this.icon(this.api.flag(f)),name=node('span','diplomacy-name',f.name);flag.alt=f.name;el.append(flag,name);return el;}
@@ -126,9 +126,10 @@
       finally{this.submitting=false;this.submit.disabled=this.cancel.disabled=this.closeButton.disabled=false;if(this.snapshot&&this.opened)this.render();}
     }
     fit(){
-      const p=this.presentation,rootStyle=getComputedStyle(document.documentElement),scale=Number(rootStyle.getPropertyValue('--battle-compact-scale'))||1;
+      const p=this.presentation,rootStyle=getComputedStyle(document.documentElement),scale=Number(rootStyle.getPropertyValue('--battle-scale'))||1;
       const anchor=['undo-move','skip-ai'].map(id=>document.getElementById(id)).find(el=>!el.hidden),rect=anchor?.getBoundingClientRect();
-      const size=Math.min(64,(p?.entrySize||27)*scale),hit=Math.max(44,size),left=rect?.left??(parseFloat(rootStyle.getPropertyValue('--screen-corner-inset'))||2);
+      // Match the cropped undo face; compact HUD controls use a different scale.
+      const size=(rect?.width||20*scale)*(p?.entrySize||27)/27,hit=Math.max(44,size),left=rect?.left??(parseFloat(rootStyle.getPropertyValue('--screen-corner-inset'))||2);
       this.entry.style.width=this.entry.style.height=hit+'px';this.entryFace.style.width=this.entryFace.style.height=size+'px';this.entry.style.left=left+'px';
       this.entry.style.bottom=(rect?innerHeight-rect.top+Math.max(4,(p?.entryGap||8)-(hit-size)/2):size+12)+'px';
       if(!this.opened||!p)return;
