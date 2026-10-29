@@ -3,7 +3,7 @@
 规则配置现已拆为独立 JSON：[文件与修改指南](rewrite/mod-kit/docs/porting/SPLIT_CATALOG.md)。
 源码数据位于 `rewrite/data/legacy/`，覆盖包使用 `legacy/` 路径；旧 APK/XML 导入继续兼容。
 
-2026-10-26：[0.2.21双端正式下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.21-20261026)，包含玩家AI设定及多目标、部队容量、战役科技、东亚调整和教程回调修复；Windows x64 Web 与 Android ARM64 APK code24，规则 API 3，远端四附件摘要核验通过。[发行说明](rewrite/RELEASE_0.2.21_20261026.md)、[发布记录](rewrite/RELEASE_PROGRESS_0.2.21_20261026.md)。
+2026-10-29：[0.2.26双端正式下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.26-20261029)，包含双端固定存档导出、手机页面手势／外交按钮修正及显卡恢复后的地图补绘；Windows x64 Web 与 Android ARM64 APK code29，规则 API 3，远端四附件摘要核验通过。[发行说明](rewrite/RELEASE_0.2.26_20261029.md)、[发布记录](rewrite/RELEASE_PROGRESS_0.2.26_20261029.md)。
 
 本仓库保存 rewrite 游戏源码、运行资源、地图制作配置和 Mod 制作指南。
 名称约定：**r版**就是 **rewrite版**的简称，后续不再另行注明。
@@ -15,7 +15,7 @@ Mod 制作资料见 [rewrite/mod-kit/README.md](rewrite/mod-kit/README.md)。
 
 ## 当前快照
 
-当前发行 0.2.21（APK code24），内容与验证见[发行说明](rewrite/RELEASE_0.2.21_20261026.md)及[发布进度](rewrite/RELEASE_PROGRESS_0.2.21_20261026.md)，下载见[GitHub Releases](https://github.com/aztksilence111/ew4-rewrite/releases/latest)。远端完成依据为本次构建目录的 `remote-audit.json`；以下未打包记录为开发历史，真机验收仍待。
+当前发行 0.2.26（APK code29），内容与验证见[发行说明](rewrite/RELEASE_0.2.26_20261029.md)及[发布进度](rewrite/RELEASE_PROGRESS_0.2.26_20261029.md)，下载见[GitHub Releases](https://github.com/aztksilence111/ew4-rewrite/releases/latest)。远端完成依据为本次构建目录的 `remote-audit.json`；以下未打包记录为开发历史，真机验收仍待。
 
 2026-10-22：[四项反馈修复](reverse/FEEDBACK_UNDO_FIX_20261022.md)已修存档国旗、空地撤回入口、保存拆行和说明将领块，新增占城事件/红黄圈不能撤回条件；93新增专项、108配置、20+172浏览器及Web/Android Compile通过。[5395独立预览](http://127.0.0.1:5395)，未打新APK或发布。[当前待办](rewrite/GOALS.md)同步，士气演出、随机掉落、OTF及长期目标另列，真机验收保留。
 
