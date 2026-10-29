@@ -92,8 +92,12 @@ const base=process.env.EW4_TEST_URL||'http://127.0.0.1:5227',baseline=path.resol
         await page.goto(base);await page.waitForFunction(()=>document.querySelector('#startup-message').textContent.includes('载入超时'));
         check((await page.locator('#startup-message').innerText()).includes('游戏目录与资源索引'),'timeout identifies stalled startup phase');
         check(await page.locator('#startup-retry').isVisible(),'pending startup provides reload');
-        await page.screenshot({path:folder+'/timeout.png'});release();await ready(page);
-        check(await page.locator('#startup-status').isHidden(),'late success clears timeout diagnostic');
+        await page.screenshot({path:folder+'/timeout.png'});release();
+        await page.waitForTimeout(1200);
+        check(await page.locator('#startup-status').isVisible(),'late resources preserve timeout diagnostic until retry');
+        check(await page.evaluate(()=>!startupReady),'timed out startup does not enable a partial menu');
+        await page.locator('#startup-retry').click();await ready(page);
+        check(await page.locator('#startup-status').isHidden(),'retry recovers a timed out startup');
       }finally{release();}
     });
   }catch(error){report.errors.push(error.message);throw error;}

@@ -14,13 +14,15 @@ internal sealed class PlanningScope : IDisposable
     private readonly HashSet<object>? validated;
     private readonly ConditionalWeakTable<WorldState, PlanningQueries>? queries;
     private readonly HashSet<object>? projections;
-    private PlanningScope(bool enabled)
+    private readonly bool snapshots;
+    private PlanningScope(bool enabled, bool snapshots = false)
     {
         previous = current;
         validated = enabled && (previous == null || previous.validated != null)
             ? previous?.validated ?? new(IdentityComparer.Instance) : null;
         queries = validated == null ? null : previous?.queries ?? new();
         projections = validated == null ? null : previous?.projections ?? new(IdentityComparer.Instance);
+        this.snapshots = validated != null && (snapshots || previous?.snapshots == true);
         // A disabled subtree may invoke caller code that mutates shared input.
         // Invalidate ancestor proofs before entry, including exceptional exits.
         if (validated == null)
@@ -32,24 +34,41 @@ internal sealed class PlanningScope : IDisposable
         || extensions.Scripts == null && extensions.Skills.Count == 0 && extensions.Statuses.Count == 0;
     internal static bool CanTrust(WorldMoveRules rules) => CanTrust(rules.Extensions) && rules.Victory.Scripts == null;
     internal static PlanningScope Begin(WorldAiRules rules) => new(CanTrust(rules.Movement));
+    internal static PlanningScope Suspend() => new(false);
     internal static PlanningQueries? Queries(WorldState state) => current?.validated?.Contains(state) == true
         ? current.queries?.GetValue(state, value => new(value)) : null;
     internal static bool IsMovementProjection(WorldState state) => current?.projections?.Contains(state) == true;
+    internal static bool FrozenSnapshots => current?.snapshots == true;
+    internal static bool IsValidated(object value) => current?.validated?.Contains(value) == true;
+    internal static T PreserveCopy<T>(T source, T copy) where T : class
+    {
+        if (IsValidated(source)) current!.validated!.Add(copy);
+        return copy;
+    }
     internal static PlanningScope Begin(WorldAiRules ai, WorldProductionRules production, WorldTurnRules turns,
-        WorldBattleRules? battle = null) => new(CanTrust(ai.Movement) && CanTrust(production.Commanders?.Extensions)
+        WorldBattleRules? battle = null, bool snapshots = false) => new(CanTrustStep(ai, production, turns, battle), snapshots);
+    internal static bool CanTrustStep(WorldAiRules ai, WorldProductionRules production, WorldTurnRules turns,
+        WorldBattleRules? battle = null) => CanTrust(ai.Movement) && CanTrust(production.Commanders?.Extensions)
             && CanTrust(turns.Extensions) && turns.Victory.Scripts == null
-            && (battle == null || CanTrust(battle.Combat.Extensions) && battle.Victory.Scripts == null));
+            && (battle == null || CanTrust(battle.Combat.Extensions) && battle.Victory.Scripts == null);
 
     internal static WorldState WithAiRandomState(WorldState state, ulong randomState)
     {
+        if (state.AiRandomState == randomState) return state;
         var next = state with { AiRandomState = randomState };
         // No validated constraint depends on this unrestricted ulong. All other
         // fields are inherited here, rather than supplied by a caller.
-        if (current?.validated?.Contains(state) == true) current.validated.Add(next);
+        if (current?.validated?.Contains(state) == true)
+        {
+            current.validated.Add(next);
+            // Spatial and scoring queries contain no RNG or command state.
+            if (current.queries!.TryGetValue(state, out var queries)) current.queries.Add(next, queries);
+        }
         return next;
     }
     internal static WorldState WithRevision(WorldState state, long revision)
     {
+        if (revision == state.Revision) return state;
         var next = state with { Revision = revision };
         if (revision >= 0 && current?.validated?.Contains(state) == true) current.validated.Add(next);
         if (revision >= 0 && IsMovementProjection(state)) current!.projections!.Add(next);

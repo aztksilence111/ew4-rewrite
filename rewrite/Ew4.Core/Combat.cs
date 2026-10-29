@@ -181,12 +181,19 @@ public static class Ew4Combat
     private static int MoraleModifier(int morale, int rolls) =>
         rolls * (morale == 1 ? 1 : morale == -1 ? -1 : morale < -1 ? -2 : 0);
 
-    private static int Rolls(Combatant unit, int count, bool maximumRoll, Ew4Random random, LegacySkillParameters skills)
+    public static (int Minimum, int Maximum) AttackBounds(Combatant unit, LegacySkillParameters? skillParameters = null)
     {
+        var skills = skillParameters ?? LegacySkillParameters.Default;
         int? lowerSkill = unit.Profile.Category switch { "infantry" => 13, "cavalry" => 11, "artillery" => 7, _ => null };
         int? upperSkill = unit.Profile.Category switch { "infantry" => 12, "cavalry" => 10, "artillery" => 8, _ => null };
         int min = checked(unit.Profile.MinimumAttack + (lowerSkill.HasValue && unit.Has(Skill(lowerSkill.Value)) ? skills.Bonus(lowerSkill.Value) : 0));
         int max = checked(unit.Profile.MaximumAttack + (upperSkill.HasValue && unit.Has(Skill(upperSkill.Value)) ? skills.Bonus(upperSkill.Value) : 0));
+        return (min, Math.Max(min, max));
+    }
+
+    private static int Rolls(Combatant unit, int count, bool maximumRoll, Ew4Random random, LegacySkillParameters skills)
+    {
+        var (min, max) = AttackBounds(unit, skills);
         int total = 0;
         for (int i = 0; i < count; i++)
             total = checked(total + (max <= min ? min : maximumRoll ? max : Math.Max(random.Next(checked(max + 1)), min)));

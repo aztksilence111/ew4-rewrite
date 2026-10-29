@@ -33,7 +33,8 @@ public sealed record GameSession
     public IReadOnlyList<SessionMarket> Markets { get; init; } = Array.Empty<SessionMarket>();
     public IReadOnlyList<TavernCandidate> TavernCandidates { get; init; } = Array.Empty<TavernCandidate>();
     public IReadOnlyList<RosterDeploymentState> RosterDeployments { get; init; } = Array.Empty<RosterDeploymentState>();
-    public void Validate()
+    public void Validate() => PlanningScope.Validate(this, ValidateCore);
+    private void ValidateCore()
     {
         World.Validate(); Account.Validate();
         if (CollectedMedals < 0 || BattleResult != null && (BattleResult.Id != BattleId

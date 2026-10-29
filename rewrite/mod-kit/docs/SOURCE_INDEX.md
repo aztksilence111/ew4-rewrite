@@ -84,6 +84,7 @@ API 2通用操作在`Ew4.Core/SkillWorldEffects.cs`：RegisterUnitTemplates、Va
 | `rewrite/Ew4.Client/ClientGame.cs` | Dispatch/Load及状态/行动分发 | 客户端宿主和保存恢复入口 |
 | `rewrite/Ew4.Client/ClientSaves.cs` | SavePath/ReadSlot/Saves/AutoSave | 七槽路径、模式分区、自动档 |
 | `rewrite/Ew4.Client/ClientHeadquarters.cs` | Profile属性及账户流程 | account.json及指挥部操作 |
+| `rewrite/Ew4.Legacy/HeadquartersPresentation.cs`、`rewrite/Ew4.Web/wwwroot/headquarters-presentation.js` | 指挥部完整布局校验/渲染与命令绑定 | API 3 headquartersPresentation，支持增删按钮、自定义子页及布局 |
 
 ## 前端显示
 

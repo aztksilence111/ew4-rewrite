@@ -18,10 +18,12 @@
   <link rel="stylesheet" href="map-views.css?v=20261027.1">
   <link rel="stylesheet" href="ai-control.css?v=20261027.3">
   <link rel="stylesheet" href="headquarters-ui.css?v=20261025.1">
+  <link rel="stylesheet" href="headquarters-presentation.css?v=20261029.1">
   <link rel="stylesheet" href="pause-objectives.css?v=20261027.1">
   <link rel="stylesheet" href="runtime-compat.css?v=20261024.1">
   <link rel="stylesheet" href="story-player.css?v=20261027.1">
   <link rel="stylesheet" href="diplomacy.css?v=20261028.1">
+  <link rel="stylesheet" href="startup.css?v=20261029.1">
 </head>
 <body>
   <section id="menu">
@@ -118,8 +120,9 @@
     <h2 id="mod-delete-title">删除 Mod</h2><p id="mod-delete-description"></p>
     <div class="mod-confirm-actions"><button id="mod-delete-cancel" class="native-command blue" autofocus>取消</button><button id="mod-delete-submit" class="native-command red">删除</button></div>
   </dialog>
-  <div id="startup-status" role="status" aria-live="polite"><span id="startup-message">正在载入…</span><button id="startup-retry" type="button" title="重试载入" aria-label="重试载入" hidden>&#8635;</button></div>
-  <div id="loading-screen" role="status" aria-label="载入" hidden><div class="loading-stage"><img src="content/ui/title.png" alt="欧陆战争4 拿破仑"><div id="loading-tip"></div><div id="loading-word"></div></div></div>
+  <div id="startup-splash" role="status" aria-label="正在载入"><img src="startup-loading.png" alt="欧陆战争4 · Rewrite 版 · 不用于商用"></div>
+  <div id="startup-status" role="status" aria-live="polite" hidden><span id="startup-message"></span><button id="startup-retry" type="button" title="重试载入" aria-label="重试载入" hidden>&#8635;</button></div>
+  <div id="loading-screen" role="status" aria-label="载入" hidden><div class="loading-stage"><img src="content/ui/title.png" alt="欧陆战争4 拿破仑"><div id="loading-tip"></div><span class="loading-watermark">Rewrite 版 · 不用于商用</span><div id="loading-word"></div></div></div>
   <div id="tutorial-focus" hidden aria-hidden="true"></div>
   <script src="startup.js?v=20261021.1"></script>
   <script src="runtime-compat.js?v=20261023.1"></script>
@@ -137,8 +140,10 @@
   <script src="menus.js?v=20261027.1"></script>
   <script src="campaign-technology.js?v=20261026.1"></script>
   <script src="music.js?v=20261027.1"></script>
+  <script src="ui-audio.js?v=20261029.1"></script>
   <script src="commander-workflows.js?v=20261023.1"></script>
   <script src="headquarters-ui.js?v=20261025.1"></script>
+  <script src="headquarters-presentation.js?v=20261029.1"></script>
   <script src="tutorial.js"></script>
   <script src="skill-ui.js?v=20261020.3"></script>
   <script src="victory-ui.js?v=20261021.4"></script>

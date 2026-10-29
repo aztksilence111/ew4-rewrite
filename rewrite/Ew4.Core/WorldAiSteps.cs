@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace Ew4.Core;
 
@@ -16,17 +17,59 @@ public static partial class WorldAi
     public static AiStepPlan PlanStep(WorldState state, WorldAiRules ai, WorldProductionRules production, WorldTurnRules turns)
     {
         using var planning = PlanningScope.Begin(ai, production, turns);
-        WorldActions.Ready(state, state.Revision);
-        ai.Validate();
-        if (WorldDiplomacy.Dormant(state, state.ActiveFaction, ai.NeutralCamps))
-            return new(new(state.Revision, state.AiRandomState, state.AiRandomState, null, null), null);
-        var attempt = PlanProduction(state, ai, production, turns);
-        if (attempt.Command != null) return new(attempt, null);
-        // Failed production consumed private draws; subsequent planning starts from that state.
-        var projected = PlanningScope.WithAiRandomState(state, attempt.FinalRandomState);
-        var commander = production.Commanders == null ? null : PlanCommander(projected, production.Commanders, production.CommanderScoring);
-        if (commander != null) return new(attempt, null, commander);
-        return new(attempt, PlanNextUnit(projected, ai));
+        var work = new StepWork(state, ai, production, turns);
+        while (!work.Advance()) { }
+        return work.Result!;
+    }
+
+    internal sealed class StepWork(WorldState state, WorldAiRules ai, WorldProductionRules production, WorldTurnRules turns)
+    {
+        private int stage;
+        private AiProductionPlan? attempt;
+        private WorldState? projected;
+        private UnitState[]? units;
+        private int unitIndex;
+        private UnitWork? unitWork;
+        internal AiStepPlan? Result { get; private set; }
+        internal bool Matches(WorldState world, WorldAiRules nextAi, WorldProductionRules nextProduction, WorldTurnRules nextTurns) =>
+            ReferenceEquals(state, world) && ReferenceEquals(ai, nextAi) && ReferenceEquals(production, nextProduction) && ReferenceEquals(turns, nextTurns);
+        internal bool Advance()
+        {
+            if (Result != null) return true;
+            WorldActions.Ready(state, state.Revision);
+            ai.Validate();
+            if (stage == 0)
+            {
+                if (WorldDiplomacy.Dormant(state, state.ActiveFaction, ai.NeutralCamps))
+                { Result = new(new(state.Revision, state.AiRandomState, state.AiRandomState, null, null), null); return true; }
+                attempt = PlanProduction(state, ai, production, turns);
+                if (attempt.Command != null) { Result = new(attempt, null); return true; }
+                // Failed production consumed private draws; subsequent planning starts from that state.
+                projected = PlanningScope.WithAiRandomState(state, attempt.FinalRandomState);
+                stage = 1; return false;
+            }
+            if (stage == 1)
+            {
+                var commander = production.Commanders == null ? null : PlanCommander(projected!, production.Commanders, production.CommanderScoring);
+                if (commander != null) { Result = new(attempt!, null, commander); return true; }
+                units = state.Units.Where(u => u.Owner == state.ActiveFaction).OrderBy(u => u.Cell).ThenBy(u => u.Id, StringComparer.Ordinal).ToArray();
+                stage = 2; return false;
+            }
+            if (unitWork == null)
+            {
+                while (unitIndex < units!.Length)
+                {
+                    var unit = units[unitIndex++];
+                    if (ai.Behaviors.TryGetValue(unit.Behavior, out var behavior)
+                        && !AiPlanning.Requests(behavior, new(unit.RemainingMovement, unit.Morale.Effective, unit.Combatant.ConstructionTurns, unit.Acted)).Eligible) continue;
+                    unitWork = new UnitWork(projected!, unit.Id, ai); break;
+                }
+                if (unitWork == null) { Result = new(attempt!, null); return true; }
+            }
+            if (!unitWork.Advance()) return false;
+            if (unitWork.Result!.Candidates.Count > 0) { Result = new(attempt!, unitWork.Result); return true; }
+            unitWork = null; return false;
+        }
     }
 
     public static WorldChange ExecuteStep(WorldState state, AiStepPlan plan, WorldAiRules ai, WorldProductionRules production,

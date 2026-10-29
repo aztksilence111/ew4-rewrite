@@ -1,6 +1,6 @@
 # 现代核心重构
 
-2026-10-29：[0.2.26双端正式下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.26-20261029)已同版本替换，维持Android code29；新增商店／兑换页驻城将领头像，保留固定双端存档导出、手机手势／外交按钮及显卡恢复补绘。当前包源码／标签12408b0、四附件远端摘要通过，已下载当日旧包者需重新下载；详见[发布记录](RELEASE_PROGRESS_0.2.26_20261029.md)。下方旧版本为历史记录，未做本轮Android真机验收。
+2026-10-29：[0.2.27双端下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.27-20261029)，Android code30／规则 API3；含 AI 分段规划、指挥部 Mod 布局、启动画面、界面音效、回合名单与 HUD、攻击区间及炮兵操作解锁，保留双端固定存档导出。详见[发行说明](RELEASE_0.2.27_20261029.md)及[发布记录](RELEASE_PROGRESS_0.2.27_20261029.md)。下方旧版本为历史记录，未做本轮 Android 真机验收。
 
 2026-10-26：[0.2.21双端正式下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.21-20261026)，Windows x64 Web 与 Android ARM64 APK code24 包含玩家AI多目标、部队容量、战役科技、东亚调整、启动缓存重建和教程回调修复；远端四附件核验通过，见[发行说明](RELEASE_0.2.21_20261026.md)与[发布记录](RELEASE_PROGRESS_0.2.21_20261026.md)。下方记录为历史阶段，真机验收仍待。
 

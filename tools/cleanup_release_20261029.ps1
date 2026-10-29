@@ -1,18 +1,24 @@
-param([switch]$Execute)
+param([switch]$Execute, [string]$ReleaseBatch = 'build/release-0.2.26-20261029')
 $ErrorActionPreference = 'Stop'
 $releaseWorkspace = (Resolve-Path (Split-Path $PSScriptRoot -Parent)).Path
-$releaseBatch = 'build/release-0.2.26-20261029'
+$releaseBatch = $ReleaseBatch
 $manifest = Get-Content (Join-Path $releaseWorkspace "$releaseBatch/assets/release-manifest.json") -Raw | ConvertFrom-Json
 $cutoff = [DateTimeOffset]::Parse((git -C $releaseWorkspace show -s --format=%cI $manifest.source)).LocalDateTime
-$targets = @("$releaseBatch/testing", 'build/honor-startup-20261028')
+$batchCreated = (Get-Item -LiteralPath (Join-Path $releaseWorkspace $releaseBatch)).CreationTime
+if ($batchCreated -lt $cutoff) { $cutoff = $batchCreated }
+$targets = @("$releaseBatch/testing", "$releaseBatch/android", 'build/honor-startup-20261028')
 foreach ($project in Get-ChildItem (Join-Path $releaseWorkspace 'rewrite') -Directory -Filter 'Ew4.*') {
     foreach ($output in 'bin','obj') { $targets += "rewrite/$($project.Name)/$output" }
 }
-foreach ($parent in @('build/save-export-checks','build/startup-assets-20261026/checks',
+foreach ($parent in @('build/save-export-checks','build/startup-assets-20261026/checks','build/android-startup-20261024',
         'build/diplomacy-20261028/mod-checks','rewrite/reports/defeated-faction-test','rewrite/reports/client-slot-test')) {
     foreach ($child in Get-ChildItem (Join-Path $releaseWorkspace $parent) -Force -ErrorAction SilentlyContinue) {
         if ($child.CreationTime -ge $cutoff) { $targets += "$parent/$($child.Name)" }
     }
+}
+foreach ($temporary in @('build/attack-bounds-check-20261029')) {
+    $path = Join-Path $releaseWorkspace $temporary
+    if ((Test-Path -LiteralPath $path) -and (Get-Item -LiteralPath $path).CreationTime -ge $cutoff) { $targets += $temporary }
 }
 foreach ($report in Get-ChildItem (Join-Path $releaseWorkspace 'rewrite/reports') -File) {
     if ($report.CreationTime -ge $cutoff) { $targets += 'rewrite/reports/' + $report.Name }

@@ -38,7 +38,8 @@ public sealed partial class ClientGame
         var presentation = content.Presentations.Values.FirstOrDefault(p => p.Id == session.World.ScenarioId || p.Alternate == session.World.ScenarioId);
         int mode = content.Scenarios.Single(s => s.Id == session.World.ScenarioId).Mode;
         var source = RequestBattle(session.World.ScenarioId);
-        session = session with { Account = CampaignProgress.Settle(content, session) };
+        var campaignAccount = CampaignProgress.Settle(content, session);
+        if (!ReferenceEquals(campaignAccount, session.Account)) session = session with { Account = campaignAccount };
         session = BattleSettlement.Settle(session, mode, presentation?.Id ?? session.World.ScenarioId, source.Header[12], source.Header[13]);
         if (content.Extensions.Metagame.Objectives.Count == 0) return session;
         var account = MetagameObjectives.Observe(session.Account, content.Extensions.Metagame.Objectives, ObjectiveContext(session, previous));

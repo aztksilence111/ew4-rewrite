@@ -12,45 +12,74 @@ public static partial class WorldAi
     public static AiUnitPlan PlanUnit(WorldState state, string unitId, WorldAiRules rules)
     {
         using var planning = PlanningScope.Begin(rules);
-        var faction = WorldActions.Ready(state, state.Revision);
-        rules.Validate();
-        var unit = PlanningScope.Queries(state) is { } queries ? queries.Units.GetValueOrDefault(unitId)
-            : state.Units.SingleOrDefault(u => u.Id == unitId);
-        if (unit == null || unit.Owner != faction.Id) throw new RuleViolation("ai.unit", "Unknown active faction unit");
-        if (WorldDiplomacy.Dormant(state, faction.Id, rules.NeutralCamps))
-            return new(state.Revision, unitId, state.AiRandomState, state.AiRandomState, Array.Empty<AiCandidate<WorldAiCommand>>());
-        if (!rules.Behaviors.TryGetValue(unit.Behavior, out var behavior)) throw new RuleViolation("ai.behavior", "Unmapped unit AI behavior");
-        var requests = AiPlanning.Requests(behavior, new(unit.RemainingMovement, unit.Morale.Effective, unit.Combatant.ConstructionTurns, unit.Acted));
-        var result = new List<AiCandidate<WorldAiCommand>>();
-        ulong finalRandom = state.AiRandomState;
-        foreach (var kind in requests.Kinds)
+        var work = new UnitWork(state, unitId, rules);
+        while (!work.Advance()) { }
+        return work.Result!;
+    }
+
+    // Candidates and private random draws retain their original order across yields.
+    internal sealed class UnitWork
+    {
+        private readonly WorldState state;
+        private readonly string unitId;
+        private readonly WorldAiRules rules;
+        private readonly UnitState unit;
+        private readonly AiCandidateKind[] kinds;
+        private readonly bool eligible;
+        private readonly List<AiCandidate<WorldAiCommand>> result = new();
+        private ulong finalRandom;
+        private int index;
+        internal AiUnitPlan? Result { get; private set; }
+        internal UnitWork(WorldState state, string unitId, WorldAiRules rules)
         {
-            switch (kind)
-            {
-                case AiCandidateKind.Hold:
-                    var facts = Facts(state, unit, rules);
-                    var cell = state.Cells[unit.Cell];
-                    long hold = AiPlanning.HoldScore(new(AiTactics.Location(Site(state, unit.Cell, rules), facts, rules.Tactics),
-                        AiTactics.Strength(facts, rules.Tactics), ThreatStrength(state, unit, rules), cell.Environment,
-                        facts.Category == rules.HoldInfantryCategory, cell.InstallationKind != null, facts.Category == rules.Tactics.NavalCategory,
-                        facts.Health, facts.MaximumHealth), rules.Hold);
-                    result.Add(new(new AiHoldCommand(state.Revision, unitId), hold));
-                    break;
-                case AiCandidateKind.TacticalMove:
-                    foreach (var candidate in TacticalMoveCandidates(state, unitId, rules)) result.Add(new(candidate.Action, candidate.Score));
-                    break;
-                case AiCandidateKind.StrategicAdvance:
-                    var strategic = StrategicCandidates(state, unitId, rules);
-                    finalRandom = strategic.FinalRandomState;
-                    foreach (var candidate in strategic.Candidates) result.Add(new(candidate.Action, candidate.Score));
-                    break;
-                case AiCandidateKind.Strike:
-                    foreach (var candidate in StrikeCandidates(state, unitId, rules)) result.Add(new(candidate.Action, candidate.Score));
-                    break;
-            }
+            this.state = state; this.unitId = unitId; this.rules = rules;
+            var faction = WorldActions.Ready(state, state.Revision);
+            rules.Validate();
+            unit = (PlanningScope.Queries(state) is { } queries ? queries.Units.GetValueOrDefault(unitId)
+                : state.Units.SingleOrDefault(u => u.Id == unitId))!;
+            if (unit == null || unit.Owner != faction.Id) throw new RuleViolation("ai.unit", "Unknown active faction unit");
+            finalRandom = state.AiRandomState;
+            if (WorldDiplomacy.Dormant(state, faction.Id, rules.NeutralCamps))
+            { kinds = []; return; }
+            if (!rules.Behaviors.TryGetValue(unit.Behavior, out var behavior)) throw new RuleViolation("ai.behavior", "Unmapped unit AI behavior");
+            var requests = AiPlanning.Requests(behavior, new(unit.RemainingMovement, unit.Morale.Effective, unit.Combatant.ConstructionTurns, unit.Acted));
+            kinds = requests.Kinds.ToArray(); eligible = requests.Eligible;
         }
-        if (requests.Eligible && result.Count == 0) result.Add(new(new AiHoldCommand(state.Revision, unitId), 0));
-        return new(state.Revision, unitId, state.AiRandomState, finalRandom, result.ToArray());
+        internal bool Advance()
+        {
+            if (Result != null) return true;
+            if (index < kinds.Length)
+            {
+                var kind = kinds[index++];
+                switch (kind)
+                {
+                    case AiCandidateKind.Hold:
+                        var facts = Facts(state, unit, rules);
+                        var cell = state.Cells[unit.Cell];
+                        long hold = AiPlanning.HoldScore(new(AiTactics.Location(Site(state, unit.Cell, rules), facts, rules.Tactics),
+                            AiTactics.Strength(facts, rules.Tactics), ThreatStrength(state, unit, rules), cell.Environment,
+                            facts.Category == rules.HoldInfantryCategory, cell.InstallationKind != null, facts.Category == rules.Tactics.NavalCategory,
+                            facts.Health, facts.MaximumHealth), rules.Hold);
+                        result.Add(new(new AiHoldCommand(state.Revision, unitId), hold));
+                        break;
+                    case AiCandidateKind.TacticalMove:
+                        foreach (var candidate in TacticalMoveCandidates(state, unitId, rules)) result.Add(new(candidate.Action, candidate.Score));
+                        break;
+                    case AiCandidateKind.StrategicAdvance:
+                        var strategic = StrategicCandidates(state, unitId, rules);
+                        finalRandom = strategic.FinalRandomState;
+                        foreach (var candidate in strategic.Candidates) result.Add(new(candidate.Action, candidate.Score));
+                        break;
+                    case AiCandidateKind.Strike:
+                        foreach (var candidate in StrikeCandidates(state, unitId, rules)) result.Add(new(candidate.Action, candidate.Score));
+                        break;
+                }
+            }
+            if (index < kinds.Length) return false;
+            if (eligible && result.Count == 0) result.Add(new(new AiHoldCommand(state.Revision, unitId), 0));
+            Result = new(state.Revision, unitId, state.AiRandomState, finalRandom, result.ToArray());
+            return true;
+        }
     }
 
     public static AiUnitPlan? PlanNextUnit(WorldState state, WorldAiRules rules)
@@ -93,8 +122,12 @@ public static partial class WorldAi
             case AiHoldCommand:
                 var unit = state.Units.SingleOrDefault(u => u.Id == command.UnitId);
                 if (unit == null || unit.Owner != faction.Id) throw new RuleViolation("ai.unit", "Unknown active faction unit");
-                var next = (state with { Revision = checked(state.Revision + 1), Units = state.Units.Select(u => u.Id == unit.Id
-                    ? u with { RemainingMovement = 0, Acted = true } : u).ToArray() }).Copy();
+                var next = (state with
+                {
+                    Revision = checked(state.Revision + 1),
+                    Units = state.Units.Select(u => u.Id == unit.Id
+                    ? u with { RemainingMovement = 0, Acted = true } : u).ToArray()
+                }).Copy();
                 change = new(next, new[] { new WorldNotice("ai.unit_held", unit.Id, unit.Cell) });
                 break;
             default: throw new RuleViolation("ai.command", "Unsupported unit AI command");

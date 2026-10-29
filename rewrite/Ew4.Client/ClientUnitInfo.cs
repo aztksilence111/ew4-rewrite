@@ -4,6 +4,12 @@ namespace Ew4.Client;
 
 public sealed partial class ClientGame
 {
+    private object AttackView(Combatant unit)
+    {
+        var (minimum, maximum) = Ew4Combat.AttackBounds(unit, content.Catalogs.Combat.SkillParameters);
+        return new { minimum, maximum };
+    }
+
     // Read the current battle instance, including scenario/enemy/tavern commanders.
     // The account roster alone cannot describe these commanders or battle experience.
     private object UnitInfo(ClientCommand command)

@@ -7,7 +7,7 @@ internal static class PerformanceContractChecks
 {
     internal static int Run(string root)
     {
-        int checks = CombatantSnapshotChecks.Run() + ValidationReuseChecks.Run() + SearchWorkspaceChecks.Run() + SnapshotAllocationChecks.Run() + ControlledMovementChecks.Run()
+        int checks = AiNeighborhoodChecks.Run() + CombatantSnapshotChecks.Run() + ValidationReuseChecks.Run() + SearchWorkspaceChecks.Run() + SnapshotAllocationChecks.Run() + AiPlanningWorkChecks.Run() + ControlledMovementChecks.Run()
             + SaveEncodingChecks.Run(root) + ExtensionPlanningChecks.Run(root) + JurisdictionQueryChecks.Run() + RequestBattleChecks.Run(root);
         void Check(bool value, string label) { checks++; if (!value) throw new InvalidOperationException(label); }
         var fixture = WorldChecks.Example();

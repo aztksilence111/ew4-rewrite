@@ -94,10 +94,15 @@ public static partial class WorldAi
         var owned = Enumerable.Range(0, state.Cells.Count).Where(i => state.Cells[i].Owner == faction.Id && state.Cells[i].Terrain.Active).ToArray();
         int armySize = state.Units.Count(u => u.Owner == faction.Id);
         int? armyLimit = WorldArmyCapacity.Limit(state, faction.Id);
-        var byCell = state.Units.GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => g.OrderBy(u => u.Id, StringComparer.Ordinal).ToArray());
+        var queries = PlanningScope.Queries(state);
+        var byCell = queries?.OrderedOccupants ?? state.Units.GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => g.OrderBy(u => u.Id, StringComparer.Ordinal).ToArray());
         UnitState[] At(int cell) => byCell.TryGetValue(cell, out var units) ? units : Array.Empty<UnitState>();
         var camps = state.Factions.ToDictionary(f => f.Id, f => f.Camp, StringComparer.Ordinal);
-        bool Enemy(UnitState unit) => WorldDiplomacy.Hostile(state, faction.Id, unit.Owner, ai.NeutralCamps);
+        var enemies = queries == null ? null : state.Factions.ToDictionary(f => f.Id,
+            f => WorldDiplomacy.Hostile(state, faction.Id, f.Id, ai.NeutralCamps), StringComparer.Ordinal);
+        bool Enemy(UnitState unit) => enemies == null ? WorldDiplomacy.Hostile(state, faction.Id, unit.Owner, ai.NeutralCamps) : enemies[unit.Owner];
+        IEnumerable<UnitState> Nearby(int cell, int radius) => queries?.Nearby(map, cell, radius)
+            ?? state.Units.Where(u => map.Distance(cell, u.Cell) is var distance && distance > 0 && distance <= radius);
         var strengths = new Dictionary<string, long>(StringComparer.Ordinal);
         long Strength(UnitState unit)
         {
@@ -108,7 +113,7 @@ public static partial class WorldAi
         long Pressure(int cell, bool enemy)
         {
             long total = 0;
-            foreach (var unit in state.Units)
+            foreach (var unit in Nearby(cell, production.PressureRadius))
             {
                 int distance = map.Distance(cell, unit.Cell);
                 if (distance > 0 && distance <= production.PressureRadius && (enemy ? Enemy(unit) : camps[unit.Owner] == faction.Camp))
@@ -137,21 +142,26 @@ public static partial class WorldAi
         // Availability is derived from configured offers and legal world sites, never legacy byte slots.
         var installationUnits = state.Units.Where(u => u.Owner == faction.Id && !u.Acted && u.Combatant.ConstructionTurns == 0
             && state.Cells[u.Cell].Environment == 0).OrderBy(u => u.Cell).ThenBy(u => u.Id, StringComparer.Ordinal).ToArray();
-        var installations = installationUnits.ToDictionary(u => u.Id, u => production.Installations
+        Dictionary<string, string[]> BuildInstallations() => installationUnits.ToDictionary(u => u.Id, u => production.Installations
             .Where(p => WorldSupportActions.CanBuildInstallationValidated(state, faction, u, p.Value)).Select(p => p.Key).ToArray(), StringComparer.Ordinal);
-        var upgradeCells = production.BuildingUpgrades == null ? Array.Empty<int>() : owned.Where(i => state.Cells[i].Environment == 0
-            && WorldImprovements.CanUpgradeBuildingValidated(state, faction, i, production.BuildingUpgrades)).ToArray();
-        var transports = production.Transport == null ? Array.Empty<UnitState>() : state.Units.Where(u => u.Owner == faction.Id
+        var upgradeSites = production.BuildingUpgrades == null ? Enumerable.Empty<int>() : owned.Where(i => state.Cells[i].Environment == 0
+            && WorldImprovements.CanUpgradeBuildingValidated(state, faction, i, production.BuildingUpgrades));
+        var transportUnits = production.Transport == null ? Enumerable.Empty<UnitState>() : state.Units.Where(u => u.Owner == faction.Id
             && !state.Cells[u.Cell].Terrain.Sea && state.Cells[u.Cell].Environment == 0 && Coastal(u.Cell)
-            && WorldSupportActions.CanBuyTransportValidated(state, faction, u, production.Transport)).OrderBy(u => u.Cell).ThenBy(u => u.Id, StringComparer.Ordinal).ToArray();
+            && WorldSupportActions.CanBuyTransportValidated(state, faction, u, production.Transport)).OrderBy(u => u.Cell).ThenBy(u => u.Id, StringComparer.Ordinal);
+        // Callback-enabled paths retain their original eager evaluation order.
+        var installations = queries == null ? BuildInstallations() : null;
+        var upgradeCells = queries == null ? upgradeSites.ToArray() : null;
+        var transports = queries == null ? transportUnits.ToArray() : null;
         bool Available(string task) => task switch
         {
             "recruit" => production.Groups.Any(g => !g.Naval && g.HighestFirst.Any(id => EligibleOffer(production.Offers[id]))),
             "naval" => production.Groups.Any(g => g.Naval && g.HighestFirst.Any(id => EligibleOffer(production.Offers[id]))),
             "fortress" => production.FortressScoring != null && production.Fortresses.Values.Any(EligibleOffer),
-            "installation" => production.InstallationScoring != null && installations.Values.Any(v => v.Length > 0),
-            "upgrade" => upgradeCells.Length > 0,
-            "transport" => transports.Length > 0,
+            "installation" => production.InstallationScoring != null && (installations != null ? installations.Values.Any(v => v.Length > 0)
+                : installationUnits.Any(u => production.Installations.Any(p => WorldSupportActions.CanBuildInstallationValidated(state, faction, u, p.Value)))),
+            "upgrade" => upgradeCells != null ? upgradeCells.Length > 0 : upgradeSites.Any(),
+            "transport" => transports != null ? transports.Length > 0 : transportUnits.Any(),
             _ => false
         };
         string? task = AiProduction.SelectTask(production.Tasks.Where(t => t.Weight > 0 && Available(t.Id)).ToArray(), random.Next);
@@ -211,6 +221,7 @@ public static partial class WorldAi
         }
         else if (task == "installation")
         {
+            installations ??= BuildInstallations();
             var stock = new Dictionary<string, long>(StringComparer.Ordinal);
             foreach (var recipe in production.Installations)
             {
@@ -220,7 +231,7 @@ public static partial class WorldAi
                 stock[recipe.Key] = best;
             }
             var sites = installationUnits.Select(unit => new AiInstallationSite(unit.Cell, installations[unit.Id].Length > 0,
-                state.Units.Where(u => Enemy(u) && map.Distance(unit.Cell, u.Cell) is var distance && distance > 0 && distance <= production.InstallationRadius)
+                Nearby(unit.Cell, production.InstallationRadius).Where(Enemy)
                     .GroupBy(u => u.Combatant.Profile.Category).ToDictionary(g => g.Key, g => g.Count(), StringComparer.Ordinal), installations[unit.Id])).ToArray();
             var choice = AiProduction.SelectInstallation(sites, stock, production.InstallationScoring!, random.Next);
             if (choice != null)
@@ -245,9 +256,8 @@ public static partial class WorldAi
                     && At(i).Length == 0)
                     .Select(i => new AiFortressNearby(true, state.Cells[i].BuildingKind == null ? null : state.Cells[i].BuildingLevel, state.Cells[i].Terrain.Sea)).ToArray();
                 return new AiFortressSite(cell, eligible, Coastal(cell), state.Cells[cell].Terrain.Sea,
-                    state.Units.Count(u => Enemy(u) && map.Distance(cell, u.Cell) > 0 && map.Distance(cell, u.Cell) <= production.FortressEnemyRadius),
-                    state.Units.Count(u => Enemy(u) && u.Combatant.Profile.Category == ai.Tactics.NavalCategory
-                        && map.Distance(cell, u.Cell) > 0 && map.Distance(cell, u.Cell) <= production.PressureRadius),
+                    Nearby(cell, production.FortressEnemyRadius).Count(Enemy),
+                    Nearby(cell, production.PressureRadius).Count(u => Enemy(u) && u.Combatant.Profile.Category == ai.Tactics.NavalCategory),
                     map.Within(cell, production.PressureRadius).Count(i => state.Cells[i].Terrain.Active && state.Cells[i].Terrain.Sea
                         && state.Cells[i].Owner != null && camps[state.Cells[i].Owner!] == faction.Camp), nearby, allowed);
             }).ToArray();
@@ -256,12 +266,14 @@ public static partial class WorldAi
         }
         else if (task == "upgrade")
         {
+            upgradeCells ??= upgradeSites.ToArray();
             var choice = AiProduction.SelectUpgrade(upgradeCells.Select(cell => new AiUpgradeSite(cell, state.Cells[cell].BuildingKind,
                 state.Cells[cell].Environment, Pressure(cell, true), Pressure(cell, false), true)).ToArray(), production.Upgrade, random.Next);
             if (choice.HasValue) command = new AiUpgradeCommand(state.Revision, choice.Value);
         }
         else if (task == "transport")
         {
+            transports ??= transportUnits.ToArray();
             var choice = AiProduction.SelectTransport(transports.Select(u => new AiTransportSite(u.Cell, true, false, false, true, true, 0,
                 Neighbors(u.Cell).Count(i => state.Cells[i].Terrain.Active && state.Cells[i].Terrain.Sea))).ToArray(), true);
             if (choice.HasValue) command = new AiTransportCommand(state.Revision, transports.First(u => u.Cell == choice.Value).Id);

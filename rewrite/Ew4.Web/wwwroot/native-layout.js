@@ -2,19 +2,20 @@
 (function(root){
   const atlases=['image_ui_hd','image_item_hd','image_recruit_hd','image_recruit_hd2','image_recruit_hd3','image_menu_hd','image_newgame_hd','commanders1_hd','commanders2_hd','princesses_hd','princesses_sketch_hd','image_ui'];
   function resource(manifest,name){
+    if(typeof name==='string'&&name.startsWith('rewrite/')&&name.endsWith('.png')&&!/[\\:\x00-\x1f]/.test(name)&&name.split('/').every(s=>s&&s!=='.'&&s!=='..'))return {file:'/content/extensions/'+name.slice(8).split('/').map(encodeURIComponent).join('/'),ratio:1};
     const atlas=atlases.find(a=>manifest.atlases[a]?.[name]);
     if(!atlas)return null;
     return {file:'/content/ui/'+atlas+'/'+encodeURIComponent(name),...manifest.atlases[atlas][name],ratio:atlas.endsWith('_hd')?2:1};
   }
   class Layout {
-    constructor(api,id,onClose){
-      this.api=api;this.definition=api.manifest.layouts[id];this.nodes=new Map();
+    constructor(api,id,onClose,options={}){
+      this.api=api;this.definition=options.definition||api.manifest.layouts[id];this.nodes=new Map();this.options=options;
       const a=this.definition.attributes;this.width=Number(a.w)||568;this.height=Number(a.h)||320;
-      this.body=api.detail(a.title||'',this.width,this.height,null,onClose);this.body.className='native-layout';
+      this.body=options.body||api.detail(a.title||'',this.width,this.height,null,onClose,a.sound);if(options.body)this.body.classList.add('native-layout');else this.body.className='native-layout';
       this.body.dataset.layout=id;
-      this.body.parentElement.classList.add('native-dialog');
+      if(!options.body)this.body.parentElement.classList.add('native-dialog');
       this.body.nativeLayout=this;
-      for(const node of this.definition.children)this.mount(node,this.body,'',this.width,this.height-27,true);
+      for(const node of this.definition.children)this.mount(node,this.body,'',this.width,this.height-(options.body?0:27),true);
     }
     mount(node,parent,path,pw,ph,topLevel=false){
       const a=node.attributes,id=path?path+'/'+a.id:a.id,type=a.type;
@@ -28,15 +29,20 @@
       if(type==='tmp_intitle')h=22;
       if(type==='text'){h=Number(a.h)||18;w=Number(a.w)||pw-Number(a.x||0);}
       const x=a.align==='hmiddle'?(pw-w)/2+Number(a.x||0):Number(a.x||0);
-      Object.assign(el.style,{left:x+'px',top:(Number(a.y||0)-(topLevel?27:0))+'px',width:w+'px',height:h+'px'});
+      Object.assign(el.style,{left:x+'px',top:(Number(a.y||0)-(topLevel&&!this.options.body?27:0))+'px',width:w+'px',height:h+'px'});
       if(a.scale){el.style.transform='scale('+a.scale+')';el.style.transformOrigin='top left';}
       if(a.hscale||a.vscale){el.style.transform=`scale(${a.hscale||1},${a.vscale||1})`;el.style.transformOrigin='top left';}
+      if(a.rotation)el.style.transform=(el.style.transform+' rotate('+a.rotation+'deg)').trim();
+      if(a.background)el.style.backgroundColor=a.background;
+      if(a.opacity)el.style.opacity=a.opacity;
+      if(a.radius)el.style.borderRadius=a.radius+'px';
       if(a.frame){const frame=resource(this.api.manifest,a.frame);if(frame){el.classList.add('native-frame');el.style.borderImageSource=`url("${frame.file}")`;}}
-      if(type==='image'&&art){const img=this.api.uiImage(a.name,w,h);el.append(img);el.classList.add('native-art');}
+      if(type==='image'&&art){const img=a.name.startsWith('rewrite/')?Object.assign(document.createElement('img'),{src:art.file,width:w,height:h,alt:''}):this.api.uiImage(a.name,w,h);el.append(img);el.classList.add('native-art');}
       if(type.includes('button')){
         el.style.justifyContent='center';el.style.alignItems='center';
         if(type==='tmp_button'){el.classList.add('native-command');if(/blue/.test(a.frm1))el.classList.add('blue');if(/red/.test(a.frm1))el.classList.add('red');}
         else if(art){el.style.backgroundImage=`url("${art.file}")`;el.style.backgroundSize='100% 100%';}
+        if(type==='tmp_button'&&this.options.body&&art)el.style.borderImageSource=`url("${art.file}")`;
         if(a.frm2){const pressed=resource(this.api.manifest,a.frm2);if(pressed)el.style.setProperty('--pressed-art',`url("${pressed.file}")`);}
         el.disabled=true;
       }
@@ -55,7 +61,7 @@
       return el;
     }
     get(id){const exact=this.nodes.get(id);if(exact)return exact;for(const [key,el] of this.nodes)if(key.endsWith('/'+id))return el;throw Error('Unknown original control '+id);}
-    current(){return this.body.isConnected&&this.body.nativeLayout===this&&!document.getElementById('detail-modal').hidden;}
+    current(){return this.body.isConnected&&this.body.nativeLayout===this&&(this.options.current?this.options.current():!document.getElementById('detail-modal').hidden);}
     write(el,value,a=el.nativeAttributes||{}){
       const font=(a.font||'font_text_2').replace(/^(font_(?:text|char)_\d)$/,(_,s)=>s.startsWith('font_text')?s+'_cn_hd':s+'_hd');
       const rgba=(a.color||a.textcolor||(a.type?.includes('button')?'235,230,225,255':'64,64,64,255')).split(',').map(Number);
@@ -78,7 +84,7 @@
       for(const id of ids){const el=this.get(id);el.style.top=y+'px';y+=parseFloat(el.style.height)+gap;}
       this.height=y+27;this.body.parentElement.style.height=this.height+'px';
     }
-    action(id,label,action,enabled=true){const el=this.get(id);el.disabled=!enabled;el.setAttribute('aria-label',label);el.title=label;let pending=false;el.onclick=async()=>{if(pending||el.disabled||!this.current())return;pending=true;el.disabled=true;try{await action();if(typeof this.api.tutorialUi==='function')await this.api.tutorialUi(el.dataset.tutorialId);}catch(e){this.api.notice(e.message);}finally{pending=false;if(this.current())el.disabled=!enabled;}};return el;}
+    action(id,label,action,enabled=true){const el=this.get(id);el.disabled=!enabled;el.setAttribute('aria-label',label);el.title=label;let pending=false;el.onclick=async()=>{if(pending||el.disabled||!this.current())return;pending=true;el.disabled=true;try{await action();if(typeof this.api.tutorialUi==='function')await this.api.tutorialUi(el.dataset.tutorialId);}catch(e){this.api.notice(e.message);}finally{pending=false;if(this.current()){el.disabled=!enabled;this.options.afterAction?.();}}};return el;}
     hide(id,value=true){this.get(id).hidden=value;}
   }
   root.Ew4NativeUI={Layout,resource};

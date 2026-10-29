@@ -35,6 +35,7 @@ public sealed partial class ExtensionLoader
     public MetagameRules Metagame { get; private init; } = new();
     public IReadOnlyDictionary<string, StageIntroPresentation> StageIntroPresentations { get; private init; } = new Dictionary<string, StageIntroPresentation>();
     public IReadOnlyDictionary<string, PauseObjectivesPresentation> PauseObjectivesPresentations { get; private init; } = new Dictionary<string, PauseObjectivesPresentation>();
+    public HeadquartersPresentation? HeadquartersPresentation { get; private init; }
     public IReadOnlyDictionary<string, CommanderDialogueLines> CommanderDialogues { get; private init; } = new Dictionary<string, CommanderDialogueLines>();
     private ExtensionLoader(RuleEventBus bus, string revision, ExtensionBinding[] units, ExtensionBinding[] commanders,
         Dictionary<string, ExtensionVictoryRules> victories, Dictionary<string, ExtensionLayout> layouts,
@@ -46,7 +47,7 @@ public sealed partial class ExtensionLoader
         string? CommanderDialogues = null, string? ItemBindings = null, string? DeploymentLimits = null, string? Metagame = null,
         string? StageIntroPresentation = null, string? FormationCounts = null, string? CampaignVisibility = null,
         string? Geography = null, string? PauseObjectivesPresentation = null, string? MapColors = null, string? AiControl = null,
-        string? StoryPresentation = null);
+        string? StoryPresentation = null, string? HeadquartersPresentation = null);
     private sealed record CampaignVisibilityFile(int Schema, Dictionary<string, string>? Visibility);
     private sealed record LegacySkillFile(int Schema, Dictionary<string, Dictionary<string, double>> Skills);
     private sealed record DeploymentLimitFile([property: JsonNumberHandling(JsonNumberHandling.Strict)] int Schema,
@@ -265,6 +266,9 @@ public sealed partial class ExtensionLoader
         var pauseScreens = m.PauseObjectivesPresentation == null ? new Dictionary<string, PauseObjectivesPresentation>()
             : Read<Dictionary<string, PauseObjectivesPresentation>>(m.PauseObjectivesPresentation);
         if (pauseScreens.Count > 0) PauseObjectivesPresentation.Validate(pauseScreens, read("client/manifest.json"), read);
+        if (m.HeadquartersPresentation != null && m.ApiVersion < 3) throw new RuleViolation("extension.version", "Headquarters presentation requires API 3");
+        var headquartersPresentation = m.HeadquartersPresentation == null ? null : Read<HeadquartersPresentation>(m.HeadquartersPresentation);
+        headquartersPresentation?.Validate(read("client/manifest.json"), read);
         foreach (var layout in layouts)
             if (layout.Value == null || layout.Key is not ("commander" or "unit" or "headquarters" or "tasks" or "achievements") || layout.Value.Mode is not ("list" or "grid" or "positioned")
                 || layout.Value.Columns is < 1 or > 16 || layout.Value.Gap is < 0 or > 32 || layout.Value.IconSize is < 12 or > 64
@@ -295,7 +299,7 @@ public sealed partial class ExtensionLoader
             { ApiVersion = m.ApiVersion, VictoryPresentations = victoryScreens, LegacySkills = legacySkills, CommanderDialogues = commanderDialogues,
                 ItemBindings = items, DeploymentLimits = deploymentLimits, FormationCounts = formationCounts, CampaignVisibility = campaignVisibility,
                 Metagame = metagame, StageIntroPresentations = introScreens, PauseObjectivesPresentations = pauseScreens, Geography = geography,
-                MapColors = mapColors, AiControl = aiControl, Stories = stories };
+                MapColors = mapColors, AiControl = aiControl, Stories = stories, HeadquartersPresentation = headquartersPresentation };
         bool Known(string id) => skills.ContainsKey(id) || id.StartsWith("ew4.skill.", StringComparison.Ordinal)
             && int.TryParse(id[10..], out int value) && value is >= 0 and < 40 || BuiltinTraits.Contains(id);
     }

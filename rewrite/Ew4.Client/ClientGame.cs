@@ -49,9 +49,11 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                 if (path == "/api/action")
                 {
                     var request = Command(body);
+                    if (request.Op != "ai_batch" || !request.Compact) pendingAiStep = null;
                     if (request.Delta && request.Op != "state" && request.Revision == deliveredRevision
                         && game?.Session.World.ScenarioId == deliveredWorld?.ScenarioId) deltaBase = deliveredWorld;
                 }
+                else pendingAiStep = null;
                 object result = path switch
                 {
                     "/api/catalog" => new { build = typeof(ClientGame).Assembly.ManifestModule.ModuleVersionId.ToString("N"),
@@ -65,6 +67,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                             Countries = p.Value.Countries.Select(content.Countries.Canonical).ToArray() }),
                         unlockedCampaigns = Account().UnlockedCampaigns, campaignStars = Account().CampaignStars,
                         hasSave = File.Exists(Slot), extensionLayouts = content.Extensions.Layouts,
+                        headquartersPresentation = content.Extensions.HeadquartersPresentation,
                         diplomacyPresentation = content.Diplomacy.Presentation,
                         commanderDialogues = content.Extensions.CommanderDialogues, countries = content.Countries.Countries,
                         countryAliases = content.Countries.Aliases, formationCounts = content.Extensions.FormationCounts },
@@ -96,6 +99,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             }
             catch (Exception error) when (error is RuleViolation or IOException or JsonException or InvalidOperationException or ArgumentException or KeyNotFoundException or OverflowException)
             {
+                pendingAiStep = null;
                 return JsonSerializer.Serialize(new { ok = false, code = error is RuleViolation rule ? rule.Code : "client.failure", message = error.Message }, Json);
             }
             finally { requestBattles.Clear(); }
@@ -360,8 +364,8 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         var recovery = WorldTurns.RecoverDefeatedFaction(change.State, current.Rules.Turns);
         if (!ReferenceEquals(recovery.State, change.State))
             change = change with { State = recovery.State, Notices = change.Notices.Concat(recovery.Notices).ToArray() };
-        return change with { State = DemandDiplomacy.Initialize(PlayerAi.Reconcile(LocalMultiplayerGame.Resolve(change.State, current.Rules.Turns.Victory)))
-            with { Revision = checked(current.Session.World.Revision + 1) } };
+        return change with { State = PlanningScope.WithRevision(DemandDiplomacy.Initialize(PlayerAi.Reconcile(
+            LocalMultiplayerGame.Resolve(change.State, current.Rules.Turns.Victory))), checked(current.Session.World.Revision + 1)) };
     }
     private void Commit(WorldChange change, bool autoSave = true)
     {
@@ -561,6 +565,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         var unitViews = world.Units.Select(u => JsonSerializer.SerializeToElement(new { u.Id, u.Owner, u.Cell, profile = u.Combatant.Profile.Id, category = u.Combatant.Profile.Category,
             skills = SkillViews(u.Combatant), statuses = StatusViews(u.Combatant), traits = u.Combatant.Profile.Traits.Where(content.Extensions.Bus.Skills.ContainsKey)
                 .Select(id => SkillView(new SkillSlot(id, "trait." + id))).ToArray(),
+            attack = AttackView(u.Combatant),
             health = u.Combatant.Health, maxHealth = u.Combatant.Profile.MaxHealth, u.Combatant.ConstructionTurns, u.RemainingMovement, u.Acted, u.CommanderId, u.Transport, u.Burning, u.Objective,
             aiControlled = PlayerAi.Managed(world, u), aiPolicy = PlayerAi.Order(u).Policy, aiGoal = PlayerAi.Order(u).Goal, aiGoals = PlayerAi.Targets(PlayerAi.Order(u)), aiTask = PlayerAi.Order(u).TaskId,
             objectiveMarker = u.Objective ? 1 : originalUnits.TryGetValue(u.Id, out var markedUnit) && markedUnit.Objective == 2 ? 2 : 0,
@@ -590,6 +595,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             world.Round, phase = world.Phase.ToString(), outcome = world.Outcome.ToString(), world.ActiveFaction, session.PlayerFaction,
             startCountry = country, ending = world.ScenarioEnding, victoryRules = world.ScenarioVictory ?? current.Rules.Turns.Victory.Custom,
             localMultiplayer = LocalMultiplayerView(session),
+            carriedCommanderIds = session.RosterDeployments.SingleOrDefault(q => q.Faction == session.PlayerFaction)?.CommanderIds ?? [],
             dialogue = world.PendingDialogue == null ? null : StoryPlayback.Current(world) != null ? "story" : WorldProvocations.Dialogue(world, world.PendingDialogue) is { } diplomatic
                 ? content.Label($"desc_{diplomatic.Kind} {diplomatic.Variant}")
                 : current.Rules.Dialogues.TryGetValue(world.PendingDialogue, out var dialogue) ? dialogue.Text : world.PendingDialogue,

@@ -784,8 +784,8 @@
     },
     {
       "path": "client/effects.json",
-      "bytes": 504812,
-      "sha256": "36fd052bbbbc9cd52a7bd5be5fc1e7234d5dc127cec387d5cea2017b48b99244"
+      "bytes": 504892,
+      "sha256": "d6ae7c2d95ff76af1262da0cd99d508f101abd36c723f130cc35d1b6b4b14624"
     },
     {
       "path": "client/fight-font.json",
@@ -6749,8 +6749,8 @@
     },
     {
       "path": "client/presentation.json",
-      "bytes": 3035,
-      "sha256": "49dc78dc54e93ad42896ee7188d32f309d2fb968a0714d6028a11c2aff1adce3"
+      "bytes": 3115,
+      "sha256": "c81cd36cb847c834a256f11831b45dbd5f63d1d4bc602fe3430eef1e199e08f8"
     },
     {
       "path": "client/sounds/sfx_armourmove.wav",
@@ -13561,6 +13561,31 @@
       "path": "rewrite/map-colors.json",
       "bytes": 33,
       "sha256": "96d1f7c5b2ff109d2780d173b0395ed0cca18bfd54ef4844f817302f5ffc9b4b"
+    },
+    {
+      "path": "client/sounds/sfx_click.wav",
+      "bytes": 4576,
+      "sha256": "810c3d8d584b84a4ef8d2369b9e5011f3ec77366dce0388e5251f7b9d3d5ba3c"
+    },
+    {
+      "path": "client/sounds/sfx_cancel.wav",
+      "bytes": 4652,
+      "sha256": "bf2ffe864c9378233234bdc3281282b2d579713fda7a30d2e4fb3723e6120cb0"
+    },
+    {
+      "path": "client/sounds/sfx_select.wav",
+      "bytes": 4246,
+      "sha256": "e150e479625e5720d58982f8116097a99c98a5d31cbc52a3abf36e5f75fdcc6f"
+    },
+    {
+      "path": "client/sounds/sfx_pop.wav",
+      "bytes": 6042,
+      "sha256": "d2d880617403f8e625fb52c34b208ff93fbd4bdaa63f230bc3eaed38c0fb5833"
+    },
+    {
+      "path": "client/sounds/sfx_lvup2.wav",
+      "bytes": 16872,
+      "sha256": "363ef1d485addd60b2f02c02522684f8bc70b03877c06e7312c3c9a2aff11780"
     }
   ]
 }

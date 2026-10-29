@@ -5,19 +5,32 @@ using System.Runtime.CompilerServices;
 
 namespace Ew4.Core;
 
-// Each context belongs to an exact validated world, inside one synchronous scope.
+// Each context belongs to a validated world (or its RNG-only projection), within one synchronous scope.
 internal sealed class PlanningQueries(WorldState state)
 {
     private Dictionary<string, FactionState>? factions;
     private Dictionary<int, UnitState[]>? occupants;
+    private Dictionary<int, UnitState[]>? orderedOccupants;
     private Dictionary<string, UnitState>? units;
+    private Dictionary<string, int>? unitOrder;
     private Dictionary<string, int[]>? targets;
     private JurisdictionQueries? jurisdictions;
     private readonly Dictionary<string, (MovementCell[] Cells, string Camp)> movement = new(StringComparer.Ordinal);
     private readonly Dictionary<WorldAiRules, AiQueries> ai = new(ReferenceComparer<WorldAiRules>.Instance);
     internal Dictionary<string, FactionState> Factions => factions ??= state.Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
     internal Dictionary<int, UnitState[]> Occupants => occupants ??= state.Units.GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => g.ToArray());
+    internal Dictionary<int, UnitState[]> OrderedOccupants => orderedOccupants ??= Occupants.ToDictionary(p => p.Key,
+        p => p.Value.Length < 2 ? p.Value : p.Value.OrderBy(u => u.Id, StringComparer.Ordinal).ToArray());
     internal Dictionary<string, UnitState> Units => units ??= state.Units.ToDictionary(u => u.Id, StringComparer.Ordinal);
+    internal IEnumerable<UnitState> Nearby(HexMap map, int center, int radius, bool includeCenter = false)
+    {
+        if ((long)radius * radius >= state.Units.Count)
+            return state.Units.Where(u => (includeCenter || u.Cell != center) && map.Distance(center, u.Cell) <= radius);
+        unitOrder ??= state.Units.Select((unit, index) => (unit.Id, index)).ToDictionary(p => p.Id, p => p.index, StringComparer.Ordinal);
+        // Candidate and dictionary insertion order must match the original army scan.
+        return map.Within(center, radius, includeCenter).SelectMany(cell => Occupants.GetValueOrDefault(cell) ?? [])
+            .OrderBy(u => unitOrder[u.Id]);
+    }
     internal JurisdictionQueries Jurisdictions => jurisdictions ??= new(state);
     internal Dictionary<string, int[]> Targets
     {

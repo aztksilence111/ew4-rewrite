@@ -1,5 +1,7 @@
 # 配置索引：从目标定位到文件
 
+指挥部完整布局、增删按钮、数据/命令绑定及自定义子页使用 API 3 `headquartersPresentation`，见[指挥部界面指南](porting/HEADQUARTERS_LAYOUT.md)及[最小示例](../examples/headquarters-layout/README.md)。
+
 国家地块颜色：`client/countries.json` 的 `color`；新增/现有势力：`faction_create.color` / `faction_identity.color`；阵营地图：API 3 `mapColors` 引用 `rewrite/map-colors.json`。见[格式、优先级与模板](porting/MAP_COLORS.md)。
 
 中英文地理名称沿曲线逐字排列使用 `client/manifest.json` 中的 `maps.<地图名>.labels[].textPath`，见[字段与作者配置](porting/MAP_TEXT_PATHS.md)。
@@ -70,7 +72,7 @@ API 3 的 `geography` 引用 `rewrite/geography.json`，配置禁行山地/海�
 
 ## 不存在的资源开关
 
-胜利/失败结算已支持 `rewrite/extension.json.victoryPresentation` 指向布局与数据/命令绑定配置，并可通过事件多阶段替换胜负规则，见[结算扩展指南](porting/VICTORY_MODDING.md)。其他界面的通用控件/命令绑定、规则/表现包组合和新的完整剧本容器尚在规划，不能向当前mod.json添加想象的字段启用。手工辖区已通过BTL的JURI扩展实现。大改UI需一起处理布局、点击区、交互和配套资源，见[移植指南](porting/README.md)。
+胜利/失败结算已支持 `rewrite/extension.json.victoryPresentation` 指向布局与数据/命令绑定配置，并可通过事件多阶段替换胜负规则，见[结算扩展指南](porting/VICTORY_MODDING.md)。指挥部已支持 `headquartersPresentation` 完整布局与按钮绑定；其余界面的通用控件/命令绑定、规则/表现包组合和新的完整剧本容器尚在规划，不能向当前mod.json添加想象的字段启用。手工辖区已通过BTL的JURI扩展实现。大改UI需一起处理布局、点击区、交互和配套资源，见[移植指南](porting/README.md)。
 
 技能/特性已支持`rewrite/extension.json`显式注册定义与Lua，可配置胜负条件；字段必须符合[API 1指南](porting/RULE_EXTENSIONS.md)，不是任意位置的skills.json都自动加载。当前没有`jurisdiction.json`公共地图分区文件或`combat.random.uniform`开关。辖区优先级、外交、解散返还和随机取样仍由后端代码控制；具体类见[函数索引](SOURCE_INDEX.md)。
 

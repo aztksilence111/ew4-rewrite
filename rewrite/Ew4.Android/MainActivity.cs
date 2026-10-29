@@ -84,7 +84,8 @@ public sealed partial class MainActivity : Activity
         starting = true;
         startupComplete = false;
         startupHasFailed = false;
-        startupPanel!.Visibility = ViewStates.Visible;
+        startupPanel!.Visibility = ViewStates.Gone;
+        startupSplash!.Visibility = ViewStates.Visible;
         startupContinue!.Visibility = ViewStates.Gone;
         startupSpinner!.Visibility = ViewStates.Visible;
         SetStartupStage("检查游戏资源");
@@ -181,6 +182,8 @@ public sealed partial class MainActivity : Activity
         exitDialog?.Dismiss(); exitDialog?.Dispose(); exitDialog = null;
         surface?.SetOnApplyWindowInsetsListener(null); safeInsets?.Dispose(); safeInsets = null;
         ReleaseWebView();
+        startupSplash?.SetImageDrawable(null);
+        startupArtwork?.Dispose(); startupArtwork = null;
         surface?.Dispose(); surface = null;
         base.OnDestroy();
     }
@@ -341,15 +344,11 @@ public sealed partial class MainActivity : Activity
         {
             if (view != activity.web || url != "https://ew4.local/index.html" || activity.destroyed) return;
             activity.startupComplete = false; activity.startupHasFailed = false; activity.starting = true;
-            activity.startupPanel!.Visibility = ViewStates.Visible;
+            activity.startupPanel!.Visibility = ViewStates.Gone;
+            activity.startupSplash!.Visibility = ViewStates.Visible;
             activity.startupSpinner!.Visibility = ViewStates.Visible;
             activity.startupContinue!.Visibility = ViewStates.Gone;
             activity.SetStartupStage("载入游戏页面");
-        }
-        public override void OnPageFinished(WebView? view, string? url)
-        {
-            if (view == activity.web && url == "https://ew4.local/index.html" && !activity.destroyed && !activity.startupHasFailed)
-                activity.startupPanel!.Visibility = ViewStates.Gone;
         }
         public override void OnReceivedError(WebView? view, IWebResourceRequest? request, WebResourceError? error)
         {

@@ -11,6 +11,7 @@ const resourceHud=['money','industry','food'].map((key,index)=>{
 });
 let startupReady=false,startupRunning=false,startupError='';
 let effects,damageNumbers,music;
+const uiAudio=new Ew4UiAudio.Feedback(file=>effects?.sound(file));
 let selectionRequest=0,dialoguePresentationKey=null,dialoguePresentationTask=null;
 let originalTextQueued=false;
 const originalTextChanges=new MutationObserver(()=>{
@@ -171,9 +172,14 @@ function sizeUi() {
 function placeArmyCapacityHud(){
   const host=$('army-capacity');
   if(!host||$('play').hidden)return;
-  const resources=document.querySelector('.battle-resources').getBoundingClientRect(),menu=$('menu-button').getBoundingClientRect();
-  const half=host.getBoundingClientRect().width/2,center=innerWidth/2;
-  host.style.top=resources.right+8>center-half||menu.left-8<center+half?Math.max(resources.bottom,menu.bottom)+4+'px':'env(safe-area-inset-top,0px)';
+  const resourceBar=document.querySelector('.battle-resources'),menu=$('menu-button').getBoundingClientRect(),center=innerWidth/2;
+  // Fit the top row horizontally as resource values grow, keeping the round bar pinned to the top.
+  const scale=Math.max(.1,Math.min(screenLayout.hudScale,
+    (center-resourceBar.getBoundingClientRect().left-8)/(resourceBar.offsetWidth+host.offsetWidth/2),
+    (menu.left-center-8)/(host.offsetWidth/2)));
+  resourceBar.style.transform='scale('+scale+')';
+  host.style.transform='translateX(-50%) scale('+scale+')';
+  host.style.top='env(safe-area-inset-top,0px)';
   const info=$('terrain-info');
   info.style.top='';
   if(!$('selection').hidden){
@@ -191,7 +197,8 @@ function originalLabels() {
     element.replaceChildren(labelImage(element.dataset.label, text, element));
   }
 }
-async function showMain() {
+async function showMain(immediate=false) {
+  if(immediate!==true&&startupReady)return menus.transitionPage(()=>showMain(true));
   mapViews.close();
   diplomacyUi.reset();
   if(sessionTransition)return;
@@ -592,8 +599,6 @@ async function playCombat(combat,destroyed=new Set()){
   const started=performance.now();
   await Promise.all(plans.map(async plan=>{
     const {id,targetId,damage,critical,unit,target,profile,facing,timeline,segments,delay}=plan;
-    const hold=impactAt-delay-plan.attackBasis;
-    const duration=delay+plan.duration+hold;
     facings.set(id,facing);
     const p=point(unit.cell),q=point(target.cell);
     effects?.timeline(timeline,p.x+facing*profile.x,p.y+profile.y,{speed,scale:profile.scale,started:started+delay});
@@ -605,8 +610,8 @@ async function playCombat(combat,destroyed=new Set()){
       playImpact(profile,target,damage,facing,speed);
       if(id===combat.attacker&&combat.splashTarget){const splash=state.units.find(u=>u.id===combat.splashTarget);if(splash){const hit=point(splash.cell);damageNumbers?.add(combat.splashDamage,false,hit.x,hit.y,speed);playImpact(profile,splash,combat.splashDamage,facing,speed);if(destroyed.has(splash.id))beginDeath(splash.id);}}
     }
-    if(!(aiRunning&&skipAi))await presentationDelay(Math.max(0,started+duration-performance.now()));
-    // The renderer retires any remaining recovery frames without locking input.
+    // Commit the resolved hit now; reload/finish clips retire in the renderer
+    // while the player can command the next unit.
   }));
 }
 function playImpact(profile,target,damage,facing,speed){
@@ -720,9 +725,9 @@ function refreshHud() {
   const capacityStatus=limit==null?'normal':count>limit?'over':count===limit?'full':'normal';
   const capacityText=count+'/'+(limit??'--'),capacityValue=$('army-capacity-value');
   if(capacity.dataset.status!==capacityStatus){capacity.dataset.status=capacityStatus;capacityValue.ew4HudText=null;}
-  updateHudText(capacityValue,capacityText,'font_char_2_hd',capacityStatus==='over'?'#ff5b50':capacityStatus==='full'?'#f5cf70':'#ffffff',Math.min(14,140/capacityText.length));
+  updateHudText(capacityValue,capacityText,'font_char_2_hd',capacityStatus==='over'?'#ff5b50':capacityStatus==='full'?'#f5cf70':'#ffffff');
   const roundValue=$('army-capacity-round');
-  updateHudText(roundValue,state.round,'font_char_2_hd','#ffffff',16);
+  updateHudText(roundValue,state.round,'font_char_2_hd','#ffffff');
   for(const value of [capacityValue,roundValue]){
     const glyphs=value.firstElementChild;
     if(glyphs){glyphs.style.transform='';const width=glyphs.getBoundingClientRect().width,available=value.getBoundingClientRect().width;
@@ -971,9 +976,9 @@ function showStageIntro(){
   refreshHud();
 }
 function confirmDisband(unit,refund,anchor){openSingleAction('disband','解散部队',{cost:refund,affordable:true,warning:selection.disbandWarning},anchor,{unit:unit.id},true);}
-function popupOpen(element){element.classList.remove('popup-opening');void element.offsetWidth;element.classList.add('popup-opening');}
+function popupOpen(element,sound='sfx_pop.wav'){if(sound)effects?.sound(sound);element.classList.remove('popup-opening');void element.offsetWidth;element.classList.add('popup-opening');}
 function closeDetail(){const back=detailReturn;detailReturn=null;menus.dismissSkillTip();$('detail-modal').hidden=true;if(back)back();}
-function detailWindow(title,width,height,confirm,onClose){
+function detailWindow(title,width,height,confirm,onClose,sound='sfx_pop.wav'){
   menus.closeHeadquartersFilter?.(true);
   closeSingleAction();
   const generation=++detailRevision;
@@ -987,7 +992,7 @@ function detailWindow(title,width,height,confirm,onClose){
   $('detail-confirm').dataset.tutorialId='winbtn_ok';$('detail-confirm').hidden=!confirm;$('detail-confirm').onclick=async()=>{try{await confirm();if(generation===detailRevision)$('detail-modal').hidden=true;await tutorialUi($('detail-confirm').dataset.tutorialId);}catch(e){notice(e.message);}};
   $('detail-confirm').disabled=false;
   fitDetailWindow();
-  popupOpen(dialog);return $('detail-content');
+  popupOpen(dialog,sound);return $('detail-content');
 }
 const formationColors=['#646464','#326478','#40803b'];
 function tintedUi(name,color,width,height){
@@ -1007,7 +1012,8 @@ function unitCard(profile,cost){
 function abilityGrid(profile,unit){
   const p=manifest.profiles[profile],s=p.stats,grid=document.createElement('div');grid.className='ability-grid';
   const health=Number(s.strength)===-999?'一次性':unit?.health??s.strength;
-  for(const [icon,value] of [['attack',s.minatk+'-'+s.maxatk],['soldiernumber',catalog.formationCounts?.[profile]??Number(p.grade)+1],['hp',health],['food',s.consumption],['range',s.maxatkrange],['move',unit?.remainingMovement??s.movement]]){
+  const attack=unit?.attack,attackText=(attack?.minimum??s.minatk)+'-'+(attack?.maximum??s.maxatk);
+  for(const [icon,value] of [['attack',attackText],['soldiernumber',catalog.formationCounts?.[profile]??Number(p.grade)+1],['hp',health],['food',s.consumption],['range',s.maxatkrange],['move',unit?.remainingMovement??s.movement]]){
     const marker=document.createElement('span');marker.className='ability-icon';marker.append(uiImage('infomarker_'+icon+'.png',21));const number=document.createElement('span');number.textContent=value;grid.append(marker,number);
     if(icon==='soldiernumber'){
       number.replaceChildren();number.className='formation-count';number.dataset.count=String(value);number.setAttribute('aria-label',value+'编');
@@ -1386,7 +1392,7 @@ canvas.addEventListener('wheel',e=>{e.preventDefault();if(!followingAi())zoom(Ma
 }
 bindMapInput();
 function zoom(factor,x=viewport.w/2,y=viewport.h/2){cameraInputUntil=performance.now()+120;const before=screenToWorld(x,y);view.zoom*=factor;clampView();const after=screenToWorld(x,y);view.x+=before.x-after.x;view.y+=before.y-after.y;clampView();}
-document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=async()=>{if(!startupReady)return;mode=Number(b.dataset.mode);if(mode===4){menus.tutorialMenu();return;}$('main-menu').hidden=true;$('scenario-menu').hidden=false;$('countries').hidden=true;$('conquest-pagination').hidden=mode!==2;$('scenario-menu').classList.toggle('campaign-mode',mode===1);menuArt.apply(mode);$('mode-title').replaceChildren(labelImage(b.dataset.label,b.getAttribute('aria-label'),$('mode-title')));if(!await menus.open(mode))scenarioList();});
+document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=async()=>{if(!startupReady)return;mode=Number(b.dataset.mode);if(mode===4){menus.tutorialMenu();return;}await menus.transitionPage(async()=>{$('main-menu').hidden=true;$('scenario-menu').hidden=false;$('countries').hidden=true;$('conquest-pagination').hidden=mode!==2;$('scenario-menu').classList.toggle('campaign-mode',mode===1);menuArt.apply(mode);$('mode-title').replaceChildren(labelImage(b.dataset.label,b.getAttribute('aria-label'),$('mode-title')));if(!await menus.open(mode))scenarioList();});});
 $('conquest-prev').onclick=()=>turnConquestPage(-1);
 $('conquest-next').onclick=()=>turnConquestPage(1);
 $('cancel-country').onclick=()=>menus.transitionPage(()=>{cancelBattlePreload();$('countries').hidden=true;});
@@ -1417,7 +1423,7 @@ function openSettings(){for(const [id,key] of [['music-volume','music'],['sound-
   $('skip-turn-fast').checked=settings.autoTurnFast;$('follow-ai').checked=settings.followAi;
   const local=$('local-multiplayer-mode'),inGame=!$('play').hidden;
   local.disabled=inGame;local.checked=inGame?!!state?.localMultiplayer:!!settings.localMultiplayer;
-  $('settings').hidden=false;}
+  const opening=$('settings').hidden;$('settings').hidden=false;if(opening)popupOpen($('settings').firstElementChild);}
 $('main-settings').onclick=()=>{if(startupReady)openSettings();};$('pause-settings').onclick=openSettings;
 $('close-settings').onclick=()=>$('settings').hidden=true;
 $('confirm-settings').onclick=()=>$('settings').hidden=true;
@@ -1488,8 +1494,9 @@ window.ew4Back=()=>{
 };
 window.addEventListener('resize',()=>{sizeUi();requestRender();});sizeUi();
 function startupStatus(){
+  if(Ew4Startup.failed)return;
   const failures=Ew4OriginalUI.fontStatus.failures;
-  $('startup-status').hidden=startupReady&&!failures.length&&!startupRunning;
+  $('startup-status').hidden=startupRunning||!startupError&&!failures.length;
   $('startup-message').textContent=startupRunning?'正在载入…':startupError||
     (failures.length?'字体载入失败，已使用内置备用字体：\n'+failures.map(face=>face.file+'：'+face.message).join('\n'):'');
   $('startup-retry').hidden=startupRunning||!startupError&&!failures.length;
@@ -1523,13 +1530,14 @@ async function initializeClient(){
     const [fightFonts,fightSheet]=await Promise.all([startupJson('/content/fight-font.json'),loadImage('images/'+fightFont+'.png'),
       Ew4OriginalUI.prepareText('-0123456789'),loadImage('images/eff.png'),
       ...resourceHud.map(({row})=>row.querySelector('img').decode())]);
+    if(Ew4Startup.failed)return;
     // Publish only after awaits so the mutation painter cannot consume initial label text.
     originalTextRenderer=text;
     damageNumbers=new Ew4Effects.DamageNumbers(manifest.fonts[fightFont]||fightFonts[fightFont],fightSheet);originalLabels();showMain();
     startupReady=true;
     Ew4Startup.ready();
     document.querySelectorAll('.main-entry').forEach(button=>button.disabled=false);$('continue').disabled=false;
-  }catch(error){startupError=error.message||String(error);}
+  }catch(error){startupError=error.message||String(error);Ew4Startup.fail(startupError,error.name);}
   finally{Ew4Startup.stop();startupRunning=false;startupStatus();}
 }
 $('startup-retry').onclick=async()=>{

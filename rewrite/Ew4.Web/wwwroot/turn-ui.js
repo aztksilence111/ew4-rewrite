@@ -52,12 +52,13 @@
       Object.assign(list.style,{width:'299px',height:'59px',transform:'none',gap:'4px'});
       const populate=roster=>{
         list.replaceChildren();
-        const available=roster?.roster.filter(c=>!c.locked)||[],definitions=new Map((roster?.definitions||[]).map(d=>[d.id,d]));
+        const owned=new Map((roster?.roster||[]).map(c=>[c.id,c])),definitions=new Map((roster?.definitions||[]).map(d=>[d.id,d]));
+        const available=(state.carriedCommanderIds||[]).map(id=>owned.get(id)).filter(Boolean);
         for(let i=0;i<Math.max(6,available.length);i++){
           const held=available[i],definition=held&&definitions.get(held.definitionId),slot=document.createElement('div');slot.className='round-commander';
           const name=document.createElement('span');name.className='round-commander-name';
           if(definition){
-            slot.setAttribute('aria-label',definition.name);slot.append(this.api.portrait(definition.image));
+            slot.setAttribute('aria-label',definition.name);slot.dataset.commanderId=held.id;slot.append(this.api.portrait(definition.image));
             name.append(this.api.text(definition.name,'font_text_2_cn_hd','#ebe6e1',46.5,'center',{size:6,singleLine:true}));
           }
           else{slot.classList.add('empty');slot.setAttribute('aria-label','空将领槽');}

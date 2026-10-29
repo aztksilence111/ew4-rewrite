@@ -1,6 +1,16 @@
 using System.Text.Json;
 using Ew4.Core;
 
+if (args.ElementAtOrDefault(1) == "--attack-bounds-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { attackBoundsChecks = AttackBoundsChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--headquarters-presentation-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { headquartersPresentationChecks = HeadquartersPresentationChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
 if (args.ElementAtOrDefault(1) == "--shop-commander-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { shopCommanderChecks = ShopCommanderChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
@@ -44,7 +54,7 @@ if (args.ElementAtOrDefault(1) == "--player-ai-only")
 if (args.ElementAtOrDefault(1) == "--food-supply-only")
 {
     string supplyRoot = Path.GetFullPath(args[0]);
-    Console.WriteLine(JsonSerializer.Serialize(new { productionChecks = AiWorldProductionChecks.Run(supplyRoot),
+    Console.WriteLine(JsonSerializer.Serialize(new { neighborhoodChecks = AiNeighborhoodChecks.Run(), productionChecks = AiWorldProductionChecks.Run(supplyRoot),
         nativeProductionChecks = AiProductionChecks.Run(supplyRoot), turnChecks = WorldTurnChecks.Run(supplyRoot),
         lifecycleChecks = LifecycleChecks.Run(supplyRoot), errors = 0 })); return;
 }
@@ -101,7 +111,7 @@ if (args.ElementAtOrDefault(1) == "--r-feedback-only")
 if (args.ElementAtOrDefault(1) == "--snapshot-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { snapshotChecks = CombatantSnapshotChecks.Run() + ValidationReuseChecks.Run()
-        + SnapshotAllocationChecks.Run() + ExtensionPlanningChecks.Run(Path.GetFullPath(args[0])),
+        + SnapshotAllocationChecks.Run() + AiPlanningWorkChecks.Run() + ExtensionPlanningChecks.Run(Path.GetFullPath(args[0])),
         strategyChecks = AiStrategySelectionChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
 }
 
@@ -296,6 +306,7 @@ int battleChainChecks = BattleChainChecks.Run(root);
 int combatContextChecks = CombatContextChecks.Run(root);
 int improvementChecks = ImprovementChecks.Run(root);
 int aiTacticalChecks = AiTacticalChecks.Run(root);
+aiTacticalChecks += AiNeighborhoodChecks.Run();
 int splashChecks = SplashChecks.Run(root);
 int supportActionChecks = SupportActionChecks.Run(root);
 int aiMovementChecks = AiMovementChecks.Run(root);

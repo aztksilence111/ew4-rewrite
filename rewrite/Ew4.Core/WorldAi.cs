@@ -106,7 +106,8 @@ public static partial class WorldAi
         var factions = PlanningScope.Queries(state)?.Factions ?? state.Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
         var result = new List<AiCandidate<AiStrikeCommand>>();
         var attacker = Facts(state, unit, rules);
-        foreach (var target in state.Units)
+        var targets = PlanningScope.Queries(state)?.Nearby(map, unit.Cell, unit.Combatant.Profile.MaximumRange, true) ?? state.Units;
+        foreach (var target in targets)
         {
             var owner = factions[target.Owner];
             if (!WorldDiplomacy.Hostile(state, active.Id, owner.Id, rules.NeutralCamps)) continue;

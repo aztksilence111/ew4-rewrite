@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "screens": {
+    "roster": {
+      "background": "#e3e6e3",
+      "layout": {
+        "attributes": { "w": "640", "h": "360" },
+        "children": [
+          { "attributes": { "id": "header", "type": "group", "x": "0", "y": "0", "w": "640", "h": "44", "background": "#384c42" }, "children": [
+            { "attributes": { "id": "back", "type": "button", "x": "8", "y": "6", "w": "32", "h": "32", "frm1": "button_back.png", "title": "返回" } },
+            { "attributes": { "id": "title", "type": "text", "x": "50", "y": "10", "w": "200", "h": "24", "color": "245,245,245,255", "size": "18" } },
+            { "attributes": { "id": "medalsIcon", "type": "image", "x": "416", "y": "12", "w": "13", "h": "17", "name": "medals.png" } },
+            { "attributes": { "id": "medals", "type": "text", "x": "436", "y": "12", "w": "90", "h": "20", "color": "245,245,245,255" } },
+            { "attributes": { "id": "count", "type": "text", "x": "554", "y": "12", "w": "66", "h": "20", "align": "right", "color": "245,245,245,255" } }
+          ] },
+          { "attributes": { "id": "generals", "type": "group", "x": "16", "y": "62", "w": "608", "h": "220" } },
+          { "attributes": { "id": "academy", "type": "tmp_button", "x": "16", "y": "308", "w": "104", "h": "36", "frm1": "btn_common_green.png", "text": "军事学院" } },
+          { "attributes": { "id": "shop", "type": "tmp_button", "x": "132", "y": "308", "w": "80", "h": "36", "frm1": "btn_common_blue.png", "text": "商店" } },
+          { "attributes": { "id": "tools", "type": "tmp_button", "x": "544", "y": "308", "w": "80", "h": "36", "frm1": "btn_common_blue.png", "text": "管理" } }
+        ]
+      },
+      "bindings": { "roster": "generals", "title": "header/title", "medals": "medals", "count": "count" },
+      "actions": { "header/back": { "command": "back" }, "academy": { "command": "academy" }, "shop": { "command": "shop" }, "tools": { "command": "page", "page": "management" } },
+      "roster": { "rows": 2, "cardScale": 1, "gap": 8, "showEmpty": false, "showInfo": true, "showPromotion": false }
+    },
+    "management": {
+      "background": "#e3e6e3",
+      "layout": {
+        "attributes": { "w": "640", "h": "360" },
+        "children": [
+          { "attributes": { "id": "back", "type": "tmp_button", "x": "16", "y": "16", "w": "80", "h": "36", "frm1": "btn_common_blue.png", "text": "返回" } },
+          { "attributes": { "id": "title", "type": "text", "x": "112", "y": "20", "w": "200", "h": "28", "text": "管理", "size": "20" } },
+          { "attributes": { "id": "tasks", "type": "tmp_button", "x": "16", "y": "90", "w": "136", "h": "44", "frm1": "btn_common_blue.png", "text": "任务" } },
+          { "attributes": { "id": "achievements", "type": "tmp_button", "x": "168", "y": "90", "w": "136", "h": "44", "frm1": "btn_common_blue.png", "text": "成就" } },
+          { "attributes": { "id": "princesses", "type": "tmp_button", "x": "320", "y": "90", "w": "136", "h": "44", "frm1": "btn_common_green.png", "text": "公主" } },
+          { "attributes": { "id": "tags", "type": "tmp_button", "x": "472", "y": "90", "w": "152", "h": "44", "frm1": "btn_common_blue.png", "text": "标签" } },
+          { "attributes": { "id": "generals", "type": "group", "x": "16", "y": "156", "w": "608", "h": "180" } }
+        ]
+      },
+      "bindings": { "roster": "generals" },
+      "actions": { "back": { "command": "back" }, "tasks": { "command": "tasks" }, "achievements": { "command": "achievements" }, "princesses": { "command": "princesses" }, "tags": { "command": "tags", "editingText": "确认" } },
+      "roster": { "rows": 1, "cardScale": 1.25, "gap": 12, "showEmpty": false, "showInfo": false, "showPromotion": false }
+    },
+    "academy": {
+      "background": "#e3e6e3",
+      "layout": {
+        "attributes": { "w": "640", "h": "360" },
+        "children": [
+          { "attributes": { "id": "back", "type": "tmp_button", "x": "16", "y": "12", "w": "72", "h": "36", "frm1": "btn_common_blue.png", "text": "返回" } },
+          { "attributes": { "id": "low", "type": "tmp_button", "x": "116", "y": "12", "w": "96", "h": "36", "frm1": "btn_common_blue.png", "text": "一星区" } },
+          { "attributes": { "id": "middle", "type": "tmp_button", "x": "224", "y": "12", "w": "96", "h": "36", "frm1": "btn_common_blue.png", "text": "二星区" } },
+          { "attributes": { "id": "high", "type": "tmp_button", "x": "332", "y": "12", "w": "96", "h": "36", "frm1": "btn_common_blue.png", "text": "三星区" } },
+          { "attributes": { "id": "generals", "type": "group", "x": "16", "y": "76", "w": "608", "h": "132" } },
+          { "attributes": { "id": "selected", "type": "text", "x": "16", "y": "228", "w": "200", "h": "24" } },
+          { "attributes": { "id": "price", "type": "text", "x": "224", "y": "228", "w": "96", "h": "24" } },
+          { "attributes": { "id": "buy", "type": "tmp_button", "x": "16", "y": "308", "w": "120", "h": "36", "frm1": "btn_common_green.png", "text": "勋章招募" } },
+          { "attributes": { "id": "refresh", "type": "tmp_button", "x": "504", "y": "308", "w": "120", "h": "36", "frm1": "btn_common_blue.png", "text": "刷新" } }
+        ]
+      },
+      "bindings": { "roster": "generals", "offerName": "selected", "medalPrice": "price" },
+      "actions": { "back": { "command": "back" }, "low": { "command": "academy", "section": 0 }, "middle": { "command": "academy", "section": 1 }, "high": { "command": "academy", "section": 2 }, "buy": { "command": "recruitMedals" }, "refresh": { "command": "refresh" } },
+      "roster": { "rows": 1, "cardScale": 1, "gap": 16, "showEmpty": true, "showInfo": true, "showPromotion": false }
+    }
+  }
+}

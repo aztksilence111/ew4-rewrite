@@ -26,7 +26,8 @@ const base=process.argv[2],out=path.resolve(process.argv[3]),baseline=process.ar
         const dialog=rect($('detail-modal').firstElementChild),body=rect(layout.body),title=rect(layout.get('text_round')),number=rect(layout.get('text_roundnum'));
         const glyph=rect(layout.get('text_roundnum').firstElementChild),scale=body.width/320;
         return {viewport:[innerWidth,innerHeight],dialog,body,title,number,glyph,scale,empty:document.querySelectorAll('.round-commander.empty').length,
-          nameplates:document.querySelectorAll('.round-commander-name').length,expectedCenter:body.x+160*scale};
+          nameplates:document.querySelectorAll('.round-commander-name').length,expectedCenter:body.x+160*scale,
+          commanderCount:(state.carriedCommanderIds||[]).length};
       });
       check(geometry.dialog.left>=0&&geometry.dialog.right<=viewport.width+1,'dialog fits');
       if(!baseline){
@@ -34,7 +35,7 @@ const base=process.argv[2],out=path.resolve(process.argv[3]),baseline=process.ar
         check(Math.abs(geometry.dialog.y+geometry.dialog.height/2-viewport.height/2)<1,'dialog centered vertically');
         check(Math.abs(geometry.title.x+geometry.title.width/2-geometry.expectedCenter)<geometry.scale,'round title centered');
         check(Math.abs(geometry.number.x+geometry.number.width/2-geometry.expectedCenter)<geometry.scale,'round number centered');
-        check(geometry.empty===6&&geometry.nameplates===6,'six empty slots retain nameboards');
+        check(geometry.empty===Math.max(0,6-geometry.commanderCount)&&geometry.nameplates===Math.max(6,geometry.commanderCount),'battle commanders and empty slots retain nameboards');
       }
       report.views.push(geometry);await page.screenshot({path:path.join(out,'round-'+viewport.width+'.png')});
     }

@@ -12,17 +12,20 @@ public sealed partial class MainActivity
     private sealed record StartupSnapshot(string Stage, string WebView, string Error, bool Complete);
     private readonly object startupGate = new();
     private LinearLayout? startupPanel;
+    private ImageView? startupSplash;
+    private global::Android.Graphics.Bitmap? startupArtwork;
     private TextView? startupText;
     private ProgressBar? startupSpinner;
     private Button? startupContinue;
     private Func<string, byte[]>? assetRead;
-    private string startupFile = "", startupStage = "准备启动", webViewVersion = "尚未初始化", previousExit = "";
+    private string startupFile = "", startupStage = "准备启动", webViewVersion = "尚未初始化", previousExit = "", startupVersion = "";
     private bool previousStartupIncomplete, startupComplete, startupHasFailed;
     private volatile bool destroyed;
 
     private void CreateStartupSurface()
     {
         startupFile = Path.Combine(FilesDir!.AbsolutePath, "startup-state.json");
+        startupVersion = PackageManager!.GetPackageInfo(PackageName!, 0)!.VersionName ?? "未知";
         StartupSnapshot? previous = null;
         try
         {
@@ -33,7 +36,18 @@ public sealed partial class MainActivity
         previousStartupIncomplete = previous is { Complete: false, Stage.Length: > 0 and < 256, WebView: not null, Error: not null };
         surface = new FrameLayout(this);
         surface.SetBackgroundColor(global::Android.Graphics.Color.Rgb(24, 26, 29));
-        startupPanel = new LinearLayout(this) { Orientation = Orientation.Vertical };
+        startupSplash = new ImageView(this);
+        startupSplash.SetBackgroundColor(global::Android.Graphics.Color.Black);
+        startupSplash.SetScaleType(ImageView.ScaleType.FitCenter);
+        try
+        {
+            using var image = Assets!.Open("www/startup-loading.png");
+            startupArtwork = global::Android.Graphics.BitmapFactory.DecodeStream(image);
+            startupSplash.SetImageBitmap(startupArtwork);
+        }
+        catch (Exception error) { global::Android.Util.Log.Warn("EW4", "Startup artwork: " + error.Message); }
+        surface.AddView(startupSplash, new FrameLayout.LayoutParams(-1, -1));
+        startupPanel = new LinearLayout(this) { Orientation = Orientation.Vertical, Visibility = ViewStates.Gone };
         startupPanel.SetBackgroundColor(global::Android.Graphics.Color.Rgb(24, 26, 29));
         startupPanel.SetGravity(GravityFlags.Center);
         int pad = (int)(20 * Resources!.DisplayMetrics!.Density);
@@ -56,6 +70,9 @@ public sealed partial class MainActivity
         SetContentView(surface);
         if (previousStartupIncomplete)
         {
+            ReadPreviousExit();
+            startupSplash.Visibility = ViewStates.Gone;
+            startupPanel.Visibility = ViewStates.Visible;
             startupStage = previous!.Stage; webViewVersion = previous.WebView!;
             startupText.Text = StartupDescription("上次启动未完成，停在：" + startupStage, previous.Error!);
             startupSpinner.Visibility = ViewStates.Gone;
@@ -65,7 +82,14 @@ public sealed partial class MainActivity
     }
 
     private string StartupDescription(string stage, string error) => stage + "\n" + Build.Manufacturer + " " + Build.Model
-        + " · Android " + Build.VERSION.Release + "\nWebView：" + webViewVersion
+        + " · Android " + Build.VERSION.Release + "（API " + (int)Build.VERSION.SdkInt + "）"
+        + "\nCPU 架构：" + string.Join(", ", Build.SupportedAbis ?? [])
+        + " · 进程：" + System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture
+        + "\n硬件：" + Build.Hardware + " · " + Build.Board
+        + "\n显示：" + Resources!.DisplayMetrics!.WidthPixels + " × " + Resources.DisplayMetrics.HeightPixels
+        + " · " + Resources.DisplayMetrics.DensityDpi + " dpi"
+        + "\nWebView：" + webViewVersion
+        + "\n版本：" + startupVersion
         + (previousExit.Length == 0 ? "" : "\n" + previousExit) + (error.Length == 0 ? "" : "\n" + error);
 
     private void SetStartupStage(string stage, string error = "", bool complete = false)
@@ -156,9 +180,10 @@ public sealed partial class MainActivity
         {
             if (destroyed || IsFinishing) return;
             starting = false; startupComplete = false; startupHasFailed = true;
-            string message = error.GetType().Name + ": " + error.Message;
+            string message = "错误类型：" + error.GetType().Name + "\n" + error.Message;
             SetStartupStage(stage, message.Length > 1200 ? message[..1200] : message);
             startupPanel!.Visibility = ViewStates.Visible;
+            startupSplash!.Visibility = ViewStates.Gone;
             startupSpinner!.Visibility = ViewStates.Gone;
             startupContinue!.Text = "重试";
             startupContinue.Visibility = ViewStates.Visible;
@@ -173,9 +198,11 @@ public sealed partial class MainActivity
             if (destroyed || startupComplete) return;
             if (state == "ready")
             {
+                if (startupHasFailed) return;
                 startupComplete = true; starting = false; startupHasFailed = false;
                 SetStartupStage("启动完成", complete: true);
                 startupPanel!.Visibility = ViewStates.Gone;
+                startupSplash!.Visibility = ViewStates.Gone;
             }
             else if (state == "pending" && !startupHasFailed) SetStartupStage(message.Length > 120 ? message[..120] : message);
             else if (state == "error") StartupFailed("游戏页面启动失败", new InvalidOperationException(message));

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Reflection;
 using Ew4.Client;
 using Ew4.Core;
 using Ew4.Persistence;
@@ -66,6 +67,52 @@ internal static class AiBatchChecks
         Check(stale.RootElement.GetProperty("code").GetString() == "client.stale", "stale batch rejected");
         stale.Dispose();
         var aiWorld = initial.World with { ActiveFaction = initial.World.Factions.First(f => !f.Human).Id };
+        var compactHost = Host("compact", initial with { World = aiWorld });
+        var compactReference = Host("compact-reference", initial with { World = aiWorld });
+        var gameField = typeof(ClientGame).GetField("game", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var pendingField = typeof(ClientGame).GetField("pendingAiStep", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        Ew4.Legacy.LegacyScenarioStart Current(ClientGame host) => (Ew4.Legacy.LegacyScenarioStart)gameField.GetValue(host)!;
+        WorldAi.StepWork Partial()
+        {
+            var current = Current(compactHost);
+            var work = new WorldAi.StepWork(current.Session.World, current.Rules.Ai,
+                current.Rules.Production[current.Session.World.ActiveFaction], current.Rules.Turns);
+            pendingField.SetValue(compactHost, work);
+            return work;
+        }
+        foreach (string route in new[] { "action", "catalog" })
+        {
+            Partial();
+            Call(compactHost, route, new { op = "state" });
+            Check(pendingField.GetValue(compactHost) == null, "refresh and non-batch routes discard pending planning");
+        }
+        var compactStart = Current(compactHost);
+        var partial = Partial();
+        using (PlanningScope.Begin(compactStart.Rules.Ai, compactStart.Rules.Production[aiWorld.ActiveFaction], compactStart.Rules.Turns)) partial.Advance();
+        int compactSteps = 0;
+        while (Current(compactHost).Session.World.ActiveFaction == aiWorld.ActiveFaction)
+        {
+            var before = Current(compactHost).Session;
+            var response = Call(compactHost, "action", new { op = "ai_batch", revision = before.Revision, compact = true });
+            int advanced = response.GetProperty("steps").GetInt32();
+            bool progressOnly = response.TryGetProperty("progressOnly", out var progress) && progress.GetBoolean();
+            Check(advanced is >= 0 and <= 32, "compact batch has bounded commits");
+            if (advanced == 0)
+                Check(progressOnly && response.GetProperty("planning").GetBoolean()
+                    && response.GetProperty("revision").GetInt64() == before.Revision, "partial planning keeps revision and reports progress");
+            for (int i = 0; i < advanced; i++)
+                Call(compactReference, "action", new { op = "ai", revision = Current(compactReference).Session.Revision });
+            Check(SessionSave.Encode(Current(compactHost).Session).SequenceEqual(SessionSave.Encode(Current(compactReference).Session)),
+                "compact continuation matches ordinary decisions and durable RNG");
+            if (!progressOnly) Check(response.GetProperty("error").ValueKind == JsonValueKind.Null, "compact boundary has no error");
+            compactSteps += advanced;
+            Check(compactSteps < 2000, "compact faction terminates");
+        }
+        Check(pendingField.GetValue(compactHost) == null && compactSteps > 0, "handoff clears pending planning");
+        Partial();
+        using (var staleCompact = JsonDocument.Parse(compactHost.Dispatch("/api/action", "{\"op\":\"ai_batch\",\"compact\":true,\"revision\":-1}")))
+            Check(staleCompact.RootElement.GetProperty("code").GetString() == "client.stale" && pendingField.GetValue(compactHost) == null,
+                "stale request discards pending planning");
         var popupEvent = new ScriptedScenarioEvent { Id = "batch-popup", Popup = new ScenarioPopup { Text = "Batch boundary" } };
         var popupWorld = aiWorld with { ScenarioEvents = [popupEvent], ScenarioPlayerFaction = initial.PlayerFaction };
         var popupHost = Host("popup", initial with { World = popupWorld });

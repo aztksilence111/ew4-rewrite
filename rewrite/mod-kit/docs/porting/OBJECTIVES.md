@@ -89,6 +89,8 @@
 
 ## UI 扩展
 
+需要增删指挥部按钮、重排整个页面或增加子页时，使用[headquartersPresentation完整布局接口](HEADQUARTERS_LAYOUT.md)。以下字段仅调节默认工具栏与任务/成就弹窗，不限制自定义页面的按钮数量。
+
 在已有 `presentation` 文件中可增加以下布局键，省略时使用 R 版原版风格默认值：
 
 ```json

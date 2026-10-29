@@ -284,15 +284,12 @@ public sealed record WorldState
                 || faction.Survival.ExcludedBuildings.Any(string.IsNullOrWhiteSpace))
                 throw new RuleViolation("world.faction", "Invalid recruitment grants or turn counters");
         }
-        foreach (var cell in Cells)
+        if (Cells is FrozenWorldCells frozenCells) frozenCells.Validate(this, factionIds);
+        else foreach (var cell in Cells)
         {
             if (ArmyCapacity != null) WorldArmyCapacity.BuildingCapacity(this, cell);
-            if (cell.Terrain.Barrier != TerrainBarrier.None || cell.Terrain.MinimumEntryCost != 0) Geography.Validate(cell);
-            cell.IncomeOverride?.Validate();
-            if ((cell.Owner != null && !factionIds.Contains(cell.Owner)) || cell.Environment < 0 || cell.Terrain.TerrainCost <= 0 || cell.BuildingLevel < 0
-                || cell.BuildingUpgradesThisTurn < 0
-                || (cell.InstallationKind != null && string.IsNullOrWhiteSpace(cell.InstallationKind)) || string.IsNullOrWhiteSpace(cell.FireTerrain)
-                || string.IsNullOrWhiteSpace(cell.DefenseTerrain))
+            ValidateCellValue(cell);
+            if (cell.Owner != null && !factionIds.Contains(cell.Owner))
                 throw new RuleViolation("world.cell", "Invalid cell state or owner");
         }
         var commanders = new HashSet<string>(StringComparer.Ordinal);
@@ -406,7 +403,16 @@ public sealed record WorldState
             : value with { Combatant = combatant, PlayerControl = control, CommanderBase = commanderBase };
     }
 
-    public WorldState Copy() => this with
+    internal static void ValidateCellValue(CellState cell)
+    {
+        if (cell.Terrain.Barrier != TerrainBarrier.None || cell.Terrain.MinimumEntryCost != 0) Geography.Validate(cell);
+        cell.IncomeOverride?.Validate();
+        if (cell.Environment < 0 || cell.Terrain.TerrainCost <= 0 || cell.BuildingLevel < 0 || cell.BuildingUpgradesThisTurn < 0
+            || cell.InstallationKind != null && string.IsNullOrWhiteSpace(cell.InstallationKind)
+            || string.IsNullOrWhiteSpace(cell.FireTerrain) || string.IsNullOrWhiteSpace(cell.DefenseTerrain))
+            throw new RuleViolation("world.cell", "Invalid cell state or owner");
+    }
+    public WorldState Copy() => PlanningScope.PreserveCopy(this, this with
     {
         ArmyCapacity = ArmyCapacity?.Copy(),
         DiplomacyAdjustments = DiplomacyAdjustments?.ToArray(),
@@ -422,7 +428,7 @@ public sealed record WorldState
         }).ToArray(),
         // CellState, MovementCell and Resources are sealed records containing only
         // immutable values. Only the caller-owned list needs snapshot isolation.
-        Cells = Cells.ToArray(),
+        Cells = PlanningScope.FrozenSnapshots ? FrozenWorldCells.Copy(Cells) : Cells.ToArray(),
         Jurisdictions = Jurisdictions?.Copy(),
         Provocations = Provocations == null ? null : Provocations with { CombatantCamps = Provocations.CombatantCamps.ToArray() },
         NeutralHostilities = NeutralHostilities.ToArray(),
@@ -441,5 +447,5 @@ public sealed record WorldState
         ScenarioEventProgress = ScenarioEventProgress.ToDictionary(p => p.Key, p => p.Value with { }, StringComparer.Ordinal),
         DestroyedScenarioUnits = DestroyedScenarioUnits.ToArray(), DeadScenarioCommanders = DeadScenarioCommanders.ToArray(),
         TriggeredEvents = TriggeredEvents.ToArray(), QueuedDialogues = QueuedDialogues.ToArray()
-    };
+    });
 }

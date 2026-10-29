@@ -17,6 +17,7 @@
         if(this.tagDraft){this.tagDraft=null;this.drawRoster();return;}
         if(this.deployment){this.closeRoster();this.api.tutorialUi('winbtn_back');return;}
         if(this.recruiting){this.recruiting=false;this.drawRoster();return;}
+        if(this.hqPage){this.hqPage=null;this.drawRoster();return;}
         this.api.main();
       };
       document.getElementById('hq-recruit').onclick=()=>{this.closeHeadquartersFilter?.(true);this.recruiting=true;this.rating=0;this.offer=null;this.drawRoster();};
@@ -43,14 +44,16 @@
     async transitionPage(change){
       if(this.pageTransition)return;
       this.pageTransition=true;
-      const curtain=document.createElement('div');curtain.className='menu-transition-curtain';
+      const focus=document.activeElement,curtain=document.createElement('div');curtain.className='menu-transition-curtain';curtain.tabIndex=-1;
+      curtain.onkeydown=e=>{e.preventDefault();e.stopPropagation();};
       const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-      document.getElementById('menu-stage').append(curtain);
+      document.body.append(curtain);
+      curtain.focus({preventScroll:true});
       try{
         if(!reduced)await curtain.animate([{opacity:0},{opacity:1}],{duration:160,fill:'forwards'}).finished;
         await change();
         if(!reduced)await curtain.animate([{opacity:1},{opacity:0}],{duration:180,fill:'forwards'}).finished;
-      }finally{curtain.remove();this.pageTransition=false;}
+      }finally{curtain.remove();this.pageTransition=false;if(focus?.isConnected&&!focus.closest('[hidden]')&&!focus.disabled)focus.focus({preventScroll:true});}
     }
     // Retarget from the currently displayed camera when clicks arrive during a pan.
     strategicPose(key,target,time){
@@ -304,12 +307,16 @@
     }
     async headquarters(deployment=null){
       this.closeHeadquartersFilter?.(true);
+      this.hqPage=null;
+      if(this.catalog.headquartersPresentation)this.rosterRating=this.catalog.headquartersPresentation.screens.roster?.initialSection??null;
       this.data=await this.api.rpc('headquarters');this.deployment=deployment;this.recruiting=false;this.tagDraft=null;
-      if(deployment)document.getElementById('play').hidden=true;
-      for(const id of ['main-menu','scenario-menu','countries','campaign-screen'])document.getElementById(id).hidden=true;
-      document.getElementById('hq-screen').hidden=false;document.getElementById('menu').hidden=false;
-      if(deployment)document.getElementById('hq-roster').scrollLeft=0;
-      this.drawRoster();
+      await this.transitionPage(()=>{
+        if(deployment)document.getElementById('play').hidden=true;
+        for(const id of ['main-menu','scenario-menu','countries','campaign-screen'])document.getElementById(id).hidden=true;
+        document.getElementById('hq-screen').hidden=false;document.getElementById('menu').hidden=false;
+        if(deployment)document.getElementById('hq-roster').scrollLeft=0;
+        this.drawRoster();
+      });
     }
     async deployGeneral(unit,revision){
       const available=await this.api.rpc('deployment',{unit,revision});
@@ -331,6 +338,7 @@
       if(held?.locked){card.dataset.locked='true';card.title=(card.title?card.title+' · ':'')+'已派遣';}return card;
     }
     drawRoster(){
+      this.clearHeadquartersPresentation?.();
       this.cancelRecruitmentReveal();this.headquartersView=(this.headquartersView||0)+1;
       const data=this.data,screen=document.getElementById('hq-screen');screen.classList.toggle('recruiting',this.recruiting);screen.classList.toggle('tag-editing',!!this.tagDraft);screen.classList.toggle('deploying',!!this.deployment);
       const heading=screen.querySelector('h1'),headingKey=this.deployment?'title_deploygeneral':this.recruiting?'title_buygeneral':'title_headquarters';heading.dataset.label=headingKey;heading.setAttribute('aria-label',this.text(headingKey));heading.replaceChildren(this.api.labels(headingKey,this.text(headingKey),heading));
@@ -355,7 +363,7 @@
         const held=owned.get(definition.id),shown=this.tagDraft&&held?{...held,tag:this.tagDraft.has(held.id)?'置顶':''}:held,b=this.card(definition,shown,()=>{
           if(this.tagDraft){if(!this.tagSaving){if(this.tagDraft.has(held.id))this.tagDraft.delete(held.id);else this.tagDraft.add(held.id);this.drawRoster();}return;}
           if(this.recruiting)this.selectRecruitmentOffer(definition);
-          else {this.rosterSelected=definition.id;for(const c of roster.children)c.setAttribute('aria-pressed',String(c===b));if(!this.deployment)this.commanderInfo(definition,held);}
+          else {this.rosterSelected=definition.id;for(const c of roster.children)c.setAttribute('aria-pressed',String(c===b));this.syncHeadquartersPresentation?.();if(!this.deployment)this.commanderInfo(definition,held);}
         });roster.append(b);if(held)b.dataset.commander=held.id;
         if(this.recruiting){b.dataset.offer=definition.id;b.ew4OfferKey=JSON.stringify(definition);}
         if(this.deployment){
@@ -390,6 +398,7 @@
         quota.append(this.api.uiImage(icon?.name||'generalnumber.png',Number(icon?.w)||26,Number(icon?.h)||19),this.lettering((this.deploymentQuota?.used??0)+' / '+(this.deploymentQuota?.limit??'∞'),'font_char_4_hd','#404040'));
         screen.append(quota);
       }
+      this.renderHeadquartersPresentation?.();
     }
     selectRecruitmentOffer(definition){
       if(this.refreshPending||this.recruitPending||!this.recruiting)return;
@@ -405,6 +414,7 @@
       const busy=!!(this.refreshPending||this.recruitPending),refresh=document.getElementById('hq-refresh');
       if(refresh){refresh.disabled=busy;refresh.setAttribute('aria-busy',String(!!this.refreshPending));}
       for(const button of screen.querySelectorAll('#hq-roster .commander-open,#hq-roster .commander-info'))button.disabled=busy;
+      this.syncHeadquartersPresentation?.();
     }
     fitRecruitmentPurchases(){
       const row=document.getElementById('hq-buy-buttons'),screen=document.getElementById('hq-screen');if(!row||screen.hidden)return;
@@ -414,6 +424,7 @@
       row.style.left=left+'px';row.style.top=((bounds.bottom-frame.top)/scale+2)+'px';row.style.transformOrigin=(center-left)+'px 0';
     }
     drawPurchases(){
+      this.syncHeadquartersPresentation?.();
       document.getElementById('hq-buy-buttons')?.remove();if(!this.offer||!this.recruiting||this.refreshPending)return;
       const definition=this.offer,group=this.rating;
       const row=document.createElement('div');row.id='hq-buy-buttons';document.getElementById('hq-screen').append(row);

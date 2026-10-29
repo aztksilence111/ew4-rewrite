@@ -94,6 +94,11 @@ internal static class AiWorldProductionChecks
                 var sample = source with { AiRandomState = seed };
                 byte[] before = WorldSave.Encode(sample);
                 var plan = WorldAi.PlanProduction(sample, ai, rules, turns);
+                using (PlanningScope.Begin(ai, rules, turns))
+                {
+                    var indexed = WorldAi.PlanProduction(sample, ai, rules, turns);
+                    Check(plan == indexed, "Indexed production changed command or random draws");
+                }
                 Check(before.SequenceEqual(WorldSave.Encode(sample)), "production planning is read only");
                 var restored = WorldSave.Decode(before, sample.ContentRevision);
                 var replayPlan = WorldAi.PlanProduction(restored, ai, rules, turns);
@@ -135,6 +140,19 @@ internal static class AiWorldProductionChecks
                 { Profile = template.Profile with { Id = "fort", Category = "fort" } }, Cost = new(10, 5, 0), Building = BuildingRequirement.Forbidden, PerTurnLimit = 1 } },
             FortressScoring = new() { Recipes = [new("fort.recipe", 1, false)], MinimumScore = 0, Admission = new(1, 1, 1) } };
         Verify(world with { Units = [enemy] }, fortress, c => c is AiRecruitCommand { Fortress: true, OfferId: "fort.recipe" });
+
+        var dense = buildWorld with { Width = 20, Height = 10,
+            Cells = Enumerable.Range(0, 200).Select(_ => new CellState { Owner = actor.Owner }).ToArray(),
+            Units = buildWorld.Units.Concat(Enumerable.Range(12, 100).Select(i => enemy with { Id = "dense." + i, Cell = i })).Reverse().ToArray() };
+        foreach (string relation in new[] { "default", "neutral", "allied", "hostile" })
+        foreach (var policy in new[] { recruit, installation, fortress })
+        for (ulong seed = 0; seed < 16; seed++)
+        {
+            var sample = WorldDiplomacy.Set(dense, actor.Owner, enemy.Owner, relation) with { AiRandomState = seed };
+            var reference = WorldAi.PlanProduction(sample, ai, policy, turns);
+            using var scope = PlanningScope.Begin(ai, policy, turns);
+            Check(reference == WorldAi.PlanProduction(sample, ai, policy, turns), "Dense indexed production changed diplomacy, order or draws");
+        }
 
         var supplyWorld = world with { Units = [actor with { Support = new() { FoodConsumption = 100 } }, enemy] };
         WorldState Supply(long food, int shortage = 0) => supplyWorld with
