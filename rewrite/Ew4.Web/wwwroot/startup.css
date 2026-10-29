@@ -1,6 +1,5 @@
-#startup-splash{position:fixed;inset:0;z-index:9999;background:#000;display:flex;align-items:center;justify-content:center}
+#startup-splash{position:fixed;inset:0;z-index:9999;background:#fff;display:flex;align-items:center;justify-content:center}
 #startup-splash>img{display:block;width:100%;height:100%;object-fit:contain}
 #startup-splash[hidden]{display:none}
 body.startup-failed #startup-status{inset:0;transform:none;width:100%;max-width:none;max-height:none;border:0;background:#181a1d;padding:24px;justify-content:center;flex-direction:column}
 body.startup-failed #startup-message{width:100%;max-width:900px;overflow:auto;text-align:center}
-.loading-watermark{position:absolute;left:20px;top:275px;font:12px sans-serif;color:#c4c4c4}

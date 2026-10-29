@@ -25,9 +25,16 @@ const base=process.argv[2]||'http://127.0.0.1:56147',out=path.resolve(process.ar
       check(await page.locator('#startup-splash').isVisible(),'original artwork while initializing '+width);
       check(await page.locator('#startup-status').isHidden(),'diagnostics hidden while initializing '+width);
       const artwork=await page.locator('#startup-splash').screenshot({path:path.join(out,'loading-'+width+'.png')});
-      const png=PNG.sync.read(artwork);let ink=0;
-      for(let i=0;i<png.data.length;i+=4)if(png.data[i]+png.data[i+1]+png.data[i+2]>90)ink++;
-      check(ink>1000,'startup artwork has rendered pixels '+width);
+      const png=PNG.sync.read(artwork);let ink=0,red=0;
+      for(let i=0;i<png.data.length;i+=4){
+        const [r,g,b]=png.data.subarray(i,i+3);
+        if(r+g+b<600)ink++;
+        if(r>100&&r>g*1.5&&r>b*1.2)red++;
+      }
+      check(ink>1000&&red>100,'EASY TECH logo has rendered pixels '+width);
+      check([[0,0],[width-1,0],[0,height-1],[width-1,height-1]].every(([x,y])=>{
+        const i=(y*png.width+x)*4;return png.data[i]===255&&png.data[i+1]===255&&png.data[i+2]===255;
+      }),'white startup surface has no black borders '+width);
       check(await page.locator('#startup-splash img').evaluate(img=>getComputedStyle(img).objectFit==='contain'&&img.naturalWidth/img.naturalHeight===1136/640),'artwork preserves original aspect ratio '+width);
       release();await ready(page);
       check(await page.locator('#startup-splash').isHidden()&&await page.locator('#startup-status').isHidden(),'successful startup clears all overlays '+width);
@@ -39,7 +46,8 @@ const base=process.argv[2]||'http://127.0.0.1:56147',out=path.resolve(process.ar
         window.loadingTask=withLoading(()=>new Promise(resolve=>{window.loadingRelease=resolve;}));
       });
       await page.waitForFunction(()=>loadingRelease!==null);
-      check(await page.locator('.loading-watermark').isVisible(),'battle loading carries noncommercial watermark '+width);
+      check(await page.locator('#loading-screen').isVisible(),'battle loading remains visible '+width);
+      check(await page.locator('.loading-watermark').count()===0&&!/Rewrite|非商用|不用于商用/.test(await page.locator('#loading-screen').innerText()),'battle loading has no rewrite notices '+width);
       await page.evaluate(async()=>{loadingRelease();await loadingTask;});
       await context.close();
     }

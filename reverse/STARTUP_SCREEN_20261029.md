@@ -1,5 +1,17 @@
 # Rewrite 启动加载页
 
+## EASY TECH 初始化画面纠正
+
+按用户进一步澄清，初始化启动页使用原版 `欧陆战争4_1.6.6.apk` 中的 `assets/logo@2x.png`，透明底合成白色背景，下方分别标注“Rewrite版”“非商用”。资源 SHA-256 为 `28be4f1a73573f1635acf920dfb9b62b0b0d14d67f7e83ddd883f0da169fc60b`，与原包及既有解包文件一致；不使用带黑边的用户截图。
+
+Android 原生与 Web 共用重新生成的 `startup-loading.png`，外围留白同样为白色，保持等比例显示。进剧本时的原版加载页已移除此前误加的 Rewrite／非商用文字和样式。失败诊断及重试流程沿用。
+
+更新的启动回归 50 项通过，覆盖桌面、手机横竖屏、白底四角、Logo 非空像素、进入剧本无新增文字，以及资源／脚本／超时／旧 Chromium 错误与重试；Chrome70 兼容构建 54 文件零错误，Python／JS 语法及 diff 检查通过。测试产物清理 8 文件、259137 字节，剩余0／错误0，凭据 `build/maintenance-20261029/startup-logo-cleanup.json`。预览继续使用 <http://127.0.0.1:56147>。
+
+按用户要求复用 0.2.27/code30 重新打包并替换 GitHub Release；最新打包与发布状态见 [发行记录](../rewrite/RELEASE_PROGRESS_0.2.27_20261029.md)。下方为纠正前的开发历史。
+
+## 首轮开发记录（已纠正画面）
+
 2026-10-29，按用户截图反馈调整 Android 与 Windows Web 启动体验。
 
 - 正常初始化显示原版 `form_loading` 黑底、左上标题、中央提示和右下 `LOADING...`。`startup-loading.png` 使用既有原版标题和位图字库生成，直接绘入“Rewrite 版 · 不用于商用”水印。原版素材与原始输入保持。

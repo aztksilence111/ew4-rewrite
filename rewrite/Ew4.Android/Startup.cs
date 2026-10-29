@@ -37,7 +37,7 @@ public sealed partial class MainActivity
         surface = new FrameLayout(this);
         surface.SetBackgroundColor(global::Android.Graphics.Color.Rgb(24, 26, 29));
         startupSplash = new ImageView(this);
-        startupSplash.SetBackgroundColor(global::Android.Graphics.Color.Black);
+        startupSplash.SetBackgroundColor(global::Android.Graphics.Color.White);
         startupSplash.SetScaleType(ImageView.ScaleType.FitCenter);
         try
         {
