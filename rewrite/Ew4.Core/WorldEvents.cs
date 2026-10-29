@@ -133,7 +133,8 @@ public static class WorldEvents
             { Owner = c.Terrain.Sea && c.BuildingKind == null ? null : successor }).ToArray();
         var next = copy with
         {
-            Cells = successor == null ? transfer : JurisdictionClaims.Filter(state, transfer, successor),
+            // Surrender transfers ownership directly; passive expansion rules reject buildings and guarded land.
+            Cells = transfer,
             Units = copy.Units.Where(u => !removedIds.Contains(u.Id)).ToArray(),
             Commanders = copy.Commanders.Select(c => c.Owner == loser || removed.Any(u => u.CommanderId == c.Id) ? c with { Withdrawn = true } : c).ToArray(),
             Factions = state.Factions.Select(f => f.Id == loser ? f with { Defeated = true } : f).ToArray(),

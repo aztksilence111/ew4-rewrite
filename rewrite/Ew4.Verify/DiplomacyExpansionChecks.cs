@@ -104,10 +104,12 @@ internal static class DiplomacyExpansionChecks
             && aiExecuted.State.Factions.Single(f => f.Id == "winner").Resources.Money == 210,
             "AI unit execution preserves treasury transfer and notices");
         Reject(() => DemandDiplomacy.Demand(ai, ai.Revision, "winner", "loser"), "diplomacy.turn");
-        var scriptedSurrender = Events(ai, new ScenarioEffect { Type = "faction_surrender", Faction = "loser", OtherFaction = "winner" });
+        var scriptedSurrender = Events(ai with { Jurisdictions = TerritorialJurisdictions.Create(ai) },
+            new ScenarioEffect { Type = "faction_surrender", Faction = "loser", OtherFaction = "winner" });
         Check(scriptedSurrender.Factions.Single(f => f.Id == "loser").Defeated && scriptedSurrender.Cells[0].Owner == "winner"
             && scriptedSurrender.Factions.Single(f => f.Id == "winner").Resources.Money == 10,
             "events simulate AI surrender without random demand or capital loot");
+        Check(scriptedSurrender.Cells.All(c => c.Owner != "loser"), "scripted surrender transfers all facilities with fixed jurisdictions");
         var spawned = Events(loot.State, new ScenarioEffect { Type = "faction_create", Faction = "transformed", Name = "new", Camp = "new", TemplateFaction = "loser",
             Capital = 2, InitialResources = new(300, 200, 100) });
         var created = spawned.Factions.Single(f => f.Id == "transformed");

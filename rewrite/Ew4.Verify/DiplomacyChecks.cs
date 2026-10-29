@@ -86,6 +86,32 @@ internal static class DiplomacyChecks
         Check(accepted.State.Units.All(u=>u.Owner!="loser")&&accepted.State.Units.Any(u=>u.Owner=="ally"),"only target army removed");
         Check(accepted.State.Cells[0].Owner=="winner"&&accepted.State.Cells[4].Owner=="winner","remaining assets including farms transfer normally");
         Check(accepted.State.Factions.Single(f=>f.Id=="winner").Resources==success.Factions.Single(f=>f.Id=="winner").Resources,"no resource stockpile inherited");
+        var districtSuccess = success with { Jurisdictions = TerritorialJurisdictions.Create(initial) };
+        var districtAccepted = DemandDiplomacy.Demand(districtSuccess,districtSuccess.Revision,"winner","loser").State;
+        Check(districtAccepted.Cells.All(c=>c.Owner!="loser"),"surrender transfers every remaining building with fixed jurisdictions");
+        Check(districtAccepted.Units.Any(u=>u.Owner=="ally"),"allied garrison survives jurisdiction surrender");
+        Check(districtSuccess.Cells[0].Owner=="loser","surrender preserves input ownership");
+        var transferWorld = districtSuccess with { Cells = districtSuccess.Cells.Select((c,i)=>i switch {
+            7 => c with { Owner="loser" },
+            8 => c with { Owner="loser",Terrain=new() { Sea=true } },
+            9 => c with { Owner="loser",Terrain=new() { Sea=true },BuildingKind="port",BuildingLevel=1 },
+            _ => c }).ToArray() };
+        foreach (bool allied in new[] { false,true })
+        {
+            var before = allied ? WorldDiplomacy.Set(transferWorld,"winner","loser","allied") : transferWorld;
+            foreach (string? recipient in new string?[] { "winner",null })
+            {
+                var transferred = WorldEvents.Surrender(before,"loser",recipient).State;
+                for(int cell=0;cell<before.Cells.Count;cell++)
+                {
+                    var previous=before.Cells[cell];
+                    string? expected=previous.Owner!="loser"?previous.Owner:previous.Terrain.Sea&&previous.BuildingKind==null?null:recipient;
+                    Check(transferred.Cells[cell].Owner==expected,"surrender ownership cell "+cell+" allied="+allied+" recipient="+recipient);
+                }
+                var restored = WorldSave.Decode(WorldSave.Encode(transferred),transferred.ContentRevision);
+                Check(restored.Cells.Select(c=>c.Owner).SequenceEqual(transferred.Cells.Select(c=>c.Owner)),"surrender ownership survives reload");
+            }
+        }
         var mover=initial with { Units=basis.Units.Select(u=>u.Owner=="winner"?u with { Cell=8,RemainingMovement=6 }:u).ToArray() };
         var moved=WorldActions.Move(mover,mover.Revision,"unit.2",3).State;
         Check(moved.Demands!.Progress.Any(p=>p.Actor=="winner"&&p.Captured.Contains(3)), "real military movement records captures");
@@ -154,6 +180,16 @@ internal static class DiplomacyChecks
         var successView=Call("action",new{op="demand_surrender",revision=loaded.GetProperty("revision").GetInt64(),target=enemy.Id});
         Check(successView.GetProperty("factions").EnumerateArray().Single(f=>f.GetProperty("id").GetString()==enemy.Id).GetProperty("defeated").GetBoolean(),"client surrender commits defeat");
         Check(successView.GetProperty("units").EnumerateArray().All(u=>u.GetProperty("owner").GetString()!=enemy.Id),"client surrender removes target units");
+        void CheckTransferredView(JsonElement view,string stage)
+        {
+            var cells=view.GetProperty("cells").EnumerateArray().ToArray();
+            foreach(int cell in Enumerable.Range(0,successWorld.Cells.Count).Where(i=>successWorld.Cells[i].Owner==enemy.Id))
+                Check(cells[cell].GetProperty("owner").GetString()==(successWorld.Cells[cell].Terrain.Sea&&successWorld.Cells[cell].BuildingKind==null?null:started.Session.PlayerFaction),
+                    stage+" transfers target cell "+cell+" "+successWorld.Cells[cell].BuildingKind);
+        }
+        Check(successWorld.Jurisdictions!=null,"client fixture uses actual conquest jurisdictions");
+        CheckTransferredView(successView,"client surrender");
+        CheckTransferredView(Call("load",new{slot=0,mode=2}),"client surrender autosave reload");
         Call("load",new{slot=4});
         Check(Call("diplomacy",new{}).GetProperty("factions").EnumerateArray().Single(f=>f.GetProperty("id").GetString()==enemy.Id).GetProperty("quote").GetProperty("demandBlocked").GetString()=="legacy","old client slot has no invented occupation history");
         string browserFixtures=Path.Combine(root,"build/diplomacy-20261028/browser-fixtures");

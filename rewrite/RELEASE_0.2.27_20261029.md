@@ -4,6 +4,7 @@
 
 Available for Android ARM64 and Windows x64 Web.
 
+- Same-version update: successful surrender now transfers the defeated faction's remaining buildings and land on maps with fixed jurisdictions. Allied troops and third-party territory remain intact. Only human players can demand surrender or declare war on allies; AI permissions are unchanged. Saves made after the ownership bug occurred are not automatically repaired; retry from a save before surrender or repair the affected save separately.
 - AI planning reuses validated world snapshots and neighborhood queries, expands production choices on demand, and resumes planning across bounded requests. Pause and refresh invalidate pending work. A 30-faction, 15,000-unit development audit completed a full AI round with matching session and save results. This does not establish a faster complete round; large armies can still take substantial time.
 - Mod authors can configure headquarters roster, academy and appointment layouts, custom pages, images and button commands through API 3. The author guide and a minimal headquarters-layout example are included in the Windows package.
 - Initialization now uses the original APK's EASY TECH logo on white, with "Rewrite版" and "非商用" below it, shared by early Android startup and Windows Web. Scenario loading keeps its original artwork without these notices. Normal startup hides diagnostics; failures and interrupted startup expose device and error information. Initialization errors and late timeout responses are handled explicitly.
