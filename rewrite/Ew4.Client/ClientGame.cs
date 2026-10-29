@@ -480,9 +480,14 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             .ToDictionary(g => g.Key, g => g.First().Support.IncomeMultiplier);
         var originalUnits = battle.Armies.Select((army, index) => (army, id: world.ScenarioId + ".unit." + index))
             .ToDictionary(p => p.id, p => p.army);
+        // Hired candidates leave the offer list; resolve their stable instance IDs from the scenario.
+        var tavernCommanders = battle.Taverns.SelectMany(t => t.Candidates).Select((candidate, index) =>
+            (id: world.ScenarioId + ".tavern." + index + ".commander", source: content.Catalogs.Runtime.Commanders[candidate.CommanderId]))
+            .ToDictionary(p => p.id, p => p.source);
         string? CommanderDefinitionId(UnitState unit) => session.Account.Roster.FirstOrDefault(c => c.Id == unit.CommanderId)?.DefinitionId
             ?? (unit.CommanderId == unit.Id + ".commander" && originalUnits.TryGetValue(unit.Id, out var army)
-                && content.Catalogs.Runtime.Commanders.TryGetValue(army.Commander, out var definition) ? definition.Definition.Id : null);
+                && content.Catalogs.Runtime.Commanders.TryGetValue(army.Commander, out var definition) ? definition.Definition.Id
+                : tavernCommanders.GetValueOrDefault(unit.CommanderId ?? "")?.Definition.Id);
         var movements = new List<object>();
         var previousUnitIds = previous?.Units.Select(u => u.Id).ToHashSet(StringComparer.Ordinal);
         if (previous != null)
@@ -576,7 +581,8 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             commanderImage = session.Account.Roster.FirstOrDefault(c => c.Id == u.CommanderId) is OwnedCommander owned
                 ? content.Catalogs.Accounts.Rules().Definitions[owned.DefinitionId].DisplayName
                 : u.CommanderId == u.Id + ".commander" && originalUnits.TryGetValue(u.Id, out var commanded)
-                && content.Catalogs.Runtime.Commanders.TryGetValue(commanded.Commander, out var commander) ? commander.Definition.DisplayName : null }, Json)).ToArray();
+                && content.Catalogs.Runtime.Commanders.TryGetValue(commanded.Commander, out var commander) ? commander.Definition.DisplayName
+                : tavernCommanders.GetValueOrDefault(u.CommanderId ?? "")?.Definition.DisplayName }, Json)).ToArray();
         pendingUnits = unitViews.ToDictionary(u => u.GetProperty("id").GetString()!, StringComparer.Ordinal);
         viewBuilt = true;
         return new

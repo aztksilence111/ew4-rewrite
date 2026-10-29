@@ -1,5 +1,9 @@
 # 0.2.27 发布进度
 
+## 酒馆头像同版本替换
+
+2026-10-29，按用户要求沿用0.2.27/code30重打双端并替换同一Release，纳入[酒馆临时将领地图头像修复](../reverse/TAVERN_PORTRAIT_FIX_20261029.md)。专项54、地图46、客户端64491及海军派遣24项已通过，双端Compile通过；本轮直接复用构建，执行正式签名/发布、包校验与上传核验，结果完成后记录。下方劝降替换记录为此前历史。
+
 ## 劝降归属同版本替换
 
 2026-10-29，已按用户要求沿用0.2.27/code30重打Android ARM64和Windows x64 Web并替换同一[Release](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.27-20261029)。当前包源码/标签 `d24196181b7263c7a3fa1490bfc35727596270ff`，Git main同步，后续记录提交不改变包源码。纳入[劝降剩余建筑移交修复](../reverse/SURRENDER_OWNERSHIP_FIX_20261029.md)，AI不能自主劝降或向盟友宣战的限制保持。

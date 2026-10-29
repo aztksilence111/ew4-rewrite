@@ -1,6 +1,11 @@
 using System.Text.Json;
 using Ew4.Core;
 
+if (args.ElementAtOrDefault(1) == "--tavern-portrait-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { tavernPortraitChecks = TavernPortraitChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
 if (args.ElementAtOrDefault(1) == "--attack-bounds-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { attackBoundsChecks = AttackBoundsChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
