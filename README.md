@@ -3,7 +3,7 @@
 规则配置现已拆为独立 JSON：[文件与修改指南](rewrite/mod-kit/docs/porting/SPLIT_CATALOG.md)。
 源码数据位于 `rewrite/data/legacy/`，覆盖包使用 `legacy/` 路径；旧 APK/XML 导入继续兼容。
 
-2026-10-29：[0.2.26双端正式下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.26-20261029)，包含双端固定存档导出、手机页面手势／外交按钮修正及显卡恢复后的地图补绘；Windows x64 Web 与 Android ARM64 APK code29，规则 API 3，远端四附件摘要核验通过。[发行说明](rewrite/RELEASE_0.2.26_20261029.md)、[发布记录](rewrite/RELEASE_PROGRESS_0.2.26_20261029.md)。
+2026-10-29：[0.2.26双端正式下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.26-20261029)，同版本重打已加入战役商店／兑换页驻城将领头像修复，保留双端固定存档导出、手机页面手势／外交按钮修正及显卡恢复后的地图补绘；Windows x64 Web 与 Android ARM64 APK code29，规则 API 3，当前四附件摘要核验通过。已下载当日旧包者需重新下载本次附件。[发行说明](rewrite/RELEASE_0.2.26_20261029.md)、[发布记录](rewrite/RELEASE_PROGRESS_0.2.26_20261029.md)。
 
 本仓库保存 rewrite 游戏源码、运行资源、地图制作配置和 Mod 制作指南。
 名称约定：**r版**就是 **rewrite版**的简称，后续不再另行注明。
