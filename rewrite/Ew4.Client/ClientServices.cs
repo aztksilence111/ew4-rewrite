@@ -29,6 +29,12 @@ public sealed partial class ClientGame
         return current.Rules.Trading with { CommanderCommerce = commerce };
     }
 
+    private string? ServiceCommander(int cell)
+    {
+        var session = Require().Session;
+        return session.World.Units.FirstOrDefault(u => u.Cell == cell && u.Owner == session.PlayerFaction)?.CommanderId;
+    }
+
     private object Exchange(ClientCommand command)
     {
         ServiceAccess(command.Cell, "trade");
@@ -58,7 +64,8 @@ public sealed partial class ClientGame
         }
         else if (command.Op != "") throw new RuleViolation("exchange.command", "Unknown exchange operation");
         var resources = session.World.Factions.Single(f => f.Id == session.PlayerFaction).Resources;
-        return new { session.Revision, commerce, rate, resources, commander = session.World.Units.FirstOrDefault(u => u.Cell == command.Cell)?.CommanderId,
+        string? commander = ServiceCommander(command.Cell);
+        return new { session.Revision, commerce, rate, resources, commander, commanderView = BattleCommanderView(commander),
             offers = amounts.Select((amount, index) => new { id = index.ToString(), resource = index < 2 ? "industry" : "food",
                 buyAmount = amount, buyMoney = (int)(money[index] * rate), sellAmount = (int)(amount * rate), sellMoney = money[index],
                 canBuy = resources.Money >= (int)(money[index] * rate), canSell = (index < 2 ? resources.Industry : resources.Food) >= (int)(amount * rate) }) };

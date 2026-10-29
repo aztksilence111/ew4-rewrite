@@ -201,8 +201,18 @@
     if(first)choose(first,l.get('lbox_item').children[data.items.indexOf(first)]);
   };
   proto.commerceStars=function(layout,level){
-    const list=layout.get('lbox_stars');list.replaceChildren();list.setAttribute('aria-label','经商 '+level+' / 5');
-    for(let i=0;i<5;i++){const star=this.api.uiImage('star_middle.png',13.5,12.5);star.classList.toggle('commerce-star-empty',i>=level);list.append(star);}
+    const list=layout.get('lbox_stars');list.replaceChildren();list.setAttribute('aria-label','经商 '+level+(level<=5?' / 5':''));
+    const count=level>5?1:5;
+    for(let i=0;i<count;i++){const star=this.api.uiImage('star_middle.png',13.5,12.5);star.classList.toggle('commerce-star-empty',i>=level);list.append(star);}
+    if(level>5)list.append(this.lettering('x'+level,'font_char_1_hd','#ebe6e1'));
+  };
+  proto.serviceCommander=function(layout,slot,data,onReturn){
+    const held=data.commanderView||(data.commander?this.held(data.commander):null);
+    if(!held)return;
+    const definition=this.definition(held),open=()=>this.commanderInfo(definition,held,onReturn),card=this.card(definition,held,open);
+    delete card.dataset.locked;card.title='';
+    card.querySelector('.commander-info').onclick=e=>{e.stopPropagation();open();};
+    layout.fill(slot,card);
   };
   proto.exchangeQuote=function(layout,key,resource,left,right){
     const quote=document.createElement('span');quote.className='exchange-quote';
@@ -270,9 +280,11 @@
     l.text('group_seller/text_name',this.text('name_Seller'),{color:'235,230,225,255'});
     clearSelection();l.text('text_discount',data.commerce?'-'+data.commerce*4+'%':'');
     const merchant=l.get('group_seller');merchant.setAttribute('aria-label',this.text('name_Seller'));
+    this.serviceCommander(l,'tcmder_buyer',data,()=>this.shop(cell));
     this.commerceStars(l,data.commerce);
   };
   proto.exchange=async function(cell,snapshot){
+    if(!this.data)this.data=await this.api.rpc('headquarters');
     const data=snapshot||await this.api.rpc('exchange',{cell}),l=this.native('form_exchange',()=>this.api.refresh());
     l.text('group_seller/text_name',this.text('name_Seller'),{color:'235,230,225,255'});
     l.text('text_rate','x'+data.rate.toFixed(1),{color:'235,230,225,255'});
@@ -281,7 +293,7 @@
       this.exchangeQuote(l,key,offer.resource,op==='buy'?offer.buyMoney:offer.sellAmount,op==='buy'?offer.buyAmount:offer.sellMoney);
       l.action('btn_'+key,(op==='buy'?'购买':'出售')+(offer.resource==='industry'?'工业':'粮食')+' '+(op==='buy'?offer.buyAmount:offer.sellAmount),async()=>{const next=await this.api.rpc('exchange',{cell,revision:data.revision,op,offer:offer.id});await this.api.refresh();await this.exchange(cell,next);},allowed);
     }
-    if(this.data){const held=this.held(data.commander);if(held)l.fill('tcmder_player',this.card(this.definition(held),held,()=>this.commanderInfo(this.definition(held),held,()=>this.exchange(cell))));}
+    this.serviceCommander(l,'tcmder_player',data,()=>this.exchange(cell));
     this.commerceStars(l,data.commerce);
   };
   proto.tavern=async function(cell){

@@ -1,9 +1,11 @@
-# 0.2.26 - Save export and display recovery
+# 0.2.26 - City commander portraits, save export and display recovery
 
 2026-10-29. Android versionCode 29; rule API 3.
 
 This release includes the current updates since 0.2.25 on Android ARM64 and Windows x64 Web.
 
+- Same-version replacement on 2026-10-29: keep version 0.2.26 and Android versionCode 29, and include the city commander portrait fix below. Download the current attachments again to receive it.
+- Campaign shops now show the friendly commander stationed on that city tile, including scenario commanders and player-deployed commanders. Resource exchange also supports scenario commanders. The portrait shows the actual battle rank and title, opens commander details and returns to the service. Empty cities and ordinary garrisons have no commander portrait. Commercial ability above five stars shows an explicit count; existing purchase, sale and resource-exchange rules are preserved.
 - Save export is a permanent feature on both platforms, available at the top of Settings from the main menu and during a paused battle. Android uses the system save dialog; Windows Web downloads a ZIP. Exports preserve the original account, save slots and backup bytes, including unreadable saves, with version, platform, frontend, Mod and SHA-256 information. Installed content and startup caches are excluded. ZIP import is not included.
 - Mobile input: prevent browser page zoom and overscroll while retaining list scrolling and two-finger map zoom. Android WebView zoom controls are disabled.
 - Diplomacy: match the action button artwork dimensions and alignment while preserving its touch target and Mod sizing options.

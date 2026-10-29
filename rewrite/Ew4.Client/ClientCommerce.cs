@@ -102,7 +102,9 @@ public sealed partial class ClientGame
         }
         else if (command.Op is not ("" or "refresh")) throw new RuleViolation("trading.command", "Unknown shop operation");
         var owned = Account();
-        return new { revision = headquarters ? owned.Revision : Require().Session.Revision, owned.Medals, commerce,
+        string? commander = headquarters ? null : ServiceCommander(command.Cell);
+        return new { revision = headquarters ? owned.Revision : Require().Session.Revision, owned.Medals, commerce, commander,
+            commanderView = headquarters ? null : BattleCommanderView(commander),
             refresh = headquarters ? RefreshView(owned, "shop") : null,
             items = ItemViews(owned), offers = market.Offers.Select(o => new { o.Id, o.ItemId, o.Remaining,
                 slot = int.Parse(o.Id.Split('.').Last()),

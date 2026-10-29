@@ -1,6 +1,11 @@
 using System.Text.Json;
 using Ew4.Core;
 
+if (args.ElementAtOrDefault(1) == "--shop-commander-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { shopCommanderChecks = ShopCommanderChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
 if (args.ElementAtOrDefault(1) == "--display-effects-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { turnEntryChecks = WorldTurnEntryChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;

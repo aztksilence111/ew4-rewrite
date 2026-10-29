@@ -2,8 +2,8 @@
 const fs=require('node:fs'),https=require('node:https'),cp=require('node:child_process'),path=require('node:path'),crypto=require('node:crypto');
 const cwd=path.resolve(__dirname,'..'),repo='aztksilence111/ew4-rewrite';
 const [action,buildArg,version,date]=process.argv.slice(2);
-if(!['inspect','push','publish','audit'].includes(action)||!buildArg||!version||!date)
-  throw Error('Usage: node tools/github_release.cjs inspect|push|publish|audit build-directory version YYYYMMDD');
+if(!['inspect','push','publish','replace','audit'].includes(action)||!buildArg||!version||!date)
+  throw Error('Usage: node tools/github_release.cjs inspect|push|publish|replace|audit build-directory version YYYYMMDD [previous-source]');
 const build=path.resolve(cwd,buildArg),tag='v'+version+'-'+date;
 const notes=path.join(cwd,'rewrite','RELEASE_'+version+'_'+date+'.md');
 function git(...args){return cp.execFileSync('git',args,{cwd,maxBuffer:64*1024*1024});}
@@ -130,6 +130,61 @@ async function audit(){
   const report={source,repositoryHead:head,tag,url:release.html_url,assets:release.assets.map(a=>({name:a.name,bytes:a.size,digest:a.digest})),errors:0};
   fs.writeFileSync(path.join(build,'remote-audit.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
 }
+async function replace(){
+  const expected=process.argv[6],head=git('rev-parse','HEAD').toString().trim();
+  if(!/^[0-9a-f]{40}$/.test(expected||'')||expected===head)throw Error('Replacement requires the previous package source');
+  git('merge-base','--is-ancestor',expected,head);
+  const remote=await request('/repos/'+repo+'/git/ref/heads/main');
+  if(remote.object.sha!==head)throw Error('Source must be synchronized first');
+  const manifest=JSON.parse(fs.readFileSync(path.join(build,'assets/release-manifest.json')));
+  if(manifest.source!==head)throw Error('Package source mismatch');
+  const tagRoute='/repos/'+repo+'/git/refs/tags/'+tag;
+  const tagged=await request('/repos/'+repo+'/git/ref/tags/'+tag);
+  if(tagged.object.type!=='commit'||![expected,head].includes(tagged.object.sha))throw Error('Existing tag changed');
+  let release=await request('/repos/'+repo+'/releases/tags/'+tag);
+  if(release.draft)throw Error('Expected an existing published release');
+  const files=releaseFiles(manifest),suffix='.replacement-'+head.slice(0,12);
+  const matches=(asset,file)=>asset&&asset.size===fs.statSync(file).size&&asset.digest==='sha256:'+crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+  if(release.assets.some(a=>!files.includes(a.name)&&!files.some(n=>n+suffix===a.name)))throw Error('Unexpected release assets');
+  const before=path.join(build,'replacement-before.json');
+  if(!fs.existsSync(before))fs.writeFileSync(before,JSON.stringify({tag,source:tagged.object.sha,release},null,2));
+  const progress={source:head,previousSource:expected,tag,releaseId:release.id,staged:[],replaced:[]};
+  const save=()=>fs.writeFileSync(path.join(build,'release-upload-progress.json'),JSON.stringify({...progress,updatedAt:new Date().toISOString()},null,2));
+  // Keep every original download until all replacement bytes are verified remotely.
+  for(const name of files){
+    const file=path.join(build,'assets',name),old=release.assets.find(a=>a.name===name);
+    if(matches(old,file)){progress.replaced.push(name);save();continue;}
+    let staged=release.assets.find(a=>a.name===name+suffix);
+    if(staged&&!matches(staged,file))throw Error('Existing staged asset differs: '+name);
+    if(!staged){
+      console.log('Staging replacement '+name+' '+fs.statSync(file).size+' bytes');
+      staged=await request(release.upload_url.split('{')[0]+'?name='+encodeURIComponent(name+suffix),'POST',undefined,file);
+    }
+    if(!matches(staged,file))throw Error('Staged replacement checksum mismatch: '+name);
+    progress.staged.push({name,id:staged.id});save();console.log('Verified replacement '+name);
+  }
+  for(const staged of progress.staged){
+    release=await request('/repos/'+repo+'/releases/'+release.id);
+    const old=release.assets.find(a=>a.name===staged.name),file=path.join(build,'assets',staged.name);
+    if(old&&!matches(old,file))await request('/repos/'+repo+'/releases/assets/'+old.id,'DELETE');
+    if(!matches(old,file))await request('/repos/'+repo+'/releases/assets/'+staged.id,'PATCH',{name:staged.name});
+    else await request('/repos/'+repo+'/releases/assets/'+staged.id,'DELETE');
+    progress.replaced.push(staged.name);save();
+  }
+  release=await request('/repos/'+repo+'/releases/'+release.id);
+  if(release.assets.length!==files.length||files.some(name=>!matches(release.assets.find(a=>a.name===name),path.join(build,'assets',name))))
+    throw Error('Final replacement inventory/checksum mismatch');
+  const latestTag=await request('/repos/'+repo+'/git/ref/tags/'+tag);
+  if(![expected,head].includes(latestTag.object.sha))throw Error('Tag changed during replacement');
+  if(latestTag.object.sha!==head)await request(tagRoute,'PATCH',{sha:head,force:true});
+  git('update-ref','refs/tags/'+tag,head);
+  release=await request('/repos/'+repo+'/releases/'+release.id,'PATCH',{name:version+' - '+(process.env.EW4_RELEASE_TITLE||'Runtime and gameplay updates'),
+    target_commitish:head,body:fs.readFileSync(notes,'utf8'),make_latest:'true'});
+  progress.complete=true;save();
+  fs.writeFileSync(path.join(build,'release-remote.json'),JSON.stringify({url:release.html_url,tag,source:head,
+    assets:release.assets.map(a=>({name:a.name,size:a.size,digest:a.digest,url:a.browser_download_url}))},null,2));
+  console.log(JSON.stringify({url:release.html_url,source:head,previousSource:expected,assets:release.assets.length,replaced:true}));
+}
 (async()=>{
   if(action==='inspect'){
     const r=await request('/repos/'+repo),remote=await request('/repos/'+repo+'/git/ref/heads/main');
@@ -137,5 +192,5 @@ async function audit(){
     console.log(JSON.stringify({repo:r.full_name,branch:r.default_branch,source:remote.object.sha,
       releases:releases.map(x=>({tag:x.tag_name,draft:x.draft,assets:x.assets.length}))}));
   }
-  else if(action==='push')await push();else if(action==='publish')await publish();else await audit();
+  else if(action==='push')await push();else if(action==='publish')await publish();else if(action==='replace')await replace();else await audit();
 })().catch(e=>{console.error(e.message);process.exitCode=1;});

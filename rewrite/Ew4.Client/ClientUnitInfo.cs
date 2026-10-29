@@ -14,8 +14,13 @@ public sealed partial class ClientGame
             ?? throw new RuleViolation("client.unit", "Unit is unavailable");
         var offer = current.Rules.Recruitment.Values.SelectMany(v => v.Values)
             .FirstOrDefault(o => o.Template?.Profile.Id == unit.Combatant.Profile.Id);
-        object? commander = null;
-        if (unit.CommanderId is string id)
+        return new { session.Revision, unit = unit.Id, cost = offer?.Cost, commander = BattleCommanderView(unit.CommanderId) };
+    }
+
+    private object? BattleCommanderView(string? id)
+    {
+        var current = Require(); var session = current.Session; var world = session.World;
+        if (id != null)
         {
             var runtime = world.Commanders.Single(c => c.Id == id);
             var owned = session.Account.Roster.FirstOrDefault(c => c.Id == id);
@@ -32,11 +37,11 @@ public sealed partial class ClientGame
             if (owned != null) foreach (var value in owned.Learning.Abilities) abilities[value.Key] = value.Value;
             foreach (var value in resolved.Stars) abilities[value.Key] = value.Value;
             abilities["movement"] = resolved.Movement;
-            commander = new { id, definitionId = source.Definition.Id, locked = true, battle = true,
+            return new { id, definitionId = source.Definition.Id, locked = true, battle = true,
                 learning = new CommanderLearningState(runtime.Rank, runtime.Title, abilities),
                 training = runtime.MaximumTrainingLevel, items = resolved.Items.Select(i => i.Id).ToArray(),
                 healthBonus = runtime.RankHealthBonus, healing = current.Rules.Commanders.TitleHealing.GetValueOrDefault(runtime.Title.Level) };
         }
-        return new { session.Revision, unit = unit.Id, cost = offer?.Cost, commander };
+        return null;
     }
 }
