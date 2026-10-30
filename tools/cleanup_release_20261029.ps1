@@ -1,4 +1,4 @@
-param([switch]$Execute, [string]$ReleaseBatch = 'build/release-0.2.26-20261029')
+param([switch]$Execute, [string]$ReleaseBatch = 'build/release-0.2.26-20261029', [string[]]$AdditionalTargets = @())
 $ErrorActionPreference = 'Stop'
 $releaseWorkspace = (Resolve-Path (Split-Path $PSScriptRoot -Parent)).Path
 $releaseBatch = $ReleaseBatch
@@ -7,6 +7,7 @@ $cutoff = [DateTimeOffset]::Parse((git -C $releaseWorkspace show -s --format=%cI
 $batchCreated = (Get-Item -LiteralPath (Join-Path $releaseWorkspace $releaseBatch)).CreationTime
 if ($batchCreated -lt $cutoff) { $cutoff = $batchCreated }
 $targets = @("$releaseBatch/testing", "$releaseBatch/android", 'build/honor-startup-20261028')
+$targets += $AdditionalTargets
 foreach ($project in Get-ChildItem (Join-Path $releaseWorkspace 'rewrite') -Directory -Filter 'Ew4.*') {
     foreach ($output in 'bin','obj') { $targets += "rewrite/$($project.Name)/$output" }
 }
