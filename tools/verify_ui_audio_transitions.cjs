@@ -10,12 +10,12 @@ const base=process.argv[2]||'http://127.0.0.1:56142',out=path.resolve(process.ar
   try{
     for(const [width,height,touch] of [[1280,720,false],[844,390,true],[390,844,true]]){
       const context=await browser.newContext({viewport:{width,height},hasTouch:touch,isMobile:touch}),page=await context.newPage();
-      if(process.argv.includes('--source'))await page.route(/\/(?:compat\/)?(?:app|menus|native-layout|ui-audio)\.js(?:\?|$)/,route=>route.fulfill({contentType:'text/javascript',path:path.join(root,'rewrite/Ew4.Web/wwwroot',new URL(route.request().url()).pathname.split('/').pop())}));
+      if(process.argv.includes('--source'))await page.route(/\/(?:compat\/)?(?:app|menus|native-layout|ui-audio|effects)\.js(?:\?|$)/,route=>route.fulfill({contentType:'text/javascript',path:path.join(root,'rewrite/Ew4.Web/wwwroot',new URL(route.request().url()).pathname.split('/').pop())}));
       page.on('pageerror',e=>report.errors.push(e.message));page.on('response',r=>{if(r.status()>=400&&!r.url().endsWith('/favicon.ico'))report.missing.push(r.url());});
       await page.goto(base);await page.waitForFunction(()=>startupReady&&!sessionTransition,null,{timeout:90000});
       await page.evaluate(()=>{
         window.uiSounds=[];const sound=effects.sound.bind(effects);effects.sound=file=>{uiSounds.push(file);sound(file);};
-        window.uiPlays=[];const play=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){if(this.src.includes('/sounds/'))uiPlays.push(this);return play.call(this);};
+        window.uiPlays=[];const start=AudioBufferSourceNode.prototype.start;AudioBufferSourceNode.prototype.start=function(...args){uiPlays.push(this);return start.apply(this,args);};
         settings.music=40;settings.sound=60;
       });
       const click=async selector=>page.locator(selector)[touch?'tap':'click']();
@@ -23,8 +23,8 @@ const base=process.argv[2]||'http://127.0.0.1:56142',out=path.resolve(process.ar
       check(await page.evaluate(()=>uiSounds.join(',')==='sfx_click.wav,sfx_pop.wav'),'one click and popup on settings '+width);
       await page.waitForFunction(()=>music.file==='battle1.mp3'&&!music.audio.paused&&music.audio.currentTime>.05,null,{timeout:20000});
       check(await page.evaluate(()=>music.audio.loop&&music.audio.volume===.4),'original menu music playing '+width);
-      await page.waitForFunction(()=>uiPlays.length===2&&uiPlays.every(a=>a.readyState>=2&&a.duration>0),null,{timeout:15000});
-      check(await page.evaluate(()=>uiPlays.every(a=>!a.error)),'real WAV elements decoded '+width);
+      await page.waitForFunction(()=>uiPlays.length===2&&uiPlays.every(a=>a.buffer?.duration>0),null,{timeout:15000});
+      check(await page.evaluate(()=>uiPlays.every(a=>a.context.state==='running')),'decoded WAV buffers playing '+width);
       await click('#confirm-settings');
       await page.evaluate(()=>{uiSounds.length=0;uiPlays.length=0;});
       await page.locator('[data-mode="1"]').focus();await page.keyboard.press('Enter');

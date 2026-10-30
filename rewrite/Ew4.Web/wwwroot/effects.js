@@ -120,8 +120,72 @@
       });
     }
   }
+  class ShortAudio {
+    constructor(volume,files){this.volume=volume;this.files=files;this.buffers=new Map();this.loads=new Map();this.voices=new Set();this.context=undefined;this.visible=true;this.generation=0;this.disposed=false;}
+    getContext(){
+      if(this.context===undefined){
+        const Context=root.AudioContext||root.webkitAudioContext;
+        try{this.context=Context?new Context({latencyHint:'interactive'}):null;}catch(_){this.context=null;}
+      }
+      return this.context;
+    }
+    unlock(){
+      const context=this.getContext();
+      if(!context||!this.visible||this.disposed||context.state==='running'||context.state==='closed')return Promise.resolve();
+      try{return context.resume().catch(()=>{});}catch(_){return Promise.resolve();}
+    }
+    load(file){
+      if(this.buffers.has(file))return Promise.resolve(this.buffers.get(file));
+      if(this.loads.has(file))return this.loads.get(file);
+      const context=this.getContext();
+      if(!context){
+        const audio=new Audio('/content/sounds/'+file);audio.preload='auto';this.buffers.set(file,audio);return Promise.resolve(audio);
+      }
+      const task=fetch('/content/sounds/'+file).then(response=>{
+        if(!response.ok)throw Error('Sound load failed: '+file);
+        return response.arrayBuffer();
+      }).then(bytes=>context.decodeAudioData(bytes)).then(buffer=>{
+        if(!this.disposed)this.buffers.set(file,buffer);return buffer;
+      }).finally(()=>this.loads.delete(file));
+      this.loads.set(file,task);return task;
+    }
+    preload(files){return Promise.all((files||[]).filter(file=>this.files.includes(file)).map(file=>this.load(file).catch(()=>null)));}
+    play(file){
+      if(!file||!this.files.includes(file)||!this.volume()||!this.visible||this.disposed||root.document?.hidden)return;
+      const context=this.getContext(),started=performance.now(),generation=this.generation;
+      let buffer=this.buffers.get(file);
+      if(!context&&!buffer){this.load(file);buffer=this.buffers.get(file);}
+      const start=buffer=>{
+        // A late fetch/resume must not replay an old click after the page has changed.
+        if(this.disposed||generation!==this.generation||!this.visible||root.document?.hidden||!this.volume()||performance.now()-started>150)return;
+        if(!context){
+          const voice=this.voices.has(buffer)?buffer.cloneNode():buffer;
+          voice.currentTime=0;voice.volume=Math.max(0,Math.min(1,this.volume()/100));this.voices.add(voice);
+          voice.onended=voice.onerror=()=>this.voices.delete(voice);voice.play().catch(()=>this.voices.delete(voice));return;
+        }
+        if(context.state!=='running')return;
+        const voice=context.createBufferSource(),gain=context.createGain();voice.buffer=buffer;
+        gain.gain.value=Math.max(0,Math.min(1,this.volume()/100));voice.connect(gain);gain.connect(context.destination);
+        voice.onended=()=>{this.voices.delete(voice);voice.disconnect();gain.disconnect();};
+        this.voices.add(voice);voice.start();
+      };
+      if(buffer&&(!context||context.state==='running'))start(buffer);
+      else Promise.all([this.load(file),this.unlock()]).then(([buffer])=>start(buffer)).catch(()=>{});
+    }
+    clear(){
+      this.generation++;
+      for(const voice of this.voices){try{if(voice.stop)voice.stop();else{voice.pause();voice.currentTime=0;}}catch(_){}}
+      this.voices.clear();
+    }
+    setVisible(visible){
+      this.visible=visible;
+      if(visible){if(this.context)this.unlock();}
+      else{this.clear();if(this.context&&this.context.state!=='closed')this.context.suspend().then(()=>{if(this.visible&&!this.disposed)this.unlock();}).catch(()=>{});}
+    }
+    dispose(){this.disposed=true;this.clear();this.buffers.clear();if(this.context&&this.context.state!=='closed')this.context.close().catch(()=>{});}
+  }
   class Effects {
-    constructor(api,data,visuals){this.api=api;this.data=data;this.visuals=new UnitVisuals(api.manifest||{profiles:{}},data,visuals);this.instances=[];this.tints=new Map();this.voices=new Set();this.audio=new Map();this.trails=new Map();this.serial=1;}
+    constructor(api,data,visuals){this.api=api;this.data=data;this.visuals=new UnitVisuals(api.manifest||{profiles:{}},data,visuals);this.instances=[];this.tints=new Map();this.sounds=new ShortAudio(api.volume,data.sounds);this.voices=this.sounds.voices;this.audio=this.sounds.buffers;this.trails=new Map();this.serial=1;}
     profile(id,faction){return this.visuals.resolve(id,faction);}
     motion(profile,action,facing){const source=this.visuals.definition(typeof profile==='string'?this.data.bindings[profile]:profile?.visualMotion),side=facing<0?'left':'right';
       return source?.motions.find(m=>m.type===action&&Number(m.index||0)===0&&(m.dir===side||(!m.dir||m.dir==='all')));}
@@ -140,12 +204,12 @@
       }
       return {segments,timeline,visualDuration,duration,attackBasis,hitAt:last==null?attackBasis:Math.max(attackBasis,(last+.2)*1000/speed),firstShot:(this.firstEvent(timeline)??0)*1000/speed};
     }
-    clear(){this.instances=[];this.trails.clear();for(const voice of this.voices){voice.pause();try{voice.currentTime=0;}catch(_){}}this.voices.clear();}
-    preloadSounds(files){for(const file of files||[])if(this.data.sounds.includes(file)&&!this.audio.has(file)){const audio=new Audio('/content/sounds/'+file);audio.preload='auto';this.audio.set(file,audio);}}
-    sound(file){if(!file||!this.data.sounds.includes(file)||!this.api.volume())return;
-      let pool=this.audio.get(file);if(!pool){pool=new Audio('/content/sounds/'+file);pool.preload='auto';this.audio.set(file,pool);}
-      const voice=this.voices.has(pool)?pool.cloneNode():pool;voice.volume=this.api.volume()/100;this.voices.add(voice);
-      voice.onended=voice.onerror=()=>this.voices.delete(voice);voice.play().catch(()=>this.voices.delete(voice));}
+    clear(){this.instances=[];this.trails.clear();this.sounds.clear();}
+    preloadSounds(files){return this.sounds.preload(files);}
+    unlockAudio(){return this.sounds.unlock();}
+    setVisible(visible){this.sounds.setVisible(visible);}
+    dispose(){this.clear();this.sounds.dispose();}
+    sound(file){this.sounds.play(file);}
     moveSound(profile,category,sea){this.sound(sea?'sfx_naval.wav':category==='cavalry'?(profile?.unitIndex===9?'sfx_armourmove.wav':'sfx_cavalrymove.wav'):'sfx_leg.wav');}
     timeline(name,x,y,options={}){
       const events=this.data.timelines[name];if(!events)return 0;

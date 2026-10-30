@@ -45,17 +45,24 @@ internal static class WorldDeaths
         return new(next, notices, defeated);
     }
 
-    internal static WorldState RefreshMorale(WorldState state, IReadOnlyCollection<string> neutralCamps)
+    internal static WorldState RefreshMorale(WorldState state, IReadOnlyCollection<string> neutralCamps,
+        HashSet<int>? affectedCells = null)
     {
         var map = new HexMap(state.Width, state.Height);
         var factions = state.Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
         var occupied = new HashSet<int>(state.Units.Select(u => u.Cell));
-        return state with { Units = state.Units.Select(unit =>
+        UnitState[]? units = null;
+        for (int slot = 0; slot < state.Units.Count; slot++)
         {
+            var unit = state.Units[slot];
+            if (affectedCells != null && !affectedCells.Contains(unit.Cell)) continue;
             int local = WorldTurns.LocalPenalty(state, map, unit.Cell, unit.Owner, neutralCamps, occupied);
             int morale = TurnEconomy.Morale(unit.Morale.Baseline, unit.Morale.Duration, local, factions[unit.Owner].Shortage,
                 unit.Support.Logistics || unit.Combatant.Has(Ew4Combat.Skill(22)), unit.Combatant.Has(Ew4Combat.Skill(3)));
-            return unit with { LocalPenalty = local, Morale = unit.Morale with { Effective = morale }, Combatant = unit.Combatant with { Morale = morale } };
-        }).ToArray() };
+            if (unit.LocalPenalty == local && unit.Morale.Effective == morale && unit.Combatant.Morale == morale) continue;
+            units ??= state.Units.ToArray();
+            units[slot] = unit with { LocalPenalty = local, Morale = unit.Morale with { Effective = morale }, Combatant = unit.Combatant with { Morale = morale } };
+        }
+        return units == null ? state : state with { Units = units };
     }
 }

@@ -1,6 +1,17 @@
 using System.Text.Json;
 using Ew4.Core;
 
+if (args.ElementAtOrDefault(1) == "--movement-morale-only")
+{
+    string project = Path.GetFullPath(args[0]);
+    Console.WriteLine(JsonSerializer.Serialize(new { movementMoraleChecks = MovementMoraleChecks.Run(project),
+        movementChecks = MovementCommitChecks.Run(project), turnChecks = WorldTurnChecks.Run(project),
+        battleChecks = BattleCommitChecks.Run(project), aiMovementChecks = AiMovementChecks.Run(project),
+        validationChecks = ValidationReuseChecks.Run(), planningChecks = AiPlanningWorkChecks.Run(),
+        projectionChecks = ControlledMovementChecks.Run(), deathChecks = HazardDeathChecks.Run(project),
+        undoChecks = FeedbackUndoChecks.Run(project), errors = 0 })); return;
+}
+
 if (args.ElementAtOrDefault(1) == "--tavern-portrait-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { tavernPortraitChecks = TavernPortraitChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
@@ -302,6 +313,7 @@ int aiChecks = AiChecks.Run(root);
 int lifecycleChecks = LifecycleChecks.Run(root);
 int actionChecks = ActionChecks.Run(root);
 int movementCommitChecks = MovementCommitChecks.Run(root);
+movementCommitChecks += MovementMoraleChecks.Run(root);
 movementCommitChecks += RFeedbackChecks.Run(root);
 int turnSettlementChecks = TurnSettlementChecks.Run(root);
 int worldTurnChecks = WorldTurnChecks.Run(root);

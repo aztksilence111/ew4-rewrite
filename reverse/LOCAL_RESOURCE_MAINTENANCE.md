@@ -1,5 +1,11 @@
 # 本地资源维护
 
+2026-10-30 修复“重建帝国”普鲁士移动后夹击士气不刷新，移动/撤回均重算起终点及六邻格，AI预测、完整/增量响应与保存重载同步。专项374及既有回归共19812项、Web Release/Android ARM64 Compile通过。核Git、绝对路径、重解析点及消费者后清本轮隔离编译/夹具/随机档案3270文件338516945字节，剩余0/错误0、Git保持；先保存 `build/maintenance-20261030/movement-morale-cleanup.json` 和[修复记录](MOVEMENT_MORALE_FIX_20261030.md)，再双STATUS与日志。56155/PID37120保留12个摘要一致的必要运行文件与干净档案，HTTP200/catalog正常/hasSave=false；原始截图、玩家资料/Mod、其他服务、正式包及同期工作保持，无新APK/发布/Android真机验收。
+
+2026-10-30 整编教学预览修复：源码及兼容浏览器三视口、真实教学整编与重载共155项通过，兼容54文件零错。停本轮56154/PID45552后核真实路径、Git、重解析点与消费者，清测试档案／缓存／截图／日志14文件1152237字节，剩余0／错误0、Git状态保持；凭据`build/maintenance-20261030/teaching-preview-cleanup.json`及[修复记录](REGROUP_TEACHING_PREVIEW_20261030.md)。56154/PID51096恢复为独立干净预览，HTTP200；玩家资料／Mod／正式包及同期修改保持，无新APK／发布／Android真机验收。
+
+2026-10-30 R版点击音效改为预解码Web Audio缓冲，源码／兼容界面各87、音频29、延迟29、原生前端14308／表现恢复5936项及双端Compile通过，兼容54文件零错。停止本轮56153/PID11608后核Git、真实路径、重解析点及消费者，清测试档案／截图／日志／隔离编译325文件30668724字节，剩余0／错误0、Git状态保持。先保存`build/maintenance-20261030/click-audio-cleanup.json`及[成果](CLICK_AUDIO_LATENCY_FIX_20261030.md)，再更新双STATUS和日志。56153/PID17684以既有发行宿主及当前共享前端运行独立干净profile，HTTP200／catalog正常／hasSave=false；玩家资料／Mod、正式包、原始输入及reverse/download.jpg保持。无新APK／发布／Android真机听音验收。
+
 2026-10-29 劝降归属修复沿用0.2.27/code30双端替换发布，包源码/标签d241961，远端四附件大小/摘要及标签核验错误0。停止独立56152/PID50948后，核Git、真实路径、无重解析点、消费者及玩家摘要，清旧同版包/运行副本、本轮测试档案/截图/日志及重复编译11357文件2483050848字节，剩余0/错误0、Git状态保持；新成果提升至本批assets/web，临时surrender-replacement已删除。先保存本发行目录cleanup/post-cleanup-verification及[发行记录](../rewrite/RELEASE_PROGRESS_0.2.27_20261029.md)，再双STATUS与WORK_LOG。仅留0.2.27/26/25三批六包，摘要正确；223份玩家文件变化0，原11服务HTTP200。原始输入/签名/共享前端/玩家资料及Mod保持。正式Web/实际APK外交各740、HTTP移交与重载282、浏览器外交53/启动50/导出89及附件3756项通过，无Android真机验收。
 
 2026-10-29 劝降剩余建筑归属修复完成，外交740、灭国266、回合7029、入口22、环境死亡1820、战斗提交5250项及Web/Android ARM64 Compile通过。核Git、真实路径、无重解析点及消费者后，仅清本轮隔离编译、外交夹具/测试档案、灭国随机profile及日志3289文件387439408字节，剩余0/错误0、Git状态保持。先保存`build/maintenance-20261029/surrender-fix-cleanup.json`及[成果](SURRENDER_OWNERSHIP_FIX_20261029.md)，再更新双STATUS和日志。56151/PID50956保留12个摘要一致的必要宿主文件和干净profile；其他服务、玩家资料/Mod、正式批次、原始输入及既有mod-checks保持。无新APK/发布/真机验收，故障后旧档未自动补转。

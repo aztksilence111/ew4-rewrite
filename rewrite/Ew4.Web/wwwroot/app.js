@@ -11,7 +11,7 @@ const resourceHud=['money','industry','food'].map((key,index)=>{
 });
 let startupReady=false,startupRunning=false,startupError='';
 let effects,damageNumbers,music;
-const uiAudio=new Ew4UiAudio.Feedback(file=>effects?.sound(file));
+const uiAudio=new Ew4UiAudio.Feedback(file=>effects?.sound(file),()=>effects?.unlockAudio());
 let selectionRequest=0,dialoguePresentationKey=null,dialoguePresentationTask=null;
 let originalTextQueued=false;
 const originalTextChanges=new MutationObserver(()=>{
@@ -51,8 +51,8 @@ function requestRender(){
   if(!renderRequest)renderRequest=requestAnimationFrame(render);
 }
 function suspendRendering(){cancelAnimationFrame(renderRequest);renderRequest=0;}
-window.ew4SetAppVisible=visible=>{appVisible=visible;music?.setVisible(visible);storyPlayer.setVisible(visible);if(visible){battlefieldNeedsFrame=true;requestRender();}else suspendRendering();};
-document.addEventListener('visibilitychange',()=>{if(document.hidden)suspendRendering();else{battlefieldNeedsFrame=true;requestRender();}});
+window.ew4SetAppVisible=visible=>{appVisible=visible;music?.setVisible(visible);effects?.setVisible(visible&&!document.hidden);storyPlayer.setVisible(visible);if(visible){battlefieldNeedsFrame=true;requestRender();}else suspendRendering();};
+document.addEventListener('visibilitychange',()=>{effects?.setVisible(appVisible&&!document.hidden);if(document.hidden)suspendRendering();else{battlefieldNeedsFrame=true;requestRender();}});
 new MutationObserver(requestRender).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden']});
 for(const event of ['pointerdown','pointermove','pointerup','wheel','input','change','click'])document.addEventListener(event,requestRender,{passive:true});
 const mapViews=new Ew4MapViews.Controls($('map-view-controls'),requestRender);
@@ -1523,8 +1523,9 @@ async function initializeClient(){
     const buildInfo=await startupJson('/build-info.json');
     performanceLog.build=buildInfo.source.slice(0,12)+'/'+(c.build||'unknown').slice(0,8)+'/'+(c.buildVariant||'unknown');
     fx.elements??=presentation.elements;fx.sounds=[...new Set([...fx.sounds,...presentation.sounds])];
-    effects=new Ew4Effects.Effects({image,sprite,animation,libraries,get manifest(){return manifest;},volume:()=>settings.sound},fx,visuals);
-    effects.preloadSounds(presentation.sounds);
+    effects?.dispose();effects=new Ew4Effects.Effects({image,sprite,animation,libraries,get manifest(){return manifest;},volume:()=>settings.sound},fx,visuals);
+    effects.setVisible(appVisible&&!document.hidden);
+    await effects.preloadSounds(presentation.sounds);
     Ew4Startup.pending('战斗图像与界面');
     const fightFont='font_fight_num_hd';
     const [fightFonts,fightSheet]=await Promise.all([startupJson('/content/fight-font.json'),loadImage('images/'+fightFont+'.png'),

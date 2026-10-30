@@ -1,9 +1,10 @@
 'use strict';
 (function(root){
   class Feedback {
-    constructor(play){
+    constructor(play,prepare=()=>{}){
       this.play=play;this.presses=new Map();
-      this.down=e=>{this.presses.clear();this.presses.set(e.pointerId,{x:e.clientX,y:e.clientY,moved:false});};
+      this.down=e=>{if(e.isTrusted)prepare();this.presses.clear();this.presses.set(e.pointerId,{x:e.clientX,y:e.clientY,moved:false});};
+      this.key=e=>{if(e.isTrusted&&(e.key==='Enter'||e.key===' '))prepare();};
       this.move=e=>{const p=this.presses.get(e.pointerId);if(p&&Math.hypot(e.clientX-p.x,e.clientY-p.y)>6)p.moved=true;};
       this.cancel=e=>this.presses.delete(e.pointerId);
       this.click=e=>{
@@ -15,6 +16,7 @@
         this.play(file);
       };
       document.addEventListener('pointerdown',this.down,true);
+      document.addEventListener('keydown',this.key,true);
       document.addEventListener('pointermove',this.move,true);
       document.addEventListener('pointercancel',this.cancel,true);
       document.addEventListener('click',this.click,true);
@@ -31,6 +33,7 @@
     }
     dispose(){
       document.removeEventListener('pointerdown',this.down,true);document.removeEventListener('pointermove',this.move,true);
+      document.removeEventListener('keydown',this.key,true);
       document.removeEventListener('pointercancel',this.cancel,true);document.removeEventListener('click',this.click,true);
       this.presses.clear();
     }

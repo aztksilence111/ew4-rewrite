@@ -161,7 +161,19 @@
     for(const [key,track] of [['rank_military','rank'],['rank_nobility','title']])l.fill(key,this.progressionBadge(track,preview.learning[track]));
     l.text('text_life',this.data.rankHealth[preview.learning.rank.level]);
     l.text('text_apply',this.data.titleHealing[preview.learning.title.level]);
-    const grid=l.get('grid_preview');for(const [key,value] of Object.entries(preview.learning.abilities).filter(([key,value])=>value>receiver.learning.abilities[key])){const row=document.createElement('div');row.append(this.api.uiImage((key==='naval'?'upgrade_tag_ship':key==='fort'?'upgrade_tag_fortress':'upgrade_tag_'+key)+'.png',20),this.lettering(value,'font_char_2_hd'));grid.append(row);}
+    const grid=l.get('grid_preview');
+    // The native grid's 28px cells cannot hold an ability icon and its star preview.
+    for(const [key,name,icon] of [['infantry','步兵','upgrade_tag_infantry'],['cavalry','骑兵','upgrade_tag_cavalry'],['artillery','炮兵','upgrade_tag_artillery'],['naval','海军','upgrade_tag_ship'],['fort','要塞','upgrade_tag_fortress'],['commerce','商业','generalsinfo_trade'],['movement','移动','generalsinfo_move']]){
+      const before=receiver.learning.abilities[key]??0,value=preview.learning.abilities[key];
+      if(!(value>before))continue;
+      const row=document.createElement('div');row.className='regroup-ability';row.dataset.ability=key;row.dataset.before=before;row.dataset.value=value;
+      row.title=name+' '+before+'星 → '+value+'星（+'+(value-before)+'）';row.setAttribute('aria-label',row.title);
+      row.append(this.api.uiImage(icon+'.png',18,18),this.lettering(name,'font_text_2_cn_hd','#404040',24,'left',{size:12,singleLine:true,shrinkWidth:true}),this.lettering(before+' →','font_text_2_cn_hd','#404040',28,'left',{size:12,singleLine:true,shrinkWidth:true}));
+      const stars=document.createElement('span');stars.className='regroup-stars';stars.setAttribute('aria-label',value+'星');
+      for(let i=0;i<(value>5?1:value);i++)stars.append(this.api.uiImage('star_middle.png',8.5,8));
+      if(value>5)stars.append(this.lettering('×'+value,'font_text_2_cn_hd','#404040',45,'left',{size:12,singleLine:true,shrinkWidth:true}));
+      row.append(stars);grid.append(row);
+    }
     l.action('btn_regroup',this.text('btn_regroup'),()=>{
       const confirm=this.api.detail('title_notice',320,170,async()=>{await this.updateAccount({op:'inherit',commander:id,target:donorId});this.reopenCommander(id);},()=>this.regroup(id,donorId));confirm.className='regroup-confirm';
       confirm.append(this.lettering(this.text('text_regroup'),'font_text_2_cn_hd','#404040'),this.card(this.definition(donor),donor,()=>{}),this.lettering(this.text('text_regroupnotice'),'font_text_1_cn_hd','#a02320',270));

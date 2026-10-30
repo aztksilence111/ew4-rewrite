@@ -81,6 +81,9 @@ public sealed class MovementHistory
             Phase = world.Phase == TurnPhase.Finished ? TurnPhase.Active : world.Phase,
             Outcome = world.Phase == TurnPhase.Finished ? BattleOutcome.Continue : world.Outcome
         };
+        var map = new HexMap(next.Width, next.Height);
+        var moraleCells = map.Within(entry.Origin, 1, true).Concat(map.Within(entry.Destination, 1, true)).ToHashSet();
+        next = WorldDeaths.RefreshMorale(next, next.DiplomacyNeutralCamps, moraleCells);
         next.Validate();
         moves.Remove(entry);
         return (new(next, new[] { new WorldNotice("unit.move_undone", entry.Unit, entry.Origin) }), entry.Path.Reverse().ToArray());

@@ -190,6 +190,9 @@ public static class WorldActions
             next = surrendered.State;
             notices.AddRange(surrendered.Notices);
         }
+        // Moving changes the flanking/surrounding situation at both ends of the route.
+        var moraleCells = map.Within(unit.Cell, 1, true).Concat(map.Within(destination, 1, true)).ToHashSet();
+        next = WorldDeaths.RefreshMorale(next, rules.NeutralCamps, moraleCells);
         if (rules.Extensions != null)
         {
             next = rules.Extensions.Dispatch(next, "unit.move_end", unitId, new Ew4Random(next.RandomState));
