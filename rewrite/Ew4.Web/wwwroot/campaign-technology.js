@@ -73,7 +73,7 @@
       layout.hide('image_arrow',entry.level<0||entry.maximum);layout.hide('text_from',entry.level<0);
       layout.text('text_needstar',entry.maximum?'MAX':String(entry.cost),{color:entry.canUpgrade?'235,230,225,255':'255,50,0,255'});layout.hide('image_needstar',entry.maximum);
       const price=layout.get('text_needstar');price.style.left=entry.maximum?'0px':'50px';price.style.width=entry.maximum?'83px':'33px';layout.text('text_needstar',entry.maximum?'MAX':String(entry.cost),{align:'center'});
-      upgrade.disabled=pending||!entry.canUpgrade;upgrade.title=entry.maximum?'科技已满级':entry.canUpgrade?'升级 '+entry.name:'战役星数不足';
+      upgrade.disabled=pending||!entry.canUpgrade;upgrade.title=entry.maximum?'科技已满级':entry.canUpgrade?'升级 '+entry.name:'金星奖章不足';
       upgrade.classList.toggle('technology-maximum',entry.maximum);
       upgrade.setAttribute('aria-label',entry.maximum?'科技已满级':'升级 '+entry.name+'，需要 '+entry.cost+' 星');
       layout.body.dataset.warzone=data.warzone;layout.body.dataset.selected=selected;layout.body.dataset.stars=data.stars;

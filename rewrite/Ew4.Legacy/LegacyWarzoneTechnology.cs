@@ -43,12 +43,11 @@ public sealed class LegacyWarzoneTechnology
         var snapshot = Snapshot(account, warzone);
         if (slot is < 0 or >= 26) throw new RuleViolation("technology.slot", "无效科技项目");
         int cost = UpgradeCost(slot, snapshot[slot]) ?? throw new RuleViolation("technology.maximum", "科技已满级");
-        int balance = CampaignTechnologyStars.Balance(account);
-        if (balance < cost) throw new RuleViolation("technology.stars", "战役星数不足");
+        var paid = CampaignTechnologyStars.Spend(account, cost);
         var zones = account.CampaignTechnology.ToDictionary(z => z.Key, z => z.Value);
         var levels = zones.GetValueOrDefault(warzone)?.ToDictionary(t => t.Key, t => t.Value) ?? new Dictionary<int, int>();
         levels[slot] = snapshot[slot] + 1; zones[warzone] = new ReadOnlyDictionary<int, int>(levels);
-        return account with { Revision = checked(account.Revision + 1), TechnologyStars = balance - cost,
+        return paid with { Revision = checked(account.Revision + 1),
             CampaignTechnology = new ReadOnlyDictionary<int, IReadOnlyDictionary<int, int>>(zones) };
     }
     private LegacyWarzoneTechnology(Dictionary<int, IReadOnlyList<int>> values, string source)
