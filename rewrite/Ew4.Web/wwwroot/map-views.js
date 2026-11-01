@@ -4,17 +4,30 @@
   const palette=['#79aadd60','#d67b7b60','#dcb36a60','#85b38a60','#b08fbd60','#6db6b060','#c9937260','#a7a9ba60'];
   const packed=hex=>{const n=parseInt(hex.slice(1,7),16),alpha=hex.length===9?parseInt(hex.slice(7,9),16):255;return (alpha<<24|(n&255)<<16|(n&0xff00)|(n>>>16))>>>0;};
   class Projection {
-    constructor(){this.camps=new Map();this.used=new Set();}
+    constructor(){this.camps=new Map();this.used=new Set();this.displayCells=new Map();}
     sync(state,map){
       const reset=this.map!==map||this.scenario!==state.scenario;
       if(reset){this.camps.clear();this.used.clear();this.map=map;this.scenario=state.scenario;}
+      const displayCells=new Map();
+      for(const link of map?.territoryDisplay?.[state.scenario]||[]){
+        if(!Array.isArray(link)||link.length!==3)continue;
+        const [cell,center,district]=link,site=state.cells?.[cell],anchor=state.cells?.[center];
+        if(!Number.isInteger(cell)||!Number.isInteger(center)||!Number.isInteger(district)||district>=0||district<-(state.cells?.length||0)
+          ||!site?.active||site.sea||site.geographyType!=='impassable_mountain'
+          ||!anchor?.active||anchor.sea||anchor.jurisdictionCenter!==center)continue;
+        displayCells.set(cell,{...site,owner:anchor.owner,jurisdictionCenter:district});
+      }
+      const displayChanged=reset||displayCells.size!==this.displayCells.size||[...displayCells].some(([cell,site])=>{
+        const prior=this.displayCells.get(cell);return prior?.owner!==site.owner||prior?.jurisdictionCenter!==site.jurisdictionCenter;
+      });
+      this.displayCells=displayCells;
       const config=state.mapColors||{},signature=JSON.stringify(config),changed=this.colorSignature!==signature;
       this.colorSignature=signature;
       const factionChanged=reset||!this.factions||this.factions.size!==state.factions.length||state.factions.some(f=>{
         const prior=this.factions.get(f.id);
         return !prior||['camp','color','country','flag'].some(key=>prior[key]!==f[key]);
       });
-      if(!factionChanged&&!changed)return false;
+      if(!factionChanged&&!changed)return displayChanged;
       const colors=config.campPalette||palette;
       const overrides=new Map(Object.entries(config.camps||{}));
       if(factionChanged)this.factions=new Map(state.factions.map(f=>[f.id,{camp:f.camp,color:f.color,country:f.country,flag:f.flag}]));
@@ -29,8 +42,9 @@
       }
       let index=0;
       for(const [id,camp] of this.camps){camp.color=packed(overrides.get(id)??colors[index%colors.length]);index++;}
-      return changed||factionChanged;
+      return changed||factionChanged||displayChanged;
     }
+    display(site,cell){return this.displayCells.get(cell)||site;}
     letters(index){let value='';do{value=String.fromCharCode(65+index%26)+value;index=Math.floor(index/26)-1;}while(index>=0);return value;}
     color(site,mode){
       const faction=this.factions.get(site.owner),normal=faction?.color||0;

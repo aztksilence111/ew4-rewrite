@@ -48,6 +48,14 @@ war_experience_multipliers、economic_multipliers 为来源资料，未新增为
 其余属性保留原 XML 名称，数值可用 JSON 数字。
 内存转换统一供规则模块读取，装备效果与价格、将领商业与战斗属性使用同一份 JSON。
 
+## 城市升级上限与金框
+
+R版本体沿用原版：普通城市最多升级到六级，剧本初始放置的七级城市保留。七条等级资料不表示可以从六级升到七级。
+
+Mod可修改完整 `legacy/buildings.json` 中 `type:"city"` 记录的 `maxlevel`：默认6，改为7即开放六升七，改为5则最多升五级。其他记录和 `children` 保留；上限必须至少为1，且不超过已提供的等级行数。此值是实际等级，不是从0开始的 `idx`。
+
+玩法升级规则和地图金框共用此上限：达到或超过上限显示金框，因此本体六／七级均有金框；Mod设为7后六级无框、七级有框。`buildingUpgradeLimits` 为游戏生成的只读显示字段，不应直接修改它代替规则。旧APK/XML改版可修改完整 `def_construction.xml` 的 `<construction type="city" maxlevel="7">` 后重新导入，转换会同步规则；独立JSON覆盖优先于原XML。该金框同步修复需新构建，尚未包含在0.2.28正式包。
+
 复制需要修改的完整文件到覆盖包 legacy/ 后执行 pack、verify，再导入启用。
 缺省文件沿用基础版；文件参与指纹和存档隔离。已有账户实例不会自动按新定义重置。
 旧 APK/XML 导入会生成独立文件。旧 schema 2 完整 catalog、schema 1 完整规则表仍可读。

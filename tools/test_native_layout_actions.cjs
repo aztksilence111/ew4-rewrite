@@ -14,6 +14,7 @@ for(const folder of ['', 'compat']){
     const errors=[],events=[];
     const button={dataset:{tutorialId:'btn_done'},setAttribute(){}};
     const layout=Object.create(prototype);
+    layout.options={};
     layout.api={tutorialUi,notice:message=>errors.push(message)};
     layout.get=()=>button;layout.current=()=>true;
     return {layout,button,errors,events};

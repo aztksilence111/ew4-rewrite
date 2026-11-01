@@ -117,6 +117,8 @@ public enum TurnPhase { Active, RoundEvents, StartFaction, Finished, EndFactionE
 public sealed record CommanderRuntime
 {
     public string Id { get; init; } = "";
+    public string? DefinitionId { get; init; }
+    public string? DisplayName { get; init; }
     public string Owner { get; init; } = "";
     public bool Withdrawn { get; init; }
     public bool ProgressionEnabled { get; init; } = true;
@@ -191,6 +193,8 @@ public sealed record WorldState
     public IReadOnlyDictionary<string, ScenarioEventProgress> ScenarioEventProgress { get; init; } = new Dictionary<string, ScenarioEventProgress>();
     public IReadOnlyList<string> DestroyedScenarioUnits { get; init; } = Array.Empty<string>();
     public IReadOnlyList<string> DeadScenarioCommanders { get; init; } = Array.Empty<string>();
+    public IReadOnlyList<string> RetiredScenarioUnits { get; init; } = Array.Empty<string>();
+    public IReadOnlyList<string> SpawnedScenarioUnits { get; init; } = Array.Empty<string>();
     public IReadOnlyList<string> TriggeredEvents { get; init; } = Array.Empty<string>();
     public string? PendingDialogue { get; init; }
     public IReadOnlyList<string> QueuedDialogues { get; init; } = Array.Empty<string>();
@@ -446,6 +450,8 @@ public sealed record WorldState
         ScenarioChoices = ScenarioChoices.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal),
         ScenarioEventProgress = ScenarioEventProgress.ToDictionary(p => p.Key, p => p.Value with { }, StringComparer.Ordinal),
         DestroyedScenarioUnits = DestroyedScenarioUnits.ToArray(), DeadScenarioCommanders = DeadScenarioCommanders.ToArray(),
+        RetiredScenarioUnits = RetiredScenarioUnits.ToArray(),
+        SpawnedScenarioUnits = SpawnedScenarioUnits.ToArray(),
         TriggeredEvents = TriggeredEvents.ToArray(), QueuedDialogues = QueuedDialogues.ToArray()
     });
 }

@@ -1,6 +1,23 @@
 using System.Text.Json;
 using Ew4.Core;
 
+if (args.ElementAtOrDefault(1) == "--mountain-installation-only")
+{
+    string project = Path.GetFullPath(args[0]);
+    Console.WriteLine(JsonSerializer.Serialize(new { mountainInstallationChecks = MountainInstallationChecks.Run(project),
+        contracts = Contracts.Run(project), navigation = UnitNavigationChecks.Run(), search = SearchWorkspaceChecks.Run(),
+        defense = CombatContextChecks.Run(project), strategy = AiStrategySelectionChecks.Run(project),
+        movementCommit = MovementCommitChecks.Run(project), aiMovement = AiMovementChecks.Run(project),
+        aiUnits = AiUnitChecks.Run(project), geography = GeographyChecks.Run(project), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--scenario-armies-only")
+{
+    string project = Path.GetFullPath(args[0]);
+    Console.WriteLine(JsonSerializer.Serialize(new { scenarioArmyChecks = ScenarioArmyChecks.Run(project),
+        commanderDeploymentChecks = CommanderDeploymentChecks.Run(project), rosterDeploymentChecks = RosterDeploymentChecks.Run(project), errors = 0 })); return;
+}
+
 if (args.ElementAtOrDefault(1) == "--movement-morale-only")
 {
     string project = Path.GetFullPath(args[0]);
@@ -313,6 +330,7 @@ int aiChecks = AiChecks.Run(root);
 int lifecycleChecks = LifecycleChecks.Run(root);
 int actionChecks = ActionChecks.Run(root);
 int movementCommitChecks = MovementCommitChecks.Run(root);
+movementCommitChecks += MountainInstallationChecks.Run(root);
 movementCommitChecks += MovementMoraleChecks.Run(root);
 movementCommitChecks += RFeedbackChecks.Run(root);
 int turnSettlementChecks = TurnSettlementChecks.Run(root);

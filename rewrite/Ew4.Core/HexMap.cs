@@ -89,12 +89,18 @@ public sealed record MovementRules
     public int SeaCost { get; init; } = 1;
     public bool BlockEnemyOccupied { get; init; } = true;
     public bool AllowOverdrawnEntry { get; init; }
+    public bool AllowFirstStepOverdraw { get; init; } = true;
 }
 
 public sealed record ReachableCell(int Cell, int Remaining, IReadOnlyList<int> Path);
 
 public static class Movement
 {
+    // Native 0x8dbd4 permits an over-budget entry only from the search origin.
+    internal static bool CanEnter(int? cost, int budget, bool firstStep, MovementRules rules) =>
+        cost.HasValue && budget > 0 && (cost.Value <= budget || rules.AllowOverdrawnEntry
+            || firstStep && rules.AllowFirstStepOverdraw);
+
     // Native 0x8dd7c caps searches starting at sea in a transport to two points.
     // Keep an exhausted or partially spent budget exhausted/partial for custom move rules.
     public static MovementActor AtOrigin(MovementActor actor, MovementCell origin) =>
@@ -122,7 +128,7 @@ public static class Movement
                     if (to < 0 || !cells[to].CanTraverse() || labels[to] >= 0) continue;
                     int? forward = EntryCost(cells[from], cells[to], (direction + 3) % 6, actor, rules);
                     int? reverse = EntryCost(cells[to], cells[from], direction, actor, rules);
-                    bool Legal(int? cost) => cost.HasValue && (cost.Value <= actor.FullBudget || rules.AllowOverdrawnEntry);
+                    bool Legal(int? cost) => CanEnter(cost, actor.FullBudget, true, rules);
                     if (!Legal(forward) && !Legal(reverse)) continue;
                     labels[to] = component; queue.Enqueue(to);
                 }
@@ -157,8 +163,8 @@ public static class Movement
                 int previous = map.Neighbor(current.Cell, direction);
                 if (previous < 0 || !cells[previous].CanTraverse()) continue;
                 int? cost = EntryCost(cells[previous], cells[current.Cell], direction, actor, rules);
-                if (!cost.HasValue || cost.Value > actor.FullBudget && !rules.AllowOverdrawnEntry) continue;
-                long total = checked(current.Cost + cost.Value);
+                if (!CanEnter(cost, actor.FullBudget, true, rules)) continue;
+                long total = checked(current.Cost + cost!.Value);
                 if (distances.TryGetValue(previous, out long old) && old <= total) continue;
                 distances.Set(previous, total);
                 queue.Add((total, previous));
@@ -186,8 +192,8 @@ public static class Movement
                 int next = map.Neighbor(current.Cell, direction);
                 if (next < 0 || !cells[next].CanTraverse()) continue;
                 int? cost = EntryCost(cells[current.Cell], cells[next], (direction + 3) % 6, actor, rules);
-                if (!cost.HasValue || cost.Value > actor.FullBudget && !rules.AllowOverdrawnEntry) continue;
-                long total = checked(current.Cost + cost.Value);
+                if (!CanEnter(cost, actor.FullBudget, true, rules)) continue;
+                long total = checked(current.Cost + cost!.Value);
                 if (distances.TryGetValue(next, out long old) && old <= total) continue;
                 distances.Set(next, total); queue.Add((total, next));
             }
@@ -230,8 +236,8 @@ public static class Movement
                     int previous = map.Neighbor(current.Cell, direction);
                     if (previous < 0 || !cells[previous].CanTraverse()) continue;
                     int? cost = EntryCost(cells[previous], cells[current.Cell], direction, actor, rules);
-                    if (!cost.HasValue || cost.Value > actor.FullBudget && !rules.AllowOverdrawnEntry) continue;
-                    long total = checked(current.Cost + cost.Value);
+                    if (!CanEnter(cost, actor.FullBudget, true, rules)) continue;
+                    long total = checked(current.Cost + cost!.Value);
                     if (costs[previous] >= 0 && costs[previous] <= total) continue;
                     costs[previous] = total;
                     queue.Add((total, previous));
@@ -362,8 +368,8 @@ public static class Movement
                 int next = map.Neighbor(current.Cell, direction);
                 if (next < 0) continue;
                 int? cost = EntryCost(cells[current.Cell], cells[next], (direction + 3) % 6, actor, rules);
-                if (!cost.HasValue || (cost.Value > budget && !rules.AllowOverdrawnEntry)) continue;
-                int rest = checked(budget - cost.Value);
+                if (!CanEnter(cost, budget, current.Cell == origin, rules)) continue;
+                int rest = checked(budget - cost!.Value);
                 if (remaining.TryGetValue(next, out int previous) && previous >= rest) continue;
                 remaining[next] = rest;
                 parents[next] = current.Cell;

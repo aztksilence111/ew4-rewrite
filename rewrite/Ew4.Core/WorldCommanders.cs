@@ -63,10 +63,16 @@ public static class WorldCommanders
 
     public static WorldChange Assign(WorldState state, long expectedRevision, string unitId, string commanderId, WorldCommanderRules rules)
     {
-        var faction = WorldActions.Ready(state, expectedRevision); rules.Validate();
+        var faction = WorldActions.Ready(state, expectedRevision);
+        return AssignForOwner(state, unitId, commanderId, faction.Id, rules);
+    }
+
+    internal static WorldChange AssignForOwner(WorldState state, string unitId, string commanderId, string owner, WorldCommanderRules rules)
+    {
+        rules.Validate();
         var unit = state.Units.SingleOrDefault(u => u.Id == unitId);
         var commander = state.Commanders.SingleOrDefault(c => c.Id == commanderId);
-        if (unit == null || unit.Owner != faction.Id || commander == null || commander.Owner != faction.Id || commander.Withdrawn
+        if (unit == null || unit.Owner != owner || commander == null || commander.Owner != owner || commander.Withdrawn
             || state.Units.Any(u => u.CommanderId == commanderId))
             throw new RuleViolation("commander.unavailable", "Commander or receiving unit is unavailable");
         if (unit.CommanderId != null && !rules.AllowReplacement)
@@ -108,9 +114,15 @@ public static class WorldCommanders
 
     public static WorldChange Detach(WorldState state, long expectedRevision, string unitId, WorldCommanderRules rules)
     {
-        var faction = WorldActions.Ready(state, expectedRevision); rules.Validate();
+        var faction = WorldActions.Ready(state, expectedRevision);
+        return DetachForOwner(state, unitId, faction.Id, rules);
+    }
+
+    internal static WorldChange DetachForOwner(WorldState state, string unitId, string owner, WorldCommanderRules rules)
+    {
+        rules.Validate();
         var unit = state.Units.SingleOrDefault(u => u.Id == unitId);
-        if (unit == null || unit.Owner != faction.Id || unit.CommanderId == null)
+        if (unit == null || unit.Owner != owner || unit.CommanderId == null)
             throw new RuleViolation("commander.unavailable", "No active faction commander to detach");
         var original = Unassigned(unit);
         int oldBudget = unit.ExtensionMovementLimit ?? unit.Combatant.Profile.Movement;

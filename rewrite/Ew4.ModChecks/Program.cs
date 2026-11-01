@@ -5,6 +5,11 @@ using System.Text.Json.Nodes;
 using System.Xml.Linq;
 using Ew4.Mods;
 
+if (args.ElementAtOrDefault(1) == "--building-presentation-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { buildingPresentationChecks = BuildingPresentationChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
 if (args.ElementAtOrDefault(1) == "--diplomacy-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { diplomacyModChecks = DiplomacyModChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;

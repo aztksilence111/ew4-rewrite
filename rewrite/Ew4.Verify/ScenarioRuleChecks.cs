@@ -182,6 +182,7 @@ internal static class ScenarioRuleChecks
         string fixture = Path.Combine(folder, "raw-fixture"); Directory.CreateDirectory(fixture);
         foreach (var p in overrides) { string target = Path.Combine(fixture, p.Key); Directory.CreateDirectory(Path.GetDirectoryName(target)!); File.WriteAllBytes(target, p.Value); }
         File.Copy(Path.Combine(root, "rewrite/data/original/conquest1.btl"), Path.Combine(fixture, "conquest1.btl"), true);
+        checks += ScenarioArmyChecks.Run(root);
         checks += ScenarioRecurrenceDiplomacyChecks.Run(root);
         checks += ScenarioFactionChecks.Run(root);
         checks += ScenarioControlChecks.Run(root);

@@ -474,8 +474,8 @@
     },
     {
       "path": "original/def_areaname.xml",
-      "bytes": 47994,
-      "sha256": "83898512615dcc8aa410e67bf789717e2ba56c6eba22256a0131e2fbf225f3d8"
+      "bytes": 48208,
+      "sha256": "74457d49558733f557dc4f334c423964813df94e596d119bf6dfb6f2735f8fe5"
     },
     {
       "path": "original/def_army.xml",
@@ -560,12 +560,12 @@
     {
       "path": "original/eastasia.bin",
       "bytes": 257872,
-      "sha256": "47289fa67d67022194e41c4ff3ba0a0d9edcca7e11c1bcc8456feb55caee86ea"
+      "sha256": "f4a9524991d93740f870d564c3a501de26cc630853067e5d9e82b195e3373fcd"
     },
     {
       "path": "original/eastasia.map.json",
-      "bytes": 8107207,
-      "sha256": "0cef21d3948e056b8a16c949be9aa382827212d7602196f44715b84e9f6f3cf7"
+      "bytes": 8107322,
+      "sha256": "c3c18fe98e572783e9784118a374d035327b57f5e9abbff82c6dd38baca849e4"
     },
     {
       "path": "original/europe.bin",
@@ -3369,8 +3369,8 @@
     },
     {
       "path": "client/manifest.json",
-      "bytes": 6502220,
-      "sha256": "990f87bcb0dcc37c1e944d68aab47e070d2f684e4a38eaae8093be13ab0c97a8"
+      "bytes": 6502513,
+      "sha256": "ea0cf76668a7ad0226b4a421234ba6a5924aa5e9c391318dd209deeee9f6d4ed"
     },
     {
       "path": "client/maps/america/0_0.png",
@@ -4054,8 +4054,8 @@
     },
     {
       "path": "client/maps/eastasia/cities.json",
-      "bytes": 124966,
-      "sha256": "cd3634967e448924f9af9ac9c2a8d42b3212790bda22a08dcf4562ed2bebe86f"
+      "bytes": 126208,
+      "sha256": "ea3d1716d8f0aa1c0d0a5f01a232c69db52ef83a62053362278cb3d355971d53"
     },
     {
       "path": "client/maps/eastasia/facilities.json",
@@ -13555,7 +13555,7 @@
     {
       "path": "rewrite/geography.json",
       "bytes": 14408,
-      "sha256": "2b878fea62d455d4d85898d0ca9b09f1fbfa30745fff813448168f6e809c73e8"
+      "sha256": "a92bfc0b52a0f7d68f4c44ee9211d2c582583490fc942ef0ab165ee2bc0e287a"
     },
     {
       "path": "rewrite/map-colors.json",

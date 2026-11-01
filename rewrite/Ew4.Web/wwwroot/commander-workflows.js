@@ -297,16 +297,31 @@
   };
   proto.exchange=async function(cell,snapshot){
     if(!this.data)this.data=await this.api.rpc('headquarters');
-    const data=snapshot||await this.api.rpc('exchange',{cell}),l=this.native('form_exchange',()=>this.api.refresh());
+    let data=snapshot||await this.api.rpc('exchange',{cell}),pending=false,inFlight;
+    const l=this.native('form_exchange',async()=>{if(inFlight)await inFlight.catch(()=>{});await this.api.refresh();});
+    const availability=()=>{
+      for(const [index,offer] of data.offers.entries())for(const op of ['buy','sell'])
+        l.get('btn_'+op+'_'+(index+1)).disabled=pending||!(op==='buy'?offer.canBuy:offer.canSell);
+    };
+    l.options.afterAction=availability;
     l.text('group_seller/text_name',this.text('name_Seller'),{color:'235,230,225,255'});
     l.text('text_rate','x'+data.rate.toFixed(1),{color:'235,230,225,255'});
     for(const [index,offer] of data.offers.entries())for(const [op,allowed] of [['buy',offer.canBuy],['sell',offer.canSell]]){
       const key=op+'_'+(index+1);l.text('text_'+key+'a',op==='buy'?offer.buyMoney:offer.sellAmount);l.text('text_'+key+'b',op==='buy'?offer.buyAmount:offer.sellMoney);
       this.exchangeQuote(l,key,offer.resource,op==='buy'?offer.buyMoney:offer.sellAmount,op==='buy'?offer.buyAmount:offer.sellMoney);
-      l.action('btn_'+key,(op==='buy'?'购买':'出售')+(offer.resource==='industry'?'工业':'粮食')+' '+(op==='buy'?offer.buyAmount:offer.sellAmount),async()=>{const next=await this.api.rpc('exchange',{cell,revision:data.revision,op,offer:offer.id});await this.api.refresh();await this.exchange(cell,next);},allowed);
+      l.action('btn_'+key,(op==='buy'?'购买':'出售')+(offer.resource==='industry'?'工业':'粮食')+' '+(op==='buy'?offer.buyAmount:offer.sellAmount),async()=>{
+        if(pending||!l.current())return;
+        pending=true;availability();
+        try{
+          const next=await (inFlight=this.api.rpc('exchange',{cell,revision:data.revision,op,offer:offer.id}));
+          if(!l.current())return;
+          data=next;this.api.updateResources(data.resources);
+        }finally{pending=false;inFlight=null;if(l.current())availability();}
+      },allowed);
     }
     this.serviceCommander(l,'tcmder_player',data,()=>this.exchange(cell));
     this.commerceStars(l,data.commerce);
+    availability();
   };
   proto.tavern=async function(cell){
     this.data=await this.api.rpc('headquarters');const data=await this.api.rpc('commerce',{op:'tavern',cell}),l=this.native('form_recruitgeneral',()=>this.api.refresh());

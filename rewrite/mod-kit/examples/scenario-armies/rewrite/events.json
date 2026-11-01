@@ -1,0 +1,30 @@
+{
+  "conquest1": [
+    {
+      "id": "army.example",
+      "popup": {
+        "title": "地方动员",
+        "text": "地方预备队已完成集结。",
+        "choices": [
+          {
+            "id": "reinforce",
+            "text": "编入法军",
+            "effects": [
+              {"type":"unit_spawn", "faction":"conquest1.faction.0.fra", "unit":"reserve.fra", "profile":"ew4.unit.fra.line_infantry.0", "cells":[1765,1841,1842], "commander":"reserve.general", "commanderDefinition":1}
+            ]
+          },
+          {
+            "id": "found",
+            "text": "建立地方政权",
+            "effects": [
+              {"type":"faction_create", "faction":"local.reserve", "templateFaction":"conquest1.faction.0.fra", "name":"地方政权", "camp":"local.reserve"},
+              {"type":"cells_owner", "faction":"local.reserve", "cells":[1765]},
+              {"type":"unit_spawn", "faction":"local.reserve", "unit":"reserve.local", "profile":"ew4.unit.fra.line_infantry.0", "cells":[1765], "commander":"reserve.general", "commanderDefinition":1}
+            ]
+          },
+          {"id":"cancel", "text":"暂缓动员", "effects":[]}
+        ]
+      }
+    }
+  ]
+}

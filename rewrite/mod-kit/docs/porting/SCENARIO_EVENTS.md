@@ -95,8 +95,11 @@
 | `unit_at` | `unit` 位于 `cells` 中任一格 |
 | `unit_alive` | 指定 unit 实例仍存在 |
 | `unit_destroyed` | 指定 unit 实例经过死亡管线；撤军/解散/投降移除不冒充死亡 |
+| `unit_removed` | 指定 unit 实例经 unit_remove 显式和平撤编 |
 | `commander_alive` | 指定 commander 实例目前任职于现存部队 |
 | `commander_dead` | 指定 commander 实例曾随部队死亡；卸任/投降退场不算死亡 |
+| `commander_available` | 指定 commander 已入场、未退场且未在任何部队任职 |
+| `commander_withdrawn` | 指定 commander 活着退场，不包含真正死亡 |
 | `faction_defeated` | 指定国家已出局 |
 | `faction_exists` | 指定国家已经创建；已灭亡仍算存在 |
 | `faction_active` | 指定国家已经创建且未灭亡，不表示正在行动 |
@@ -108,7 +111,7 @@
 | `event_count` | key 指定事件累计触发次数；支持 compare/value；弹窗打开时计数 |
 | `script` | 自定义 Lua 布尔/数值查询；非零/true 为满足，script 与 function 必填 |
 
-`city_count/territory_count/objective_count/unit_count/cells_owned` 可用 `camp` 查询整个阵营；省略时只查 `faction`。其他条件按表说明。单位和将领使用 `units[].id/commanderId`，不直接使用 XML 的编号；内置初始部队例如 `conquest1.unit.N`，将领通常为 `conquest1.unit.N.commander`。地块为完整地图数组的零基索引，不能用裁剪后屏幕序号。加载会拒绝未知剧本、国家、初始单位/将领和无效地块引用。
+`city_count/territory_count/objective_count/unit_count/cells_owned` 可用 `camp` 查询整个阵营；省略时只查 `faction`。其他条件按表说明。单位和将领使用 `units[].id/commanderId`，不直接使用 XML 的编号；内置初始部队例如 `conquest1.unit.N`，将领通常为 `conquest1.unit.N.commander`。地块为完整地图数组的零基索引，不能用裁剪后屏幕序号。加载会拒绝未知剧本、国家、未声明的单位/将领和无效地块引用；允许提前引用事件或剧情选项中声明的新增对象，见[事件军队接口](SCENARIO_ARMIES.md)。
 
 ## 结果字段与完整类型
 
@@ -125,6 +128,9 @@
 | `faction_identity` | 修改指定势力名称、国土颜色及旗帜，可只改其中一项 |
 | `cells_owner` | 把 cells 所列地块转交指定国家；存在敌对占军时应先明确转交部队 |
 | `unit_owner` | unit 转交指定国家，其任职将领随部队转交；原名册派遣历史仍占原国名额 |
+| `unit_spawn` | 独立生成有将或无将部队，可给已有国家增援或与创建国家同批执行 |
+| `unit_remove` | 和平移除部队；有将军队须明确将领待命或活着退场，不冒充战毁 |
+| `commander_assign` / `commander_detach` | 原部队任命／卸任；显式先卸后任可换将，保留战损比例 |
 | `morale` | 指定国家部队士气设为 value（-3 至 1），保留领导力负士气豁免 |
 | `environment` | cells 所列地块环境值设置为非负 value |
 | `environment_spread` | cells 各格执行原环境扩散，随机状态随存档保存 |
@@ -138,7 +144,9 @@
 
 角色切换及动态胜负见[角色与结局接口](SCENARIO_CONTROL.md)，含本国分离和转投敌国叛军示例。`player_faction` 条件判断当前控制国，普通结果中的 `@player` 随控制权变化。
 
-数值结果可附加 `script:"rewrite/xxx.lua", function:"xxx"`，用 Lua 返回值代替 value；可根据局势计算奖励、惩罚、环境或变量值。返回有限且精确的整数，绝对值不超过 2^53-1。创建/身份、角色切换、胜负规则及结局结果不接受该数值脚本字段；胜负规则自身可嵌套 Lua 条件。所有权和阵营由声明字段决定。此接口没有任意托管代码执行、任意世界对象写入、生成新单位或新建建筑命令。
+数值结果可附加 `script:"rewrite/xxx.lua", function:"xxx"`，用 Lua 返回值代替 value；可根据局势计算奖励、惩罚、环境或变量值。返回有限且精确的整数，绝对值不超过 2^53-1。创建/身份、角色切换、胜负规则、结局和新增军队/任免结果不接受该数值脚本字段；胜负规则自身可嵌套 Lua 条件。所有权和阵营由声明字段决定。此接口没有任意托管代码执行、任意世界对象写入或新建建筑命令。
+
+2026-10-31 新增军队结果的 `profile/commander/commanderDefinition/health/experience/cost/disposition`、原军转属来源保护 `expectedOwner`、落点阻塞重试及读档行为见[事件军队接口](SCENARIO_ARMIES.md)，附[最小示例](../../examples/scenario-armies/README.md)。需包含本能力的新构建，既有 0.2.28 发行版不支持。
 
 势力操作的字符串参数直接声明；`faction_create/faction_identity` 不接受 script/function。具体字段、两种触发流程、独立兵种/PNG 旗帜及复国行为见[势力事件接口](SCENARIO_FACTIONS.md)。新势力创建前，针对它的资源/数量/所有权/关系等条件为假；可用 `not(faction_exists)` 判断尚未出现。给它执行其他结果前，必须先创建；接收部队前若它已灭亡，必须先复活。
 

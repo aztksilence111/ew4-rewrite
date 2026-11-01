@@ -279,7 +279,7 @@ public static class WorldActions
                 int next = map.Neighbor(unit.Cell, direction);
                 if (next < 0) continue;
                 int? cost = Movement.EntryCost(context.Cells[unit.Cell], context.Cells[next], (direction + 3) % 6, actor, configuration.Search);
-                if (!cost.HasValue || cost.Value > actor.Remaining && !configuration.Search.AllowOverdrawnEntry) continue;
+                if (!Movement.CanEnter(cost, actor.Remaining, true, configuration.Search)) continue;
                 if (!occupied.Contains(next)) { open = true; break; }
                 throughOccupied = true;
             }

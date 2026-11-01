@@ -134,8 +134,8 @@ public static partial class PlayerAi
                 int next = map.Neighbor(cell, d);
                 if (next < 0) continue;
                 int? cost = Movement.EntryCost(context.Cells[cell], context.Cells[next], (d + 3) % 6, context.Actor, ai.Movement.Search);
-                if (!cost.HasValue || cost > context.Actor.FullBudget && !ai.Movement.Search.AllowOverdrawnEntry) continue;
-                long total = priority.Cost + cost.Value;
+                if (!Movement.CanEnter(cost, context.Actor.FullBudget, true, ai.Movement.Search)) continue;
+                long total = priority.Cost + cost!.Value;
                 if (distances.TryGetValue(next, out long old) && old <= total) continue;
                 distances[next] = total; queue.Add((total, next));
             }

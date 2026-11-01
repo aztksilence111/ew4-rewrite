@@ -152,7 +152,8 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         }
         bool upgradedCapacity = JsonSerializer.Serialize(state.World.ArmyCapacity, Json)
             != JsonSerializer.Serialize(start.Session.World.ArmyCapacity, Json);
-        state = state with { World = state.World with { ArmyCapacity = start.Session.World.ArmyCapacity?.Copy() } };
+        state = state with { World = ScenarioArmyContent.Prepare(content,
+            state.World with { ArmyCapacity = start.Session.World.ArmyCapacity?.Copy() }, start.Rules.Commanders) };
         if (content.Scenarios.Single(s => s.Id == slot.Scenario).Mode == 2 && state.World.Demands == null)
             state = state with { World = state.World with { Demands = new DemandState { Legacy = true,
                 Rules = (start.Session.World.Demands?.Rules ?? new DemandRules()) with { } } } };
@@ -485,6 +486,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             (id: world.ScenarioId + ".tavern." + index + ".commander", source: content.Catalogs.Runtime.Commanders[candidate.CommanderId]))
             .ToDictionary(p => p.id, p => p.source);
         string? CommanderDefinitionId(UnitState unit) => session.Account.Roster.FirstOrDefault(c => c.Id == unit.CommanderId)?.DefinitionId
+            ?? world.Commanders.FirstOrDefault(c => c.Id == unit.CommanderId)?.DefinitionId
             ?? (unit.CommanderId == unit.Id + ".commander" && originalUnits.TryGetValue(unit.Id, out var army)
                 && content.Catalogs.Runtime.Commanders.TryGetValue(army.Commander, out var definition) ? definition.Definition.Id
                 : tavernCommanders.GetValueOrDefault(unit.CommanderId ?? "")?.Definition.Id);
@@ -514,6 +516,10 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             var level = definition?.Levels.ElementAtOrDefault(Math.Max(0, cell.BuildingLevel - 1));
             var income = WorldTurns.SiteIncome(cell, index, current.Rules.Turns, economicCommanders.GetValueOrDefault(index));
             content.Catalogs.Combat.Context.TerrainDefense.TryGetValue(cell.DefenseTerrain, out var penalties);
+            if (cell.BuildingKind == null && cell.InstallationKind != null
+                && content.Catalogs.Combat.Context.InstallationDefense.TryGetValue(cell.InstallationKind, out var installation))
+                penalties = (penalties ?? new Dictionary<string, int>()).Concat(installation)
+                    .GroupBy(p => p.Key, StringComparer.Ordinal).ToDictionary(g => g.Key, g => g.Max(p => p.Value), StringComparer.Ordinal);
             return new { income, defense = level?.DefensePercent ?? 0, penalties,
                 armyCapacity = WorldArmyCapacity.BuildingCapacity(world, cell) };
         }
@@ -543,7 +549,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                     && world.Units.Any(u => u.CommanderId == c.Id)).OrderByDescending(c => c.Title.Level)
                     .ThenByDescending(c => c.Rank.Level).FirstOrDefault();
                 string? diplomaticPortrait = diplomaticSpeaker != null && current.Rules.Commanders.Definitions.TryGetValue(diplomaticSpeaker.Id, out var diplomaticDefinition)
-                    ? diplomaticDefinition.DisplayName : null;
+                    ? diplomaticDefinition.DisplayName : diplomaticSpeaker?.DisplayName;
                 return new { id = world.PendingDialogue, text = content.Label($"desc_{diplomatic.Kind} {diplomatic.Variant}"), left = true,
                     portrait = diplomaticPortrait == null ? null : diplomaticPortrait + ".png", name = diplomaticPortrait == null
                         ? world.Factions.Single(f => f.Id == diplomatic.Faction).Name : content.Label("name_" + diplomaticPortrait) };
@@ -582,7 +588,8 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                 ? content.Catalogs.Accounts.Rules().Definitions[owned.DefinitionId].DisplayName
                 : u.CommanderId == u.Id + ".commander" && originalUnits.TryGetValue(u.Id, out var commanded)
                 && content.Catalogs.Runtime.Commanders.TryGetValue(commanded.Commander, out var commander) ? commander.Definition.DisplayName
-                : tavernCommanders.GetValueOrDefault(u.CommanderId ?? "")?.Definition.DisplayName }, Json)).ToArray();
+                : tavernCommanders.GetValueOrDefault(u.CommanderId ?? "")?.Definition.DisplayName
+                    ?? world.Commanders.FirstOrDefault(c => c.Id == u.CommanderId)?.DisplayName }, Json)).ToArray();
         pendingUnits = unitViews.ToDictionary(u => u.GetProperty("id").GetString()!, StringComparer.Ordinal);
         viewBuilt = true;
         return new

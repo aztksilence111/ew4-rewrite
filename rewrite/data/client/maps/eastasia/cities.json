@@ -5762,14 +5762,13 @@
     "x": 998.417,
     "y": 841.253,
     "id": "city-ef54a9919456",
-    "cell": 5087,
-    "col": 31,
+    "cell": 5088,
+    "col": 32,
     "row": 32,
     "world_pixel": [
-      1984,
+      2048,
       1710
     ],
-    "displacement_km": 20.05,
     "generalized_land": false,
     "city_id": 10250,
     "building_level": 2,
@@ -6431,5 +6430,85 @@
     "building_level": 2,
     "building_style": 2,
     "visual_land_patch": false
+  },
+  {
+    "name": "加德满都",
+    "lon": 85.324,
+    "lat": 27.717,
+    "tier": 1,
+    "city_id": 30001,
+    "building_level": 1,
+    "building_style": 2,
+    "cell": 14084,
+    "col": 22,
+    "row": 89,
+    "world_pixel": [
+      1440,
+      4788
+    ]
+  },
+  {
+    "name": "廷布",
+    "lon": 89.64,
+    "lat": 27.47,
+    "tier": 1,
+    "city_id": 30002,
+    "building_level": 1,
+    "building_style": 2,
+    "cell": 14726,
+    "col": 32,
+    "row": 93,
+    "world_pixel": [
+      2080,
+      5004
+    ]
+  },
+  {
+    "name": "达旺",
+    "lon": 91.86,
+    "lat": 27.59,
+    "tier": 1,
+    "city_id": 30003,
+    "building_level": 1,
+    "building_style": 2,
+    "cell": 14890,
+    "col": 38,
+    "row": 94,
+    "world_pixel": [
+      2432,
+      5058
+    ]
+  },
+  {
+    "name": "罕萨",
+    "lon": 74.65,
+    "lat": 36.32,
+    "tier": 1,
+    "city_id": 30004,
+    "building_level": 1,
+    "building_style": 2,
+    "cell": 8855,
+    "col": 7,
+    "row": 56,
+    "world_pixel": [
+      448,
+      3006
+    ]
+  },
+  {
+    "name": "承化寺",
+    "lon": 88.13,
+    "lat": 47.85,
+    "tier": 1,
+    "city_id": 30005,
+    "building_level": 1,
+    "building_style": 2,
+    "cell": 4938,
+    "col": 40,
+    "row": 31,
+    "world_pixel": [
+      2592,
+      1656
+    ]
   }
 ]

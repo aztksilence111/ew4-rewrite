@@ -41,6 +41,7 @@ public sealed partial class ClientGame
         }
         foreach (var commander in world.Commanders)
             RequireSavedDefinition(current.Rules.Commanders.Definitions.ContainsKey(commander.Id)
+                || commander.DefinitionId != null && content.Catalogs.Accounts.Rules().Definitions.ContainsKey(commander.DefinitionId)
                 || state.Account.Roster.Any(c => c.Id == commander.Id), "战场将领", commander.Id);
         foreach (var candidate in state.TavernCandidates)
             RequireSavedDefinition(current.Rules.Tavern.Assignment.Definitions.ContainsKey(candidate.CommanderId), "酒馆将领", candidate.CommanderId);

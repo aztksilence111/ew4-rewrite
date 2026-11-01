@@ -75,7 +75,9 @@ internal static class Contracts
         var pair = new HexMap(2, 1);
         var river = new MovementCell { RiverEdges = 8 };
         var limited = new MovementActor { Category = "cavalry", FullBudget = 6, Remaining = 3 };
-        Check(!Movement.Reachable(pair, [new(), river], 0, limited).ContainsKey(1), "no implicit overdraft");
+        Check(Movement.Reachable(pair, [new(), river], 0, limited)[1].Remaining == -3, "native first-step overdraft");
+        Check(!Movement.Reachable(pair, [new(), river], 0, limited, new MovementRules { AllowFirstStepOverdraw = false }).ContainsKey(1),
+            "explicit strict budget");
         Check(Movement.Reachable(pair, [new(), river], 0, limited, new MovementRules { AllowOverdrawnEntry = true })[1].Remaining == -3,
             "explicit legacy overdraft");
         Check(Movement.Reachable(pair, [new(), river with { BridgeEdges = 8, TerrainCost = 3 }], 0, limited)[1].Remaining == 0, "bridge");

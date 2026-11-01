@@ -21,7 +21,10 @@ build = ROOT / args.build
 assets = build / "assets"
 assets.mkdir(exist_ok=True)
 head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
-assert not subprocess.check_output(["git", "status", "--porcelain", "--untracked-files=no"], cwd=ROOT).strip(), "Commit tracked source before packaging"
+inputs = ["rewrite/Frontend.Build.targets", "rewrite/data", "rewrite/mod-kit", "tools/frontend",
+          "tools/package_release.py"]
+inputs.extend(str(p.relative_to(ROOT)) for p in (ROOT / "rewrite").glob("Ew4.*") if p.is_dir())
+assert not subprocess.check_output(["git", "status", "--porcelain", "--untracked-files=all", "--", *inputs], cwd=ROOT).strip(), "Commit distribution inputs before packaging"
 web = build / "web"
 if not args.android_only:
     assert (web / "Ew4.Web.exe").is_file() and (web / "MoonSharp.Interpreter.dll").is_file()

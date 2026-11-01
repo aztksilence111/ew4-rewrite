@@ -74,7 +74,7 @@ public static class ExtensionVictory
         foreach (var c in Conditions(rules.Win).Concat(rules.Lose == null ? Array.Empty<VictoryCondition>() : Conditions(rules.Lose)))
             if (c.Cells.Any(i => i < 0 || i >= world.Cells.Count || !world.Cells[i].Terrain.CanTraverse())
                 || c.Factions.Any(id => !(knownFaction?.Invoke(id) ?? world.Factions.Any(f => f.Id == id)))
-                || initial && c.Units.Any(id => world.Units.All(u => u.Id != id)))
+                || initial && c.Units.Any(id => !ScenarioArmies.KnownUnit(world, id)))
                 throw new RuleViolation("extension.victory_reference", "Victory condition references an unknown unit/faction/cell");
     }
 
@@ -95,6 +95,8 @@ public static class ExtensionVictory
     {
         bool Owned(int cell) => state.Cells[cell].Owner is string owner && (state.ScenarioPlayerFaction is string player
             ? WorldDiplomacy.Allied(state, owner, player) : state.Factions.Single(f => f.Id == owner).Camp == camp);
+        bool Lost(string id) => state.Units.All(u => u.Id != id) && (state.SpawnedScenarioUnits.Contains(id)
+            || !ScenarioArmies.Effects(state).Any(e => e.Type == "unit_spawn" && e.Unit != null && ScenarioArmies.Declared(e.Unit, id)));
         switch (c.Type)
         {
             case "all": return c.Conditions.All(v => Match(state, camp, neutral, v, scripts));
@@ -103,8 +105,8 @@ public static class ExtensionVictory
                 && (c.IncludeProvokedNeutrals ? f.Combatant : !neutral.Contains(state.Factions.Single(s => s.Id == f.Id).Camp)
                     || state.ScenarioPlayerFaction is string player && WorldDiplomacy.Override(state, player, f.Id) == "hostile"));
             case "factions_defeated": return c.Factions.All(id => state.Factions.Any(f => f.Id == id && f.Defeated));
-            case "units_destroyed": return c.Units.All(id => state.Units.All(u => u.Id != id));
-            case "units_lost": return c.Units.Any(id => state.Units.All(u => u.Id != id));
+            case "units_destroyed": return c.Units.All(Lost);
+            case "units_lost": return c.Units.Any(Lost);
             case "cells_owned": return c.Cells.All(Owned);
             case "cells_lost": return c.Cells.Any(cell => !Owned(cell));
             case "enemy_objectives_cleared": return !WorldVictory.Facts(state, neutral).Any(f => !f.Defeated && f.Combatant && f.Camp != camp && f.Objectives > 0);

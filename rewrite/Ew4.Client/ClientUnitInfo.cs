@@ -31,9 +31,11 @@ public sealed partial class ClientGame
             var runtime = world.Commanders.Single(c => c.Id == id);
             var owned = session.Account.Roster.FirstOrDefault(c => c.Id == id);
             var resolved = owned != null ? AccountCommanders.Resolve(owned, current.Rules.Roster.Account)
+                : runtime.DefinitionId != null ? content.Catalogs.Accounts.Rules().Definitions[runtime.DefinitionId]
                 : current.Rules.Commanders.Definitions[id];
             var battle = content.Battle(world.ScenarioId);
             int sourceId = owned != null ? content.Catalogs.Runtime.Commanders.Single(c => c.Value.Definition.Id == owned.DefinitionId).Key
+                : runtime.DefinitionId != null ? content.Catalogs.Runtime.Commanders.Single(c => c.Value.Definition.Id == runtime.DefinitionId).Key
                 : battle.Armies.Select((a, i) => new { a.Commander, Id = world.ScenarioId + ".unit." + i + ".commander" })
                     .FirstOrDefault(a => a.Id == id)?.Commander
                     ?? battle.Taverns.SelectMany(t => t.Candidates).Select((c, i) => new { c.CommanderId, Id = world.ScenarioId + ".tavern." + i + ".commander" })

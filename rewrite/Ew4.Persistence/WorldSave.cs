@@ -22,6 +22,8 @@ public static class WorldSave
                 if (info.Type == typeof(WorldState)) {
                     info.Properties.Single(p => p.Name == "armyCapacity").ShouldSerialize = (_, value) => value != null;
                     info.Properties.Single(p => p.Name == "story").ShouldSerialize = (_, value) => value != null;
+                    info.Properties.Single(p => p.Name == "retiredScenarioUnits").ShouldSerialize = (_, value) => ((IReadOnlyList<string>)value!).Count > 0;
+                    info.Properties.Single(p => p.Name == "spawnedScenarioUnits").ShouldSerialize = (_, value) => ((IReadOnlyList<string>)value!).Count > 0;
                     info.Properties.Single(p => p.Name == "demands").ShouldSerialize = (_, value) => value != null;
                     info.Properties.Single(p => p.Name == "diplomacyAdjustments").ShouldSerialize = (_, value) => value != null;
                 }
@@ -30,6 +32,12 @@ public static class WorldSave
                     info.Properties.Single(p => p.Name == "homelandBuildings").ShouldSerialize = (_, value) => value != null;
                     info.Properties.Single(p => p.Name == "turnSummary").ShouldSerialize = (_, value) => value != null;
                 }
+                if (info.Type == typeof(CommanderRuntime)) {
+                    info.Properties.Single(p => p.Name == "definitionId").ShouldSerialize = (_, value) => value != null;
+                    info.Properties.Single(p => p.Name == "displayName").ShouldSerialize = (_, value) => value != null;
+                }
+                if (info.Type == typeof(ScenarioCommanderTemplate))
+                    info.Properties.Remove(info.Properties.Single(p => p.Name == "extensions"));
                 if (info.Type == typeof(MovementCell)) {
                     info.Properties.Single(p => p.Name == "barrier").ShouldSerialize = (_, value) => (TerrainBarrier)value! != TerrainBarrier.None;
                     info.Properties.Single(p => p.Name == "minimumEntryCost").ShouldSerialize = (_, value) => (int)value! != 0;

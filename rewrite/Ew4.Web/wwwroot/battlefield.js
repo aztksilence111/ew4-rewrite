@@ -363,13 +363,19 @@
     ownership(preview=false) {
       const {draw}=this;
       // Land in the original texture is transparent. Ownership belongs BELOW coast/river tiles.
-      for(const {site:c,cell:i,p} of this.visibleCells){
+      for(const {site,cell:i,p} of this.visibleCells){
+        const c=this.projection?.display(site,i)??site;
         if(c.owner&&!c.sea){const color=Ew4MapSurface.rgba(this.projection?.color(c,this.mapMode)??this.factions.get(c.owner)?.color??0);
-          hex(draw,p.x,p.y);draw.fillStyle=`rgba(${color[0]},${color[1]},${color[2]},${color[3]/255})`;draw.fill();}
+          hex(draw,p.x,p.y);draw.fillStyle=`rgba(${color[0]},${color[1]},${color[2]},${color[3]/255})`;draw.fill();
+          if(this.map.territoryEdgeExtension?.includes(this.state.scenario)){
+            const edges=Ew4MapSurface.edgeFill(i,this.state.width,this.map.cameraBounds||{left:0,top:0,width:this.map.width,height:this.map.height},this.state.height);
+            for(const edge of edges){draw.beginPath();edge.forEach(([x,y],index)=>index?draw.lineTo(x,y):draw.moveTo(x,y));draw.closePath();draw.fill();}
+          }
+        }
         else if(!preview){const neighbors=this.neighbors(i);if(neighbors.some(n=>n?.active&&!n.sea&&n.color))draw.drawImage(this.surface.coast(neighbors),p.x-32,p.y-36,64,72);}
       }
     }
-    neighbors(index){return Array.from({length:6},(_,d)=>{const cell=this.state.cells[neighbor(index,d,this.state.width,this.state.height)];
+    neighbors(index){return Array.from({length:6},(_,d)=>{const i=neighbor(index,d,this.state.width,this.state.height),site=this.state.cells[i],cell=this.projection?.display(site,i)??site;
       return cell?{...cell,owner:this.projection?.borderOwner(cell,this.mapMode)??cell.owner,color:this.projection?.color(cell,this.mapMode)??this.factions.get(cell.owner)?.color??0}:null;});}
     mapTiles() {
       if(this.map.waterDetailZoom&&this.zoom>=this.map.waterDetailZoom){
@@ -398,7 +404,7 @@
     borders() {
       const {draw,state}=this,rules=this.api.manifest.mapDrawing;if(!rules)return;
       const texture=this.api.image(rules.borderTexture);
-      for(const {site:c,cell:i,p} of this.visibleCells){if(!c.active||c.sea||!c.owner)continue;
+      for(const {site,cell:i,p} of this.visibleCells){const c=this.projection?.display(site,i)??site;if(!c.active||c.sea||!c.owner)continue;
         const display={...c,owner:this.projection?.borderOwner(c,this.mapMode)??c.owner};
         const mask=Ew4MapSurface.borderMask(display,this.neighbors(i));if(!mask)continue;
         const bitmap=this.surface.border(mask,rules,texture);if(bitmap)draw.drawImage(bitmap,p.x-32,p.y-36,64,72);
@@ -408,11 +414,12 @@
       if(this.mapMode!=='district')return;
       this.districtCanvases??=new Map();
       const edges=[[1,2],[2,3],[3,4],[4,5],[5,0],[0,1]];
-      for(const {site,cell,p} of this.visibleCells){
+      for(const {site:actual,cell,p} of this.visibleCells){
+        const site=this.projection?.display(actual,cell)??actual;
         if(!site.active||site.sea||!Number.isInteger(site.jurisdictionCenter))continue;
         let mask=0;
         for(let d=0;d<6;d++){
-          const other=neighbor(cell,d,this.state.width,this.state.height),next=this.state.cells[other];
+          const other=neighbor(cell,d,this.state.width,this.state.height),raw=this.state.cells[other],next=this.projection?.display(raw,other)??raw;
           if(next?.active&&!next.sea&&next.owner===site.owner&&next.jurisdictionCenter!==site.jurisdictionCenter&&(!Number.isInteger(next.jurisdictionCenter)||cell<other))mask|=1<<d;
         }
         if(!mask)continue;
@@ -460,6 +467,10 @@
       const density=1;
       for(const label of this.labelIndex.query(this.visibleRect)){const p={x:Number(label.tx),y:Number(label.ty)};if(!label.textPath&&!this.visible(p,Math.max(Number(label.width),Number(label.height))))continue;
         const chinese=this.api.geographicLanguage==='zh'&&label.textZh;
+        if(chinese&&Ew4OriginalUI.displayText(label.textZh)===label.textZh.normalize('NFC')&&Ew4OriginalUI.availableText(label.textZh)!==label.textZh.normalize('NFC')){
+          // Font completion invalidates this layer; never cache pending glyphs as replacement characters.
+          void Ew4OriginalUI.prepareMapText(label.textZh,!label.sea);continue;
+        }
         const opacity=Number.isFinite(label.opacity)?Math.max(0,Math.min(1,label.opacity)):60/255;
         const key=label.libName+':'+density+':'+opacity+':'+(chinese?'zh':'en');
         if(!this.mapLabels.has(key)){
@@ -517,7 +528,8 @@
           if(c.buildingImage?.startsWith('capital_')){this.api.sprite('buildings',c.buildingImage,p.x,p.y,1,this.draw);this.api.sprite('buildings',`city_${region}_lv${level}_up.png`,p.x,p.y,1,this.draw);}
           this.draw.restore();
           if(!farms){const levels=this.api.manifest.buildings[c.buildingKind];
-            if(levels&&level>=levels.length)this.api.sprite('buildings','buildinglevel_max.png',p.x,p.y+25,1,this.draw);
+            const maximum=this.api.manifest.buildingUpgradeLimits?.[c.buildingKind]??levels?.length;
+            if(maximum&&level>=maximum)this.api.sprite('buildings','buildinglevel_max.png',p.x,p.y+25,1,this.draw);
             this.api.sprite('buildings','buildinglevel_'+level+'.png',p.x,p.y+25,1,this.draw);
           }
           if(!farms&&c.facility)this.api.sprite('buildings','marker_'+c.facility+'.png',p.x+17,p.y+25,1,this.draw);

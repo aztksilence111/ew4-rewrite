@@ -89,6 +89,7 @@ async function prepareMapFonts(next,preferences=settings){
 }
 const menus = new Ew4Menus.Menus({rpc,button,uiImage,countryImage,labels:labelImage,text:(value,font,color,width,align,options)=>originalTextRenderer?.element(value,font,color,width,align,options)||document.createTextNode(value),prose:(...args)=>originalTextRenderer.prose(...args),detail:detailWindow,start,loadLibrary,image,animation,libraries,notice,main:showMain,
   get manifest(){return manifest;},get catalog(){return catalog;},refreshCatalog:async()=>{catalog=await rpc('catalog');},tutorialUi,popup:popupOpen,load:(slot,mode)=>load(slot,mode),deploy:(unit,commander)=>act('deploy',{unit,commander}),act,
+  updateResources:resources=>{const player=state?.factions.find(f=>f.id===state.playerFaction);if(player){player.resources=resources;refreshResources();}},
   refresh:async()=>{if(state&&!$('play').hidden){await installState(await rpc('action',{op:'state',revision:state.revision}));}},get menuArt(){return menuArt;},closeDetail});
 let chosenScenario, chosenCountry, countryChoices = [], showGrid = false, selectedAt = 0;
 const turnUi=new Ew4TurnUI.Turns({
@@ -709,6 +710,12 @@ function refreshDialogue(){
   });
   dialoguePresentationTask=task;
 }
+function refreshResources() {
+  const player=state.factions.find(f=>f.id===state.playerFaction);
+  for (const {key,label,row,value} of resourceHud) {
+    if(updateHudText(value,player.resources[key],'font_char_2_hd','#ffffff'))row.setAttribute('aria-label',label+' '+player.resources[key]);
+  }
+}
 function refreshHud() {
   aiControl.sync();
   if(!$('pause').hidden||state?.dialogue||state?.scenarioPopup)mapViews.close();
@@ -718,9 +725,7 @@ function refreshHud() {
   const flag=$('player-flag'),source=flagSource(player);
   if(flag.getAttribute('src')!==source)flag.src=source;
   if(flag.alt!==player.name)flag.alt=flag.title=player.name;
-  for (const {key,label,row,value} of resourceHud) {
-    if(updateHudText(value,player.resources[key],'font_char_2_hd','#ffffff'))row.setAttribute('aria-label',label+' '+player.resources[key]);
-  }
+  refreshResources();
   const capacity=$('army-capacity'),count=player.unitCount??state.units.filter(u=>u.owner===player.id).length,limit=player.unitLimit;
   const capacityStatus=limit==null?'normal':count>limit?'over':count===limit?'full':'normal';
   const capacityText=count+'/'+(limit??'--'),capacityValue=$('army-capacity-value');

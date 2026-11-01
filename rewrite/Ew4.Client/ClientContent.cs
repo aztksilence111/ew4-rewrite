@@ -202,6 +202,16 @@ public sealed class ClientContent
         if (choice.Mode == 3) throw new RuleViolation("client.mode", "Multiplayer requires a multiplayer session host");
         account ??= new PlayerAccount { Id = "local", ContentRevision = Catalogs.Accounts.SourceRevision, Medals = 20_000_000 };
         var battle = Battle(id);
+        Dictionary<string, string> CapacityCountries(WorldState world)
+        {
+            var countries = battle.Factions.Select((f, i) => new {
+                Id = LegacyScenarioInitialization.FactionId(id, i, f), Country = Countries.Canonical(f.CountryId)
+            }).ToDictionary(f => f.Id, f => f.Country, StringComparer.Ordinal);
+            foreach (var creation in ScenarioFactions.Creations(world.ScenarioEvents))
+                countries[creation.Faction] = creation.Country ?? (ScenarioFactions.Template(world, creation) is string template
+                    ? countries.GetValueOrDefault(template) ?? creation.Faction : creation.Faction);
+            return countries;
+        }
         // The UI uses canonical registry IDs while legacy conquest records still
         // carry their fixed-width source IDs.
         string? selectedCountry = country == null ? null
@@ -244,7 +254,6 @@ public sealed class ClientContent
             var victory = rules.Turns.Victory with { Custom = customVictory, Scripts = Extensions.Bus.Scripts };
             if (customVictory != null)
             {
-                ValidateVictoryTargets(customVictory, started.Session.World);
                 Extensions.ValidateVictoryScripts(customVictory);
             }
             var movement = rules.Movement with { Extensions = Extensions.Bus, Victory = victory };
@@ -270,6 +279,7 @@ public sealed class ClientContent
                     return unit with { ExtensionMovementLimit = budget, RemainingMovement = unit.RemainingMovement == unit.Combatant.Profile.Movement
                         ? budget : Math.Min(unit.RemainingMovement, budget) };
                 }).ToArray() };
+                world = ScenarioArmyContent.Prepare(this, world, started.Rules.Commanders);
                 ScenarioRules.Validate(world, initial: true);
                 var production = started.Rules.Production.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal);
                 var recruitment = started.Rules.Recruitment.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal);
@@ -301,9 +311,11 @@ public sealed class ClientContent
                 started = started with { Rules = started.Rules with { Production = production, Recruitment = recruitment } };
                 foreach (string unit in world.Units.Select(u => u.Id).ToArray())
                     world = Extensions.Bus.Dispatch(world, "scenario.start", unit, new Ew4Random(world.RandomState));
+                world = world with { ArmyCapacity = ArmyCapacity.Resolve(id, CapacityCountries(world)) };
                 world.Validate();
                 started = started with { Session = started.Session with { World = world } };
             }
+            if (customVictory != null) ValidateVictoryTargets(customVictory, started.Session.World);
             if (Extensions.Stories?.Bindings.GetValueOrDefault(id)?.OpeningStory is { } opening)
             {
                 var world = started.Session.World;
@@ -328,12 +340,7 @@ public sealed class ClientContent
             started = started with { Session = SessionActions.SyncPlayer(started.Session with {
                 World = LocalMultiplayerGame.Resolve(started.Session.World, started.Rules.Turns.Victory) }) };
         // Apply the current capacity policy after content fingerprints, including when upgrading older saves.
-        var capacityCountries = battle.Factions.Select((f, i) => new {
-            Id = LegacyScenarioInitialization.FactionId(id, i, f), Country = Countries.Canonical(f.CountryId)
-        }).ToDictionary(f => f.Id, f => f.Country, StringComparer.Ordinal);
-        foreach (var creation in ScenarioFactions.Creations(started.Session.World.ScenarioEvents))
-            capacityCountries[creation.Faction] = creation.Country ?? (ScenarioFactions.Template(started.Session.World, creation) is string template
-                ? capacityCountries.GetValueOrDefault(template) ?? creation.Faction : creation.Faction);
+        var capacityCountries = CapacityCountries(started.Session.World);
         var capacities = ArmyCapacity.Resolve(id, capacityCountries);
         var capacityWorld = started.Session.World with { ArmyCapacity = capacities };
         foreach (var cell in capacityWorld.Cells) WorldArmyCapacity.BuildingCapacity(capacityWorld, cell);
@@ -365,8 +372,9 @@ public sealed class ClientContent
         void Check(VictoryCondition c)
         {
             if (c.Cells.Any(i => i < 0 || i >= world.Cells.Count || !world.Cells[i].Terrain.Active)
-                || c.Factions.Any(id => world.Factions.All(f => f.Id != id)) || c.Units.Any(id => world.Units.All(u => u.Id != id)))
-                throw new RuleViolation("extension.victory_reference", "Victory condition references an unknown initial unit/faction/cell");
+                || c.Factions.Any(id => world.Factions.All(f => f.Id != id) && !ScenarioFactions.Creations(world.ScenarioEvents).Any(e => e.Faction == id))
+                || c.Units.Any(id => !ScenarioArmies.KnownUnit(world, id)))
+                throw new RuleViolation("extension.victory_reference", "Victory condition references an unknown unit/faction/cell");
             foreach (var child in c.Conditions) Check(child);
         }
         Check(rules.Win); if (rules.Lose != null) Check(rules.Lose);

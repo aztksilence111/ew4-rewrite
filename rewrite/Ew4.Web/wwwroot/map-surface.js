@@ -2,6 +2,21 @@
 (function(root) {
   const corners=[[32,-18],[32,18],[0,36],[-32,18],[-32,-18],[0,-36]];
   const rgba=value=>[value&255,(value>>>8)&255,(value>>>16)&255,(value>>>24)&255];
+  function edgeFill(cell,width,bounds,height) {
+    const row=Math.floor(cell/width),col=cell%width,odd=row%2,x=col*64+odd*32,y=row*54-18;
+    const paths=[];
+    if(col===0&&odd)paths.push([[bounds.left,y-36],[x-64,y-36],[x-32,y-18],[x-32,y+18],[x-64,y+36],[bounds.left,y+36]]);
+    if(col===width-1&&!odd){const right=bounds.left+bounds.width;paths.push([[right,y-36],[x+64,y-36],[x+32,y-18],[x+32,y+18],[x+64,y+36],[right,y+36]]);}
+    if(row===0&&Number.isFinite(bounds.top)){
+      const top=Math.min(bounds.top,y-36);
+      paths.push([[x-32,top],[x+32,top],[x+32,y-18],[x,y-36],[x-32,y-18]]);
+    }
+    if(row===height-1&&Number.isFinite(bounds.top+bounds.height)){
+      const bottom=Math.max(bounds.top+bounds.height,y+36);
+      paths.push([[x-32,y+18],[x,y+36],[x+32,y+18],[x+32,bottom],[x-32,bottom]]);
+    }
+    return paths;
+  }
   function coastTriangles(neighbors) {
     const result=[];
     for(let d=0;d<6;d++){
@@ -79,5 +94,5 @@
       return this.borders.get(mask);
     }
   }
-  root.Ew4MapSurface=Object.freeze({rgba,coastTriangles,borderMask,rasterize,Surface});
+  root.Ew4MapSurface=Object.freeze({rgba,edgeFill,coastTriangles,borderMask,rasterize,Surface});
 })(typeof window!=='undefined'?window:globalThis);

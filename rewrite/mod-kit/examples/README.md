@@ -30,6 +30,8 @@
 
 创建独立势力、选择不创建、修改国号/国土颜色/旗帜见[势力事件示例](scenario-factions/README.md)。
 
+既有国家单独增兵、创建国家同批生成带将部队见[事件军队示例](scenario-armies/README.md)；任免、原军换将和和平撤编见[完整接口](../docs/porting/SCENARIO_ARMIES.md)。
+
 固定回合扣军费、AI 三资源支援、资源短缺结果和阶段性双边外交见[周期与外交示例](scenario-recurrence-diplomacy/README.md)。
 
 新增技能/标签、七技能将领、Lua和征服胜利条件可直接从[可打包规则示例](rule-extension/README.md)开始；详细字段见[API 1](../docs/porting/RULE_EXTENSIONS.md)。

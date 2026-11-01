@@ -16,7 +16,8 @@ internal static class SearchWorkspaceChecks
                 BlockedSeaEdges = (byte)random.Next(64), OccupantCamp = i % 7 == 0 ? "other" : null }).ToArray();
             var actor = new MovementActor { Category = sample % 3 == 0 ? "naval" : "cavalry", Camp = "self",
                 Transport = sample % 2 == 0, Geography = sample % 5 == 0, FullBudget = 9, Remaining = 5 };
-            var rules = new MovementRules { AllowOverdrawnEntry = sample % 4 == 0, BlockEnemyOccupied = sample % 5 != 0 };
+            var rules = new MovementRules { AllowOverdrawnEntry = sample % 4 == 0,
+                AllowFirstStepOverdraw = sample % 3 != 0, BlockEnemyOccupied = sample % 5 != 0 };
             int[] targets = [map.Count - 1, 0, map.Count - 1, random.Next(map.Count)];
             var expected = Reference(map, cells, targets, actor, rules);
             var actual = Movement.DistancesTo(map, cells, targets, actor, rules);
@@ -85,7 +86,7 @@ internal static class SearchWorkspaceChecks
                 int previous = map.Neighbor(current.Cell, direction);
                 if (previous < 0 || !cells[previous].Active) continue;
                 int? cost = Movement.EntryCost(cells[previous], cells[current.Cell], direction, actor, rules);
-                if (!cost.HasValue || cost.Value > actor.FullBudget && !rules.AllowOverdrawnEntry) continue;
+                if (!cost.HasValue || cost.Value > actor.FullBudget && !rules.AllowOverdrawnEntry && !rules.AllowFirstStepOverdraw) continue;
                 long total = checked(current.Cost + cost.Value);
                 if (result.TryGetValue(previous, out long old) && old <= total) continue;
                 result[previous] = total; queue.Add((total, previous));

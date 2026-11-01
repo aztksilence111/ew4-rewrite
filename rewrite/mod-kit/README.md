@@ -30,6 +30,8 @@ API 3 [通用禁行地形](docs/porting/GEOGRAPHY.md)：任意地图可配置禁
 
 事件还可[创建势力、复国或改名换旗](docs/porting/SCENARIO_FACTIONS.md)：支持独立兵种配置、国土颜色及包内 PNG 旗帜，可直接执行或放入选择按钮。见[可打包示例](examples/scenario-factions/README.md)。
 
+2026-10-31 新增[事件军队接口](docs/porting/SCENARIO_ARMIES.md)：独立或随建国生成有将／无将新军、原军任免换将、和平撤编及后续对象引用；含[最小源码示例](examples/scenario-armies/README.md)。需要新构建，尚未包含在既有 0.2.28 发行包。
+
 ## 按修改目标找文件
 
 `data/`是工具的基础资源。作者请在自己的工作副本修改原格式资源，或制作覆盖包；覆盖路径没有`data/`前缀。以下文档均可离线打开。
@@ -39,6 +41,7 @@ API 3 [通用禁行地形](docs/porting/GEOGRAPHY.md)：任意地图可配置禁
 | 背景、标题、头像、旗帜、按钮 | `client/ui/main.png`、`client/ui/title.png`、`client/ui/commanders1_hd/Napoleon.png`等 | [裁剪图](data/client/ui/README.md)、[完整图集](data/client/images/README.md) |
 | 将领属性/技能/价格 | `legacy/commanders.json`；旧 XML 可经导入转换 | [独立规则配置](docs/porting/SPLIT_CATALOG.md) |
 | 兵种生命/移动/攻击与招募价 | `legacy/units.json`、`legacy/recruitment.json` | [规则说明](data/legacy/README.md) |
+| 城市升级上限／满级金框 | `legacy/buildings.json` 的 `type:"city"`／`maxlevel`；旧XML重新导入亦可 | [配置说明](docs/porting/SPLIT_CATALOG.md#城市升级上限与金框)，本体最多升六级、保留初始七级，Mod可调整 |
 | 征服分页/灰框/卡片图 | `frontend/conquest-pages.json`的`pages[].slots[]` | [完整JSON示例](data/frontend/README.md) |
 | 新征服/新战役章节 | BTL、`def_battleline.xml`、`def_battlelist.xml`、文字表 | [分步示例](examples/README.md) |
 | 地形/底图/辖区 | `def_map.xml`、地形BIN、块索引BIN、PVR、剧本BTL/JURI | [地图依赖](data/client/maps/README.md)、[手工辖区](docs/porting/BTL_JURISDICTIONS.md) |

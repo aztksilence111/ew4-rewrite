@@ -31,12 +31,12 @@ public sealed partial class ModStore
                 if (end < 0) throw new FileNotFoundException("Invalid content revision");
                 string key = path[2..end], resource = ContentPath(path[(end + 1)..]);
                 // In-flight requests from the closing document still resolve their own content set.
-                if (key == baseline.Revision) return baseline.Read(resource);
+                if (key == baseline.Revision) return Presentation(baseline.Read(resource), resource, null, null);
                 var selected = key == activeKey ? activeManifest : Manifest(key);
-                return Presentation(ReadFrom(key, selected, resource), resource, selected);
+                return Presentation(ReadFrom(key, selected, resource), resource, key, selected);
             }
             string logical = ContentPath(path);
-            return Presentation(ReadFrom(activeKey, activeManifest, logical), logical, activeManifest);
+            return Presentation(ReadFrom(activeKey, activeManifest, logical), logical, activeKey, activeManifest);
         }
     }
     private static string ContentPath(string path)
@@ -47,10 +47,18 @@ public sealed partial class ModStore
         return "rewrite/" + path[11..];
     }
 
-    private static byte[] Presentation(byte[] bytes, string path, ModManifest? selected)
+    private byte[] Presentation(byte[] bytes, string path, string? key, ModManifest? selected)
     {
-        if (path != "client/manifest.json" || selected == null) return bytes;
+        if (path != "client/manifest.json") return bytes;
         var manifest = ModFiles.Object(bytes);
+        // The catalog may contain initial-only tiers above the upgrade ceiling.
+        var catalog = ModFiles.Object(ReadFrom(key, selected, "legacy/catalog.json"));
+        manifest["buildingUpgradeLimits"] = (int?)catalog["schema_version"] == 3
+            ? new JsonObject(ModFiles.Object(ReadFrom(key, selected, "legacy/buildings.json"))["buildings"]!.AsArray().Select(row =>
+                KeyValuePair.Create<string, JsonNode?>((string)row!["type"]!, JsonValue.Create(int.Parse(row["maxlevel"]?.ToString() ?? "1", System.Globalization.CultureInfo.InvariantCulture)))))
+            : new JsonObject(ModFiles.Xml(ReadFrom(key, selected, "original/def_construction.xml")).Root!.Elements().Select(e =>
+                KeyValuePair.Create<string, JsonNode?>((string)e.Attribute("type")!, JsonValue.Create((int?)e.Attribute("maxlevel") ?? 1))));
+        if (selected == null) return Encoding.UTF8.GetBytes(manifest.ToJsonString());
         var overrides = new JsonObject();
         bool RawTexture(string? reference)
         {
