@@ -67,8 +67,9 @@ async function push(){
   const commit=git('cat-file','commit',head).toString(),split=commit.indexOf('\n\n');
   function person(kind){
     const match=commit.slice(0,split).split('\n').find(s=>s.startsWith(kind+' ')).match(/^\w+ (.*) <(.*)> (\d+) ([+-]\d+)$/);
-    if(match[4]!=='+0000')throw Error('Use UTC commit identity for exact REST publication');
-    return {name:match[1],email:match[2],date:new Date(Number(match[3])*1000).toISOString()};
+    const zone=match[4],minutes=(zone[0]==='-'?-1:1)*(Number(zone.slice(1,3))*60+Number(zone.slice(3)));
+    const date=new Date(Number(match[3])*1000+minutes*60000).toISOString().replace(/\.000Z$/,zone.slice(0,3)+':'+zone.slice(3));
+    return {name:match[1],email:match[2],date};
   }
   const created=await request('/repos/'+repo+'/git/commits','POST',{message:commit.slice(split+2),tree:createdTree.sha,parents:[parent],author:person('author'),committer:person('committer')});
   if(created.sha!==head)throw Error('Commit identity mismatch');
