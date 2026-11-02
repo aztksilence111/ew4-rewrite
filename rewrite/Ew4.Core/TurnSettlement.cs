@@ -47,6 +47,7 @@ public static class EconomyProduction
 
 public sealed record UnitEndInput
 {
+    public bool IgnoreSiteEffects { get; init; }
     public string Id { get; init; } = "";
     public int Health { get; init; }
     public int MaximumHealth { get; init; }
@@ -112,10 +113,10 @@ public static class TurnSettlement
             {
                 if ((unit.ConstructionTurns == 0 && !unit.Acted) || force)
                 {
-                    if (input.BuildingKind != null) Heal(input.BuildingHealing);
+                    if (!unit.IgnoreSiteEffects && input.BuildingKind != null) Heal(input.BuildingHealing);
                     force = false;
                     Heal(unit.VeterancyHealing);
-                    if (unit.HasCommander && input.BuildingKind == null) Heal(unit.FieldHealing);
+                    if (unit.HasCommander && (unit.IgnoreSiteEffects || input.BuildingKind == null)) Heal(unit.FieldHealing);
                 }
                 Heal(unit.AdjacentHealing);
                 if (unit.HasCommander) Heal(unit.TitleHealing);
@@ -125,12 +126,13 @@ public static class TurnSettlement
         }
         int level = input.BuildingLevel;
         if (input.DegradeBuilding && input.BuildingKind == rules.VulnerableBuilding && level > rules.DegradedLevel
-            && (input.Environment > 0 || units.Any(u => u.Burning > 0)) && local.Next(100) < rules.DegradationProbability)
+            && (input.Environment > 0 || units.Where((u, i) => !input.Units[i].IgnoreSiteEffects).Any(u => u.Burning > 0)) && local.Next(100) < rules.DegradationProbability)
             level = rules.DegradedLevel;
         if (input.Environment > 0)
             for (int i = 0; i < units.Count; i++)
-                units[i] = units[i] with { Health = Hazards.Damage(units[i].Health, input.Units[i].MaximumHealth,
-                    rules.Environment.Stages[input.Environment].DamagePercent, rules.Environment.Nonlethal) };
+                if (!input.Units[i].IgnoreSiteEffects)
+                    units[i] = units[i] with { Health = Hazards.Damage(units[i].Health, input.Units[i].MaximumHealth,
+                        rules.Environment.Stages[input.Environment].DamagePercent, rules.Environment.Nonlethal) };
         int environment = input.DecayEnvironment ? Hazards.Decay(input.Environment, local, rules.Environment) : input.Environment;
         random.Commit(local.State);
         return new(units, level, environment, local.State);

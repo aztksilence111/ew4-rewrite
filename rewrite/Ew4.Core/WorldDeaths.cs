@@ -17,7 +17,7 @@ internal static class WorldDeaths
             DestroyedScenarioUnits = state.DestroyedScenarioUnits.Append(unit.Id).Distinct(StringComparer.Ordinal).ToArray(),
             DeadScenarioCommanders = unit.CommanderId == null ? state.DeadScenarioCommanders : state.DeadScenarioCommanders.Append(unit.CommanderId).Distinct(StringComparer.Ordinal).ToArray(),
             Units = state.Units.Where(u => u.Id != unitId).ToArray(),
-            Cells = unit.Combatant.Profile.Category == "fort" && successor != null && successor != unit.Owner
+            Cells = !WorldUnitLayers.Air(state, unit) && unit.Combatant.Profile.Category == "fort" && successor != null && successor != unit.Owner
                 ? JurisdictionClaims.DestroyFort(state, unit.Cell, successor) : state.Cells,
             Commanders = state.Commanders.Select(c => c.Id == unit.CommanderId ? c with { Withdrawn = true } : c).ToArray()
         };
@@ -40,7 +40,7 @@ internal static class WorldDeaths
             }
         }
         var site = next.Cells[unit.Cell];
-        if (site.Terrain.Sea && site.BuildingKind == null && !next.Units.Any(u => u.Cell == unit.Cell))
+        if (!WorldUnitLayers.Air(state, unit) && site.Terrain.Sea && site.BuildingKind == null && !WorldUnitLayers.Surface(next).Any(u => u.Cell == unit.Cell))
             next = next with { Cells = next.Cells.Select((c, i) => i == unit.Cell ? c with { Owner = null } : c).ToArray() };
         return new(next, notices, defeated);
     }
@@ -50,15 +50,15 @@ internal static class WorldDeaths
     {
         var map = new HexMap(state.Width, state.Height);
         var factions = state.Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
-        var occupied = new HashSet<int>(state.Units.Select(u => u.Cell));
+        var occupied = new HashSet<int>(WorldUnitLayers.Surface(state).Select(u => u.Cell));
         UnitState[]? units = null;
         for (int slot = 0; slot < state.Units.Count; slot++)
         {
             var unit = state.Units[slot];
             if (affectedCells != null && !affectedCells.Contains(unit.Cell)) continue;
-            int local = WorldTurns.LocalPenalty(state, map, unit.Cell, unit.Owner, neutralCamps, occupied);
+            int local = WorldUnitLayers.Air(state, unit) ? 0 : WorldTurns.LocalPenalty(state, map, unit.Cell, unit.Owner, neutralCamps, occupied);
             int morale = TurnEconomy.Morale(unit.Morale.Baseline, unit.Morale.Duration, local, factions[unit.Owner].Shortage,
-                unit.Support.Logistics || unit.Combatant.Has(Ew4Combat.Skill(22)), unit.Combatant.Has(Ew4Combat.Skill(3)));
+                unit.Support.Logistics || unit.Combatant.FoodExempt || unit.Combatant.Has(Ew4Combat.Skill(22)), unit.Combatant.Has(Ew4Combat.Skill(3)));
             if (unit.LocalPenalty == local && unit.Morale.Effective == morale && unit.Combatant.Morale == morale) continue;
             units ??= state.Units.ToArray();
             units[slot] = unit with { LocalPenalty = local, Morale = unit.Morale with { Effective = morale }, Combatant = unit.Combatant with { Morale = morale } };

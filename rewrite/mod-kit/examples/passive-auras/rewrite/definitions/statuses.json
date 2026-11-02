@@ -1,0 +1,6 @@
+[
+  {"id":"example.inspired","nameKey":"友军支援","stacking":"refresh","effects":[
+    {"event":"combat.modify_damage","operation":"damage_multiplier","value":1.1},
+    {"event":"unit.attributes","operation":"max_health_add","value":100}
+  ]}
+]

@@ -1,0 +1,8 @@
+[
+  {"target":"ew4.unit.fra.heavy_artillery.1","mode":"append","skills":[
+    {"id":"example.aura","instanceId":"unit.aura"},
+    {"id":"example.capacity","instanceId":"unit.capacity"},
+    {"id":"example.morale","instanceId":"unit.morale"},
+    {"id":"example.conditions","instanceId":"unit.conditions"}
+  ]}
+]

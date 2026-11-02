@@ -15,6 +15,8 @@ const check=(v,label)=>{assert.ok(v,label);report.checks++;};
       const original=state,unit=state.units.find(u=>u.owner===state.playerFaction),calls=[],sprite=battlefield.api.sprite;
       const run=async(morale,center=false,notices=[])=>{
         await installState({...state,revision:state.revision+1,notices,combat:null,movements:[],recruited:[],units:state.units.map(u=>u.id===unit.id?{...u,morale}:u)},center);
+        const transition=battlefield.moraleTransitions?.get(unit.id);
+        if(transition)await new Promise(resolve=>setTimeout(resolve,transition.duration+20));
         view.x=point(unit.cell).x;view.y=point(unit.cell).y;clampView();calls.length=0;renderDirty=true;
         battlefield.api.sprite=(atlas,name,x,y,...rest)=>{if(name.startsWith('morale_'))calls.push({name,x,y});return sprite(atlas,name,x,y,...rest);};
         try{render(performance.now());}finally{battlefield.api.sprite=sprite;}

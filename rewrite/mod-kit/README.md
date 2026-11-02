@@ -1,8 +1,18 @@
 # EW4 rewrite 离线 Mod 工具包
 
+API3 [自定义将领能力栏](docs/porting/COMMANDER_ABILITIES.md)：新增独立能力、图标、数值、教学和兵种攻击星级绑定，附[最小示例](examples/commander-abilities/README.md)。
+
+API 3 [被动光环与技能属性](docs/porting/RULE_EXTENSIONS.md)：回合施加状态、最大生命/射程/免粮/地形移动、士气及 Lua 距离/地形/建筑条件，附[最小示例](examples/passive-auras/README.md)；须使用包含此次实现的新客户端。
+
+API 3 [剧本粮食与收入](docs/porting/SCENARIO_ECONOMY.md)：势力基础收入、可夺取城镇粮源及按剧本修改各级农田产出；未配置时保持原版，附[最小示例](examples/scenario-economy/README.md)。
+
+API 3 [自定义建筑与工兵建造](docs/porting/CUSTOM_CONSTRUCTION.md)：新增建筑等级/费用/招募，工兵白名单约束全部新工事、升级不需工兵；配套[双层协同单位与机场示例](examples/advanced-units/README.md)，支持双层单实例、组合兵模及按目标层切换攻击动画。
+
 征服的宣战、核心地区、势力组合概率、首都国库缴获和原版风格UI覆盖，见[外交接口](docs/porting/DIPLOMACY.md)。战役不开放；农田不计核心。核心、名称、国旗、颜色、首都和新势力初始国库均可独立修改。
 
 API 3 [通用禁行地形](docs/porting/GEOGRAPHY.md)：任意地图可配置禁行雪山及禁航海洋，附[双地图示例](examples/impassable-geography/README.md)及 `geography-template` 命令。
+
+API 3 [空地分层](docs/porting/UNIT_LAYERS.md)：核心默认关闭，Mod 显式启用空层与陆军/海军同格，独立配置普通攻击和反击目标层，附[最小示例](examples/unit-layers/README.md)。不为 R 本体开放航空玩法；需要包含 2026-11-02 接口的新构建。
 
 将领、技能文字、兵种、装备、招募、建筑、地形、战斗和成长等已拆为独立 JSON，
 可直接放入覆盖包 `legacy/` 编辑；文件与字段见[独立规则配置](docs/porting/SPLIT_CATALOG.md)。

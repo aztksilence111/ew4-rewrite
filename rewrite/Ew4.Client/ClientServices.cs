@@ -88,6 +88,8 @@ public sealed partial class ClientGame
         var preview = WorldBattle.Preview(projected, projected.Revision, command.UnitId, target, Require().Rules.Battle);
         var movements = movedChange?.Movements ?? [];
         return new { attacker = preview.Attacker, defender = preview.Defender, counterattack = preview.Main.Counterattack, movements,
+            attackLayer = WorldUnitLayers.AttackLayer(projected, projected.Units.Single(u => u.Id == preview.Attacker), projected.Units.Single(u => u.Id == preview.Defender)),
+            counterLayer = WorldUnitLayers.AttackLayer(projected, projected.Units.Single(u => u.Id == preview.Defender), projected.Units.Single(u => u.Id == preview.Attacker), true),
             damage = preview.Main.DefenderDamage, counterDamage = preview.Main.AttackerDamage,
             critical = preview.Main.OffensiveProc && !preview.Main.DefensiveProc, counterCritical = false,
             splashTarget = preview.SplashTarget, splashDamage = preview.SplashDamage };

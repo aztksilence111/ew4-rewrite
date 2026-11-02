@@ -1,5 +1,17 @@
 # Mod制作与排查导航
 
+[自定义将领能力栏](porting/COMMANDER_ABILITIES.md)：API3增加独立能力、图标与数值，支持整编教学、兵种攻击星级绑定和存档，附[最小示例](../examples/commander-abilities/README.md)。
+
+[被动光环与技能属性](porting/RULE_EXTENSIONS.md)：API 3 开放回合施加状态、生命上限/射程/免粮/地形移动、士气及 Lua 距离/地形/建筑条件，附[最小示例](../examples/passive-auras/README.md)。
+
+[剧本粮食与收入](porting/SCENARIO_ECONOMY.md)：按剧本调整各级农田/城镇产出、事件设置势力基础与可夺取地点收入，附[最小示例](../examples/scenario-economy/README.md)。保留默认原版与其他剧本规则。
+
+[自定义建筑、工兵与招募](porting/CUSTOM_CONSTRUCTION.md)：API 3 默认关闭；新增建筑及等级、机场招募、指定工兵建工事、无驻军升级，附[双层协同队示例](../examples/advanced-units/README.md)。[分层接口](porting/UNIT_LAYERS.md)另含多层占位、组合兵模与目标层攻击动画。
+
+[地图素材分辨率](porting/SPRITE_RESOLUTION.md)：图集条目可独立指定 `pixelRatio`，提高采样分辨率同时保持显示尺寸和锚点；默认1倍/高清2倍规则保持。
+
+[空中与地表分层接口](porting/UNIT_LAYERS.md)：API 3，默认关闭，由 Mod 显式启用空层与陆军/海军同格；含攻击/反击层、存档边界和[最小配置示例](../examples/unit-layers/README.md)。
+
 [国家、势力与阵营地块颜色](porting/MAP_COLORS.md)：国家表/事件颜色沿用现有接口，API 3 新增阵营地图按 ID 配色、默认色池及逐剧本覆盖。
 
 [暂停战局目标栏](porting/PAUSE_OBJECTIVES.md)支持 UI 配置、当前胜负条件及星级区间；暂停菜单居中，左栏避让并纵向滚动。

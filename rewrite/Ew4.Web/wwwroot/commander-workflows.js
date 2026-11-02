@@ -163,12 +163,13 @@
     l.text('text_apply',this.data.titleHealing[preview.learning.title.level]);
     const grid=l.get('grid_preview');
     // The native grid's 28px cells cannot hold an ability icon and its star preview.
-    for(const [key,name,icon] of [['infantry','步兵','upgrade_tag_infantry'],['cavalry','骑兵','upgrade_tag_cavalry'],['artillery','炮兵','upgrade_tag_artillery'],['naval','海军','upgrade_tag_ship'],['fort','要塞','upgrade_tag_fortress'],['commerce','商业','generalsinfo_trade'],['movement','移动','generalsinfo_move']]){
+    for(const ability of this.abilityDefinitions().filter(a=>a.id!=='training')){
+      const {id:key,name}=ability;
       const before=receiver.learning.abilities[key]??0,value=preview.learning.abilities[key];
       if(!(value>before))continue;
       const row=document.createElement('div');row.className='regroup-ability';row.dataset.ability=key;row.dataset.before=before;row.dataset.value=value;
       row.title=name+' '+before+'星 → '+value+'星（+'+(value-before)+'）';row.setAttribute('aria-label',row.title);
-      row.append(this.api.uiImage(icon+'.png',18,18),this.lettering(name,'font_text_2_cn_hd','#404040',24,'left',{size:12,singleLine:true,shrinkWidth:true}),this.lettering(before+' →','font_text_2_cn_hd','#404040',28,'left',{size:12,singleLine:true,shrinkWidth:true}));
+      row.append(this.abilityIcon(ability,18,18),this.lettering(name,'font_text_2_cn_hd','#404040',24,'left',{size:12,singleLine:true,shrinkWidth:true}),this.lettering(before+' →','font_text_2_cn_hd','#404040',28,'left',{size:12,singleLine:true,shrinkWidth:true}));
       const stars=document.createElement('span');stars.className='regroup-stars';stars.setAttribute('aria-label',value+'星');
       for(let i=0;i<(value>5?1:value);i++)stars.append(this.api.uiImage('star_middle.png',8.5,8));
       if(value>5)stars.append(this.lettering('×'+value,'font_text_2_cn_hd','#404040',45,'left',{size:12,singleLine:true,shrinkWidth:true}));

@@ -44,6 +44,7 @@ public sealed record ScenarioEffect
     public string? FlagImage { get; init; }
     public string? Color { get; init; }
     public Resources? InitialResources { get; init; }
+    public ResourceIncomePatch? Income { get; init; }
     public int? Capital { get; init; }
     public ExtensionVictoryRules? VictoryRules { get; init; }
     public string? Outcome { get; init; }
@@ -312,6 +313,8 @@ public static class ScenarioRules
                 case "faction_create": next = ScenarioFactions.Create(next, e); notices.Add(new("faction.created", owner)); break;
                 case "faction_revive": next = ScenarioFactions.Revive(next, owner); notices.Add(new("faction.revived", owner)); break;
                 case "faction_identity": next = ScenarioFactions.Identity(next, owner, e); notices.Add(new("faction.identity", owner)); break;
+                case "faction_income": case "site_income": case "site_income_default":
+                    next = ScenarioEconomy.Apply(next, owner, e); break;
                 case "faction_homeland": case "faction_core": next = DemandDiplomacy.SetHomeland(next, owner, e.Cells); notices.Add(new("faction.homeland", owner)); break;
                 case "core_add": case "core_remove": next = DemandDiplomacy.ChangeCores(next, owner, e.Cells, e.Type); notices.Add(new("faction.cores", owner)); break;
                 case "faction_capital": next = CapitalTreasury.SetCapital(next, owner, e.Cells[0]); notices.Add(new("faction.capital", owner)); break;
@@ -349,7 +352,7 @@ public static class ScenarioRules
                 case "camp":
                     next = next with { Factions = next.Factions.Select(f => f.Id == owner ? f with { Camp = e.Camp! } : f).ToArray() }; break;
                 case "cells_owner":
-                    if (next.Units.Any(u => e.Cells.Contains(u.Cell) && !WorldDiplomacy.Allied(next, u.Owner, owner)))
+                    if (WorldUnitLayers.Surface(next).Any(u => e.Cells.Contains(u.Cell) && !WorldDiplomacy.Allied(next, u.Owner, owner)))
                         throw new RuleViolation("scenario.occupants", "Transfer occupants first before changing hostile territory");
                     next = next with { Cells = next.Cells.Select((c, i) => e.Cells.Contains(i) ? c with { Owner = owner } : c).ToArray() }; break;
                 case "unit_owner":
@@ -374,7 +377,7 @@ public static class ScenarioRules
                 case "heal":
                     if (value < 0) throw new RuleViolation("scenario.value", "Healing must be nonnegative");
                     next = next with { Units = next.Units.Select(u => u.Id == e.Unit ? u with { Combatant = u.Combatant with {
-                        Health = checked((int)Math.Min(u.Combatant.Profile.MaxHealth, checked(u.Combatant.Health + value))) } } : u).ToArray() }; break;
+                        Health = checked((int)Math.Min(u.Combatant.MaximumHealth, checked(u.Combatant.Health + value))) } } : u).ToArray() }; break;
                 case "destroy_unit":
                     if (next.Units.Any(u => u.Id == e.Unit))
                     { var death = WorldDeaths.Remove(next, e.Unit!); next = death.State; notices.AddRange(death.Notices); } break;
@@ -457,7 +460,12 @@ public static class ScenarioRules
                         or "unit_owner" or "morale" or "environment" or "environment_spread" or "heal" or "destroy_unit" or "state" or "add_state" or "victory" or "defeat" or "relation" or "faction_create" or "faction_revive" or "faction_identity" or "faction_homeland"
                         or "faction_core" or "core_add" or "core_remove" or "faction_capital" or "surrender_modifier" or "loot_modifier" or "faction_surrender"
                         or "player_control" or "victory_rules" or "victory_default" or "ending" or "play_story"
-                        or "unit_spawn" or "unit_remove" or "commander_assign" or "commander_detach")
+                        or "unit_spawn" or "unit_remove" or "commander_assign" or "commander_detach"
+                        or "faction_income" or "site_income" or "site_income_default")
+                    || e.Type is "faction_income" or "site_income" && e.Income == null
+                    || e.Type is not ("faction_income" or "site_income" or "faction_create") && e.Income != null
+                    || e.Type is "faction_income" or "site_income" or "site_income_default" && e.Script != null
+                    || e.Type is "site_income" or "site_income_default" && (e.Cells.Count == 0 || e.Cells.Distinct().Count() != e.Cells.Count)
                     || e.Type == "play_story" && (!StoryValidation.Id(e.Key) || !StoryValidation.Id(e.Scene) || e.Script != null)
                     || e.Type != "play_story" && e.Scene != null
                     || (e.Type == "victory_rules") != (e.VictoryRules != null)
@@ -493,6 +501,7 @@ public static class ScenarioRules
                     throw new RuleViolation("scenario.effect", "Invalid effect in " + ev.Id);
                 ScenarioFactions.ValidateAppearance(new(e.Flag, e.FlagImage, e.Color));
                 ScenarioArmies.ValidateEffect(e);
+                e.Income?.Validate();
                 if (e.VictoryRules != null) ExtensionVictory.Validate(e.VictoryRules);
                 Handler(e.Script, e.Function, false);
             }
@@ -559,20 +568,23 @@ public static class ScenarioRules
                 throw new RuleViolation("scenario.state", "Recurring event is missing progress");
             foreach (var c in Conditions(ev))
                 if (!KnownFaction(c.Faction) || c.OtherFaction != null && !KnownFaction(c.OtherFaction)
-                    || c.Cells.Any(i => i < 0 || i >= world.Cells.Count || !world.Cells[i].Terrain.CanTraverse())
+                    || c.Cells.Any(i => i < 0 || i >= world.Cells.Count
+                        || (WorldUnitLayers.Enabled(world) && c.Type == "unit_at" ? !world.Cells[i].Terrain.Active : !world.Cells[i].Terrain.CanTraverse()))
                     || initial && (c.Unit != null && !ScenarioArmies.KnownUnit(world, c.Unit) || c.Commander != null && !ScenarioArmies.KnownCommander(world, c.Commander)))
                     throw new RuleViolation("scenario.reference", "Unknown condition target in " + ev.Id);
             foreach (var e in Effects(ev))
             {
                 if (!KnownFaction(e.Faction) || e.OtherFaction != null && (!KnownFaction(e.OtherFaction) || e.Faction == e.OtherFaction
                         || initial && e.Faction != "@active" && e.OtherFaction != "@active" && Faction(world, e.Faction) == Faction(world, e.OtherFaction))
-                    || e.Cells.Any(i => i < 0 || i >= world.Cells.Count || !world.Cells[i].Terrain.CanTraverse())
+                    || e.Cells.Any(i => !ScenarioArmies.ValidLocation(world, e, i))
                     || e.ExpectedOwner != null && !KnownFaction(e.ExpectedOwner)
                     || initial && e.Unit != null && !ScenarioArmies.KnownUnit(world, e.Unit))
                     throw new RuleViolation("scenario.reference", "Unknown effect target in " + ev.Id);
                 if (e.Type is "faction_homeland" or "faction_core" or "core_add" or "core_remove" or "faction_capital"
                     && e.Cells.Any(i => !DemandDiplomacy.Counts(world.Cells[i])))
                     throw new RuleViolation("scenario.homeland", "Homeland can only contain eligible buildings in " + ev.Id);
+                if (initial && e.Type is "site_income" or "site_income_default" && e.Cells.Any(i => world.Cells[i].BuildingKind == null))
+                    throw new RuleViolation("scenario.income_site", "Site income requires existing buildings in " + ev.Id);
                 if (e.Capital is int capital && (capital < 0 || capital >= world.Cells.Count || !DemandDiplomacy.Counts(world.Cells[capital])))
                     throw new RuleViolation("scenario.capital", "Invalid initial faction capital in " + ev.Id);
                 if (e.VictoryRules != null) ExtensionVictory.ValidateTargets(e.VictoryRules, world, initial, id => !id.StartsWith("@", StringComparison.Ordinal) && KnownFaction(id));

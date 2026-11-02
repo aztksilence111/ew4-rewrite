@@ -20,7 +20,9 @@ public sealed partial class ClientGame
             ?? throw new RuleViolation("client.unit", "Unit is unavailable");
         var offer = current.Rules.Recruitment.Values.SelectMany(v => v.Values)
             .FirstOrDefault(o => o.Template?.Profile.Id == unit.Combatant.Profile.Id);
-        return new { session.Revision, unit = unit.Id, cost = offer?.Cost, commander = BattleCommanderView(unit.CommanderId) };
+        return new { session.Revision, unit = unit.Id, cost = offer?.Cost, commander = BattleCommanderView(unit.CommanderId),
+            layer = WorldUnitLayers.Enabled(world) ? WorldUnitLayers.Layer(world, unit.Combatant.Profile) : null,
+            occupiedLayers = WorldUnitLayers.Enabled(world) ? WorldUnitLayers.Occupies(world, unit.Combatant.Profile) : null };
     }
 
     private object? BattleCommanderView(string? id)

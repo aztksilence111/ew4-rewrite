@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "builderProfiles": ["ew4.unit.fra.guards.0"],
+  "buildings": {
+    "airfield": {
+      "name": "Airport",
+      "cost": {"money": 100, "industry": 40, "food": 0},
+      "scenarios": ["conquest1"],
+      "levels": [
+        {"image": "stable_west_lv1.png"},
+        {"image": "stable_west_lv2.png", "upgradeCost": {"money": 80, "industry": 30, "food": 0}}
+      ],
+      "recruitment": [
+        {"id": "demo.heli", "profile": "ew4.unit.fra.light_infantry.0", "cost": {"money": 150, "industry": 60, "food": 0}, "minimumLevel": 1, "countries": ["fra"]},
+        {"id": "demo.fighter", "profile": "ew4.unit.fra.militia.0", "cost": {"money": 100, "industry": 40, "food": 0}, "minimumLevel": 2, "countries": ["fra"]}
+      ]
+    }
+  }
+}

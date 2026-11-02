@@ -50,11 +50,13 @@ public sealed class MovementHistory
         if (world.Round != round || world.ActiveFaction != faction || world.PendingDialogue != null || world.Phase != TurnPhase.Active) return null;
         return moves.LastOrDefault(m => (unit == null || m.Unit == unit) && !attackers.Contains(m.Unit)
             && world.Units.Any(u => u.Id == m.Unit && u.Owner == faction && u.Cell == m.Destination)
-            && world.Units.Count(u => u.Cell == m.Origin) < world.Limits.UnitsPerCell
-            && m.Removed.All(old => !world.Units.Any(u => u.Id == old.Id || u.Cell == old.Cell))
+            && world.Units.Any(u => u.Id == m.Unit && WorldUnitLayers.HasSpace(world, u.Combatant.Profile, u.Owner, m.Origin, u.Id))
+            && m.Removed.All(old => !world.Units.Any(u => u.Id == old.Id)
+                && (WorldUnitLayers.Enabled(world) ? WorldUnitLayers.HasSpace(world, old.Combatant.Profile, old.Owner, old.Cell)
+                    : !world.Units.Any(u => u.Cell == old.Cell)))
             && m.Owners.All(c => c.Cell >= 0 && c.Cell < world.Cells.Count && world.Cells[c.Cell].Owner == c.After
                 && !(c.After == faction && (world.Cells[c.Cell].Objective || world.Cells[c.Cell].BlocksTerritoryExpansion))
-                && !world.Units.Any(u => u.Id != m.Unit && u.Cell == c.Cell && u.Owner != c.Before)));
+                && !WorldUnitLayers.Surface(world).Any(u => u.Id != m.Unit && u.Cell == c.Cell && u.Owner != c.Before)));
     }
     internal static bool EventTriggered(WorldState before, WorldState after, IReadOnlyList<WorldNotice>? notices)
         => notices?.Any(n => n.Kind is "event.triggered" or "scenario.triggered" or "scenario.choice" or "capital.captured") == true
@@ -73,7 +75,8 @@ public sealed class MovementHistory
             {
                 Cell = entry.Origin, RemainingMovement = entry.Remaining,
                 PlayerControl = PlayerAi.Order(u) with { ActionRound = entry.PlayerActionRound },
-                Combatant = u.Combatant with { AtSea = world.Cells[entry.Origin].Terrain.Sea, BuildingKind = world.Cells[entry.Origin].BuildingKind }
+                Combatant = u.Combatant with { AtSea = !WorldUnitLayers.Air(world, u) && world.Cells[entry.Origin].Terrain.Sea,
+                    BuildingKind = WorldUnitLayers.Air(world, u) ? null : world.Cells[entry.Origin].BuildingKind }
             }).Concat(entry.Removed).ToArray(),
             Cells = world.Cells.Select((c,i) => owners.TryGetValue(i,out var owner) ? c with { Owner = owner.Before } : c).ToArray(),
             Factions = world.Factions.Select(f => entry.Defeated.Contains(f.Id) ? f with { Defeated = false } : f).ToArray(),

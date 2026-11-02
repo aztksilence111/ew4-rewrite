@@ -30,6 +30,7 @@ public sealed record UnitProfile
 {
     public string Id { get; init; } = "";
     public string Category { get; init; } = "";
+    public string? CommanderAbility { get; init; }
     public string Grade { get; init; } = "";
     public int MaxHealth { get; init; }
     public int Movement { get; init; }
@@ -56,7 +57,7 @@ public sealed record UnitProfile
     private void ValidateCore()
     {
         SkillSlot.Validate(SkillSlots);
-        if (string.IsNullOrWhiteSpace(Id) || string.IsNullOrWhiteSpace(Category) || MaxHealth <= 0
+        if (string.IsNullOrWhiteSpace(Id) || string.IsNullOrWhiteSpace(Category) || CommanderAbility != null && string.IsNullOrWhiteSpace(CommanderAbility) || MaxHealth <= 0
             || Movement < 0 || MinimumAttack < 0 || MaximumAttack < 0 || MinimumRange < 0
             || MaximumRange < MinimumRange || AttackBands.Any(b => b.Rolls <= 0) || KillExperience < 0
             || IgnitionNumerator < 0 || IgnitionDenominator < 1)
@@ -70,6 +71,12 @@ public sealed record UnitProfile
 
 public sealed record Combatant
 {
+    public UnitAttributeModifiers? AttributeModifiers { get; init; }
+    public int MaximumHealth => checked(Profile.MaxHealth + (AttributeModifiers?.Health ?? 0));
+    public int MaximumRange => checked(Profile.MaximumRange + (AttributeModifiers?.Range ?? 0));
+    public bool FoodExempt => AttributeModifiers?.FoodExempt == true;
+    public bool IgnoreTerrain => AttributeModifiers?.IgnoreTerrain == true;
+    public RuleUnitLocation? RuleLocation { get; init; }
     public UnitProfile Profile { get; init; } = new();
     public int Health { get; init; }
     public int Morale { get; init; }
@@ -105,7 +112,7 @@ public sealed record Combatant
             || s.Id.Length > 128 || s.RemainingTurns is < 1 or > 1000 || s.Level < 1 || s.Stacks is < 1 or > 32)
             || Statuses.Select(s => s.Id).Distinct(StringComparer.Ordinal).Count() != Statuses.Count)
             throw new RuleViolation("combatant.status", "Invalid saved status");
-        if (Health <= 0 || Health > Profile.MaxHealth || Morale < -3 || Morale > sbyte.MaxValue || Stars < 0
+        if (MaximumHealth < 1 || MaximumRange < Profile.MinimumRange || Health <= 0 || Health > MaximumHealth || Morale < -3 || Morale > sbyte.MaxValue || Stars < 0
             || ConstructionTurns < 0 || Evasion < 0 || Evasion > 1 || float.IsNaN(Evasion)
             || EvasionIgnoringBuilding < 0 || EvasionIgnoringBuilding > 1 || float.IsNaN(EvasionIgnoringBuilding))
             throw new RuleViolation("combatant.invalid", $"Invalid combatant: {Profile.Id}");
@@ -132,7 +139,7 @@ public static class Ew4Combat
 
     public static int AttackCount(Combatant unit)
     {
-        int percent = (int)((long)unit.Health * 100 / unit.Profile.MaxHealth);
+        int percent = (int)((long)unit.Health * 100 / unit.MaximumHealth);
         if ((unit.Profile.Category == "infantry" && unit.Has(Skill(15))) || unit.FullAttackRolls)
             percent = 100;
         return unit.Profile.AttackBands.Where(b => percent > b.StrictMinimumPercent)
@@ -154,13 +161,13 @@ public static class Ew4Combat
         int ac = AttackCount(a), dc = AttackCount(d);
         if (rules.Extensions != null)
         {
-            ac = Math.Max(1, checked((int)rules.Extensions.Modify("combat.attack_count", "attack_count_add", ac, a, d, random)));
-            dc = Math.Max(1, checked((int)rules.Extensions.Modify("combat.attack_count", "attack_count_add", dc, d, a, random)));
+            ac = Math.Max(1, checked((int)rules.Extensions.Modify("combat.attack_count", "attack_count_add", ac, a, d, random, distance)));
+            dc = Math.Max(1, checked((int)rules.Extensions.Modify("combat.attack_count", "attack_count_add", dc, d, a, random, distance)));
         }
         bool counter = !a.Profile.HasTrait("no_retaliation") && !d.Profile.HasTrait("no_retaliation")
-            && distance >= d.Profile.MinimumRange && distance <= d.Profile.MaximumRange
+            && distance >= d.Profile.MinimumRange && distance <= d.MaximumRange
             && d.Morale != -3 && !(d.Profile.Category == "fort" && d.ConstructionTurns > 0);
-        if (rules.Extensions != null) counter = counter && rules.Extensions.Modify("combat.counterattack", "counterattack", 1, a, d, random) > 0;
+        if (rules.Extensions != null) counter = counter && rules.Extensions.Modify("combat.counterattack", "counterattack", 1, a, d, random, distance) > 0;
         int am = MoraleModifier(a.Morale, ac), dm = MoraleModifier(d.Morale, dc);
         int aa = am + a.AttackBonus + Math.Min(ac, rules.StarRollCap) * a.Stars;
         int da = dm + d.AttackBonus + Math.Min(dc, rules.StarRollCap) * d.Stars;
@@ -168,11 +175,11 @@ public static class Ew4Combat
         bool offensive = a.Has(Skill(31)) && random.Next(100) < skills.Percent(31);
         bool defensive = d.Has(Skill(32)) && random.Next(100) < skills.Percent(32);
         int attack = Rolls(a, ac, offensive, random, skills);
-        int dealt = Damage(a, d, aa + attack - Math.Min(0, dm) - d.DefenseBonus - d.Armor, false, rules, random);
+        int dealt = Damage(a, d, aa + attack - Math.Min(0, dm) - d.DefenseBonus - d.Armor, false, rules, random, distance);
         if (defensive) dealt = rules.MinimumDamage;
         if (rules.LethalStrikePreventsCounterattack && dealt >= d.Health) counter = false;
         int retaliation = counter ? Rolls(d, dc, false, random, skills) : 0;
-        int taken = counter ? Damage(d, a, da + retaliation - Math.Min(0, am) - a.DefenseBonus - a.Armor, true, rules, random) : 0;
+        int taken = counter ? Damage(d, a, da + retaliation - Math.Min(0, am) - a.DefenseBonus - a.Armor, true, rules, random, distance) : 0;
         var result = new CombatResult(dealt, taken, counter, offensive, defensive, random.State);
         callerRandom.Commit(random.State);
         return result;
@@ -200,7 +207,7 @@ public static class Ew4Combat
         return total;
     }
 
-    private static int Damage(Combatant source, Combatant target, int raw, bool retaliation, CombatRules rules, Ew4Random random)
+    private static int Damage(Combatant source, Combatant target, int raw, bool retaliation, CombatRules rules, Ew4Random random, int distance)
     {
         if (!source.Profile.DamageMultipliers.TryGetValue(target.Profile.Category, out float factor))
             throw new RuleViolation("combat.multiplier_missing", $"{source.Profile.Id} -> {target.Profile.Category}");
@@ -227,10 +234,10 @@ public static class Ew4Combat
         double damage = Math.Max(rules.MinimumDamage, checked((int)(raw * combined)));
         if (rules.Extensions != null)
         {
-            damage = rules.Extensions.Modify("combat.modify_damage", "damage_multiplier", damage, source, target, random);
-            damage = rules.Extensions.Modify("combat.modify_damage", "damage_add", damage, source, target, random);
-            damage = rules.Extensions.Modify("combat.modify_incoming_damage", "damage_multiplier", damage, target, source, random);
-            damage = rules.Extensions.Modify("combat.modify_incoming_damage", "damage_add", damage, target, source, random);
+            damage = rules.Extensions.Modify("combat.modify_damage", "damage_multiplier", damage, source, target, random, distance);
+            damage = rules.Extensions.Modify("combat.modify_damage", "damage_add", damage, source, target, random, distance);
+            damage = rules.Extensions.Modify("combat.modify_incoming_damage", "damage_multiplier", damage, target, source, random, distance);
+            damage = rules.Extensions.Modify("combat.modify_incoming_damage", "damage_add", damage, target, source, random, distance);
         }
         return Math.Max(rules.MinimumDamage, checked((int)damage));
     }

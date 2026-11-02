@@ -529,6 +529,18 @@
         command.append(this.api.uiImage('button_ok_gray_noshadow.png',30));body.append(panel);
       }
     }
+    abilityDefinitions(){
+      const definitions=[['infantry','步兵','upgrade_tag_infantry'],['cavalry','骑兵','upgrade_tag_cavalry'],['artillery','炮兵','upgrade_tag_artillery'],['naval','海军','upgrade_tag_ship'],['fort','要塞','upgrade_tag_fortress'],['commerce','商业','generalsinfo_trade'],['movement','移动','generalsinfo_move'],['training','训练','generalsinfo_training']]
+        .map(([id,name,icon])=>({id,name,icon:icon+'.png'})).concat(this.data.commanderAbilities||[]);
+      const order=this.data.commanderAbilityOrder||[],byId=new Map(definitions.map(ability=>{
+        const override=this.data.commanderAbilityPresentation?.[ability.id];return [ability.id,{...ability,name:override?.name??ability.name,icon:override?.icon??ability.icon}];
+      }));
+      return order.concat(definitions.map(a=>a.id).filter(id=>!order.includes(id))).map(id=>byId.get(id)).filter(Boolean);
+    }
+    abilityIcon(ability,width=22,height=21.5){
+      if(!ability.icon.startsWith('rewrite/'))return this.api.uiImage(ability.icon,width,height);
+      const image=document.createElement('img');image.src='/content/extensions/'+ability.icon.slice(8).split('/').map(encodeURIComponent).join('/');image.width=width;image.height=height;image.alt='';return image;
+    }
     commanderInfo(definition,held,onClose){
       this.commanderReturn=onClose;
       const body=this.api.detail('title_unitinfo',440,217,null,onClose||(()=>{this.drawRoster();}));body.className='commander-detail';
@@ -548,9 +560,11 @@
       const ranks=document.createElement('div');ranks.className='commander-ranks';
       for(const [track,effect,value] of [['rank','hp',held?.healthBonus??definition.healthBonus],['title','recover',held?.healing??definition.healing]]){const row=document.createElement('div');row.append(this.progressionBadge(track,held?.learning[track]??{level:definition[track],experience:0}));const icon=this.api.uiImage('marker_'+effect+'_dark.png',17);icon.className='rank-effect';row.append(icon,this.lettering(value,'font_char_2_hd'));ranks.append(row);}body.append(ranks);
       const abilities=document.createElement('div');abilities.className='commander-abilities';const values=held?.learning.abilities||definition.abilities;
-      for(const [key,icon] of [['infantry','upgrade_tag_infantry'],['cavalry','upgrade_tag_cavalry'],['artillery','upgrade_tag_artillery'],['naval','upgrade_tag_ship'],['fort','upgrade_tag_fortress'],['commerce','generalsinfo_trade'],['movement','generalsinfo_move'],['training','generalsinfo_training']]){
-        const count=key==='training'?(held?.training??definition.training):values[key];
-        const row=document.createElement('div');row.className='commander-ability';row.dataset.ability=key;row.setAttribute('aria-label',key+' '+count);row.append(this.api.uiImage(icon+'.png',22,21.5));
+      const custom=!!this.data.commanderAbilities?.length||!!Object.keys(this.data.commanderAbilityPresentation||{}).length;abilities.classList.toggle('has-custom-abilities',custom);abilities.tabIndex=custom?0:-1;
+      for(const ability of this.abilityDefinitions()){
+        const key=ability.id,count=key==='training'?(held?.training??definition.training):values[key]??0;
+        const row=document.createElement('div');row.className='commander-ability';row.dataset.ability=key;row.title=ability.name+' '+count;row.setAttribute('aria-label',key+' '+count);row.append(this.abilityIcon(ability));
+        if(custom){const name=this.lettering(ability.name,'font_char_2_hd','#404040',126,'left',{size:11,singleLine:true,shrinkWidth:true,maxHeight:16});name.classList.add('ability-name');row.append(name);}
         const stars=document.createElement('div');stars.className='ability-stars';stars.dataset.value=String(count);
         // Mod abilities are not limited to the original five-star artwork.
         for(let i=0;i<(count>5?1:count);i++)stars.append(this.api.uiImage('star_middle.png',13.5,12.5));

@@ -1,0 +1,8 @@
+{
+  "composites": {
+    "ew4.unit.fra.light_infantry.0": [
+      {"visual": "Light Infantry fra 1", "layer": "surface", "x": -10, "y": 24},
+      {"visual": "Militia fra 1", "layer": "air", "x": 18, "y": -24}
+    ]
+  }
+}

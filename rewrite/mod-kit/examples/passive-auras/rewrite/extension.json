@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "apiVersion": 3,
+  "skills": ["rewrite/definitions/skills.json"],
+  "statuses": ["rewrite/definitions/statuses.json"],
+  "unitBindings": "rewrite/definitions/unit-bindings.json"
+}

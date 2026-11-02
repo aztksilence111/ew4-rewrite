@@ -1,0 +1,12 @@
+{
+  "enabled": true,
+  "surfaceCapacity": 1,
+  "airCapacity": 1,
+  "profiles": {
+    "ew4.unit.fra.light_infantry.0": {
+      "layer": "air",
+      "attackLayers": ["air"],
+      "counterattackLayers": ["air"]
+    }
+  }
+}

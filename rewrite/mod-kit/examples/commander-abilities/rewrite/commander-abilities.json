@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "order": ["infantry", "demo.air", "cavalry", "artillery", "naval", "fort", "commerce", "movement", "training"],
+  "abilities": [
+    {"id": "demo.air", "nameKey": "航空能力", "icon": "upgrade_tag_ship.png", "defaultValue": 0}
+  ],
+  "commanders": {
+    "ew4.commander.1": {"demo.air": 8}
+  },
+  "units": {
+    "ew4.unit.fra.light_infantry.0": "demo.air"
+  },
+  "inheritance": [
+    {"skill": "demo.teach.air", "ability": "demo.air", "gain": 2}
+  ]
+}

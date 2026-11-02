@@ -79,18 +79,21 @@ public static class WorldCommanders
             throw new RuleViolation("commander.occupied", "Commander replacement is disabled");
         if (!rules.Definitions.TryGetValue(commanderId, out var definition)) throw new RuleViolation("commander.definition", "Missing commander definition");
         var original = Unassigned(unit);
+        if (rules.Extensions != null) original = rules.Extensions.RefreshAttributes(original);
         var support = unit.CommanderBase?.Support ?? unit.Support;
         var effects = Ew4Commander.Resolve(definition, original.Profile.Category, rules.LegacySkills);
         var attached = Ew4Commander.Attach(original, definition, rules.LegacySkills);
         int maximum = checked(original.Profile.MaxHealth + commander.RankHealthBonus);
-        int movement = rules.ImmobileCategories.Contains(original.Profile.Category) ? 0 : attached.Profile.Movement;
-        int health = CommanderAttachment.ResizeHealth(unit.Combatant.Health, unit.Combatant.Profile.MaxHealth, original.Profile.MaxHealth, maximum);
-        attached = attached with { Health = health, Profile = attached.Profile with { MaxHealth = maximum, Movement = movement } };
+        int movement = !WorldUnitLayers.Air(state, unit) && rules.ImmobileCategories.Contains(original.Profile.Category) ? 0 : attached.Profile.Movement;
+        attached = attached with { Profile = attached.Profile with { MaxHealth = maximum, Movement = movement } };
+        if (rules.Extensions != null) attached = rules.Extensions.RefreshAttributes(attached);
+        int health = CommanderAttachment.ResizeHealth(unit.Combatant.Health, unit.Combatant.MaximumHealth, original.MaximumHealth, attached.MaximumHealth);
+        attached = attached with { Health = health };
         int oldBudget = unit.ExtensionMovementLimit ?? unit.Combatant.Profile.Movement;
         int budget = rules.Extensions?.MovementBudget(attached) ?? Math.Max(0, checked(movement + oldBudget - unit.Combatant.Profile.Movement));
         var updated = unit with
         {
-            CommanderId = commanderId, CommanderBase = new(original with { Health = original.Profile.MaxHealth }, support),
+            CommanderId = commanderId, CommanderBase = new(original with { Health = original.MaximumHealth }, support),
             RemainingMovement = CommanderAttachment.RebaseMovement(unit.RemainingMovement, oldBudget, budget, rules.RefillAvailableMovement),
             ExtensionMovementLimit = unit.ExtensionMovementLimit.HasValue || rules.Extensions != null ? budget : null,
             Combatant = attached,
@@ -125,13 +128,14 @@ public static class WorldCommanders
         if (unit == null || unit.Owner != owner || unit.CommanderId == null)
             throw new RuleViolation("commander.unavailable", "No active faction commander to detach");
         var original = Unassigned(unit);
+        if (rules.Extensions != null) original = rules.Extensions.RefreshAttributes(original);
         int oldBudget = unit.ExtensionMovementLimit ?? unit.Combatant.Profile.Movement;
         int budget = rules.Extensions?.MovementBudget(original)
             ?? Math.Max(0, checked(original.Profile.Movement + oldBudget - unit.Combatant.Profile.Movement));
         var detached = unit with
         {
-            Combatant = original with { Health = CommanderAttachment.ResizeHealth(unit.Combatant.Health, unit.Combatant.Profile.MaxHealth,
-                original.Profile.MaxHealth, original.Profile.MaxHealth) },
+            Combatant = original with { Health = CommanderAttachment.ResizeHealth(unit.Combatant.Health, unit.Combatant.MaximumHealth,
+                original.MaximumHealth, original.MaximumHealth) },
             Support = unit.CommanderBase!.Support, CommanderId = null, CommanderBase = null,
             RemainingMovement = CommanderAttachment.RebaseMovement(unit.RemainingMovement, oldBudget, budget, rules.RefillAvailableMovement),
             ExtensionMovementLimit = unit.ExtensionMovementLimit.HasValue || rules.Extensions != null ? budget : null
@@ -145,7 +149,7 @@ public static class WorldCommanders
     private static UnitState RefreshMorale(WorldState state, UnitState unit)
     {
         int morale = TurnEconomy.Morale(unit.Morale.Baseline, unit.Morale.Duration, unit.LocalPenalty,
-            state.Factions.Single(f => f.Id == unit.Owner).Shortage, unit.Support.Logistics || unit.Combatant.Has(Ew4Combat.Skill(22)), unit.Combatant.Has(Ew4Combat.Skill(3)));
+            state.Factions.Single(f => f.Id == unit.Owner).Shortage, unit.Support.Logistics || unit.Combatant.FoodExempt || unit.Combatant.Has(Ew4Combat.Skill(22)), unit.Combatant.Has(Ew4Combat.Skill(3)));
         return unit with { Morale = unit.Morale with { Effective = morale }, Combatant = unit.Combatant with { Morale = morale } };
     }
 

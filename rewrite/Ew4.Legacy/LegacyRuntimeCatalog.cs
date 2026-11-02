@@ -93,6 +93,7 @@ public sealed class LegacyRuntimeCatalog
             string Text(string key) => value.GetProperty(key).GetString()!;
             int Int(string key) => value.GetProperty(key).GetInt32();
             var profile = new UnitProfile { Id = Text("id"), Category = Text("category"), Grade = Text("grade"),
+                CommanderAbility = value.TryGetProperty("commander_ability", out var ability) ? ability.GetString() : null,
                 SkillSlots = value.TryGetProperty("skill_slots", out var unitSlots) ? unitSlots.Deserialize<SkillSlot[]>(ExtensionLoader.Json)! : [],
                 LegacySkillOverrides = overridden,
                 MaxHealth = Int("max_health"), Movement = Int("movement"), MinimumAttack = Int("minimum_attack"), MaximumAttack = Int("maximum_attack"),
@@ -147,6 +148,8 @@ public sealed class LegacyRuntimeCatalog
             var stars = new Dictionary<string, int>(StringComparer.Ordinal);
             foreach (string category in new[] { "infantry", "cavalry", "artillery", "warship", "fort" })
                 stars.Add(category == "warship" ? "naval" : category, Integer(category));
+            if (value.TryGetProperty("commander_abilities", out var customAbilities))
+                foreach (var ability in customAbilities.EnumerateObject()) stars.Add(ability.Name, ability.Value.GetInt32());
             var commander = new Commander { Id = value.GetProperty("id").GetString()!, DisplayName = attrs.GetProperty("name").GetString()!,
                 SkillSlots = value.TryGetProperty("skill_slots", out var commanderSlots) ? commanderSlots.Deserialize<SkillSlot[]>(ExtensionLoader.Json)! : [],
                 LegacySkillOverrides = overridden,

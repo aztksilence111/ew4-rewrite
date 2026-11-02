@@ -58,7 +58,9 @@ public static class SplashCombat
         int direction = FacesRight(map, attacker.Cell, defender.Cell) ? rules.RightDirection : rules.LeftDirection;
         int cell = map.Neighbor(defender.Cell, direction);
         if (cell < 0) return null;
-        var target = state.Units.FirstOrDefault(u => u.Cell == cell && u.Id != attacker.Id && u.Id != defender.Id);
+        var target = state.Units.FirstOrDefault(u => u.Cell == cell && u.Id != attacker.Id && u.Id != defender.Id
+            && (!WorldUnitLayers.Enabled(state) || WorldUnitLayers.Occupies(state, u.Combatant.Profile).Contains(WorldUnitLayers.AttackLayer(state, attacker, defender)!))
+            && WorldUnitLayers.CanAttack(state, attacker, u));
         if (target != null && !rules.AllowFriendlyFire
             && WorldDiplomacy.Allied(state, attacker.Owner, target.Owner)) return null;
         return target;

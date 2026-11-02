@@ -81,9 +81,19 @@ public static class WorldActions
     {
         if (cell < 0 || cell >= state.Cells.Count || state.PendingDialogue != null || state.Phase != TurnPhase.Active) return false;
         var site = state.Cells[cell];
-        if (faction.Defeated || !site.Terrain.CanTraverse() || site.Owner != faction.Id || (!offer.AllowSea && site.Terrain.Sea)
-            || offer.Template?.Profile.Category == "fort" && !JurisdictionClaims.CanBuildFort(state, cell, faction.Id)
+        if (state.Construction?.Enabled == true && offer.Template != null)
+        {
+            var configured = state.Construction.Buildings.SelectMany(b => b.Value.Recruitment.Select(r => (Kind: b.Key, Offer: r)))
+                .Where(p => p.Offer.Profile == offer.Template.Profile.Id).ToArray();
+            if (configured.Length > 0 && !configured.Any(p => p.Kind == site.BuildingKind && p.Offer.Id == offer.Id
+                && site.BuildingLevel >= p.Offer.MinimumLevel)) return false;
+        }
+        if (faction.Defeated || (offer.Template == null ? !site.Terrain.CanTraverse() : !WorldUnitLayers.ValidTerrain(state, offer.Template.Profile, cell))
+            || site.Owner != faction.Id || (!offer.AllowSea && site.Terrain.Sea)
+            || offer.Template?.Profile.Category == "fort" && !WorldUnitLayers.Air(state, offer.Template.Profile) && !JurisdictionClaims.CanBuildFort(state, cell, faction.Id)
             || !faction.Recruitment.ContainsKey(offer.Id)
+            || state.Construction?.Enabled == true && offer.Template?.Profile.Category == "fort" && !WorldUnitLayers.Air(state, offer.Template.Profile)
+                && WorldConstruction.FortBuilder(state, cell, faction.Id) == null
             || (offer.Building == BuildingRequirement.Required && site.BuildingKind == null)
             || (offer.Building == BuildingRequirement.Forbidden && site.BuildingKind != null)
             || site.BuildingLevel < offer.MinimumBuildingLevel
@@ -91,12 +101,14 @@ public static class WorldActions
             || (offer.AllowedBuildingLevels != null && (site.BuildingKind == null
                 || !offer.AllowedBuildingLevels.TryGetValue(site.BuildingKind, out var levels) || !levels.Contains(site.BuildingLevel)))
             || (faction.TurnUses.TryGetValue(offer.TurnGroup, out int used) && used >= offer.PerTurnLimit)) return false;
-        if ((occupants ?? state.Units.Count(u => u.Cell == cell)) >= state.Limits.UnitsPerCell
+        if ((WorldUnitLayers.Enabled(state) && offer.Template != null
+                ? !WorldUnitLayers.HasSpace(state, offer.Template.Profile, faction.Id, cell)
+                : (occupants ?? state.Units.Count(u => u.Cell == cell)) >= state.Limits.UnitsPerCell)
             || state.Limits.UnitsPerFaction.HasValue && state.Units.Count(u => u.Owner == faction.Id) >= state.Limits.UnitsPerFaction.Value) return false;
         return true;
     }
 
-    public static WorldChange Recruit(WorldState state, long expectedRevision, int cell, string unitId, RecruitmentOffer offer)
+    public static WorldChange Recruit(WorldState state, long expectedRevision, int cell, string unitId, RecruitmentOffer offer, RuleEventBus? extensions = null)
     {
         var faction = Ready(state, expectedRevision);
         if (string.IsNullOrWhiteSpace(unitId) || state.Units.Any(u => u.Id == unitId))
@@ -110,21 +122,25 @@ public static class WorldActions
         var unit = new UnitState
         {
             Id = unitId, Owner = faction.Id, Cell = cell, Veterancy = grant.Veterancy, Transport = grant.Transport,
-            Combatant = offer.Template with { Health = offer.Template.Profile.MaxHealth, Morale = 0, ConstructionTurns = offer.ConstructionTurns,
-                AtSea = state.Cells[cell].Terrain.Sea, BuildingKind = state.Cells[cell].BuildingKind },
+            Combatant = offer.Template with { Health = offer.Template.MaximumHealth, Morale = 0, ConstructionTurns = offer.ConstructionTurns,
+                AtSea = !WorldUnitLayers.Air(state, offer.Template.Profile) && state.Cells[cell].Terrain.Sea,
+                BuildingKind = WorldUnitLayers.Air(state, offer.Template.Profile) ? null : state.Cells[cell].BuildingKind },
             RemainingMovement = 0, Acted = true, Support = offer.Support
         };
         var uses = faction.TurnUses.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal);
+        if (extensions != null) unit = unit with { Combatant = extensions.RefreshAttributes(unit.Combatant) };
         uses[offer.TurnGroup] = checked((uses.TryGetValue(offer.TurnGroup, out int previous) ? previous : 0) + 1);
         var updated = faction with
         {
             Resources = new(faction.Resources.Money - offer.Cost.Money, faction.Resources.Industry - offer.Cost.Industry, faction.Resources.Food - offer.Cost.Food),
             TurnUses = uses
         };
+        string? builderId = state.Construction?.Enabled == true && offer.Template.Profile.Category == "fort" && !WorldUnitLayers.Air(state, offer.Template.Profile)
+            ? WorldConstruction.FortBuilder(state, cell, faction.Id)?.Id : null;
         var next = (state with
         {
             Factions = state.Factions.Select(f => f.Id == faction.Id ? updated : f).ToArray(),
-            Units = state.Units.Append(unit).ToArray(), Revision = checked(state.Revision + 1)
+            Units = state.Units.Select(u => u.Id == builderId ? u with { Acted = true, RemainingMovement = 0 } : u).Append(unit).ToArray(), Revision = checked(state.Revision + 1)
         }).Copy();
         next.Validate();
         return new(next, new[] { new WorldNotice("unit.recruited", unitId) });
@@ -152,18 +168,19 @@ public static class WorldActions
             throw new RuleViolation("move.unit", "Unit is unavailable for movement");
         var map = new HexMap(state.Width, state.Height);
         map.Check(destination);
-        if (destination == unit.Cell || state.Units.Count(u => u.Cell == destination) >= state.Limits.UnitsPerCell)
+        if (destination == unit.Cell || !WorldUnitLayers.HasSpace(state, unit.Combatant.Profile, unit.Owner, destination, unit.Id))
             throw new RuleViolation("move.destination", "Destination is occupied or unchanged");
         if (!(range ?? MovementRange(state, unit, rules)).TryGetValue(destination, out var reachable))
             throw new RuleViolation("move.unreachable", "No affordable legal route to destination");
         var otherUnits = state.Units.Where(u => u.Id != unitId).ToArray();
-        var ownership = MovementOwnership.Move(state, map, otherUnits.Select(u => u.Cell).Distinct().ToArray(),
-            reachable.Path, faction.Id, rules.Territory);
+        bool air = WorldUnitLayers.Air(state, unit);
+        var ownership = MovementOwnership.Move(state, map, otherUnits.Where(u => !WorldUnitLayers.Air(state, u)).Select(u => u.Cell).Distinct().ToArray(),
+            reachable.Path, faction.Id, rules.Territory, capture: !air);
         var claimed = ownership.Cells;
         var moved = unit with
         {
             Cell = destination, RemainingMovement = rules.SpendAllMovement ? 0 : Math.Max(0, reachable.Remaining),
-            Combatant = unit.Combatant with { AtSea = claimed[destination].Terrain.Sea, BuildingKind = claimed[destination].BuildingKind }
+            Combatant = unit.Combatant with { AtSea = !air && claimed[destination].Terrain.Sea, BuildingKind = air ? null : claimed[destination].BuildingKind }
         };
         var notices = new List<WorldNotice> { new("unit.moved", unitId, destination) };
         foreach (int i in ownership.Changed) notices.Add(new("cell.owner_changed", i.ToString()));
@@ -231,7 +248,7 @@ public static class WorldActions
         if (unit == null || unit.Owner != faction.Id) throw new RuleViolation("recruit.relocation_unit", "Recruitment relocation requires an owned unit");
         int origin = unit.Cell;
         var moved = Move(state, expectedRevision, unitId, destination, rules);
-        var recruited = Recruit(moved.State, moved.State.Revision, origin, recruitedUnitId, offer);
+        var recruited = Recruit(moved.State, moved.State.Revision, origin, recruitedUnitId, offer, rules?.Extensions);
         var next = recruited.State with { Revision = checked(state.Revision + 1) };
         next.Validate();
         return new(next, moved.Notices.Concat(recruited.Notices).ToArray()) { Movements = moved.Movements };
@@ -255,6 +272,11 @@ public static class WorldActions
 
     public static IReadOnlyCollection<string> MovableUnits(WorldState state, string owner, WorldMoveRules configuration)
     {
+        if (WorldUnitLayers.Enabled(state)) return state.Units.Where(u => u.Owner == owner && u.Combatant.Health > 0
+            && (u.Combatant.Profile.Category != "fort" || WorldUnitLayers.Air(state, u)) && u.RemainingMovement > 0
+            && u.Morale.Effective != -3 && u.Combatant.ConstructionTurns == 0
+            && MovementRange(state, u, configuration).Keys.Any(cell => cell != u.Cell
+                && WorldUnitLayers.HasSpace(state, u.Combatant.Profile, owner, cell, u.Id))).Select(u => u.Id).ToArray();
         var units = state.Units.Where(u => u.Owner == owner && u.Combatant.Health > 0
             && u.Combatant.Profile.Category != "fort" && u.RemainingMovement > 0
             && u.Morale.Effective != -3 && u.Combatant.ConstructionTurns == 0).ToArray();
@@ -293,13 +315,13 @@ public static class WorldActions
     private static MovementActor MovementActorFor(UnitState unit, string camp) => new()
     {
         Category = unit.Combatant.Profile.Category, Camp = camp, Transport = unit.Transport,
-        Geography = unit.Combatant.Geography || unit.Combatant.Has(Ew4Combat.Skill(1)),
+        Geography = unit.Combatant.Geography || unit.Combatant.IgnoreTerrain || unit.Combatant.Has(Ew4Combat.Skill(1)),
         FullBudget = Math.Max(unit.ExtensionMovementLimit ?? unit.Combatant.Profile.Movement, unit.RemainingMovement), Remaining = unit.RemainingMovement
     };
 
     internal static (MovementCell[] Cells, MovementActor Actor) MovementContext(WorldState state, UnitState unit, WorldMoveRules? rules = null)
     {
-        if (PlanningScope.Queries(state) is { } queries)
+        if (!WorldUnitLayers.Enabled(state) && PlanningScope.Queries(state) is { } queries)
         {
             var prepared = queries.Movement(unit.Owner);
             var mover = MovementActorFor(unit, prepared.Camp);
@@ -313,9 +335,14 @@ public static class WorldActions
         var campIndex = state.Factions.ToDictionary(f => f.Id, f => f.Camp, StringComparer.Ordinal);
         if (state.DiplomaticRelations.Count > 0)
             campIndex = state.Factions.ToDictionary(f => f.Id, f => WorldDiplomacy.Allied(state, unit.Owner, f.Id) ? "allied" : "other", StringComparer.Ordinal);
-        var occupied = state.Units.GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => campIndex[g.First().Owner]);
+        bool air = WorldUnitLayers.Air(state, unit);
+        var occupied = state.Units.Where(u => WorldUnitLayers.Same(state, unit, u)).GroupBy(u => u.Cell).ToDictionary(g => g.Key,
+            g => campIndex[(g.FirstOrDefault(u => campIndex[u.Owner] != campIndex[unit.Owner]) ?? g.First()).Owner]);
         var cells = state.Cells.Select((c, i) => c.Terrain with { OccupantCamp = occupied.TryGetValue(i, out string camp) ? camp : null }).ToArray();
+        if (air) cells = cells.Select(c => c with { Barrier = TerrainBarrier.None, Sea = false, TerrainCost = 1, MinimumEntryCost = 0,
+            RiverEdges = 0, BridgeEdges = 0, BlockedSeaEdges = 0 }).ToArray();
         var actor = MovementActorFor(unit, campIndex[unit.Owner]);
+        if (air) actor = actor with { Category = "layer.air", Transport = false, Geography = false };
         if (rules?.Extensions != null)
         {
             int budget = rules.Extensions.MovementBudget(unit.Combatant);

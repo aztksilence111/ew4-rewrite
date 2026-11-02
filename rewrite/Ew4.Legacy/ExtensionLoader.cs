@@ -28,6 +28,10 @@ public sealed partial class ExtensionLoader
     public GeographyCatalog Geography { get; private init; } = GeographyCatalog.Empty;
     public IReadOnlyDictionary<string, MapColorsPresentation> MapColors { get; private init; } = new Dictionary<string, MapColorsPresentation>();
     public AiControlPresentation AiControl { get; private init; } = new();
+    public UnitLayerRules? UnitLayers { get; private init; }
+    public ModConstructionRules? Construction { get; private init; }
+    public IReadOnlyDictionary<string, BuildingIncomePatch[]> Economy { get; private init; } = new Dictionary<string, BuildingIncomePatch[]>();
+    public CommanderAbilityConfiguration? CommanderAbilities { get; private init; }
     public LegacySkillParameters? LegacySkills { get; private init; }
     public IReadOnlyDictionary<string, int?> DeploymentLimits { get; private init; } = new Dictionary<string, int?>();
     public IReadOnlyDictionary<string, int> FormationCounts { get; private init; } = new Dictionary<string, int>();
@@ -47,7 +51,9 @@ public sealed partial class ExtensionLoader
         string? CommanderDialogues = null, string? ItemBindings = null, string? DeploymentLimits = null, string? Metagame = null,
         string? StageIntroPresentation = null, string? FormationCounts = null, string? CampaignVisibility = null,
         string? Geography = null, string? PauseObjectivesPresentation = null, string? MapColors = null, string? AiControl = null,
-        string? StoryPresentation = null, string? HeadquartersPresentation = null);
+        string? StoryPresentation = null, string? HeadquartersPresentation = null, string? UnitLayers = null, string? Construction = null,
+        string? Economy = null, string? CommanderAbilities = null);
+    private sealed record EconomyFile(int Schema, Dictionary<string, BuildingIncomePatch[]> Scenarios);
     private sealed record CampaignVisibilityFile(int Schema, Dictionary<string, string>? Visibility);
     private sealed record LegacySkillFile(int Schema, Dictionary<string, Dictionary<string, double>> Skills);
     private sealed record DeploymentLimitFile([property: JsonNumberHandling(JsonNumberHandling.Strict)] int Schema,
@@ -84,6 +90,43 @@ public sealed partial class ExtensionLoader
         }
         var m = Read<Manifest>("rewrite/extension.json");
         if (m.Schema != 1 || m.ApiVersion is not (1 or 2 or 3)) throw new RuleViolation("extension.version", "Unsupported extension schema/API version");
+        CommanderAbilityConfiguration? commanderAbilities = null;
+        if (m.CommanderAbilities != null)
+        {
+            if (m.ApiVersion < 3) throw new RuleViolation("extension.version", "Commander abilities require API 3");
+            commanderAbilities = Read<CommanderAbilityConfiguration>(m.CommanderAbilities);
+            commanderAbilities.Validate();
+            foreach (string icon in commanderAbilities.Abilities.Select(a => a.Icon)
+                .Concat(commanderAbilities.Presentation.Values.Select(p => p.Icon).OfType<string>()).Distinct()
+                .Where(icon => icon.StartsWith("rewrite/", StringComparison.Ordinal)))
+                if (read(icon).Length > 4 * 1024 * 1024) throw new RuleViolation("extension.size", icon);
+        }
+        UnitLayerRules? unitLayers = null;
+        ModConstructionRules? construction = null;
+        var economy = new Dictionary<string, BuildingIncomePatch[]>();
+        if (m.Economy != null)
+        {
+            if (m.ApiVersion < 3) throw new RuleViolation("extension.version", "Scenario economy requires API 3");
+            var configured = Read<EconomyFile>(m.Economy);
+            if (configured.Schema != 1 || configured.Scenarios == null || configured.Scenarios.Any(p =>
+                string.IsNullOrWhiteSpace(p.Key) || p.Key == "*" || p.Value == null || p.Value.Any(v => v == null)))
+                throw new RuleViolation("extension.economy", "Invalid scenario economy configuration");
+            economy = configured.Scenarios;
+        }
+        if (m.Construction != null)
+        {
+            if (m.ApiVersion < 3) throw new RuleViolation("extension.version", "Custom construction requires API 3");
+            var configured = Read<ModConstructionRules>(m.Construction);
+            configured.Validate();
+            if (configured.Enabled) construction = configured.Copy();
+        }
+        if (m.UnitLayers != null)
+        {
+            if (m.ApiVersion < 3) throw new RuleViolation("extension.version", "Unit layers require API 3");
+            var layers = Read<UnitLayerRules>(m.UnitLayers);
+            layers.Validate();
+            if (layers.Enabled) unitLayers = layers.Copy();
+        }
         if (m.Geography != null && m.ApiVersion < 3) throw new RuleViolation("extension.version", "Geography requires API 3");
         var geography = m.Geography == null ? GeographyCatalog.Empty : Read<GeographyCatalog>(m.Geography);
         if (m.MapColors != null && m.ApiVersion < 3) throw new RuleViolation("extension.version", "Map colors require API 3");
@@ -178,7 +221,8 @@ public sealed partial class ExtensionLoader
             {
                 ValidateEffect(effect, m.ApiVersion);
                 if (effect.Event is not ("combat.modify_damage" or "combat.modify_incoming_damage" or "combat.counterattack" or "combat.attack_count"
-                    or "movement.modify" or "turn.start" or "turn.end"))
+                    or "movement.modify" or "unit.attributes" or "turn.start" or "turn.end")
+                    || effect.Operation is "apply_status" or "remove_status")
                     throw new RuleViolation("extension.status", "Unsupported status event");
             }
         }
@@ -299,7 +343,8 @@ public sealed partial class ExtensionLoader
             { ApiVersion = m.ApiVersion, VictoryPresentations = victoryScreens, LegacySkills = legacySkills, CommanderDialogues = commanderDialogues,
                 ItemBindings = items, DeploymentLimits = deploymentLimits, FormationCounts = formationCounts, CampaignVisibility = campaignVisibility,
                 Metagame = metagame, StageIntroPresentations = introScreens, PauseObjectivesPresentations = pauseScreens, Geography = geography,
-                MapColors = mapColors, AiControl = aiControl, Stories = stories, HeadquartersPresentation = headquartersPresentation };
+                MapColors = mapColors, AiControl = aiControl, Stories = stories, HeadquartersPresentation = headquartersPresentation,
+                UnitLayers = unitLayers, Construction = construction, Economy = economy, CommanderAbilities = commanderAbilities };
         bool Known(string id) => skills.ContainsKey(id) || id.StartsWith("ew4.skill.", StringComparison.Ordinal)
             && int.TryParse(id[10..], out int value) && value is >= 0 and < 40 || BuiltinTraits.Contains(id);
     }
@@ -318,19 +363,32 @@ public sealed partial class ExtensionLoader
     private static void ValidateEffect(ExtensionEffect e, int apiVersion)
     {
         if (e == null) throw new RuleViolation("extension.effect", "Null effect");
+        if (e.When != null)
+        {
+            if (apiVersion < 3) throw new RuleViolation("extension.version", "Effect conditions require API 3");
+            e.When.Validate();
+            if (e.Event is "unit.attributes" or "movement.modify" && e.When.UsesLocation())
+                throw new RuleViolation("extension.condition", "Attribute and movement-limit queries only support category conditions");
+        }
         bool valid = e.Event switch {
             "combat.modify_damage" => e.Operation is "damage_multiplier" or "damage_add",
             "combat.modify_incoming_damage" when apiVersion >= 2 => e.Operation is "damage_multiplier" or "damage_add",
             "movement.modify" when apiVersion >= 2 => e.Operation == "movement_add",
+            "unit.attributes" when apiVersion >= 3 => e.Operation is "max_health_add" or "range_add" or "food_exempt" or "ignore_terrain",
             "combat.counterattack" => e.Operation == "counterattack",
             "combat.attack_count" => e.Operation == "attack_count_add",
             "unit.recruited" or "unit.move_end" or "unit.captured" or "combat.after" or "unit.damaged" or "unit.destroyed" or "turn.start" or "turn.end" or "scenario.start"
-                => e.Operation is "heal" or "money" or "industry" or "food" || apiVersion >= 2 && e.Operation is "damage" or "movement",
+                => e.Operation is "heal" or "money" or "industry" or "food" || apiVersion >= 2 && e.Operation is "damage" or "movement"
+                    || apiVersion >= 3 && e.Operation is "apply_status" or "remove_status" or "morale",
             "skill.activate" => e.Operation is "heal" or "damage" or "money" or "industry" or "food"
                 || apiVersion >= 2 && e.Operation is "summon" or "teleport" or "apply_status" or "remove_status" or "movement",
             _ => false };
-        bool query = e.Event.StartsWith("combat.", StringComparison.Ordinal) && e.Event != "combat.after" || e.Event == "movement.modify";
-        if (!valid || !double.IsFinite(e.Value) || e.Value < 0 && e.Operation is not ("movement" or "movement_add") || e.Script == null != (e.Function == null)
+        bool query = e.Event.StartsWith("combat.", StringComparison.Ordinal) && e.Event != "combat.after" || e.Event is "movement.modify" or "unit.attributes";
+        if (e.Event == "skill.activate" && apiVersion >= 3 && e.Operation == "morale") valid = true;
+        if (!valid || !double.IsFinite(e.Value) || e.Value < 0 && e.Operation is not ("movement" or "movement_add" or "max_health_add" or "range_add" or "morale") || e.Script == null != (e.Function == null)
+            || e.Event == "unit.attributes" && (e.Script != null || e.Value != Math.Truncate(e.Value)
+                || e.Operation is "food_exempt" or "ignore_terrain" && e.Value is not (0 or 1))
+            || e.Operation == "morale" && (e.Value != Math.Truncate(e.Value) || e.Value is < -3 or > 1)
             || e.Scope is not ("source" or "target" or "area") || e.Relation is not ("any" or "ally" or "enemy")
             || e.Radius is < 0 or > 32 || e.Scope != "area" && e.Radius != 0
             || (query || e.Operation is "money" or "industry" or "food" or "summon" or "teleport") && (e.Scope != "target" || e.Relation != "any" || e.Radius != 0)
@@ -379,13 +437,14 @@ public sealed partial class ExtensionLoader
 
     public string PatchCatalog(string json)
     {
-        if (!Enabled || Geography.Maps.Length > 0 && Bus.Skills.Count == 0 && UnitBindings.Count == 0 && CommanderBindings.Count == 0) return json;
+        if (!Enabled || Geography.Maps.Length > 0 && Bus.Skills.Count == 0 && UnitBindings.Count == 0 && CommanderBindings.Count == 0 && CommanderAbilities == null) return json;
         var catalog = JsonNode.Parse(json)!.AsObject();
         catalog["overridden_skills"] = JsonSerializer.SerializeToNode(Bus.Skills.Keys.Where(s => s.StartsWith("ew4.skill.", StringComparison.Ordinal)).ToArray());
         foreach (var definition in Bus.Skills.Values)
             if (!catalog["skills"]!.AsArray().Any(s => (string?)s!["id"] == definition.Id))
                 catalog["skills"]!.AsArray().Add(new JsonObject { ["id"] = definition.Id });
         Apply("profiles", UnitBindings, true); Apply("commanders", CommanderBindings, false);
+        CommanderAbilities?.Patch(catalog, Bus.Skills.Keys);
         return catalog.ToJsonString();
         void Apply(string collection, IReadOnlyList<ExtensionBinding> bindings, bool unit)
         {

@@ -37,7 +37,7 @@ public static class WorldSupportActions
         var faction = WorldActions.Ready(state, expectedRevision);
         rules.Validate();
         var unit = state.Units.SingleOrDefault(u => u.Id == unitId);
-        if (unit == null || unit.Owner != faction.Id) throw new RuleViolation("purchase.unit", "Unit is not controlled by the active faction");
+        if (unit == null || unit.Owner != faction.Id || WorldUnitLayers.Air(state, unit)) throw new RuleViolation("purchase.unit", "Unit is not an eligible surface unit");
         var cell = state.Cells[unit.Cell];
         if (cell.Owner != faction.Id || !cell.Terrain.Active || !rules.AllowSea && cell.Terrain.Sea)
             throw new RuleViolation("purchase.site", "Purchase requires an eligible owned site");
@@ -85,7 +85,8 @@ public static class WorldSupportActions
         if (string.IsNullOrWhiteSpace(rules.Kind) || rules.Builders.Any(string.IsNullOrWhiteSpace))
             throw new RuleViolation("installation.configuration", "Invalid installation kind or builder categories");
         var (faction, unit, cell) = Ready(state, expectedRevision, unitId, rules.Purchase);
-        if (!rules.Builders.Contains(unit.Combatant.Profile.Category) || cell.BuildingKind != null || cell.InstallationKind != null
+        if (!WorldConstruction.Builder(state, unit) || WorldUnitLayers.Air(state, unit)
+            || !rules.Builders.Contains(unit.Combatant.Profile.Category) || cell.BuildingKind != null || cell.InstallationKind != null
             || !((unit.RemainingMovement > 0 && unit.Morale.Effective != -3) || unit.Combatant.ConstructionTurns < 1))
             throw new RuleViolation("installation.unavailable", "Unit or site is unavailable for installation construction");
         return (faction, unit, cell, Price(unit, rules.Purchase));
@@ -104,6 +105,7 @@ public static class WorldSupportActions
 
     internal static bool CanBuildInstallationValidated(WorldState state, FactionState faction, UnitState unit, InstallationBuildRules rules)
     {
+        if (WorldUnitLayers.Air(state, unit) || !WorldConstruction.Builder(state, unit)) return false;
         var cell = state.Cells[unit.Cell];
         if (cell.Owner != faction.Id || !cell.Terrain.Active || !rules.Purchase.AllowSea && cell.Terrain.Sea
             || !rules.Builders.Contains(unit.Combatant.Profile.Category) || cell.BuildingKind != null || cell.InstallationKind != null
@@ -137,13 +139,13 @@ public static class WorldSupportActions
         rules.Purchase.Validate();
         if (rules.ExcludedCategories.Any(string.IsNullOrWhiteSpace)) throw new RuleViolation("transport.configuration", "Invalid transport category policy");
         var unit = state.Units.SingleOrDefault(u => u.Id == unitId);
-        if (unit == null || unit.Owner != faction.Id || unit.Transport || rules.ExcludedCategories.Contains(unit.Combatant.Profile.Category)) return false;
+        if (unit == null || unit.Owner != faction.Id || WorldUnitLayers.Air(state, unit) || unit.Transport || rules.ExcludedCategories.Contains(unit.Combatant.Profile.Category)) return false;
         return CanBuyTransportValidated(state, faction, unit, rules);
     }
 
     internal static bool CanBuyTransportValidated(WorldState state, FactionState faction, UnitState unit, TransportPurchaseRules rules)
     {
-        if (unit.Owner != faction.Id || unit.Transport || rules.ExcludedCategories.Contains(unit.Combatant.Profile.Category)) return false;
+        if (unit.Owner != faction.Id || WorldUnitLayers.Air(state, unit) || unit.Transport || rules.ExcludedCategories.Contains(unit.Combatant.Profile.Category)) return false;
         var cell = state.Cells[unit.Cell];
         if (!cell.Terrain.Active || cell.Owner != faction.Id || !rules.Purchase.AllowSea && cell.Terrain.Sea) return false;
         var price = Price(unit, rules.Purchase);

@@ -56,6 +56,7 @@ public sealed record CellState
     public bool BlocksTerritoryExpansion { get; init; }
     public int Environment { get; init; }
     public Resources? IncomeOverride { get; init; }
+    public BuildingIncomeOverride? IncomeAdjustment { get; init; }
     public string? InstallationKind { get; init; }
     public string FireTerrain { get; init; } = "open";
     public string DefenseTerrain { get; init; } = "land";
@@ -169,6 +170,8 @@ public sealed record WorldState
     public IReadOnlyDictionary<string, long> ExtensionState { get; init; } = new Dictionary<string, long>();
     public WorldLimits Limits { get; init; } = new();
     public ArmyCapacityRules? ArmyCapacity { get; init; }
+    public UnitLayerRules? UnitLayers { get; init; }
+    public ModConstructionRules? Construction { get; init; }
     public IReadOnlyList<FactionState> Factions { get; init; } = Array.Empty<FactionState>();
     public IReadOnlyList<CellState> Cells { get; init; } = Array.Empty<CellState>();
     public TerritorialJurisdictions? Jurisdictions { get; init; }
@@ -207,6 +210,11 @@ public sealed record WorldState
     {
         Limits.Validate();
         ArmyCapacity?.Validate();
+        UnitLayers?.Validate();
+        Construction?.Validate();
+        if (Construction?.Enabled == true && Cells.Any(c => c.BuildingKind != null && Construction.Buildings.TryGetValue(c.BuildingKind, out var b)
+            && (c.BuildingLevel < 1 || c.BuildingLevel > b.Levels.Count)))
+            throw new RuleViolation("construction.level", "Custom building level is outside its definition");
         if (ExtensionState.Count > 100_000 || ExtensionState.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Key.Length > 512))
             throw new RuleViolation("extension.state", "Invalid extension save state");
         Jurisdictions?.Validate(this);
@@ -309,7 +317,7 @@ public sealed record WorldState
                 ValidateSupport(unit.CommanderBase.Support);
             }
             if (!factionIds.Contains(unit.Owner) || factionIndex[unit.Owner].Defeated
-                || unit.Cell < 0 || unit.Cell >= Cells.Count || !Cells[unit.Cell].Terrain.CanTraverse() || unit.Experience < 0
+                || !WorldUnitLayers.ValidTerrain(this, unit.Combatant.Profile, unit.Cell) || unit.Experience < 0
                 || unit.ExtensionMovementLimit < 0 || unit.RemainingMovement < 0
                 || unit.RemainingMovement > (unit.ExtensionMovementLimit ?? unit.Combatant.Profile.Movement)
                 || unit.Combatant.Statuses.Any(s => s.SourceOwner != null && !factionIds.Contains(s.SourceOwner))
@@ -328,17 +336,21 @@ public sealed record WorldState
                 || commander.Rank.Experience < 0 || commander.Title.Experience < 0 || commander.RankHealthBonus < 0
                 || commander.RankExperiencePercent < 0 || commander.TitleExperiencePercent < 0 || commander.MaximumTrainingLevel < 0)
                 throw new RuleViolation("world.commander", "Invalid commander runtime state");
-        var occupants = new Dictionary<int, (int Count, string Camp)>();
+        var occupants = new Dictionary<(int Cell, string Layer), (int Count, string Camp)>();
         var factionCounts = new Dictionary<string, int>(StringComparer.Ordinal);
         bool overCapacity = false, opposingCamps = false;
         foreach (var unit in Units)
         {
             string camp = factionIndex[unit.Owner].Camp;
-            occupants.TryGetValue(unit.Cell, out var occupied);
-            opposingCamps |= occupied.Count > 0 && !StringComparer.Ordinal.Equals(occupied.Camp, camp);
-            int cellCount = occupied.Count + 1;
-            occupants[unit.Cell] = (cellCount, camp);
-            overCapacity |= cellCount > Limits.UnitsPerCell;
+            foreach (string layer in WorldUnitLayers.Occupies(this, unit.Combatant.Profile))
+            {
+                var key = (unit.Cell, layer);
+                occupants.TryGetValue(key, out var occupied);
+                opposingCamps |= occupied.Count > 0 && !StringComparer.Ordinal.Equals(occupied.Camp, camp);
+                int cellCount = occupied.Count + 1;
+                occupants[key] = (cellCount, camp);
+                overCapacity |= cellCount > WorldUnitLayers.Capacity(this, layer);
+            }
             if (Limits.UnitsPerFaction.HasValue)
             {
                 factionCounts.TryGetValue(unit.Owner, out int count);
@@ -411,6 +423,9 @@ public sealed record WorldState
     {
         if (cell.Terrain.Barrier != TerrainBarrier.None || cell.Terrain.MinimumEntryCost != 0) Geography.Validate(cell);
         cell.IncomeOverride?.Validate();
+        if (cell.IncomeAdjustment is { } income && (string.IsNullOrWhiteSpace(income.Kind)
+            || income.Money < 0 || income.Industry < 0 || income.Food < 0))
+            throw new RuleViolation("world.cell_income", "Invalid site income adjustment");
         if (cell.Environment < 0 || cell.Terrain.TerrainCost <= 0 || cell.BuildingLevel < 0 || cell.BuildingUpgradesThisTurn < 0
             || cell.InstallationKind != null && string.IsNullOrWhiteSpace(cell.InstallationKind)
             || string.IsNullOrWhiteSpace(cell.FireTerrain) || string.IsNullOrWhiteSpace(cell.DefenseTerrain))
@@ -419,6 +434,8 @@ public sealed record WorldState
     public WorldState Copy() => PlanningScope.PreserveCopy(this, this with
     {
         ArmyCapacity = ArmyCapacity?.Copy(),
+        UnitLayers = UnitLayers?.Copy(),
+        Construction = Construction?.Copy(),
         DiplomacyAdjustments = DiplomacyAdjustments?.ToArray(),
         ExtensionState = ExtensionState.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal),
         Factions = Factions.Select(f => f with

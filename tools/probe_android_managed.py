@@ -11,13 +11,14 @@ import zipfile
 parser = argparse.ArgumentParser(__doc__)
 parser.add_argument("apk", type=Path)
 parser.add_argument("--dotnet", required=True)
+parser.add_argument("--checks-directory", type=Path, help="Built desktop ModChecks directory; defaults to the project output")
 parser.add_argument("--output", type=Path, default=Path("build/android-startup-20261024/package-runtime"))
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[1]
 output = (root / args.output).resolve()
 assert root / "build" in output.parents, "Probe output must remain under repository build/"
 output.mkdir(parents=True, exist_ok=True)
-for source in (root / "rewrite/Ew4.ModChecks/bin/Release/net10.0").glob("*"):
+for source in (root / (args.checks_directory or Path("rewrite/Ew4.ModChecks/bin/Release/net10.0"))).glob("*"):
     if source.is_file():
         shutil.copy2(source, output / source.name)
 with zipfile.ZipFile(args.apk) as archive:

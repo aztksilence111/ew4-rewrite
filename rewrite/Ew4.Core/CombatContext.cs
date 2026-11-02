@@ -29,8 +29,9 @@ public static class CombatContext
 {
     public static CombatAura Auras(WorldState state, HexMap map, UnitState unit)
     {
+        if (WorldUnitLayers.Air(state, unit)) return new(0, 0);
         var allies = new HashSet<string>(state.Factions.Where(f => WorldDiplomacy.Allied(state, f.Id, unit.Owner)).Select(f => f.Id), StringComparer.Ordinal);
-        var adjacent = state.Units.Where(u => u.CommanderId != null && allies.Contains(u.Owner) && state.Cells[u.Cell].Terrain.Active
+        var adjacent = state.Units.Where(u => !WorldUnitLayers.Air(state, u) && u.CommanderId != null && allies.Contains(u.Owner) && state.Cells[u.Cell].Terrain.Active
             && map.Distance(unit.Cell, u.Cell) == 1).ToArray();
         return new(checked((int)adjacent.Sum(u => (long)u.Support.AdjacentAttack)), checked((int)adjacent.Sum(u => (long)u.Support.AdjacentDefense)));
     }
@@ -42,15 +43,16 @@ public static class CombatContext
         var owner = state.Factions.Single(f => f.Id == unit.Owner);
         float basis = unit.Combatant.Evasion;
         float withoutBuilding = unit.Combatant.EvasionIgnoringBuilding;
+        bool air = WorldUnitLayers.Air(state, unit);
         float Percent(IReadOnlyDictionary<string, int> row) => row.TryGetValue(opponentCategory, out int amount) ? amount / 100f
             : throw new RuleViolation("context.category", "Defense configuration has no entry for this attacker category");
-        if (cell.BuildingKind != null)
+        if (!air && cell.BuildingKind != null)
         {
             var building = rules.Buildings.SingleOrDefault(b => b.Kind == cell.BuildingKind && b.Level == cell.BuildingLevel);
             if (building != null) basis = building.Percent / 100f;
             else if (!rules.UseResolvedFallback) throw new RuleViolation("context.building", "Missing building defense configuration");
         }
-        else
+        else if (!air)
         {
             if (rules.TerrainDefense.TryGetValue(cell.DefenseTerrain, out var terrain)) basis = Percent(terrain);
             else if (!rules.UseResolvedFallback) throw new RuleViolation("context.terrain", "Missing terrain defense configuration");
@@ -66,7 +68,8 @@ public static class CombatContext
         var aura = Auras(state, new(state.Width, state.Height), unit);
         return unit.Combatant with
         {
-            AtSea = cell.Terrain.Sea, BuildingKind = cell.BuildingKind, Morale = unit.Morale.Effective,
+            RuleLocation = new(unit.Cell, cell.DefenseTerrain, cell.BuildingKind, cell.BuildingLevel, cell.InstallationKind),
+            AtSea = !air && cell.Terrain.Sea, BuildingKind = air ? null : cell.BuildingKind, Morale = unit.Morale.Effective,
             Evasion = Math.Min(1f, basis + bonus), EvasionIgnoringBuilding = Math.Min(1f, withoutBuilding + bonus),
             Armor = rules.VeterancyArmor.TryGetValue(unit.Veterancy, out int armor) ? armor : unit.Combatant.Armor,
             AttackBonus = checked(unit.Combatant.AttackBonus + aura.Attack), DefenseBonus = checked(unit.Combatant.DefenseBonus + aura.Defense)

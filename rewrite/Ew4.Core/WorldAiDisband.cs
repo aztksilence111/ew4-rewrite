@@ -34,12 +34,12 @@ public static partial class WorldAi
         var map = new HexMap(state.Width, state.Height);
         return army.Where(u => u.CommanderId == null && !u.Objective && !u.Acted && u.Combatant.ConstructionTurns == 0
                 && u.Combatant.Profile.Category != "fort" && !production.HoldBehaviors.Contains(u.Behavior)
-                && !u.Support.Logistics && !u.Combatant.Has(Ew4Combat.Skill(22)) && u.Support.FoodConsumption > 0
+                && !u.Support.Logistics && !u.Combatant.FoodExempt && !u.Combatant.Has(Ew4Combat.Skill(22)) && u.Support.FoodConsumption > 0
                 && costs.ContainsKey(u.Combatant.Profile.Id) && !state.Cells[u.Cell].Objective
                 && state.Cells[u.Cell].BuildingKind == null && state.Cells[u.Cell].Owner == faction.Id)
             .Select(u => (Unit: u, Distance: front.Min(cell => map.Distance(u.Cell, cell))))
             .Where(p => p.Distance >= 6).OrderByDescending(p => p.Distance)
-            .ThenBy(p => (decimal)p.Unit.Combatant.Health / p.Unit.Combatant.Profile.MaxHealth)
+            .ThenBy(p => (decimal)p.Unit.Combatant.Health / p.Unit.Combatant.MaximumHealth)
             .ThenByDescending(p => p.Unit.Support.FoodConsumption).ThenBy(p => p.Unit.Id, StringComparer.Ordinal)
             .Select(p => p.Unit).FirstOrDefault();
     }

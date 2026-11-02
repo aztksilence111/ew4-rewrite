@@ -36,15 +36,27 @@ public sealed class ExtensionScriptRuntime : IRuleScriptRuntime
         var ctx = new Table(script);
         ctx.Set("event", DynValue.NewString(context.Event)); ctx.Set("level", DynValue.NewNumber(context.Level));
         ctx.Set("round", DynValue.NewNumber(context.Round)); ctx.Set("value", DynValue.NewNumber(context.Value));
+        ctx.Set("distance", context.Distance.HasValue ? DynValue.NewNumber(context.Distance.Value) : DynValue.Nil);
         ctx.Set("targetCell", context.TargetCell.HasValue ? DynValue.NewNumber(context.TargetCell.Value) : DynValue.Nil);
         ctx.Set("stacks", DynValue.NewNumber(context.Stacks)); ctx.Set("remainingTurns", DynValue.NewNumber(context.RemainingTurns));
         Table Combatant(Combatant? unit)
         {
             var t = new Table(script);
             if (unit == null) return t;
-            t.Set("health", DynValue.NewNumber(unit.Health)); t.Set("maxHealth", DynValue.NewNumber(unit.Profile.MaxHealth));
+            t.Set("health", DynValue.NewNumber(unit.Health)); t.Set("maxHealth", DynValue.NewNumber(unit.MaximumHealth));
+            t.Set("maximumRange", DynValue.NewNumber(unit.MaximumRange));
             t.Set("category", DynValue.NewString(unit.Profile.Category)); t.Set("profile", DynValue.NewString(unit.Profile.Id));
             t.Set("atSea", DynValue.NewBoolean(unit.AtSea));
+            t.Set("morale", DynValue.NewNumber(unit.Morale));
+            t.Set("building", unit.BuildingKind == null ? DynValue.Nil : DynValue.NewString(unit.BuildingKind));
+            if (unit.RuleLocation is { } site)
+            {
+                t.Set("cell", DynValue.NewNumber(site.Cell));
+                t.Set("terrain", DynValue.NewString(site.Terrain));
+                t.Set("building", site.Building == null ? DynValue.Nil : DynValue.NewString(site.Building));
+                t.Set("buildingLevel", DynValue.NewNumber(site.BuildingLevel));
+                t.Set("installation", site.Installation == null ? DynValue.Nil : DynValue.NewString(site.Installation));
+            }
             var statuses = new Table(script);
             foreach (var status in unit.Statuses)
             {

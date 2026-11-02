@@ -107,6 +107,11 @@ input,select,textarea{font-family:inherit;font-synthesis:none}
 .ability-stars img{width:13.5px;height:12.5px;flex:none}
 .commander-ability .ability-stars-count{top:4px;height:19px;align-items:center}
 .ability-stars-count>.original-text{flex:none;max-width:106px}
+.commander-detail .commander-abilities.has-custom-abilities{grid-template-rows:none;grid-auto-rows:42px;overflow-y:auto;overflow-x:hidden;grid-template-columns:repeat(2,minmax(0,1fr));touch-action:pan-y;scrollbar-width:thin}
+.has-custom-abilities .commander-ability{height:42px;width:100%;min-width:0}
+.has-custom-abilities .commander-ability>img{top:10px;object-fit:contain}
+.has-custom-abilities .ability-name{position:absolute;left:44px;top:1px;max-width:calc(100% - 48px);height:16px}
+.has-custom-abilities .ability-stars,.has-custom-abilities .ability-stars-count{top:21px;left:44px;max-width:calc(100% - 48px)}
 .commander-ranks{position:absolute;left:2px;top:103px;width:78px;height:85px;border:1px solid #888}
 .commander-ranks>div{position:relative;height:42px;border-bottom:1px solid #aaa}
 .rank-gauge{position:relative;display:inline-block;flex:none;width:28.5px;height:28.5px;vertical-align:middle}
@@ -321,6 +326,10 @@ body:has(#play:not([hidden])>#pause:not([hidden])) :is(#pause,#settings,#detail-
 #actions{max-width:94vw;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
 #actions .active-skill-button{flex:none;display:grid;place-items:center;background:url("content/ui/image_recruit_hd/button_info.png") center/100% 100% no-repeat}
 #actions .active-skill-button>img{width:23px;height:23px;object-fit:contain}
+.layer-targets{display:flex;flex-direction:column;gap:4px;padding:6px;overflow-y:auto}
+.layer-targets>button{flex:none;min-height:36px;padding:4px 8px;white-space:normal;overflow-wrap:anywhere}
+.defense-cards.has-buildings{overflow-x:auto;overflow-y:hidden;max-width:100%;box-sizing:border-box;height:76px;touch-action:pan-x}
+.defense-cards.has-buildings canvas{display:block}
 .skill-action-description{position:absolute;inset:7px 8px 25px;display:flex;flex-direction:column;gap:7px;overflow:auto}
 .skill-action-cost{display:flex;justify-content:center;gap:14px}
 .skill-action-cost>span{display:flex;align-items:center;gap:3px}

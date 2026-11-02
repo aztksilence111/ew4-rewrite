@@ -34,6 +34,7 @@ public sealed class WorldMapDefinition
                 || string.IsNullOrWhiteSpace(cell.DefenseTerrain) || string.IsNullOrWhiteSpace(cell.FireTerrain))
                 throw new RuleViolation("map.cell_definition", "Base maps need valid geography without faction or scenario runtime state");
             cell.IncomeOverride?.Validate();
+            if (cell.IncomeAdjustment != null) throw new RuleViolation("map.cell_definition", "Site income adjustments belong to scenario events");
         }
         var layers = images ?? Array.Empty<MapImageLayer>();
         bool Finite(double value) => !double.IsNaN(value) && !double.IsInfinity(value);

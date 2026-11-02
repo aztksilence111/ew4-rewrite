@@ -1,0 +1,5 @@
+[
+  {"target": "ew4.commander.1", "mode": "append", "skills": [
+    {"id": "demo.teach.air", "instanceId": "commander.air.teaching"}
+  ]}
+]

@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "apiVersion": 3,
+  "commanderAbilities": "rewrite/commander-abilities.json",
+  "skills": ["rewrite/teaching.json"],
+  "commanderBindings": "rewrite/commander-bindings.json"
+}

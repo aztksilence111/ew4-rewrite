@@ -16,7 +16,7 @@ public static class WorldDisband
     public static Resources Refund(UnitState unit, Resources recruitmentCost)
     {
         recruitmentCost.Validate();
-        int maximum = unit.Combatant.Profile.MaxHealth, health = unit.Combatant.Health;
+        int maximum = unit.Combatant.MaximumHealth, health = unit.Combatant.Health;
         if (maximum <= 0 || health <= 0 || health > maximum) throw new RuleViolation("disband.health", "Invalid remaining health");
         long Portion(long value) => checked((long)decimal.Floor((decimal)value * health / maximum / 2));
         return new(Portion(recruitmentCost.Money), Portion(recruitmentCost.Industry), Portion(recruitmentCost.Food));

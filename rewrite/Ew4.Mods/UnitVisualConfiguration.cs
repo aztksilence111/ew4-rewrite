@@ -67,7 +67,25 @@ internal static class UnitVisualConfiguration
                 if (action["speed"] != null && (!double.TryParse(action["speed"]!.ToString(), CultureInfo.InvariantCulture, out double speed) || !double.IsFinite(speed) || speed <= 0))
                     throw new InvalidDataException("Invalid unit visual speed: " + key);
             }
+            if (definition["attackVisuals"] is JsonObject attacks)
+                foreach (var (layer, target) in attacks)
+                    if (layer is not ("air" or "surface") || target == null || !bank.ContainsKey(target.GetValue<string>()))
+                        throw new InvalidDataException("Invalid target layer attack visual: " + key);
         }
+        if (config["composites"] is JsonObject composites)
+            foreach (var (id, value) in composites)
+            {
+                if (!manifest["profiles"]!.AsObject().ContainsKey(id) || value is not JsonArray parts || parts.Count is < 1 or > 8)
+                    throw new InvalidDataException("Invalid composite visual profile: " + id);
+                foreach (var part in parts)
+                {
+                    if (part is not JsonObject p || p["visual"] == null || !bank.ContainsKey(p["visual"]!.GetValue<string>())
+                        || (string?)p["layer"] is not ("air" or "surface")) throw new InvalidDataException("Invalid composite visual part: " + id);
+                    foreach (string field in new[] { "x", "y" })
+                        if (p[field] != null && (!double.TryParse(p[field]!.ToString(), CultureInfo.InvariantCulture, out double n) || !double.IsFinite(n) || Math.Abs(n) > 10000))
+                            throw new InvalidDataException("Invalid composite part offset: " + id);
+                }
+            }
         void Bindings(JsonObject bindings)
         {
             foreach (var (_, value) in bindings)

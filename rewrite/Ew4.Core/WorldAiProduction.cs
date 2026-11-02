@@ -64,6 +64,7 @@ public sealed record AiDisbandCommand(long ExpectedRevision, string UnitId) : Wo
 public sealed record AiRecruitCommand(long ExpectedRevision, int Cell, string OfferId, string NewUnitId,
     bool Fortress = false, string? RelocateUnitId = null, int? Relocation = null) : WorldProductionCommand(ExpectedRevision);
 public sealed record AiInstallationCommand(long ExpectedRevision, string UnitId, string RecipeId) : WorldProductionCommand(ExpectedRevision);
+public sealed record AiBuildingCommand(long ExpectedRevision, string UnitId, string Kind) : WorldProductionCommand(ExpectedRevision);
 public sealed record AiUpgradeCommand(long ExpectedRevision, int Cell) : WorldProductionCommand(ExpectedRevision);
 public sealed record AiTransportCommand(long ExpectedRevision, string UnitId) : WorldProductionCommand(ExpectedRevision);
 public sealed record AiProductionPlan(long ExpectedRevision, ulong InitialRandomState, ulong FinalRandomState,
@@ -89,6 +90,16 @@ public static partial class WorldAi
         ai.Validate(); production.Validate(); turns.Validate();
         if (EmergencyDisbandCandidate(state, ai, production) is { } disband)
             return new(state.Revision, state.AiRandomState, state.AiRandomState, "disband", new AiDisbandCommand(state.Revision, disband.Id));
+        if (state.Construction?.Enabled == true)
+            foreach (var building in state.Construction.Buildings.OrderBy(p => p.Key, StringComparer.Ordinal))
+            {
+                if (state.Cells.Any(c => c.Owner == faction.Id && c.BuildingKind == building.Key)
+                    || !building.Value.Recruitment.Any(r => faction.Recruitment.ContainsKey(r.Id))) continue;
+                var builder = state.Units.Where(u => u.Owner == faction.Id && state.Cells[u.Cell].Environment == 0)
+                    .OrderBy(u => u.Cell).ThenBy(u => u.Id, StringComparer.Ordinal).FirstOrDefault(u => WorldConstruction.CanBuild(state, u.Id, building.Key));
+                if (builder != null) return new(state.Revision, state.AiRandomState, state.AiRandomState, "building",
+                    new AiBuildingCommand(state.Revision, builder.Id, building.Key));
+            }
         var random = new AiRandom(state.AiRandomState);
         var map = new HexMap(state.Width, state.Height);
         var owned = Enumerable.Range(0, state.Cells.Count).Where(i => state.Cells[i].Owner == faction.Id && state.Cells[i].Terrain.Active).ToArray();
@@ -131,7 +142,8 @@ public static partial class WorldAi
             // Reserve the next owner turn's upkeep after paying the offer and applying the income cap.
             decimal food = (decimal)faction.Resources.Food - offer.Cost.Food + income.Food;
             if (turns.ResourceCap.HasValue) food = Math.Min(food, turns.ResourceCap.Value);
-            long added = offer.Support.Logistics || offer.Template!.Has(Ew4Combat.Skill(22)) ? 0 : offer.Support.FoodConsumption;
+            long added = offer.Support.Logistics || offer.Template!.Has(Ew4Combat.Skill(22))
+                || turns.Extensions?.RefreshAttributes(offer.Template).FoodExempt == true ? 0 : offer.Support.FoodConsumption;
             return food >= (decimal)upkeep + added;
         }
         bool EligibleOffer(RecruitmentOffer offer) => !(armySize >= armyLimit) && !faction.TurnUses.ContainsKey(EmergencyDisbandUse)
@@ -181,7 +193,7 @@ public static partial class WorldAi
                     WorldState projected = state;
                     string? relocating = null;
                     int? destination = null;
-                    if (At(cell).Length >= state.Limits.UnitsPerCell)
+                    if (!WorldUnitLayers.Enabled(state) && At(cell).Length >= state.Limits.UnitsPerCell)
                     {
                         foreach (var unit in At(cell).Where(u => u.Owner == faction.Id && u.RemainingMovement > 0 && u.Morale.Effective != -3
                             && !production.HoldBehaviors.Contains(u.Behavior)))
@@ -310,12 +322,15 @@ public static partial class WorldAi
                     throw new RuleViolation("ai.production_relocation", "Recruitment relocation must identify unit and destination");
                 if (recruit.RelocateUnitId != null && state.Units.SingleOrDefault(u => u.Id == recruit.RelocateUnitId)?.Cell != recruit.Cell)
                     throw new RuleViolation("ai.production_relocation", "Relocation unit is not on the recruitment site");
-                change = recruit.RelocateUnitId == null ? WorldActions.Recruit(state, state.Revision, recruit.Cell, recruit.NewUnitId, offer)
+                change = recruit.RelocateUnitId == null ? WorldActions.Recruit(state, state.Revision, recruit.Cell, recruit.NewUnitId, offer, ai.Movement.Extensions)
                     : WorldActions.RelocateAndRecruit(state, state.Revision, recruit.RelocateUnitId, recruit.Relocation!.Value, recruit.NewUnitId, offer, ai.Movement);
                 break;
             case AiInstallationCommand installation:
                 if (!production.Installations.TryGetValue(installation.RecipeId, out var build)) throw new RuleViolation("ai.production_offer", "Unknown installation recipe");
                 change = WorldSupportActions.BuildInstallation(state, state.Revision, installation.UnitId, build);
+                break;
+            case AiBuildingCommand building:
+                change = WorldConstruction.Build(state, state.Revision, building.UnitId, building.Kind);
                 break;
             case AiUpgradeCommand upgrade:
                 change = WorldImprovements.UpgradeBuilding(state, state.Revision, upgrade.Cell,

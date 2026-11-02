@@ -30,6 +30,7 @@ public sealed record ExtensionEffect
     public string? Profile { get; init; }
     public string? Status { get; init; }
     public int Duration { get; init; }
+    public ExtensionEffectCondition? When { get; init; }
 }
 public sealed record ExtensionSkill
 {
@@ -45,10 +46,11 @@ public sealed record ExtensionSkill
     public Resources Cost { get; init; } = new(0, 0, 0);
     public IReadOnlyList<ExtensionEffect> Effects { get; init; } = Array.Empty<ExtensionEffect>();
 }
+public sealed record RuleUnitLocation(int Cell, string Terrain, string? Building, int BuildingLevel, string? Installation);
 public sealed record RuleScriptContext(string Event, Combatant? Source, Combatant? Target, int Level,
     int Round, double Value, IReadOnlyDictionary<string, long> State, WorldState? World = null, string? PlayerCamp = null,
     string? SourceId = null, string? TargetId = null, int? TargetCell = null, int Stacks = 1, int RemainingTurns = 0,
-    string? SkillId = null, string? InstanceId = null, string? ItemId = null);
+    string? SkillId = null, string? InstanceId = null, string? ItemId = null, int? Distance = null);
 public sealed record RuleScriptResult(double Value, IReadOnlyDictionary<string, long>? State = null);
 public interface IRuleScriptRuntime
 {
@@ -78,17 +80,18 @@ public sealed partial class RuleEventBus
         return end > 5 ? "ew4.item." + slot.InstanceId.Substring(5, end - 5) : null;
     }
 
-    public double Modify(string ev, string operation, double value, Combatant source, Combatant target, Ew4Random random)
+    public double Modify(string ev, string operation, double value, Combatant source, Combatant target, Ew4Random random, int? distance = null)
     {
         foreach (var (skill, slot) in Bound(source).Where(p => p.Skill.Kind == "passive"))
             foreach (var effect in skill.Effects.Where(e => e.Event == ev && e.Operation == operation
-                && (e.TargetTag == null || target.Profile.Traits.Contains(e.TargetTag))))
+                && (e.TargetTag == null || target.Profile.Traits.Contains(e.TargetTag))
+                && (e.When == null || e.When.Matches(source, target, distance))))
             {
                 var status = source.Statuses.SingleOrDefault(s => "status." + s.Id == slot.InstanceId);
                 double amount = effect.Script == null ? StackedValue(effect, status) : Scripts!.Run(effect.Script, effect.Function!,
                     new(ev, source, target, slot.Level, 0, value, new Dictionary<string, long>(),
                         Stacks: status?.Stacks ?? 1, RemainingTurns: status?.RemainingTurns ?? 0,
-                        SkillId: skill.Id, InstanceId: slot.InstanceId, ItemId: ItemId(slot)), random).Value;
+                        SkillId: skill.Id, InstanceId: slot.InstanceId, ItemId: ItemId(slot), Distance: distance), random).Value;
                 value = operation.EndsWith("multiplier", StringComparison.Ordinal) ? value * amount
                     : operation == "counterattack" ? Math.Min(value, amount) : value + amount;
                 if (double.IsNaN(value) || double.IsInfinity(value) || value < 0 || value > int.MaxValue)
@@ -97,7 +100,7 @@ public sealed partial class RuleEventBus
         return value;
     }
 
-    internal WorldState DispatchFactionTurn(WorldState world, string faction, string ev)
+    public WorldState DispatchFactionTurn(WorldState world, string faction, string ev)
     {
         var ids = world.Units.Where(u => u.Owner == faction).Select(u => u.Id).ToArray();
         var units = world.Units.ToDictionary(u => u.Id, StringComparer.Ordinal);
@@ -129,11 +132,17 @@ public sealed partial class RuleEventBus
                 var status = source.Combatant.Statuses.SingleOrDefault(s => "status." + s.Id == slot.InstanceId);
                 foreach (var affected in EffectTargets(world, source, target, targetCell, effect))
                 {
+                    var currentSource = world.Units.SingleOrDefault(u => u.Id == source.Id) ?? source;
+                    RuleUnitLocation Location(int cell) => new(cell, world.Cells[cell].DefenseTerrain,
+                        world.Cells[cell].BuildingKind, world.Cells[cell].BuildingLevel, world.Cells[cell].InstallationKind);
+                    Combatant Located(UnitState unit) => unit.Combatant with { RuleLocation = Location(unit.Cell) };
+                    if (effect.When != null && !effect.When.Matches(Located(currentSource), affected == null ? null : Located(affected),
+                        new HexMap(world.Width, world.Height).Distance(currentSource.Cell, affected?.Cell ?? targetCell ?? target.Cell),
+                        affected == null ? Location(targetCell ?? target.Cell) : null)) continue;
                     var counters = world.ExtensionState.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal);
                     string prefix = unitId + "/" + slot.InstanceId + "/";
                     var local = counters.Where(p => p.Key.StartsWith(prefix, StringComparison.Ordinal))
                         .ToDictionary(p => p.Key[prefix.Length..], p => p.Value, StringComparer.Ordinal);
-                    var currentSource = world.Units.SingleOrDefault(u => u.Id == source.Id) ?? source;
                     var result = effect.Script == null ? new RuleScriptResult(StackedValue(effect, status)) : Scripts!.Run(effect.Script, effect.Function!,
                         new(ev, currentSource.Combatant, affected?.Combatant, slot.Level, world.Round, effect.Value, local, world,
                             SourceId: source.Id, TargetId: affected?.Id, TargetCell: targetCell ?? target.Cell,
@@ -145,10 +154,12 @@ public sealed partial class RuleEventBus
                             throw new RuleViolation("extension.state", "Invalid script state key");
                         counters[prefix + pair.Key] = pair.Value;
                     }
-                    if (double.IsNaN(result.Value) || double.IsInfinity(result.Value) || result.Value < (effect.Operation == "movement" ? int.MinValue : 0) || result.Value > int.MaxValue)
+                    if (double.IsNaN(result.Value) || double.IsInfinity(result.Value) || result.Value < (effect.Operation is "movement" or "morale" ? int.MinValue : 0) || result.Value > int.MaxValue)
                         throw new RuleViolation("extension.value", "Invalid event result: " + skill.Id);
                     if (effect.Operation == "summon" && result.Value != 1)
                         throw new RuleViolation("skill.summon", "A summon effect must return exactly one unit");
+                    if (effect.Operation == "morale" && (result.Value != Math.Truncate(result.Value) || result.Value is < -3 or > 1))
+                        throw new RuleViolation("skill.morale", "Morale must be an integer between -3 and 1");
                     int amount = checked((int)result.Value);
                     world = world with { ExtensionState = counters, RandomState = random.State };
                     world = ApplyEffect(world, currentSource, affected, targetCell ?? target.Cell, effect, amount, slot.Level,

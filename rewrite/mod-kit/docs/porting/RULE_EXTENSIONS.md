@@ -1,4 +1,6 @@
-# 技能、特性与胜负规则扩展（API 1/2）
+# 技能、特性与胜负规则扩展（API 1/2/3）
+
+2026-11-02 API 3 增补：被动回合事件可施加/移除状态，支持友军光环；增加最大生命、最大射程、免粮、忽略普通地形消耗及士气操作，兵种/距离/地形/建筑条件可直接写 JSON `when`，复杂逻辑可选 Lua。见下文及[最小示例](../../examples/passive-auras/README.md)。须使用包含此次实现的新客户端；旧版即使支持其他 API 3 功能，也可能拒绝新操作。
 
 2026-10-22 增补：[局外配置与战役说明](METAGAME_AND_BRIEFING.md)，API 2 的 `metagame` 支持初始资源、商品位/库存及刷新恢复条件；`stageIntroPresentation` 支持任务窗口布局和目标文字，实际目标沿用胜负规则。
 
@@ -16,9 +18,63 @@ API 2 的 `formationCounts` 引用编制数量 JSON（`schema:1`、`profiles` �
 
 2026-10-21 增补：[剧本条件、直接结果与多按钮弹窗](SCENARIO_EVENTS.md)，入口 `scenarioEvents`；包括资源、城市、死亡、回合、阵营、组合条件及 Lua。
 
-本指南对应 `rewrite/extension.json` 的 `schema:1 / apiVersion:1或2`。API 1继续兼容；使用下文通用技能新字段时须声明API 2，旧发行版会拒绝该版本。电脑与 Android 共用 C# 加载器和 MoonSharp Lua 解释器；制作好离线包后两端都能导入，不需要服务器。原 APK 的 SO、DEX、DLL 不能作为此接口的脚本执行，需要将行为移植到下列事件和操作。
+本指南对应 `rewrite/extension.json` 的 `schema:1 / apiVersion:1、2或3`。API 1继续兼容；API 2、API 3 新字段分别须声明相应版本。电脑与 Android 共用 C# 加载器和 MoonSharp Lua 解释器；制作好离线包后两端都能导入，不需要服务器。原 APK 的 SO、DEX、DLL 不能作为此接口的脚本执行，需要将行为移植到下列事件和操作。
 
 注意路径：下文 `rewrite/definitions/skills.json` 是 **Mod 包内部路径**。源码同名的顶层 `rewrite/` 则是项目目录，两者不是同一层。不要把扩展放进 `client/` 或工具的 `data/`。
+
+## API 3 被动光环、属性与条件
+
+`turn.start/turn.end/scenario.start/unit.recruited/unit.move_end/unit.captured/combat.after/unit.damaged/unit.destroyed` 可使用 `apply_status/remove_status`，scope/radius/relation 沿用范围效果规则。状态定义自身不能递归施加/移除状态。API 3 新开局已完成本方回合初始化时，也会执行首个 turn.start；读档不重放事件。
+
+例如给周围 1 格友方步兵施加支援状态，不需要 Lua 或额外兵种标签：
+
+```json
+{"event":"turn.start","operation":"apply_status","status":"my.support",
+ "duration":2,"value":1,"scope":"area","radius":1,"relation":"ally",
+ "when":{"targetCategories":["infantry"]}}
+```
+
+光环按触发时位置取样，默认包含自身，加入 `when.minDistance:1` 则排除来源同格。盟友按外交关系判断；duration 按受益方回合结束递减，1 会在当前回合结束到期，2 可覆盖之后的敌方行动。不同来源同 ID 状态遵守 stacking，默认 refresh 不重复叠加。移动后实时跟随的持续光环需另行定义移动事件与清理策略。
+
+| event | operation | 语义 |
+| --- | --- | --- |
+| unit.attributes | max_health_add | 整数增减有效最大生命；最终至少 1 |
+| unit.attributes | range_add | 整数增减普通攻击/反击最大射程；最终不得小于兵种最小射程 |
+| unit.attributes | food_exempt | value:1 免本单位回合粮耗，并沿用后勤的缺粮士气豁免；0 不提供此效果 |
+| unit.attributes | ignore_terrain | value:1 按基础陆地代价移动；保留禁行、山口最低代价、渡河/上下船及海陆限制 |
+| 上述普通事件或 skill.activate | morale | 整数 -3～1，设定士气基线，沿用原三回合持续/领导力/局部惩罚/缺粮结算；支持范围；设定值不乘状态层数 |
+
+属性效果放在被动技能或状态中，固定整数，无 Lua；多层状态的加值乘层数，布尔效果任意一项为 1 即生效。兵种、将领、装备及状态组合后计算；更换将领、状态刷新/移除/到期、招募/召唤/事件生成与存读档共用有效值。基础兵种表不被改写。生命上限变化保留缺失生命量，下降最低保留 1 HP；重复刷新不会加血。最大生命和最大射程同步给战斗、AI及客户端状态。原无扩展属性存档仍可读。
+
+每条效果可加可选 `when`，各字段之间为 AND；数组内为 OR，省略/空数组不限制。未匹配时跳过该效果，不运行脚本或修改脚本计数。
+
+| when 字段 | 值 |
+| --- | --- |
+| sourceCategories / targetCategories | 兵种 category 数组，如 infantry/cavalry/artillery/naval/fort 或自定义类别 |
+| sourceTerrains / targetTerrains | 实际 DefenseTerrain 数组，原版为 land/sea/plant/forest/desert/hill/mountain |
+| sourceBuildings / targetBuildings | 实际 BuildingKind 数组，如 city/farmland 或 Mod 自定义建筑 |
+| sourceInBuilding / targetInBuilding | true 要求有建筑；false 要求无建筑，工事与建筑区分 |
+| minDistance / maxDistance | 非负整数，包含边界；实际六角格距离 |
+
+普通事件的 source 是技能来源，target 是每个实际受影响单位；cell 技能的位置条件指向落点。伤害修正的 source 是伤害发起方，target 是被攻击方；incoming 修正的 source 则为承伤方，target 为伤害发起方，反击同样按实际双方判定。纯 unit.attributes/movement.modify 查询只允许稳定的兵种条件，位置条件会在导入时拒绝。
+
+例如对骑兵增伤 25%：
+
+```json
+{"event":"combat.modify_damage","operation":"damage_multiplier","value":1.25,
+ "when":{"targetCategories":["cavalry"]}}
+```
+
+例如平原上的部队在距离 2 攻击城市驻军时增伤 25%：
+
+```json
+{"event":"combat.modify_damage","operation":"damage_multiplier","value":1.25,
+ "when":{"sourceTerrains":["land"],"targetBuildings":["city"],"minDistance":2,"maxDistance":2}}
+```
+
+复杂条件仍可选用 Lua。战斗回调新增 `ctx.distance`，source/target 的 `terrain/building/buildingLevel/installation/cell`、`morale/maximumRange/maxHealth`；来自实际战斗位置，反击双方自动互换。直接调用无地图的纯战斗时没有位置数据，distance 仍可用。战斗查询仍无可写世界，round=0，返回 state 不保存。
+
+完整演示见[被动光环示例](../../examples/passive-auras/README.md)。源码专项：`dotnet run --project rewrite/Ew4.Verify -- <仓库根> --passive-interfaces-only`。
 
 ## 1. 最小入口与目录
 
@@ -275,7 +331,7 @@ cell/unit/faction仅在带world的普通事件及胜利检查可用，伤害取�
 
 再次施加时更新来源和技能等级；移除状态会清除该状态脚本计数，到期同样清除。相同ID不按施法者分成多个独立状态。状态在受影响单位的turn.end效果执行后减1，到0移除；当前己方回合施加的duration=1状态在本回合结束就到期。
 
-状态效果只允许战斗修正、反击资格、攻击取样次数、移动上限、turn.start和turn.end；不能在状态内施加新状态、召唤或传送。状态随战局保存，切换/更换将领不清除单位状态；不写入局外将领培养数据。部队信息列表中的状态名称后显示“层数/剩余回合”。
+状态效果只允许战斗修正、反击资格、攻击取样次数、移动上限、API 3 unit.attributes、turn.start和turn.end；不能在状态内施加/移除状态、召唤或传送。状态随战局保存，切换/更换将领不清除单位状态；不写入局外将领培养数据。部队信息列表中的状态名称后显示“层数/剩余回合”。
 
 没有Lua时，固定加值/治疗/伤害按层数相乘，倍率按 `value^层数` 计算。有Lua时返回值直接使用，脚本自行按ctx.stacks计算，不再自动乘层数。状态脚本中的ctx.source是持有状态的单位，ctx.target是本次实际目标；伤害结算保留最近施加者的国家来源。
 

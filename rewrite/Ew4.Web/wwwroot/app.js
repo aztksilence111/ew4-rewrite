@@ -395,7 +395,7 @@ function battleLibraries(next,center){
   const involved=new Set([next.combat?.attacker,next.combat?.defender,next.combat?.splashTarget,selected?.id,...(next.recruited||[]),
     ...(next.movements||[]).map(m=>m.unit),...(next.combat?.movements||[]).map(m=>m.unit)]);
   const nearby=unit=>{const p=Ew4Battlefield.point(unit.cell,next.width);return involved.has(unit.id)||Math.abs(p.x-camera.x)<=width/camera.zoom/2+512&&Math.abs(p.y-camera.y)<=height/camera.zoom/2+512;};
-  return [...new Set([...next.units,...(state?.units||[])].filter(nearby).map(u=>visualProfile(u,next)?.library).filter(Boolean))];
+  return [...new Set([...next.units,...(state?.units||[])].filter(nearby).flatMap(u=>{const p=visualProfile(u,next);return p?(effects?.profileLibraries(p)||[p.library]):[];}).filter(Boolean))];
 }
 async function installState(next, center = false) {
   if(center)storyPlayer.reset();
@@ -460,6 +460,7 @@ async function installState(next, center = false) {
       queueBattleDialogue(speaker,choices[Math.floor(Math.random()*choices.length)]);
     }
   }
+  battlefield.observeMorale(previous,next,{animate:!center&&!skipAi,speed:settings.speed});
   state = next; selected = undefined; selection = undefined; selectionRequest++; $('selection').hidden = true;
   if(!center)diplomacyUi.showCapitalNotices(next);
   turnUi.observe(next,center);
@@ -483,15 +484,12 @@ async function installState(next, center = false) {
   }
   refreshHud();
   motions.clear(); arrivals.clear();
-  const now=performance.now(), stepMs=movementStepMs();
+  const now=performance.now(), stepMs=movementStepMs(), recruitSpeed=Ew4Battlefield.recruitSpeed(settings.speed,aiRunning);
   if (!center && !fastSkipping()) {
     const moves=skipAi&&next.combat?.movements?.length?next.combat.movements:next.movements||[];
     if(!next.combat||skipAi)for(const move of moves)if(!move.instant&&move.path.length>1){combatMotions.delete(move.unit);motions.set(move.unit,{path:move.path,started:now,stepMs});const a=point(move.path.at(-2)),b=point(move.path.at(-1));facings.set(move.unit,b.x<a.x?-1:1);if(!skipAi)playMovementSound(move);}
-    if(!skipAi)for(const id of next.recruited || []){const unit=state.units.find(u=>u.id===id);if(!unit||unit.category==='fort'||!next.notices?.some(n=>n.kind==='unit.recruited'&&n.subject===id))continue;arrivals.set(id,now);const p=point(unit.cell);effects?.sound('sfx_draft.wav');effects?.effect('effect_recruit.xml',p.x,p.y,{speed:Math.sqrt(settings.speed)});}
-    const duration=Math.max(...[...motions.values()].map(m=>(m.path.length-1)*stepMs),...([...arrivals.keys()].map(id=>{
-      const unit=state.units.find(u=>u.id===id),p=visualProfile(unit),lib=libraries.get(p?.library),item=lib?.byName.get(p?.motions.ready);
-      return Math.max(Ew4Battlefield.recruitDuration(Math.sqrt(settings.speed)),(item?.duration||1)/(lib?.fps||24)*1000);
-    })),0);
+    if(!skipAi)for(const id of next.recruited || []){const unit=state.units.find(u=>u.id===id);if(!unit||unit.category==='fort'||!next.notices?.some(n=>n.kind==='unit.recruited'&&n.subject===id))continue;arrivals.set(id,now);const p=point(unit.cell);effects?.sound('sfx_draft.wav');effects?.effect('effect_recruit.xml',p.x,p.y,{speed:recruitSpeed});}
+    const duration=Math.max(...[...motions.values()].map(m=>(m.path.length-1)*stepMs),arrivals.size?Ew4Battlefield.recruitDuration(recruitSpeed):0);
     updateAiCamera(now);
     if(duration)await presentationDelay(duration);
     if(!next.combat&&!skipAi)playOccupationSound(next,moves);
@@ -580,15 +578,17 @@ async function playMovements(moves){
 async function playCombat(combat,destroyed=new Set()){
   selection=undefined;$('selection').hidden=true;requestRender();
   // The backend has already resolved both hits. Animation timing cannot change the outcome.
-  const pairs=[[combat.attacker,combat.defender,combat.damage,combat.critical]];
-  if(combat.counterattack)pairs.push([combat.defender,combat.attacker,combat.counterDamage,combat.counterCritical]);
+  const pairs=[[combat.attacker,combat.defender,combat.damage,combat.critical,combat.attackLayer]];
+  if(combat.counterattack)pairs.push([combat.defender,combat.attacker,combat.counterDamage,combat.counterCritical,combat.counterLayer]);
   if(aiRunning&&skipAi)return;
   const speed=Math.sqrt(settings.speed),plans=[];
-  for(const [id,targetId,damage,critical] of pairs){
+  for(const [id,targetId,damage,critical,layer] of pairs){
     const unit=state.units.find(u=>u.id===id),target=state.units.find(u=>u.id===targetId);
     if(!unit||!target)continue;
-    const profile=visualProfile(unit),lib=libraries.get(profile?.library);if(!lib)continue;
-    const facing=point(target.cell).x<point(unit.cell).x?-1:1;
+    const base=visualProfile(unit),parts=effects.parts(base,state.cells[unit.cell].sea);
+    const part=parts.find(p=>p.partLayer===layer)||parts.find(p=>p.partLayer==null);if(!part)continue;
+    const profile=effects.attackProfile(part,layer),lib=libraries.get(profile?.library);if(!lib)continue;
+    const facing=unitPoint(target).x<unitPoint(unit).x?-1:1;
     const plan=effects.attackPlan(profile,lib,unit.category,facing,speed);if(!plan.duration)continue;
     plans.push({id,targetId,damage,critical,unit,target,profile,facing,...plan});
   }
@@ -601,15 +601,15 @@ async function playCombat(combat,destroyed=new Set()){
   await Promise.all(plans.map(async plan=>{
     const {id,targetId,damage,critical,unit,target,profile,facing,timeline,segments,delay}=plan;
     facings.set(id,facing);
-    const p=point(unit.cell),q=point(target.cell);
+    const origin=unitPoint(unit),p={x:origin.x+(profile.partX||0),y:origin.y+(profile.partY||0)},q=unitPoint(target);
     effects?.timeline(timeline,p.x+facing*profile.x,p.y+profile.y,{speed,scale:profile.scale,started:started+delay});
-    combatMotions.set(id,{started,delay,speed,segments});
+    combatMotions.set(id,{started,delay,speed,segments,profile,part:profile.part});
     await presentationDelay(Math.max(0,started+impactAt-performance.now()));
     if(!(aiRunning&&skipAi)){
       damageNumbers?.add(damage,critical,q.x,q.y,speed);
       if(destroyed.has(targetId))beginDeath(targetId);
       playImpact(profile,target,damage,facing,speed);
-      if(id===combat.attacker&&combat.splashTarget){const splash=state.units.find(u=>u.id===combat.splashTarget);if(splash){const hit=point(splash.cell);damageNumbers?.add(combat.splashDamage,false,hit.x,hit.y,speed);playImpact(profile,splash,combat.splashDamage,facing,speed);if(destroyed.has(splash.id))beginDeath(splash.id);}}
+      if(id===combat.attacker&&combat.splashTarget){const splash=state.units.find(u=>u.id===combat.splashTarget);if(splash){const hit=unitPoint(splash);damageNumbers?.add(combat.splashDamage,false,hit.x,hit.y,speed);playImpact(profile,splash,combat.splashDamage,facing,speed);if(destroyed.has(splash.id))beginDeath(splash.id);}}
     }
     // Commit the resolved hit now; reload/finish clips retire in the renderer
     // while the player can command the next unit.
@@ -617,8 +617,8 @@ async function playCombat(combat,destroyed=new Set()){
 }
 function playImpact(profile,target,damage,facing,speed){
   if(damage<=0)return;
-  const p=point(target.cell),rocket=profile.kind==='Rocket';
-  effects?.timeline(rocket?'rocketstrike':Ew4Effects.impact(profile.stats.weapon,target.category,damage,state.cells[target.cell].sea,facing),p.x+(rocket?30*facing:0),p.y,{speed});
+  const p=unitPoint(target),rocket=profile.kind==='Rocket';
+  effects?.timeline(rocket?'rocketstrike':Ew4Effects.impact(profile.stats.weapon,target.category,damage,state.cells[target.cell].sea&&!(state.unitLayers&&target.layer==='air'),facing),p.x+(rocket?30*facing:0),p.y,{speed});
 }
 async function start(scenario, country, localPlayers) {
   if(busy)return;
@@ -715,6 +715,21 @@ function refreshResources() {
   for (const {key,label,row,value} of resourceHud) {
     if(updateHudText(value,player.resources[key],'font_char_2_hd','#ffffff'))row.setAttribute('aria-label',label+' '+player.resources[key]);
   }
+  const food=resourceHud.find(r=>r.key==='food').row,enabled=!!state.foodEconomy;
+  food.classList.toggle('food-economy-enabled',enabled);
+  food.onclick=enabled?openFoodEconomy:null;
+  if(enabled){food.setAttribute('role','button');food.tabIndex=0;food.title='粮食收支';food.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openFoodEconomy();}};}
+  else{food.removeAttribute('role');food.removeAttribute('tabindex');food.removeAttribute('title');food.onkeydown=null;}
+}
+function openFoodEconomy(){
+  const info=state?.foodEconomy;if(!info||busy)return;
+  const host=detailWindow('粮食收支',320,330),table=document.createElement('table');table.className='food-economy-table';
+  for(const [label,value] of [['势力基础',info.base],['城镇征粮',info.settlements],['农田产出',info.farmland],
+    ...(info.other?[['其他产出',info.other]]:[]),...(info.reduction?[['超限减产',-info.reduction]]:[]),
+    ['每回合收入',info.total],['军队消耗',-info.consumption],['净结余',info.net]]){
+    const row=table.insertRow();row.insertCell().textContent=label;row.insertCell().textContent=String(value);
+  }
+  host.append(table);
 }
 function refreshHud() {
   aiControl.sync();
@@ -809,6 +824,7 @@ async function act(op, extra = {}) {
   busy = true;if(storyCommand)storyPlayer.sync(state.story,stageIntroOpen,true);else refreshHud();
   try {
     const next = await rpc('action', {op, revision:state.revision, unit:selected?.id, ...extra});
+    if(op==='recruit'||op==='building'||op==='installation')closeDetail();
     presentationOnly=!!next.presentationOnly;
     if(presentationOnly){state=next;await storyPlayer.sync(state.story,stageIntroOpen,true);}
     else await installState(next);
@@ -905,23 +921,33 @@ function refreshTerrainInfo(site){
   }
   host.replaceChildren(...columns);host.ew4TerrainKey=key;host.ew4TerrainRenderer=originalTextRenderer;
 }
-async function selectCell(cell,restore=false,selectOnly=false) {
+async function selectCell(cell,restore=false,selectOnly=false,unitId=null) {
   if(aiControl.mode||state?.playerAi?.endingTurn)return;
   if ((!restore&&busy) || !state || cell < 0 || cell >= state.cells.length || !state.cells[cell].active) return;
   closeSingleAction();
   if(!restore&&tutorial?.wait?.name==='wait area'&&Number(tutorial.wait.id)!==cell)return;
-  if(!restore&&!selectOnly&&selection?.cell===cell){
+  if(!state.unitLayers&&!restore&&!selectOnly&&selection?.cell===cell){
     selectionRequest++;selected=undefined;selection=undefined;$('selection').hidden=true;
     refreshHud();requestRender();await tutorial?.notify({type:'area',cell});return;
   }
-  const target = state.units.find(u => u.cell === cell);
+  const occupants=state.units.filter(u=>u.cell===cell);
+  const cycle=state.unitLayers&&!restore&&!selectOnly&&!unitId&&selection?.cell===cell&&occupants.length>1;
+  const preferred=unitId||(cycle?occupants[(occupants.findIndex(u=>u.id===selected?.id)+1)%occupants.length]?.id:restore&&selected?.cell===cell?selected.id:null);
+  const target = occupants.find(u=>u.id===preferred)||(state.unitLayers?occupants.find(u=>u.layer!=='air'):null)||occupants[0];
   if (!restore && !selectOnly && selected && selection && state.activeFaction === state.playerFaction && !state.dialogue) {
-    if (target && selection.targets?.includes(cell))
-      return act('attack', {target:target.id}).then(()=>tutorial?.notify({type:'area',cell}));
-    if (!target && selection.range.includes(cell)) return act('move', {cell}).then(()=>tutorial?.notify({type:'area',cell}));
+    const attackChoices=state.unitLayers?occupants.filter(u=>selection.targetUnits?.includes(u.id)):[];
+    if(attackChoices.length>1){
+      const body=detailWindow('选择目标',260,150);body.className='layer-targets';
+      for(const u of attackChoices)button((u.layer==='air'?'空中 · ':'地表 · ')+(manifest.profiles[u.profile]?.name||u.id),async()=>{closeDetail();await act('attack',{target:u.id});},body);
+      return;
+    }
+    const attackTarget=state.unitLayers?attackChoices[0]:target;
+    if (attackTarget && selection.targets?.includes(cell))
+      return act('attack', {target:attackTarget.id}).then(()=>tutorial?.notify({type:'area',cell}));
+    if ((!target||state.unitLayers) && selection.range.includes(cell)) return act('move', {cell}).then(()=>tutorial?.notify({type:'area',cell}));
   }
   const source=state,request=++selectionRequest;
-  const next=await rpc('action', {op:'select', cell, revision:source.revision});
+  const next=await rpc('action', {op:'select', cell, ...(state.unitLayers&&target?{unit:target.id}:{}), revision:source.revision});
   if(request!==selectionRequest||state!==source||aiControl.mode)return;
   selection=next;
   selected = target;if(!restore)selectedAt = performance.now(); const site = state.cells[cell];
@@ -931,7 +957,7 @@ async function selectCell(cell,restore=false,selectOnly=false) {
   refreshTerrainInfo(site);
   if(selection.deploy) toolButton('general','任命将领',()=>menus.deployGeneral(target.id,state.revision));
   if(selection.actionQuotes?.upgrade) singleActionButton('buildupgrade','升级建筑','upgrade',selection.actionQuotes.upgrade,{cell});
-  if(selection.installationOffers?.length) toolButton('builddefense','防御',()=>openDefense(cell));
+  if(selection.installationOffers?.length||selection.buildingOffers?.length) toolButton('builddefense','建造',()=>openDefense(cell));
   if(selection.actionQuotes?.train) singleActionButton('training','培训','train',selection.actionQuotes.train);
   if(selection.items) toolButton('items','使用物品',()=>menus.useItems(target.id));
   if(selection.offers.length) toolButton(({city:'city',industry:'factory',stable:'stable',port:'dock'})[site.buildingKind]||'buildfortress',site.buildingKind?'雇佣':'建造要塞',()=>openRecruitment(cell));
@@ -958,7 +984,7 @@ async function findNextUnit(){
   findingUnit=true;busy=true;refreshHud();
   try{
     // Selecting a different friendly cell must never execute the previous unit's move/attack.
-    await selectCell(unit.cell,true,true);
+    await selectCell(unit.cell,true,true,unit.id);
     selectedAt=performance.now();
     const p=point(unit.cell);view.x=p.x;view.y=p.y;clampView();requestRender();
   }catch(error){unitNavigation.reset();throw error;}
@@ -1037,7 +1063,7 @@ async function openUnitInfo(unit){
   card.querySelector('.card-marker').remove();
   for(let i=0;i<=p.grade;i++){const marker=document.createElement('span');marker.className='info-formation-marker';marker.style.left=(i*4)+'px';marker.append(tintedUi('buildmaker.png',formationColors[p.grade]||formationColors[0],19,20),uiImage(p.cardMarker,19,19));card.append(marker);}
   const grid=abilityGrid(unit.profile,unit);grid.classList.add('info-abilities');l.fill('grid_ability',grid);
-  l.text('intitle',p.name);l.text('text_desc',p.description);l.hide('group_info');
+  l.text('intitle',p.name);l.text('text_desc',(state.unitLayers?'作战层：'+(unit.occupiedLayers?.length>1?'空中＋地表':unit.layer==='air'?'空中':'地表')+'\n':'')+p.description);l.hide('group_info');
   const tags=document.createElement('section');tags.className='unit-effect-region';tags.setAttribute('aria-label','技能与效果');
   const title=document.createElement('div');title.className='unit-effect-title';title.append(originalTextRenderer.element('技能 / 效果','font_text_1_cn_hd','#646464'));tags.append(title);l.body.append(tags);
   const list=document.createElement('div');list.className='unit-skill-list';tags.append(list);
@@ -1149,7 +1175,7 @@ function openRecruitment(cell){
   if(!chosen)return;
   const body=detailWindow('recruit_label',441,185,()=>act('recruit',{cell,offer:chosen.id}));
   const row=document.createElement('div');row.className='recruit-cards';body.append(row);const details=document.createElement('div');details.className='recruit-description';body.append(details);
-  function choose(offer,b){chosen=offer;for(const c of row.children)c.setAttribute('aria-pressed',String(c===b));details.replaceChildren(abilityGrid(offer.profile));descriptionBox(details,manifest.profiles[offer.profile].name,manifest.profiles[offer.profile].description);const funds=state.factions.find(f=>f.id===state.playerFaction).resources;$('detail-confirm').disabled=['money','industry','food'].some(key=>(offer.cost[key]||0)>funds[key]);}
+  function choose(offer,b){chosen=offer;const library=visualProfile({profile:offer.profile,owner:state.playerFaction})?.library;if(library)void loadLibrary(library).catch(()=>{});for(const c of row.children)c.setAttribute('aria-pressed',String(c===b));details.replaceChildren(abilityGrid(offer.profile));descriptionBox(details,manifest.profiles[offer.profile].name,manifest.profiles[offer.profile].description);const funds=state.factions.find(f=>f.id===state.playerFaction).resources;$('detail-confirm').disabled=['money','industry','food'].some(key=>(offer.cost[key]||0)>funds[key]);}
   const groups=new Map();for(const offer of offers){const key=manifest.profiles[offer.profile].unitIndex;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(offer);}
   [...groups.values()].forEach((group,index)=>{group.sort((a,b)=>manifest.profiles[a.profile].grade-manifest.profiles[b.profile].grade);let grade=0;
     function render(b,animate){
@@ -1169,14 +1195,14 @@ function openRecruitment(cell){
   choose(chosen,row.firstElementChild);
 }
 function openDefense(){
-  const offers=selection.installationOffers;if(!offers?.length)return;
+  const offers=[...(selection.installationOffers||[]),...(selection.buildingOffers||[]).map(o=>({...o,building:true}))];if(!offers.length)return;
   let chosen=offers[0];const unit=selected.id,revision=state.revision,cell=selection.cell;
-  const body=detailWindow('defense_label',300,185,async()=>{
+  const body=detailWindow(selection.buildingOffers?.length?'建造':'defense_label',300,185,async()=>{
     if(!chosen.quote.affordable||busy)return;
     if(revision!==state.revision||cell!==selection?.cell||unit!==selected?.id)throw new Error('状态已更新，请重新选择');
-    await act('installation',{offer:chosen.id,unit,revision});
+    await act(chosen.building?'building':'installation',{offer:chosen.id,unit,revision});
   });
-  const row=document.createElement('div');row.className='defense-cards';body.append(row);
+  const row=document.createElement('div');row.className='defense-cards'+(selection.buildingOffers?.length?' has-buildings':'');body.append(row);
   function choose(offer,b){
     chosen=offer;for(const c of row.children)c.setAttribute('aria-pressed',String(c===b));
     body.querySelector('.unit-description')?.remove();
@@ -1186,7 +1212,8 @@ function openDefense(){
   const funds=state.factions.find(f=>f.id===state.playerFaction).resources;
   for(const [index,offer] of offers.entries()){
     const b=button('',()=>choose(offer,b),row);b.dataset.tutorialId='lbox_defense';b.dataset.tutorialRow=index;b.setAttribute('aria-label',manifest.strings['name_'+offer.name]||offer.name);
-    b.append(uiImage('build_'+({trench:'moat',fence:'fences',bunker:'bunker'})[offer.kind]+'.png',94,64));
+    if(offer.building){const preview=document.createElement('canvas');preview.width=188;preview.height=128;preview.style.width='94px';preview.style.height='64px';sprite('buildings',offer.image,94,64,1.5,preview.getContext('2d'));b.append(preview);}
+    else b.append(uiImage('build_'+({trench:'moat',fence:'fences',bunker:'bunker'})[offer.kind]+'.png',94,64));
     const strip=document.createElement('span');strip.className='cost-strip';
     for(const key of ['money','industry','food']){
       const value=offer.quote.cost[key]||0;if(key==='food'&&!value)continue;
@@ -1209,6 +1236,7 @@ function clampView() {
   view = Ew4Camera.constrain(view, {w:canvas.clientWidth || innerWidth, h:canvas.clientHeight || innerHeight}, bounds);
 }
 function point(cell) { return Ew4Battlefield.point(cell,state.width); }
+function unitPoint(unit) { return Ew4Battlefield.unitPoint(state,unit); }
 function screenToWorld(x, y) { return {x:(x - viewport.w/2)/view.zoom + view.x, y:(y - viewport.h/2)/view.zoom + view.y}; }
 function cellAt(x, y) {
   const p = screenToWorld(x, y); const approximateRow = Math.round((p.y+18) / 54); let best = -1, distance = Infinity;
@@ -1227,7 +1255,8 @@ function hex(x, y) { ctx.beginPath(); for(const [dx,dy] of [[0,-36],[32,-18],[32
 function sprite(atlas, name, x, y, scale=1, draw=ctx) {
   let ratio=1;if(manifest.atlases[atlas+'_hd']?.[name]){atlas+='_hd';ratio=2;}
   const s=manifest.atlases[atlas]?.[name], texture=image('images/'+atlas+'.png');
-  if(s && texture.complete && texture.naturalWidth) draw.drawImage(texture,s.x,s.y,s.w,s.h,x-s.refx*scale/ratio,y-s.refy*scale/ratio,s.w*scale/ratio,s.h*scale/ratio);
+  ratio=Ew4Battlefield.spritePixelRatio(s,ratio);
+  if(s && texture.complete && texture.naturalWidth) draw.drawImage(...Ew4Battlefield.spriteSample(texture,s,ratio,draw,scale),x-s.refx*scale/ratio,y-s.refy*scale/ratio,s.w*scale/ratio,s.h*scale/ratio);
 }
 const unresolved = new Set();
 function animation(lib, item, tick, depth=0, draw=ctx, frameFor=null) {
@@ -1308,7 +1337,7 @@ function render(time,forceBattlefield=false) {
   ctx.translate(w/2,h/2);ctx.scale(view.zoom,view.zoom);ctx.translate(-view.x,-view.y);
   const min=screenToWorld(0,0),max=screenToWorld(w,h);
   battlefield.frame({draw:ctx,state,map:manifest.maps[state.map],visibleRect:{left:min.x,top:min.y,width:max.x-min.x,height:max.y-min.y},
-    zoom:view.zoom,detailScale:Math.max(1,Math.min(w/568,h/320,3)),showGrid,selection,selected,selectedAt,motions,facings,arrivals,arrivalSpeed:Math.sqrt(settings.speed),deaths,combatMotions,
+    zoom:view.zoom,detailScale:Math.max(1,Math.min(w/568,h/320,3)),showGrid,selection,selected,selectedAt,motions,facings,arrivals,arrivalSpeed:Math.sqrt(settings.speed),recruitSpeed:Ew4Battlefield.recruitSpeed(settings.speed,aiRunning),deaths,combatMotions,
     tutorialCell:!aiControl.mode&&tutorial?.wait?.name==='wait area'?Number(tutorial.wait.id):null,aiOverlay:aiControl.overlay()},time);
   effects?.frame(ctx,time,'foreground',battlefield.visibleRect);
   damageNumbers?.frame(ctx,time,battlefield.visibleRect);

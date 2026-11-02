@@ -1,6 +1,33 @@
 'use strict';
 (function(root) {
   const corners = [[0,-36],[32,-18],[32,18],[0,36],[-32,18],[-32,-18]];
+  function spritePixelRatio(sprite, fallback=1) {
+    const value=Number(sprite?.pixelRatio);
+    return Number.isFinite(value)&&value>0?value:fallback;
+  }
+  const spriteLevels=new WeakMap();
+  function spriteSample(texture,sprite,ratio,draw,scale=1) {
+    const original=[texture,sprite.x,sprite.y,sprite.w,sprite.h];
+    if(ratio<=2||typeof document==='undefined'||!draw.getTransform)return original;
+    const m=draw.getTransform(),density=Math.max(Math.hypot(m.a,m.b),Math.hypot(m.c,m.d))*Math.abs(scale);
+    if(!(density>0))return original;
+    const level=Math.min(6,Math.max(0,Math.floor(Math.log2(ratio/density))));
+    if(!level)return original;
+    let entries=spriteLevels.get(texture);
+    if(!entries){entries=new Map();spriteLevels.set(texture,entries);}
+    const key=[sprite.x,sprite.y,sprite.w,sprite.h].join(',');
+    let levels=entries.get(key);
+    if(!levels){levels=[original];entries.set(key,levels);}
+    // Crop before reducing so adjacent atlas entries cannot bleed into a mip.
+    for(let i=levels.length;i<=level;i++){
+      const prior=levels[i-1],canvas=document.createElement('canvas');
+      canvas.width=Math.max(1,Math.ceil(prior[3]/2));canvas.height=Math.max(1,Math.ceil(prior[4]/2));
+      const context=canvas.getContext('2d');context.imageSmoothingEnabled=true;context.imageSmoothingQuality='high';
+      context.drawImage(...prior,0,0,canvas.width,canvas.height);
+      levels.push([canvas,0,0,canvas.width,canvas.height]);
+    }
+    return levels[level];
+  }
   function point(cell, width) {
     const row = Math.floor(cell / width);
     // Native cell rectangles start one row above the grid; their centre is at -18.
@@ -10,6 +37,10 @@
     const row=Math.floor(cell/width), col=cell%width, odd=row%2;
     const [x,y]=[[col+1,row],[col+odd,row+1],[col+odd-1,row+1],[col-1,row],[col+odd-1,row-1],[col+odd,row-1]][direction];
     return x>=0&&x<width&&y>=0&&y<height?y*width+x:-1;
+  }
+  function unitPoint(state,unit,position){
+    const p=position||point(unit.cell,state.width);
+    return state.unitLayers&&unit.layer==='air'?{...p,x:p.x+18,y:p.y-24}:p;
   }
   function cameraBounds(state, texture) {
     const scenario=state.cameraBounds||{left:0,top:0,width:texture.width,height:texture.height};
@@ -78,8 +109,8 @@
     // Shared phase, independent of selection: only available friendly unit badges pulse.
     return .25+.75*(1+Math.cos(time*Math.PI*2/1200))/2;
   }
-  function selectionHostile(state,cell){
-    const owner=state.units.find(u=>u.cell===cell)?.owner||state.cells[cell]?.owner;
+  function selectionHostile(state,cell,unitId){
+    const owner=(unitId?state.units.find(u=>u.id===unitId&&u.cell===cell):state.units.find(u=>u.cell===cell))?.owner||state.cells[cell]?.owner;
     const player=state.factions.find(f=>f.id===state.playerFaction),target=state.factions.find(f=>f.id===owner);
     return !!(player&&target&&(target.relation?target.relation!=='allied':player.camp!==target.camp));
   }
@@ -87,7 +118,9 @@
     const player=state.factions.find(f=>f.id===state.playerFaction),target=state.factions.find(f=>f.id===owner);
     return target?.relation?({allied:'blue',neutral:'black',hostile:'red'}[target.relation]):target?.neutral?'black':target&&player&&target.camp===player.camp?'blue':'red';
   }
-  function recruitDuration(speed=1){return 480/speed;}
+  // Native JNI advances 1.15 simulation seconds per wall second; only AI speeds 4/5 add a multiplier.
+  function recruitSpeed(setting=1,ai=false){return 1.15*(ai&&setting>=4?(setting-1)*.5:1);}
+  function recruitDuration(speed=1.15){return 60/320*1000/speed;}
   function flagFrame(time){return Math.floor(time/100)%4+1;}
   function flagAnimated(unit,state){
     // Original 50900 -> 4fb38: movement first, then the unspent attack/target flag.
@@ -108,7 +141,7 @@
   function flagPosition(p){return {x:p.x-27,y:p.y-45};}
   function moraleSprite(morale){return ({'-3':'morale_down3.png','-2':'morale_down2.png','-1':'morale_down1.png','1':'morale_up.png'})[morale]||null;}
   function objectiveMarker(site,unit){return site?.objectiveMarker||(site?.objective?1:0)||unit?.objectiveMarker||(unit?.objective?1:0);}
-  function recruitOffset(elapsed,speed=1){const t=Math.max(0,Math.min(1,elapsed/recruitDuration(speed)));return t>=1?0:-60*(1-t);}
+  function recruitOffset(elapsed,speed=1.15){const t=Math.max(0,Math.min(1,elapsed/recruitDuration(speed)));return t>=1?0:-60*(1-t);}
   function advanceTutorialArrow(motion,seconds){
     // Preserve native float32 rounding at the turning points.
     let offset=Math.fround(motion.offset+motion.speed*Math.fround(seconds)),speed=motion.speed;
@@ -171,7 +204,25 @@
       this.waterTileIndex=new SpatialIndex(map.detailTiles||[],t=>({left:t.x,top:t.y,right:t.x+t.width,bottom:t.y+t.height}));
       this.labelIndex=new SpatialIndex(map.labels||[],mapLabelBounds);
     }
-    resetMotions(){this.unitMotions=new Map();this.motionSelection=null;}
+    resetMotions(){this.unitMotions=new Map();this.motionSelection=null;this.moraleTransitions=new Map();}
+    observeMorale(previous,next,{animate=true,speed=1,time=performance.now()}={}){
+      if(!animate||!previous){this.moraleTransitions.clear();return;}
+      if(next.revision<=previous.revision)return;
+      const prior=new Map(previous.units.map(unit=>[unit.id,unit])),ids=new Set(next.units.map(unit=>unit.id));
+      for(const id of this.moraleTransitions.keys())if(!ids.has(id))this.moraleTransitions.delete(id);
+      for(const unit of next.units){
+        const old=prior.get(unit.id);
+        if(!old||old.morale===unit.morale)continue;
+        this.moraleTransitions.delete(unit.id);
+        const from=moraleSprite(old.morale),to=moraleSprite(unit.morale);
+        if((old.morale!==0&&!from)||(unit.morale!==0&&!to))continue;
+        this.moraleTransitions.set(unit.id,{from,to,morale:unit.morale,direction:unit.morale>old.morale?-1:1,started:time,duration:650/Math.sqrt(Math.max(1,speed))});
+      }
+      if(this.moraleTransitions.size){this.animated=true;this.api.requestFrame?.();}
+    }
+    syncMorale(){
+      for(const [id,transition] of this.moraleTransitions)if(this.unitById.get(id)?.morale!==transition.morale||this.time>=transition.started+transition.duration)this.moraleTransitions.delete(id);
+    }
     syncMotions(){
       for(const [id,combat] of this.combatMotions||[])if(!this.stationedHasUnit(id)||this.time>=combat.started+(combat.delay||0)+(combat.segments.at(-1)?.end||0))this.combatMotions.delete(id);
       for(const id of this.unitMotions.keys())if(!this.stationedHasUnit(id))this.unitMotions.delete(id);
@@ -212,7 +263,7 @@
         this.cityLayout=null;
         this.factions=new Map(this.state.factions.map(f=>[f.id,f]));
         if(root.Ew4MapViews){this.projection??=new root.Ew4MapViews.Projection();if(this.projection.sync(this.state,this.map))this.invalidateGround();}
-        this.stationed=new Map(this.state.units.map(u=>[u.cell,u]));
+        this.stationed=new Map(this.state.units.filter(u=>!this.state.unitLayers||u.layer!=='air').map(u=>[u.cell,u]));
         this.unitById=new Map(this.state.units.map(u=>[u.id,u]));
         this.unitIds=new Set(this.unitById.keys());
         this.orderedUnits=[...this.state.units].sort((a,b)=>a.cell-b.cell);
@@ -253,7 +304,8 @@
         const blend=Math.min(1,(this.visibleUnits.length-2000)/2000);
         this.markerScale=(nativeSize+(compactSize-nativeSize)*blend)/24/this.zoom;
       }
-      this.animated=arrowActive||!!this.selection||this.visibleUnits.some(u=>badgeAlpha(u,this.state,300)!==1||!this.badgeOnly&&(this.unitMotions.get(u.id)?.playing||u.burning>0||u.category==='fort'&&u.health>0&&u.maxHealth-u.health>=80||flagAnimated(u,this.state)&&this.factions.get(u.owner)?.flag&&!this.factions.get(u.owner)?.flagImage))||
+      this.syncMorale();
+      this.animated=arrowActive||!!this.selection||this.visibleUnits.some(u=>badgeAlpha(u,this.state,300)!==1||!this.badgeOnly&&(this.moraleTransitions.has(u.id)||this.unitMotions.get(u.id)?.playing||u.burning>0||u.category==='fort'&&u.health>0&&u.maxHealth-u.health>=80||flagAnimated(u,this.state)&&this.factions.get(u.owner)?.flag&&!this.factions.get(u.owner)?.flagImage))||
         this.visibleCells.some(({site,cell})=>site.active&&(objectiveMarker(site,this.stationed.get(cell))||!this.badgeOnly&&facilityFlagAnimated(site,this.state)&&this.factions.get(site.owner)?.flag&&!this.factions.get(site.owner)?.flagImage&&!this.stationed.has(cell)));
       // Grid covers the ground/buildings, while units, flags and portraits stay above it.
       this.staticGround();this.grid();this.objectives();this.units();this.flags();this.unitMarkers();this.labels();this.highlights();this.playerOrders();this.tutorialArrow();this.scheduleCityLabels();
@@ -524,11 +576,11 @@
         if(c.buildingKind){
           const level=Math.max(1,c.buildingLevel),style=c.buildingStyle??1,region=style===1?'west':'east';
           const art=({city:`city_${region}_lv${level}.png`,industry:`factory_${region}_lv${level}.png`,stable:`stable_${region}_lv${level}.png`,port:`port_${style}.png`,farmland:`farm_${style}_lv${level}.png`})[c.buildingKind];
-          this.draw.save();this.draw.globalAlpha=.85;this.api.sprite('buildings',art,p.x,p.y,1,this.draw);
+          this.draw.save();this.draw.globalAlpha=.85;this.api.sprite('buildings',art||c.buildingImage,p.x,p.y,1,this.draw);
           if(c.buildingImage?.startsWith('capital_')){this.api.sprite('buildings',c.buildingImage,p.x,p.y,1,this.draw);this.api.sprite('buildings',`city_${region}_lv${level}_up.png`,p.x,p.y,1,this.draw);}
           this.draw.restore();
           if(!farms){const levels=this.api.manifest.buildings[c.buildingKind];
-            const maximum=this.api.manifest.buildingUpgradeLimits?.[c.buildingKind]??levels?.length;
+            const maximum=c.buildingMaximumLevel??this.api.manifest.buildingUpgradeLimits?.[c.buildingKind]??levels?.length;
             if(maximum&&level>=maximum)this.api.sprite('buildings','buildinglevel_max.png',p.x,p.y+25,1,this.draw);
             this.api.sprite('buildings','buildinglevel_'+level+'.png',p.x,p.y+25,1,this.draw);
           }
@@ -588,8 +640,9 @@
       if(this.motions.size){const activeUnits=new Set(units);
         for(const id of this.motions.keys()){const unit=this.unitById.get(id);if(unit)activeUnits.add(unit);}
         units=[...activeUnits].sort((a,b)=>this.unitOrder.get(a.id)-this.unitOrder.get(b.id));}
+      if(state.unitLayers)units=[...units].sort((a,b)=>Number(a.layer==='air')-Number(b.layer==='air'));
       for(const unit of units){
-        const motion=this.motions.get(unit.id),p=motion?pose(motion,state.width,time):point(unit.cell,state.width);
+        const motion=this.motions.get(unit.id),p=unitPoint(state,unit,motion?pose(motion,state.width,time):null);
         if(!this.visible(p))continue;
         const profile=(!this.badgeOnly&&this.api.effects?.profile(unit.profile,this.factions.get(unit.owner)))||this.api.manifest.profiles[unit.profile];if(!profile)continue;
         const death=this.deaths?.get(unit.id),deathProgress=death?Math.max(0,Math.min(1,(time-death.started)/death.duration)):0;
@@ -601,20 +654,20 @@
           continue;
         }
         draw.save();
-        const lib=this.api.libraries.get(profile.library);
-        if(!lib)this.requestLibrary(profile.library);
         const facing=motion?p.facing:this.facings.get(unit.id)??(unit.facing===0?-1:1),sea=state.cells[p.cell??unit.cell]?.sea;
         draw.save();if(death)draw.globalAlpha*=1-deathProgress;
-        const arrival=this.arrivals.get(unit.id);if(arrival!=null)draw.translate(0,recruitOffset(time-arrival,this.arrivalSpeed||1));
-        if(!this.badgeOnly&&sea&&unit.category!=='naval')this.api.sprite('buildings',facing>0?'transportship1.png':'transportship2.png',p.x,p.y);
-        else if(!this.badgeOnly&&lib){
+        const arrival=this.arrivals.get(unit.id);if(arrival!=null)draw.translate(0,recruitOffset(time-arrival,this.recruitSpeed||1.15));
+        if(!this.badgeOnly&&sea&&unit.category!=='naval'&&!(state.unitLayers&&unit.layer==='air'))this.api.sprite('buildings',facing>0?'transportship1.png':'transportship2.png',p.x,p.y);
+        else if(!this.badgeOnly)for(const part of this.api.effects?.parts?.(profile,sea)||[profile]){
           const combat=this.combatMotions?.get(unit.id),elapsed=combat?time-combat.started-(combat.delay||0):0;
-          const segment=elapsed>=0?(combat?.segments.find(s=>elapsed<s.end)||combat?.segments.at(-1)):null;
+          const active=combat&&combat.part===part.part,body=active&&combat.profile?combat.profile:part;
+          const lib=this.api.libraries.get(body.library);if(!lib){this.requestLibrary(body.library);continue;}
+          const segment=active&&elapsed>=0?(combat?.segments.find(s=>elapsed<s.end)||combat?.segments.at(-1)):null;
           if(combat)this.unitMotions.set(unit.id,{action:'ready',playing:false});
-          const idle=this.motionPose(unit,profile,lib,facing,time,motion&&p.moving),native=idle.native,item=segment?lib.byName.get(segment.name):idle.item;
+          const idle=this.motionPose(unit,body,lib,facing,time,motion&&p.moving),native=idle.native,item=segment?lib.byName.get(segment.name):idle.item;
           const tick=segment?Math.min((elapsed-segment.start)*segment.speed/1000*lib.fps,Math.max(0,(item?.duration||1)-1)):idle.tick;
           const directional=segment?segment.directional:native?.dir==='left'||native?.dir==='right';
-          draw.save();draw.translate(p.x+facing*profile.x,p.y+profile.y);draw.scale((directional?1:facing)*profile.scale*.5,.5);
+          draw.save();draw.translate(p.x+(part.partX||0)+facing*body.x,p.y+(part.partY||0)+body.y);draw.scale((directional?1:facing)*body.scale*.5,.5);
           this.unitAnimation(lib,item,tick);draw.restore();
         }
         draw.restore();
@@ -664,7 +717,7 @@
       if(uses<2||this.farBadgeBuilds>=8)return null;
       const names=['hpbar_'+color+'.png','mark_unit_'+profile.unitIndex+'.png'];
       let left=-12,top=-12,right=12,bottom=12;
-      for(const name of names){const hd=this.api.manifest.atlases.buildings_hd?.[name],atlas=hd?'buildings_hd':'buildings',sprite=hd||this.api.manifest.atlases.buildings?.[name],ratio=hd?2:1;
+      for(const name of names){const hd=this.api.manifest.atlases.buildings_hd?.[name],atlas=hd?'buildings_hd':'buildings',sprite=hd||this.api.manifest.atlases.buildings?.[name],ratio=spritePixelRatio(sprite,hd?2:1);
         const texture=this.api.image('images/'+atlas+'.png');if(!sprite||!texture?.complete||!texture.naturalWidth)return null;
         left=Math.min(left,-sprite.refx/ratio);top=Math.min(top,-sprite.refy/ratio);right=Math.max(right,(sprite.w-sprite.refx)/ratio);bottom=Math.max(bottom,(sprite.h-sprite.refy)/ratio);
       }
@@ -783,7 +836,15 @@
       for(const {unit,p} of this.visibleUnitMarkers||[]){
         // Native 5335c -> 60b50 draws the effective state, including after reload.
         const morale=moraleSprite(unit.morale);
-        if(morale)this.api.sprite('buildings',morale,p.x+15,p.y-25);
+        const transition=this.moraleTransitions.get(unit.id);
+        const progress=transition?Math.max(0,Math.min(1,(this.time-transition.started)/transition.duration)):1;
+        if(progress<1){
+          const eased=1-Math.pow(1-progress,3),draw=this.draw;
+          // Keep both sprites attached to the presented unit, including during movement.
+          const paint=(name,alpha,offset)=>{if(!name||alpha<=0)return;draw.save();draw.globalAlpha*=alpha;this.api.sprite('buildings',name,p.x+15,p.y-25+offset,1,draw);draw.restore();};
+          paint(transition.from,1-eased,transition.direction*18*eased);
+          paint(transition.to,eased,-transition.direction*24*(1-eased));
+        }else if(morale)this.api.sprite('buildings',morale,p.x+15,p.y-25);
       }
       for(const {unit,p} of this.visibleUnitMarkers||[]){
         const faction=this.factions.get(unit.owner);this.flag(faction?.flag,p,flagAnimated(unit,state),faction?.flagImage);
@@ -883,11 +944,11 @@
     highlights() {
       const range=new Set(this.selection?.range),targets=new Set(this.selection?.targets);
       for(const {site:c,cell:i,p} of this.visibleCells){if(!c.active)continue;
-        if(range.has(i)&&i!==this.selection.cell&&!this.stationed.has(i))this.api.sprite('buildings','move.png',p.x,p.y);
+        if(range.has(i)&&i!==this.selection.cell&&(this.state.unitLayers||!this.stationed.has(i)))this.api.sprite('buildings','move.png',p.x,p.y);
         if(targets.has(i))this.api.sprite('buildings','attack.png',p.x,p.y);
       }
-      if(this.selection){const p=point(this.selection.cell,this.state.width);let lib=this.api.libraries.get('choose');
-        if(lib&&selectionHostile(this.state,this.selection.cell)){
+      if(this.selection){const p=this.state.unitLayers&&this.selected?unitPoint(this.state,this.selected):point(this.selection.cell,this.state.width);let lib=this.api.libraries.get('choose');
+        if(lib&&selectionHostile(this.state,this.selection.cell,this.state.unitLayers?this.selected?.id:null)){
           if(this.redChoose?.source!==lib.texture){
             const texture=document.createElement('canvas');texture.width=lib.texture.naturalWidth;texture.height=lib.texture.naturalHeight;
             const d=texture.getContext('2d');d.drawImage(lib.texture,0,0);d.globalCompositeOperation='multiply';d.fillStyle='#ff0000';d.fillRect(0,0,texture.width,texture.height);d.globalCompositeOperation='destination-in';d.drawImage(lib.texture,0,0);
@@ -911,5 +972,5 @@
     }
     visible(p,padding=120) {const r=this.visibleRect;return p.x>=r.left-padding&&p.x<=r.left+r.width+padding&&p.y>=r.top-padding&&p.y<=r.top+r.height+padding;}
   }
-  root.Ew4Battlefield=Object.freeze({point,neighbor,cameraBounds,hex,textPath,pathLettering,mapLabelBounds,pose,badgeAlpha,badgeColor,selectionHostile,recruitDuration,recruitOffset,advanceTutorialArrow,flagFrame,flagAnimated,facilityFlagAnimated,healthColor,flagPosition,moraleSprite,objectiveMarker,terrainRows,animationBounds,SpatialIndex,Renderer});
+  root.Ew4Battlefield=Object.freeze({point,unitPoint,spritePixelRatio,spriteSample,neighbor,cameraBounds,hex,textPath,pathLettering,mapLabelBounds,pose,badgeAlpha,badgeColor,selectionHostile,recruitSpeed,recruitDuration,recruitOffset,advanceTutorialArrow,flagFrame,flagAnimated,facilityFlagAnimated,healthColor,flagPosition,moraleSprite,objectiveMarker,terrainRows,animationBounds,SpatialIndex,Renderer});
 })(globalThis);

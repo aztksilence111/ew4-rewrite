@@ -21,6 +21,8 @@ public static class WorldSave
             Modifiers = { info => {
                 if (info.Type == typeof(WorldState)) {
                     info.Properties.Single(p => p.Name == "armyCapacity").ShouldSerialize = (_, value) => value != null;
+                    info.Properties.Single(p => p.Name == "unitLayers").ShouldSerialize = (_, value) => value != null;
+                    info.Properties.Single(p => p.Name == "construction").ShouldSerialize = (_, value) => value != null;
                     info.Properties.Single(p => p.Name == "story").ShouldSerialize = (_, value) => value != null;
                     info.Properties.Single(p => p.Name == "retiredScenarioUnits").ShouldSerialize = (_, value) => ((IReadOnlyList<string>)value!).Count > 0;
                     info.Properties.Single(p => p.Name == "spawnedScenarioUnits").ShouldSerialize = (_, value) => ((IReadOnlyList<string>)value!).Count > 0;
@@ -38,6 +40,19 @@ public static class WorldSave
                 }
                 if (info.Type == typeof(ScenarioCommanderTemplate))
                     info.Properties.Remove(info.Properties.Single(p => p.Name == "extensions"));
+                if (info.Type == typeof(CellState))
+                    info.Properties.Single(p => p.Name == "incomeAdjustment").ShouldSerialize = (_, value) => value != null;
+                if (info.Type == typeof(Combatant)) {
+                    info.Properties.Single(p => p.Name == "attributeModifiers").ShouldSerialize = (_, value) => value != null;
+                    foreach (string name in new[] { "maximumHealth", "maximumRange", "foodExempt", "ignoreTerrain", "ruleLocation" })
+                        info.Properties.Remove(info.Properties.Single(p => p.Name == name));
+                }
+                if (info.Type == typeof(UnitProfile))
+                    info.Properties.Single(p => p.Name == "commanderAbility").ShouldSerialize = (_, value) => value != null;
+                if (info.Type == typeof(ExtensionEffect))
+                    info.Properties.Single(p => p.Name == "when").ShouldSerialize = (_, value) => value != null;
+                if (info.Type == typeof(ScenarioEffect))
+                    info.Properties.Single(p => p.Name == "income").ShouldSerialize = (_, value) => value != null;
                 if (info.Type == typeof(MovementCell)) {
                     info.Properties.Single(p => p.Name == "barrier").ShouldSerialize = (_, value) => (TerrainBarrier)value! != TerrainBarrier.None;
                     info.Properties.Single(p => p.Name == "minimumEntryCost").ShouldSerialize = (_, value) => (int)value! != 0;

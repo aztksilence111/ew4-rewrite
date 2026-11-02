@@ -1,5 +1,9 @@
 # 原版 Mod 移植到 rewrite
 
+新增将领能力栏、初值、图标、教学及兵种星级绑定见[自定义能力接口](COMMANDER_ABILITIES.md)与[最小示例](../../examples/commander-abilities/README.md)。
+
+周围友军光环、最大生命/射程/免粮/地形移动、士气和战斗距离/地形/城市条件见[技能接口 API 3](RULE_EXTENSIONS.md)及[最小示例](../../examples/passive-auras/README.md)。
+
 征服外交的核心地区、有向势力组合修正、首都一次性国库缴获、保护名单及UI覆盖见[外交接口](DIPLOMACY.md)。仅征服，敌对及中立资源隐藏，农田不计核心；事件创建势力支持独立初始国库和首都。
 
 步兵默认基础陆地消耗及按剧本国家调整 AI 隐藏回避减伤，见[AI 减伤参数](AI_DEFENSE.md)。默认保留原版数值，Mod 可覆盖 BTL 中的国家参数。

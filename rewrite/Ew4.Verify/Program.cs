@@ -1,5 +1,46 @@
 using System.Text.Json;
 using Ew4.Core;
+if (args.ElementAtOrDefault(1) == "--commander-abilities-only")
+{
+    string project = Path.GetFullPath(args[0]);
+    Console.WriteLine(JsonSerializer.Serialize(new { commanders = CommanderChecks.Run(project),
+        commanderDeployment = CommanderDeploymentChecks.Run(project), rosterDeployment = RosterDeploymentChecks.Run(project),
+        saveCompatibility = SaveCompatibilityChecks.Run(project), errors = 0 })); return;
+}
+if (args.ElementAtOrDefault(1) == "--passive-interfaces-only")
+{
+    string project = Path.GetFullPath(args[0]);
+    Console.WriteLine(JsonSerializer.Serialize(new { passiveInterfaces = PassiveInterfaceChecks.Run(project),
+        commonSkills = CommonSkillChecks.Run(project), commanderDeployment = CommanderDeploymentChecks.Run(project),
+        turnChecks = WorldTurnChecks.Run(project), battleChecks = BattleCommitChecks.Run(project),
+        movementChecks = MovementCommitChecks.Run(project), scenarioArmies = ScenarioArmyChecks.Run(project),
+        contextChecks = CombatContextChecks.Run(project), aiMovement = AiMovementChecks.Run(project),
+        aiStrategy = AiStrategySelectionChecks.Run(project), aiProduction = AiWorldProductionChecks.Run(project),
+        itemExtensions = ItemExtensionChecks.Run(project), improvements = ImprovementChecks.Run(project),
+        saveCompatibility = SaveCompatibilityChecks.Run(project), errors = 0 })); return;
+}
+if (args.ElementAtOrDefault(1) == "--scenario-economy-only")
+{
+    string project = Path.GetFullPath(args[0]);
+    Console.WriteLine(JsonSerializer.Serialize(new { scenarioEconomyChecks = ScenarioEconomyChecks.Run(project),
+        turnChecks = WorldTurnChecks.Run(project), saveCompatibility = SaveCompatibilityChecks.Run(project), errors = 0 })); return;
+}
+if (args.ElementAtOrDefault(1) is "--unit-layers-only" or "--advanced-units-only")
+{
+    string project = Path.GetFullPath(args[0]);
+    Console.WriteLine(JsonSerializer.Serialize(new { advancedUnitChecks = AdvancedUnitChecks.Run(), unitLayerChecks = UnitLayerChecks.Run(project),
+        improvements = ImprovementChecks.Run(project), aiProduction = AiWorldProductionChecks.Run(project), legacyBuildings = LegacyBuildingChecks.Run(project),
+        worldChecks = WorldChecks.Run(project), movementChecks = MovementCommitChecks.Run(project),
+        turnChecks = WorldTurnChecks.Run(project), battleChecks = BattleCommitChecks.Run(project),
+        aiMovementChecks = AiMovementChecks.Run(project), strategyChecks = AiStrategySelectionChecks.Run(project),
+        commonSkills = CommonSkillChecks.Run(project), scenarioArmies = ScenarioArmyChecks.Run(project),
+        undoChecks = FeedbackUndoChecks.Run(project), saveCompatibility = SaveCompatibilityChecks.Run(project),
+        combatContext = CombatContextChecks.Run(project), errors = 0 })); return;
+}
+if (args.ElementAtOrDefault(1) == "--critical-damage-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { criticalDamageChecks = CriticalDamageChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
 
 if (args.ElementAtOrDefault(1) == "--mountain-installation-only")
 {
@@ -325,6 +366,7 @@ commanderChecks += ConsumableChecks.Run(root);
 int animationChecks = AnimationChecks.Run(root);
 int catalogChecks = CatalogChecks.Run(root);
 int worldChecks = WorldChecks.Run(root);
+int unitLayerChecks = UnitLayerChecks.Run(root);
 int progressionChecks = ProgressionChecks.Run(root);
 int aiChecks = AiChecks.Run(root);
 int lifecycleChecks = LifecycleChecks.Run(root);
@@ -377,14 +419,14 @@ int extensionChecks = ExtensionChecks.Run(root);
 extensionChecks += ItemExtensionChecks.Run(root);
 extensionChecks += DeploymentLimitChecks.Run(root);
 int commanderDialogueChecks = CommanderDialogueChecks.Run(root);
-int commonSkillChecks = CommonSkillChecks.Run(root);
+int commonSkillChecks = CommonSkillChecks.Run(root) + PassiveInterfaceChecks.Run(root);
 int legacySkillParameterChecks = LegacySkillParameterChecks.Run(root);
 int scenarioRuleChecks = ScenarioRuleChecks.Run(root);
 int mapColorChecks = MapColorChecks.Run(root);
 int objectiveChecks = ObjectiveChecks.Run(root);
 int playerAiChecks = PlayerAiChecks.Run(root);
 var report = new { combatVectors = cases, ruleChecks = contracts, commanderChecks, animationChecks, catalogChecks, worldChecks, progressionChecks, aiChecks, lifecycleChecks, actionChecks, movementCommitChecks, turnSettlementChecks, worldTurnChecks, battleCommitChecks, battleChainChecks, combatContextChecks, improvementChecks, aiTacticalChecks, splashChecks, supportActionChecks, aiMovementChecks, aiStrategyChecks, aiStrategySelectionChecks, aiUnitChecks, aiProductionChecks, aiOfferPoolChecks, aiConstructionChecks, aiWorldProductionChecks, commanderDeploymentChecks, hazardDeathChecks, legacyImportChecks, legacyArmyImportChecks, legacyEventChecks, legacyBuildingChecks, legacyFactionChecks, legacyCombatChecks, legacyActionAiChecks, legacyCommerceChecks, sessionAccountChecks, rosterDeploymentChecks, legacyTechnologyChecks, legacyStartupChecks, worldTurnEntryChecks, mapCatalogChecks, legacyHostChecks, jurisdictionChecks, errors = 0,
-    armyCapacityChecks, diplomacyChecks, objectiveChecks, playerAiChecks, autoJurisdictionChecks, extensionChecks, commanderDialogueChecks, commonSkillChecks, legacySkillParameterChecks, scenarioRuleChecks, mapColorChecks, limitations = new[] { "Headless scenario/session startup and core rules; rendering and Android require separate integration checks.",
+    unitLayerChecks, armyCapacityChecks, diplomacyChecks, objectiveChecks, playerAiChecks, autoJurisdictionChecks, extensionChecks, commanderDialogueChecks, commonSkillChecks, legacySkillParameterChecks, scenarioRuleChecks, mapColorChecks, limitations = new[] { "Headless scenario/session startup and core rules; rendering and Android require separate integration checks.",
         "Native profile migration, commander purchase/cultivation, session tavern AI, tutorial controller, merge flows, full playthroughs and display/Android integration remain incomplete." } };
 Directory.CreateDirectory(Path.Combine(root, "rewrite/reports"));
 File.WriteAllText(Path.Combine(root, "rewrite/reports/core_validation.json"), JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true }) + "\n");

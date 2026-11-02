@@ -83,3 +83,4 @@ html,body{touch-action:pan-x pan-y;overscroll-behavior:none}
 #scenario-event-choices button:disabled{opacity:.45}
 #scenario-event-content:focus-visible,#scenario-event-choices:focus-visible{outline:2px solid #536b59;outline-offset:-2px}
 @media(orientation:portrait){#scenario-event .scenario-event-dialog{height:min(400px,var(--event-available-height))}#scenario-event-image{height:152px}#scenario-event-choices{grid-template-columns:minmax(0,1fr);max-height:118px}}
+.food-economy-enabled{cursor:pointer;pointer-events:auto}.food-economy-enabled:focus-visible{outline:1px solid white;outline-offset:2px}.food-economy-table{width:100%;border-collapse:collapse;font-size:15px;color:#343b37}.food-economy-table td{padding:8px 12px;border-bottom:1px solid #92968c}.food-economy-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}.food-economy-table tr:last-child{font-weight:bold}

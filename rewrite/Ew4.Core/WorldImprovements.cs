@@ -49,7 +49,7 @@ public static class WorldImprovements
 
     private static Resources UpgradePrice(WorldState state, int cellId, BuildingUpgradeStep step, BuildingUpgradeRules rules)
     {
-        bool discount = state.Units.Any(u => u.Cell == cellId && u.CommanderId != null && u.Combatant.Has(rules.DiscountSkill));
+        bool discount = WorldUnitLayers.Surface(state).Any(u => u.Cell == cellId && u.CommanderId != null && u.Combatant.Has(rules.DiscountSkill));
         long Discount(long value) => checked(value / 100 * rules.DiscountPercent + value % 100 * rules.DiscountPercent / 100);
         return discount ? step.Cost with { Money = Discount(step.Cost.Money), Industry = Discount(step.Cost.Industry) } : step.Cost;
     }
@@ -102,7 +102,7 @@ public static class WorldImprovements
         var trained = unit with
         {
             Veterancy = rules.Stages[level + 1].Id, RemainingMovement = 0, Acted = true,
-            Combatant = unit.Combatant with { Health = (int)Math.Min(unit.Combatant.Profile.MaxHealth,
+            Combatant = unit.Combatant with { Health = (int)Math.Min(unit.Combatant.MaximumHealth,
                 (long)unit.Combatant.Health + rules.Stages[level + 1].HealingOnEntry) }
         };
         var next = (state with

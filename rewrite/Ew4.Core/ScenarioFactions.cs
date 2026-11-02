@@ -69,6 +69,7 @@ public static class ScenarioFactions
             Capital = effect.Capital is int capital ? new(capital) : null,
             Appearance = Appearance(template.Appearance, effect),
             Resources = effect.InitialResources ?? new(0, 0, 0), Shortage = 0, Kills = new Dictionary<string, long>(), TurnUses = new Dictionary<string, int>(),
+            IncomeBonus = effect.Income?.Apply(template.IncomeBonus) ?? template.IncomeBonus,
             Recruitment = (effect.Recruitment ?? template.Recruitment).ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal),
             Survival = template.Survival with { ExcludedBuildings = template.Survival.ExcludedBuildings.ToArray() } };
         return world with { Factions = world.Factions.Append(created).ToArray() };

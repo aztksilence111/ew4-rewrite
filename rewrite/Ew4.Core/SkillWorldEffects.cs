@@ -41,7 +41,8 @@ public sealed partial class RuleEventBus
             Icon = definition.Icon, Effects = definition.Effects }, new SkillSlot(s.Id, "status." + s.Id, s.Level));
     });
 
-    private static double StackedValue(ExtensionEffect effect, SkillStatus? status) => effect.Operation.EndsWith("multiplier", StringComparison.Ordinal)
+    private static double StackedValue(ExtensionEffect effect, SkillStatus? status) => effect.Operation == "morale" ? effect.Value
+        : effect.Operation.EndsWith("multiplier", StringComparison.Ordinal)
         ? Math.Pow(effect.Value, status?.Stacks ?? 1) : effect.Value * (status?.Stacks ?? 1);
 
     private static UnitState?[] EffectTargets(WorldState world, UnitState source, UnitState selected, int? selectedCell, ExtensionEffect effect)
@@ -73,11 +74,12 @@ public sealed partial class RuleEventBus
     {
         if (cell < 0 || cell >= world.Cells.Count) return false;
         var site = world.Cells[cell];
-        return profile.Category != "fort" && site.Terrain.CanTraverse()
-            && (profile.Category == "naval" ? site.Terrain.Sea : !site.Terrain.Sea || transport)
+        return (profile.Category != "fort" || WorldUnitLayers.Air(world, profile)) && WorldUnitLayers.ValidTerrain(world, profile, cell)
+            && (WorldUnitLayers.Air(world, profile) || (profile.Category == "naval" ? site.Terrain.Sea : !site.Terrain.Sea || transport))
             && (site.Owner == null || WorldDiplomacy.Allied(world, owner, site.Owner))
-            && world.Units.Count(u => u.Cell == cell) < world.Limits.UnitsPerCell
-            && world.Units.Where(u => u.Cell == cell).All(u => WorldDiplomacy.Allied(world, owner, u.Owner));
+            && WorldUnitLayers.HasSpace(world, profile, owner, cell)
+            && world.Units.Where(u => u.Cell == cell && WorldUnitLayers.Layer(world, u.Combatant.Profile) == WorldUnitLayers.Layer(world, profile))
+                .All(u => WorldDiplomacy.Allied(world, owner, u.Owner));
     }
 
     private WorldState ApplyEffect(WorldState world, UnitState source, UnitState? target, int cell,
@@ -94,8 +96,9 @@ public sealed partial class RuleEventBus
             while (world.Units.Any(u => u.Id == id) || world.DestroyedScenarioUnits.Contains(id))
                 id = "summon." + world.Revision + "." + cell + "." + ++serial;
             var summoned = new UnitState { Id = id, Owner = source.Owner, Cell = cell, Support = template.Support,
-                Combatant = new Combatant { Profile = template.Profile, Health = template.Profile.MaxHealth,
-                    AtSea = world.Cells[cell].Terrain.Sea, BuildingKind = world.Cells[cell].BuildingKind }, Acted = true };
+                Combatant = RefreshAttributes(new Combatant { Profile = template.Profile, Health = template.Profile.MaxHealth,
+                    AtSea = !WorldUnitLayers.Air(world, template.Profile) && world.Cells[cell].Terrain.Sea,
+                    BuildingKind = WorldUnitLayers.Air(world, template.Profile) ? null : world.Cells[cell].BuildingKind }), Acted = true };
             return world with { Units = world.Units.Append(summoned).ToArray() };
         }
         if (effect.Operation == "teleport")
@@ -105,7 +108,8 @@ public sealed partial class RuleEventBus
                 throw new RuleViolation("skill.teleport", "Invalid teleport destination");
             var next = world with { Units = world.Units.Select(u => u.Id != caster.Id ? u : u with {
                 Cell = cell, RemainingMovement = 0, Combatant = u.Combatant with {
-                    AtSea = world.Cells[cell].Terrain.Sea, BuildingKind = world.Cells[cell].BuildingKind } }).ToArray() };
+                    AtSea = !WorldUnitLayers.Air(world, u) && world.Cells[cell].Terrain.Sea,
+                    BuildingKind = WorldUnitLayers.Air(world, u) ? null : world.Cells[cell].BuildingKind } }).ToArray() };
             // Teleportation does not traverse or claim territory; only neutral or friendly destinations are allowed.
             return WorldDeaths.RefreshMorale(next, movement?.NeutralCamps ?? world.DiplomacyNeutralCamps);
         }
@@ -116,6 +120,19 @@ public sealed partial class RuleEventBus
                     checked(f.Resources.Food + (effect.Operation == "food" ? amount : 0))) }).ToArray() };
         target = target == null ? null : world.Units.SingleOrDefault(u => u.Id == target.Id);
         if (target == null) return world;
+        if (effect.Operation == "morale")
+        {
+            if (amount is < -3 or > 1) throw new RuleViolation("skill.morale", "Morale must be between -3 and 1");
+            if (amount < 0 && !WorldDiplomacy.Allied(world, source.Owner, target.Owner))
+                world = WorldDiplomacy.Attacked(world, source.Owner, target.Owner, world.DiplomacyNeutralCamps);
+            var morale = MoraleState.Set(amount, target.Combatant.Has(Ew4Combat.Skill(3)));
+            int effective = TurnEconomy.Morale(morale.Baseline, morale.Duration, target.LocalPenalty,
+                world.Factions.Single(f => f.Id == target.Owner).Shortage,
+                target.Support.Logistics || target.Combatant.FoodExempt || target.Combatant.Has(Ew4Combat.Skill(22)),
+                target.Combatant.Has(Ew4Combat.Skill(3)));
+            return world with { Units = world.Units.Select(u => u.Id != target.Id ? u : u with {
+                Morale = morale with { Effective = effective }, Combatant = u.Combatant with { Morale = effective } }).ToArray() };
+        }
         if (effect.Operation == "damage")
         {
             if (amount > 0 && target.Owner != creditOwner) world = WorldDiplomacy.Attacked(world, creditOwner, target.Owner, world.DiplomacyNeutralCamps);
@@ -137,21 +154,22 @@ public sealed partial class RuleEventBus
             if (statuses.Length > 64) throw new RuleViolation("skill.status", "Too many statuses");
             if (!WorldDiplomacy.Allied(world, source.Owner, target.Owner))
                 world = WorldDiplomacy.Attacked(world, source.Owner, target.Owner, world.DiplomacyNeutralCamps);
+            var combatant = RefreshAttributes(target.Combatant with { Statuses = statuses });
             return world with { Units = world.Units.Select(u => u.Id != target.Id ? u : u with {
-                Combatant = u.Combatant with { Statuses = statuses }, ExtensionMovementLimit = MovementBudget(u.Combatant with { Statuses = statuses }),
-                RemainingMovement = Math.Min(u.RemainingMovement, MovementBudget(u.Combatant with { Statuses = statuses })) }).ToArray(),
+                Combatant = combatant, ExtensionMovementLimit = MovementBudget(combatant),
+                RemainingMovement = Math.Min(u.RemainingMovement, MovementBudget(combatant)) }).ToArray(),
                 ExtensionState = old == null || definition.Stacking == "replace" ? ClearStatusState(world, target.Id, definition.Id) : world.ExtensionState };
         }
         if (effect.Operation == "remove_status")
             return world with { Units = world.Units.Select(u => {
                 if (u.Id != target.Id) return u;
-                var combatant = u.Combatant with { Statuses = u.Combatant.Statuses.Where(s => s.Id != effect.Status).ToArray() };
+                var combatant = RefreshAttributes(u.Combatant with { Statuses = u.Combatant.Statuses.Where(s => s.Id != effect.Status).ToArray() });
                 return u with { Combatant = combatant, ExtensionMovementLimit = MovementBudget(combatant),
                     RemainingMovement = Math.Min(u.RemainingMovement, MovementBudget(combatant)) };
             }).ToArray(),
                 ExtensionState = ClearStatusState(world, target.Id, effect.Status!) };
         return world with { Units = world.Units.Select(u => u.Id != target.Id ? u : effect.Operation == "heal"
-            ? u with { Combatant = u.Combatant with { Health = (int)Math.Min(u.Combatant.Profile.MaxHealth, (long)u.Combatant.Health + amount) } }
+            ? u with { Combatant = u.Combatant with { Health = (int)Math.Min(u.Combatant.MaximumHealth, (long)u.Combatant.Health + amount) } }
             : effect.Operation == "movement" ? u with { ExtensionMovementLimit = MovementBudget(u.Combatant),
                 RemainingMovement = (int)Math.Max(0, Math.Min(MovementBudget(u.Combatant), (long)u.RemainingMovement + amount)) }
             : throw new RuleViolation("extension.operation", effect.Operation)).ToArray() };
@@ -172,8 +190,8 @@ public sealed partial class RuleEventBus
             if (unit.Owner != faction) continue;
             foreach (var status in unit.Combatant.Statuses.Where(s => s.RemainingTurns == 1))
                 world = world with { ExtensionState = ClearStatusState(world, unit.Id, status.Id) };
-            var combatant = unit.Combatant with { Statuses = unit.Combatant.Statuses.Where(s => s.RemainingTurns > 1)
-                    .Select(s => s with { RemainingTurns = s.RemainingTurns - 1 }).ToArray() };
+            var combatant = RefreshAttributes(unit.Combatant with { Statuses = unit.Combatant.Statuses.Where(s => s.RemainingTurns > 1)
+                    .Select(s => s with { RemainingTurns = s.RemainingTurns - 1 }).ToArray() });
             int limit = MovementBudget(combatant);
             units[i] = unit with { Combatant = combatant, ExtensionMovementLimit = limit, RemainingMovement = Math.Min(unit.RemainingMovement, limit) };
         }
@@ -185,7 +203,8 @@ public sealed partial class RuleEventBus
         double budget = unit.Profile.Movement;
         foreach (var (skill, slot) in Bound(unit).Where(p => p.Skill.Kind == "passive"))
             foreach (var effect in skill.Effects.Where(e => e.Event == "movement.modify"
-                && (e.TargetTag == null || unit.Profile.Traits.Contains(e.TargetTag))))
+                && (e.TargetTag == null || unit.Profile.Traits.Contains(e.TargetTag))
+                && (e.When == null || e.When.Matches(unit, unit, null))))
             {
                 var status = unit.Statuses.SingleOrDefault(s => "status." + s.Id == slot.InstanceId);
                 double amount = effect.Script == null ? StackedValue(effect, status) : Scripts!.Run(effect.Script, effect.Function!,

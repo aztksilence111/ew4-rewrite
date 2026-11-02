@@ -35,9 +35,10 @@ internal sealed class MovementOwnership
         Cells = buffer.Seal();
     }
     internal static MovementOwnership Move(WorldState source, HexMap map, IReadOnlyCollection<int> occupied,
-        IReadOnlyList<int> path, string owner, TerritoryMoveRules rules)
+        IReadOnlyList<int> path, string owner, TerritoryMoveRules rules, bool capture = true)
     {
         var buffer = new OwnershipBuffer(source.Cells);
+        if (!capture) return new(source, buffer);
         TerritoryClaims.MoveOwners(map, source.Cells, occupied, path, owner, rules, buffer);
         JurisdictionClaims.MoveOwners(source, buffer, path, owner);
         return new(source, buffer);

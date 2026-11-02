@@ -1,0 +1,6 @@
+{
+  "schema": 1,
+  "apiVersion": 3,
+  "unitLayers": "rewrite/unit-layers.json",
+  "construction": "rewrite/construction.json"
+}

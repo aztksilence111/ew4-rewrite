@@ -83,14 +83,16 @@ public static class WorldBattle
         var defender = state.Units.SingleOrDefault(u => u.Id == defenderId);
         if (attacker == null || defender == null || attacker.Owner != state.ActiveFaction
             || state.Factions.Single(f => f.Id == attacker.Owner).Defeated
-            || WorldDiplomacy.Allied(state, attacker.Owner, defender.Owner))
+            || WorldDiplomacy.Allied(state, attacker.Owner, defender.Owner) || !WorldUnitLayers.CanAttack(state, attacker, defender))
             throw new RuleViolation("attack.target", "Attacker or hostile target is unavailable");
         var map = new HexMap(state.Width, state.Height);
         int distance = map.Distance(attacker.Cell, defender.Cell);
         if (AttackLegality.Check(true, true, attacker.Combatant.ConstructionTurns, attacker.Acted, attacker.Morale.Effective,
-            distance, attacker.Combatant.Profile.MinimumRange, attacker.Combatant.Profile.MaximumRange) != AttackBlock.None)
+            distance, attacker.Combatant.Profile.MinimumRange, attacker.Combatant.MaximumRange) != AttackBlock.None)
             throw new RuleViolation("attack.unavailable", "Attacker cannot attack this target");
         var a = CombatContext.Resolve(state, attacker, defender.Combatant.Profile.Category, rules.Context);
+        if (!WorldUnitLayers.CanAttack(state, defender, attacker, counterattack: true))
+            a = a with { Profile = a.Profile with { Traits = a.Profile.Traits.Append("no_retaliation").Distinct().ToArray() } };
         var d = CombatContext.Resolve(state, defender, attacker.Combatant.Profile.Category, rules.Context);
         var splash = SplashCombat.Target(state, attacker, defender, rules.Splash);
         CombatExchange? secondary = splash == null ? null : new(
@@ -170,7 +172,7 @@ public static class WorldBattle
                 SetUnit(survivor with { RemainingMovement = 0, Acted = true });
             if (defenderDead)
             {
-                ClearInstallation(defender.Cell);
+                if (!WorldUnitLayers.Air(state, defender)) ClearInstallation(defender.Cell);
                 if (Unit(attacker.Id) != null && Roll() < rules.KillMoraleProbability) SetMorale(attacker.Id, 1);
             }
             else if (rules.SuppressingCategories.Contains(attacker.Combatant.Profile.Category)
@@ -180,7 +182,7 @@ public static class WorldBattle
             if (splash != null && battle.SplashDamage > 0 && Damage(splash.Id, battle.SplashDamage, attacker))
             {
                 RecordKill(attacker, splash);
-                ClearInstallation(splash.Cell);
+                if (!WorldUnitLayers.Air(state, splash)) ClearInstallation(splash.Cell);
             }
             CollectMedals(attacker, defender, battle.Dealt, battle.Taken);
             ConsumeWeapon(attacker.Id);
@@ -242,6 +244,7 @@ public static class WorldBattle
 
         private void Ignite(UnitState originalTarget, UnitProfile weapon)
         {
+            if (WorldUnitLayers.Air(state, originalTarget)) return;
             notices.Add(new("battle.environment_check", originalTarget.Id));
             if (!rules.ResolveIgnition || weapon.IgnitionNumerator == 0) return;
             var cell = state.Cells[originalTarget.Cell];
@@ -308,7 +311,7 @@ public static class WorldBattle
             int level = track.Levels.ToList().FindIndex(l => l.Id == unit.Veterancy);
             var result = Progression.Award(new(level, unit.Experience), amount, track);
             SetUnit(unit with { Experience = result.State.Experience, Veterancy = track.Levels[result.State.Level].Id,
-                Combatant = unit.Combatant with { Health = (int)Math.Min(unit.Combatant.Profile.MaxHealth, (long)unit.Combatant.Health + result.Healing) } });
+                Combatant = unit.Combatant with { Health = (int)Math.Min(unit.Combatant.MaximumHealth, (long)unit.Combatant.Health + result.Healing) } });
         }
 
         private void AwardCommander(string id, long amount, bool title)
@@ -332,8 +335,9 @@ public static class WorldBattle
                 if (!title && rules.RankHealthBonuses.TryGetValue(level, out int bonus))
                 {
                     int maximum = checked(unit.Combatant.Profile.MaxHealth - commander.RankHealthBonus + bonus);
+                    int effectiveMaximum = checked(maximum + (unit.Combatant.AttributeModifiers?.Health ?? 0));
                     if (maximum < 1) throw new RuleViolation("battle.rank_health", "Rank change would produce an invalid maximum health");
-                    int health = Math.Max(1, (int)Math.Min(maximum, (long)unit.Combatant.Health * maximum / unit.Combatant.Profile.MaxHealth));
+                    int health = Math.Max(1, (int)Math.Min(effectiveMaximum, (long)unit.Combatant.Health * effectiveMaximum / unit.Combatant.MaximumHealth));
                     unit = unit with { Combatant = unit.Combatant with { Health = health, Profile = unit.Combatant.Profile with { MaxHealth = maximum } } };
                     commander = commander with { RankHealthBonus = bonus };
                 }

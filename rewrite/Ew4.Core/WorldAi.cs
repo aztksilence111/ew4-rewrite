@@ -56,8 +56,8 @@ public static partial class WorldAi
         var profile = value.Combatant.Profile;
         return new()
         {
-            Category = profile.Category, Grade = profile.Grade, Health = value.Combatant.Health, MaximumHealth = profile.MaxHealth,
-            ExperienceLevel = level, AtSea = state.Cells[value.Cell].Terrain.Sea, HasCommander = value.CommanderId != null,
+            Category = profile.Category, Grade = profile.Grade, Health = value.Combatant.Health, MaximumHealth = value.Combatant.MaximumHealth,
+            ExperienceLevel = level, AtSea = !WorldUnitLayers.Air(state, value) && state.Cells[value.Cell].Terrain.Sea, HasCommander = value.CommanderId != null,
             Transport = value.Transport, UnderConstruction = value.Combatant.ConstructionTurns > 0, PriorityCommander = rules.PriorityBehaviors.Contains(value.Behavior),
             Traits = profile.Traits.Concat(rules.ProfileTraits.TryGetValue(profile.Id, out var traits) ? traits : Array.Empty<string>()).Distinct(StringComparer.Ordinal).ToArray()
         };
@@ -106,13 +106,13 @@ public static partial class WorldAi
         var factions = PlanningScope.Queries(state)?.Factions ?? state.Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
         var result = new List<AiCandidate<AiStrikeCommand>>();
         var attacker = Facts(state, unit, rules);
-        var targets = PlanningScope.Queries(state)?.Nearby(map, unit.Cell, unit.Combatant.Profile.MaximumRange, true) ?? state.Units;
+        var targets = PlanningScope.Queries(state)?.Nearby(map, unit.Cell, unit.Combatant.MaximumRange, true) ?? state.Units;
         foreach (var target in targets)
         {
             var owner = factions[target.Owner];
-            if (!WorldDiplomacy.Hostile(state, active.Id, owner.Id, rules.NeutralCamps)) continue;
+            if (!WorldDiplomacy.Hostile(state, active.Id, owner.Id, rules.NeutralCamps) || !WorldUnitLayers.CanAttack(state, unit, target)) continue;
             if (AttackLegality.Check(true, true, unit.Combatant.ConstructionTurns, unit.Acted, unit.Morale.Effective,
-                map.Distance(unit.Cell, target.Cell), unit.Combatant.Profile.MinimumRange, unit.Combatant.Profile.MaximumRange) != AttackBlock.None) continue;
+                map.Distance(unit.Cell, target.Cell), unit.Combatant.Profile.MinimumRange, unit.Combatant.MaximumRange) != AttackBlock.None) continue;
             long score = AiTactics.AttackScore(attacker, Facts(state, target, rules), Site(state, unit.Cell, rules), Site(state, target.Cell, rules), false, rules.Tactics);
             result.Add(new(new(state.Revision, unit.Id, target.Id), AiTactics.StrikeScore(score, attacker, rules.Tactics)));
         }
@@ -138,13 +138,15 @@ public static partial class WorldAi
         var occupied = PlanningScope.Queries(state)?.Occupants;
         foreach (int cellId in range.Keys.OrderBy(i => i))
         {
-            if (cellId == unit.Cell || (occupied != null ? occupied.ContainsKey(cellId) : state.Units.Any(u => u.Cell == cellId))) continue;
+            if (cellId == unit.Cell || (WorldUnitLayers.Enabled(state)
+                ? !WorldUnitLayers.HasSpace(state, unit.Combatant.Profile, unit.Owner, cellId, unit.Id)
+                : (occupied != null ? occupied.ContainsKey(cellId) : state.Units.Any(u => u.Cell == cellId)))) continue;
             var site = state.Cells[cellId];
             var owner = site.Owner == null ? null : state.Factions.Single(f => f.Id == site.Owner);
             var relation = owner?.Id == faction.Id ? AiTerritoryRelation.Owned : owner != null && WorldDiplomacy.Allied(state, owner.Id, faction.Id) ? AiTerritoryRelation.Allied
                 : owner == null || !WorldDiplomacy.Hostile(state, faction.Id, owner.Id, rules.NeutralCamps) ? AiTerritoryRelation.NonAllied : AiTerritoryRelation.Hostile;
             var facts = new AiMoveFacts(sourceValue, AiTactics.Location(Site(state, cellId, rules), null, rules.Tactics), relation,
-                site.Environment, site.BuildingKind == null ? 0 : site.BuildingLevel, unit.Combatant.Health < unit.Combatant.Profile.MaxHealth, owner?.Human == true);
+                site.Environment, site.BuildingKind == null ? 0 : site.BuildingLevel, unit.Combatant.Health < unit.Combatant.MaximumHealth, owner?.Human == true);
             var projected = WorldActions.ProjectMove(state, unit.Id, cellId, rules.Movement, range).State;
             long score = AiMovement.MoveScore(facts, rules.MoveScoring);
             if (score > 0 && (move == null || score > move.Score)) move = new(new(state.Revision, unit.Id, cellId), score);
@@ -156,7 +158,7 @@ public static partial class WorldAi
                 var scoreUnit = scoreState.Units.Single(u => u.Id == unit.Id);
                 long attackScore = AiTactics.AttackScore(Facts(scoreState, scoreUnit, rules), Facts(projected, targetUnit, rules),
                     Site(scoreState, scoreUnit.Cell, rules), Site(projected, targetUnit.Cell, rules), false, rules.Tactics);
-                long combined = AiMovement.MoveAttackScore(facts, attackScore, unit.Combatant.Health, unit.Combatant.Profile.MaxHealth, rules.MoveScoring);
+                long combined = AiMovement.MoveAttackScore(facts, attackScore, unit.Combatant.Health, unit.Combatant.MaximumHealth, rules.MoveScoring);
                 if (combined > 0 && (combo == null || combined > combo.Score)) combo = new(new(state.Revision, unit.Id, cellId, targetUnit.Id), combined);
             }
         }

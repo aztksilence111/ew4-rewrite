@@ -146,7 +146,7 @@ public static partial class PlayerAi
     {
         var map = new HexMap(world.Width, world.Height);
         var members = world.Units.Where(u => u.Owner == world.ActiveFaction && draft.Units.Contains(u.Id))
-            .OrderBy(u => u.Combatant.Profile.MaximumRange > 1 ? 1 : 0).ThenBy(u => u.Cell).ThenBy(u => u.Id, StringComparer.Ordinal).ToArray();
+            .OrderBy(u => u.Combatant.MaximumRange > 1 ? 1 : 0).ThenBy(u => u.Cell).ThenBy(u => u.Id, StringComparer.Ordinal).ToArray();
         var area = MissionArea(world, draft);
         var line = draft.Kind == "defend" ? Targets(draft).Take(1).ToArray() : DeploymentLine(world, draft.Line);
         var outsiders = new HashSet<int>(world.Units.Where(u => !draft.Units.Contains(u.Id)).Select(u => u.Cell));
@@ -163,7 +163,7 @@ public static partial class PlayerAi
             if (candidates.Count == 0) continue;
             var distances = StationDistances(world, unit, ai, candidates);
             int anchor = line[members.Length == 1 ? line.Length / 2 : (int)((long)i * (line.Length - 1) / (members.Length - 1))];
-            bool ranged = unit.Combatant.Profile.MaximumRange > 1;
+            bool ranged = unit.Combatant.MaximumRange > 1;
             int destination = candidates.Where(distances.ContainsKey)
                 .OrderBy(c => distances[c] + map.Distance(c, anchor) * 6 + (ranged && draft.Radius > 0 && line.Contains(c) ? 14 : 0)
                     + (ranged && draft.Kind == "line_attack" && draft.Goal.HasValue && map.Distance(c, draft.Goal.Value) < map.Distance(anchor, draft.Goal.Value) ? 12 : 0))

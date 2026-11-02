@@ -41,7 +41,8 @@ public sealed class LegacyCommanderAccounts
         && SourceRevision == "73e030e5c7d0f9a227b27cc1eb43cbe28f158177b02104788d02bca563ea12eb";
     private LegacyCommanderAccounts(LegacyRuntimeCatalog runtime, Dictionary<int, int> title, Dictionary<int, int> commanders, CommanderInheritanceRules inheritance, string revision)
     { this.runtime = runtime; TitleCommerce = new ReadOnlyDictionary<int, int>(title); CommanderCommerce = new ReadOnlyDictionary<int, int>(commanders); Inheritance = inheritance; SourceRevision = revision; }
-    public static LegacyCommanderAccounts Read(LegacyRuntimeCatalog runtime, LegacyCombatCatalog combat, string nativeTables)
+    public static LegacyCommanderAccounts Read(LegacyRuntimeCatalog runtime, LegacyCombatCatalog combat, string nativeTables,
+        IReadOnlyList<InheritedAbilityRule>? customAbilities = null)
     {
         using var document = JsonDocument.Parse(nativeTables);
         var data = document.RootElement;
@@ -54,7 +55,8 @@ public sealed class LegacyCommanderAccounts
         var inheritance = new CommanderInheritanceRules { Rank = combat.RankProgression, Title = combat.TitleProgression,
             RankPercent = data.GetProperty("rank_percent").EnumerateArray().Select(v => v.GetInt32()).ToArray(),
             TitlePercent = data.GetProperty("title_percent").EnumerateArray().Select(v => v.GetInt32()).ToArray(),
-            Abilities = Abilities.Select((id, i) => new InheritedAbilityRule(Ew4Combat.Skill(33 + i), id, skills.Gain(33 + i), skills.Maximum(33 + i))).ToArray() };
+            Abilities = Abilities.Select((id, i) => new InheritedAbilityRule(Ew4Combat.Skill(33 + i), id, skills.Gain(33 + i), skills.Maximum(33 + i)))
+                .Concat(customAbilities ?? []).ToArray() };
         inheritance.Validate();
         var business = runtime.SourceTrees.GetProperty("def_commander.xml").GetProperty("children").EnumerateArray()
             .Select(v => v.GetProperty("attributes")).ToDictionary(v => int.Parse(v.GetProperty("id").GetString()!, CultureInfo.InvariantCulture),
@@ -62,6 +64,7 @@ public sealed class LegacyCommanderAccounts
         if (business.Count != runtime.Commanders.Count || business.Any(p => !runtime.Commanders.ContainsKey(p.Key) || p.Value < 0))
             throw new RuleViolation("legacy.metagame_tables", "Commander commerce attributes disagree with the catalog");
         string revision = Convert.ToHexStringLower(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new { nativeTables, combat.SourceRevision, runtime.SourceHashes, runtime.DefinitionRevision })));
+        if (customAbilities?.Count > 0) revision = Convert.ToHexStringLower(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new { revision, customAbilities })));
         return new(runtime, commerce, business, inheritance, revision);
     }
     public AccountCommanderRules Rules() => new() { Inheritance = Inheritance,
@@ -84,7 +87,9 @@ public sealed class LegacyCommanderAccounts
     {
         if (!runtime.Commanders.TryGetValue(source.LegacyId, out var definition) || source.Items.Any(i => i >= 0 && !runtime.Items.ContainsKey(i)))
             throw new RuleViolation("legacy.roster_definition", "Unknown owned commander or item reference");
-        var result = new OwnedCommander(instanceId, definition.Definition.Id, source.Learning, source.Training,
+        var abilities = FromDefinition(source.LegacyId, instanceId).Learning.Abilities.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal);
+        foreach (var ability in source.Learning.Abilities) abilities[ability.Key] = ability.Value;
+        var result = new OwnedCommander(instanceId, definition.Definition.Id, source.Learning with { Abilities = abilities }, source.Training,
             source.Items.Where(i => i >= 0).Select(i => runtime.Items[i].Id).ToArray());
         result.Validate();
         if (result.Learning.Rank.Level >= Inheritance.Rank.Levels.Count || result.Learning.Title.Level >= Inheritance.Title.Levels.Count)

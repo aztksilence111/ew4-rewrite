@@ -9,7 +9,7 @@ public sealed record CampaignChapter(int Id, string Name, string Start, string E
 public sealed record ScenarioPresentation(string Id, string Description, string? Commander, string Age,
     int Chapter, string? Alternate, string[] Countries, bool Hidden = false);
 
-public sealed class ClientContent
+public sealed partial class ClientContent
 {
     private readonly Func<string, byte[]> read;
     public LegacyScenarioCatalogs Catalogs { get; }
@@ -65,7 +65,7 @@ public sealed class ClientContent
         var combat = LegacyCombatCatalog.Read(definitionsBundle.RuntimeRules.ToJsonString(),
             Text("def_terraintype.xml"), Text("def_installation.xml"), buildings, Extensions.LegacySkills);
         var accounts = LegacyCommanderAccounts.Read(runtime, combat,
-            definitionsBundle.MetagameRules.ToJsonString());
+            definitionsBundle.MetagameRules.ToJsonString(), Extensions.CommanderAbilities?.Inheritance);
         Catalogs = new(runtime, LegacyTerrainRules.FromXml(Text("def_mapterrain.xml"), Text("def_terraintype.xml")), buildings,
             LegacyRecruitmentCatalog.Read(Text("def_card.xml")), combat, accounts, LegacyItemTradingCatalog.Read(Text("def_item.xml"), correctItems, runtime.Items),
             LegacyWarzoneTechnology.Read(Text("def_warzonetech.xml")), LegacyDialogueCatalog.Read(Text("def_dialogues.xml"), Text("stringtable_cn.ini")));
@@ -144,8 +144,24 @@ public sealed class ClientContent
             throw new RuleViolation("extension.victory_presentation", "Victory screen references an unknown scenario");
         if (Extensions.ScenarioEvents.Keys.Any(id => !Scenarios.Any(s => s.Id == id)))
             throw new RuleViolation("scenario.reference", "Event rules reference an unknown scenario");
+        if (Extensions.Economy.Keys.Any(id => !Scenarios.Any(s => s.Id == id)))
+            throw new RuleViolation("extension.economy", "Economy rules reference an unknown scenario");
         if (Extensions.DeploymentLimits.Keys.Any(id => id != "*" && !Scenarios.Any(s => s.Id == id)))
             throw new RuleViolation("extension.deployment_limit", "Deployment limits reference an unknown scenario");
+        if (Extensions.UnitLayers?.Profiles.Keys.Any(id => !Catalogs.Runtime.Profiles.ContainsKey(id)) == true)
+            throw new RuleViolation("layers.profile", "Unit layers reference an unknown unit profile");
+        if (Extensions.Construction is { } construction && construction.BuilderProfiles
+            .Concat(construction.Buildings.Values.SelectMany(b => b.Recruitment.Select(r => r.Profile)))
+            .Any(id => !Catalogs.Runtime.Profiles.ContainsKey(id)))
+            throw new RuleViolation("construction.profile", "Construction references an unknown unit profile");
+        if (Extensions.Construction is { } buildingConfig)
+        {
+            using var visualManifest = System.Text.Json.JsonDocument.Parse(originalRead("client/manifest.json"));
+            var atlases = visualManifest.RootElement.GetProperty("atlases");
+            foreach (string image in buildingConfig.Buildings.Values.SelectMany(b => b.Levels.Select(l => l.Image)))
+                if (!new[] { "buildings", "buildings_hd" }.Any(atlas => atlases.TryGetProperty(atlas, out var sprites) && sprites.TryGetProperty(image, out _)))
+                    throw new RuleViolation("construction.image", "Custom building image is absent from the buildings atlas: " + image);
+        }
         if (Extensions.StageIntroPresentations.Keys.Any(id => id != "*" && !Scenarios.Any(s => s.Id == id)))
             throw new RuleViolation("extension.stage_intro", "Stage intro references an unknown scenario");
         if (Extensions.PauseObjectivesPresentations.Keys.Any(id => id != "*" && !Scenarios.Any(s => s.Id == id)))
@@ -226,7 +242,7 @@ public sealed class ClientContent
         {
             Id = id, Mode = choice.Mode, SelectedCountry = selectedCountry, LocalPlayers = localPlayers,
             CityNames = scenarioCityNames.TryGetValue(id, out var names) ? names : Cities,
-            Warzone = warzone,
+            Warzone = warzone, UnitLayers = Extensions.UnitLayers, Construction = Extensions.Construction,
             TechnologySnapshot = choice.Mode == 1 ? technologySnapshot ?? Catalogs.Technology.Snapshot(account, warzone) : null,
             CountryNames = battle.Factions.Select(f => f.CountryId).Distinct().ToDictionary(c => c, CountryName),
             CountryUnitVariants = battle.Factions.Where(f => Country(f.CountryId)?.UnitVariant is string variant && variant != f.Variant
@@ -258,6 +274,7 @@ public sealed class ClientContent
             }
             var movement = rules.Movement with { Extensions = Extensions.Bus, Victory = victory };
             var turns = rules.Turns with { Extensions = Extensions.Bus, Victory = victory };
+            if (Extensions.Economy.TryGetValue(id, out var economy)) turns = ScenarioEconomy.BuildingRules(turns, economy);
             var combat = rules.Battle with { Combat = rules.Battle.Combat with { Extensions = Extensions.Bus }, Victory = victory };
             started = started with { Rules = rules with { Movement = movement, Turns = turns, Battle = combat,
                 Commanders = rules.Commanders with { Extensions = Extensions.Bus },
@@ -275,8 +292,9 @@ public sealed class ClientContent
                     ScenarioEvents = (Extensions.ScenarioEvents.GetValueOrDefault(id) ?? [])
                         .Select(e => ScenarioFactions.BindTemplates(e, started.Session.PlayerFaction)).ToArray() };
                 world = world with { Units = world.Units.Select(unit => {
-                    int budget = Extensions.Bus.MovementBudget(unit.Combatant);
-                    return unit with { ExtensionMovementLimit = budget, RemainingMovement = unit.RemainingMovement == unit.Combatant.Profile.Movement
+                    var combatant = Extensions.Bus.RefreshAttributes(unit.Combatant);
+                    int budget = Extensions.Bus.MovementBudget(combatant);
+                    return unit with { Combatant = combatant, ExtensionMovementLimit = budget, RemainingMovement = unit.RemainingMovement == unit.Combatant.Profile.Movement
                         ? budget : Math.Min(unit.RemainingMovement, budget) };
                 }).ToArray() };
                 world = ScenarioArmyContent.Prepare(this, world, started.Rules.Commanders);
@@ -311,6 +329,8 @@ public sealed class ClientContent
                 started = started with { Rules = started.Rules with { Production = production, Recruitment = recruitment } };
                 foreach (string unit in world.Units.Select(u => u.Id).ToArray())
                     world = Extensions.Bus.Dispatch(world, "scenario.start", unit, new Ew4Random(world.RandomState));
+                if (Extensions.ApiVersion >= 3 && world.Phase == TurnPhase.Active)
+                    world = Extensions.Bus.DispatchFactionTurn(world, world.ActiveFaction, "turn.start");
                 world = world with { ArmyCapacity = ArmyCapacity.Resolve(id, CapacityCountries(world)) };
                 world.Validate();
                 started = started with { Session = started.Session with { World = world } };
@@ -365,7 +385,7 @@ public sealed class ClientContent
                 Seed = capacityWorld.RandomState, Rules = Diplomacy.ResolveRules(id, capacityCountries, started.Session.PlayerFaction) } });
         }
         started = started with { Session = started.Session with { World = capacityWorld } };
-        return started;
+        return ConfigureConstruction(started, CapacityCountries(started.Session.World));
     }
     private static void ValidateVictoryTargets(ExtensionVictoryRules rules, WorldState world)
     {

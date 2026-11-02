@@ -24,7 +24,7 @@ public static class ConsumableItems
         {
             "ew4.item_effect.6" => unit.Morale.Effective < 1 ? null : "部队士气已经高昂",
             "ew4.item_effect.7" => unit.Morale.Effective < 0 ? null : "部队士气无需恢复",
-            "ew4.item_effect.8" => item.Value > 0 && unit.Combatant.Health < unit.Combatant.Profile.MaxHealth ? null : "部队无需治疗",
+            "ew4.item_effect.8" => item.Value > 0 && unit.Combatant.Health < unit.Combatant.MaximumHealth ? null : "部队无需治疗",
             "ew4.item_effect.17" => training.Stages.Take(training.Stages.Count - 1).Any(s => s.Id == unit.Veterancy)
                 ? null : "部队等级已满",
             _ => "此物品没有可用效果"
@@ -50,13 +50,13 @@ public static class ConsumableItems
             changed = unit with { Morale = morale, Combatant = unit.Combatant with { Morale = morale.Effective } };
         }
         else if (item.Effect == "ew4.item_effect.8")
-            changed = unit with { Combatant = unit.Combatant with { Health = (int)Math.Min(unit.Combatant.Profile.MaxHealth,
+            changed = unit with { Combatant = unit.Combatant with { Health = (int)Math.Min(unit.Combatant.MaximumHealth,
                 (long)unit.Combatant.Health + item.Value) } };
         else if (item.Effect == "ew4.item_effect.17")
         {
             int level = training.Stages.ToList().FindIndex(s => s.Id == unit.Veterancy) + 1;
             changed = unit with { Veterancy = training.Stages[level].Id, Experience = 0,
-                Combatant = unit.Combatant with { Health = (int)Math.Min(unit.Combatant.Profile.MaxHealth,
+                Combatant = unit.Combatant with { Health = (int)Math.Min(unit.Combatant.MaximumHealth,
                     (long)unit.Combatant.Health + training.Stages[level].HealingOnEntry) } };
         }
         var world = state.World with { Units = state.World.Units.Select(u => u.Id == unitId ? changed : u).ToArray() };

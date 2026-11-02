@@ -47,10 +47,13 @@ public static partial class WorldAi
         if (unit.RemainingMovement < 1 || unit.Combatant.Profile.Movement < 1 || unit.Morale.Effective == -3 || behavior.Weight == AiStrategyBehavior.Zero)
             return new(state.Revision, unitId, state.AiRandomState, random.State, result);
         var map = new HexMap(state.Width, state.Height);
+        bool layered = WorldUnitLayers.Enabled(state), air = WorldUnitLayers.Air(state, unit);
         var queries = PlanningScope.Queries(state);
         var factions = queries?.Factions ?? state.Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
-        var occupants = queries?.Occupants ?? state.Units.GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => g.ToArray());
-        var goalFacts = queries?.Ai(rules).Goals ?? new Dictionary<int, AiStrategyGoal>();
+        var occupants = WorldUnitLayers.Enabled(state)
+            ? state.Units.Where(u => WorldUnitLayers.Same(state, unit, u)).GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => g.ToArray())
+            : queries?.Occupants ?? state.Units.GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => g.ToArray());
+        var goalFacts = !layered ? queries?.Ai(rules).Goals ?? new Dictionary<int, AiStrategyGoal>() : new Dictionary<int, AiStrategyGoal>();
         bool Hostile(string owner) => WorldDiplomacy.Hostile(state, faction.Id, owner, rules.NeutralCamps) && !factions[owner].Defeated;
         var facts = Facts(state, unit, rules);
         long threat = ThreatStrength(state, unit, rules);
@@ -75,17 +78,19 @@ public static partial class WorldAi
                 && owner != faction.Id && WorldDiplomacy.Allied(state, owner, faction.Id)
                 && !rules.Strategy.Landing.ReservedAlliedBuildings.Contains(building)
                 && rules.Strategy.Landing.AlliedBuildingChance.ContainsKey(building));
-            var strategyUnit = new AiStrategyUnit(unit.Combatant.Health, unit.Combatant.Profile.MaxHealth, unit.RemainingMovement,
+            var strategyUnit = new AiStrategyUnit(unit.Combatant.Health, unit.Combatant.MaximumHealth, unit.RemainingMovement,
                 facts.Category == rules.Tactics.NavalCategory, mover.Transport, unit.CommanderId != null, facts.AtSea, strength, threat);
             // Stable identifiers keep independent faction candidates unaffected by collection ordering.
             foreach (var opponent in state.Factions.Where(f => Hostile(f.Id)).OrderBy(f => f.Id, StringComparer.Ordinal))
             {
                 var goals = new List<AiStrategyGoalOption>();
-                foreach (int i in queries?.Targets[opponent.Id] ?? Enumerable.Range(0, state.Cells.Count))
+                foreach (int i in !layered && queries != null ? queries.Targets[opponent.Id] : Enumerable.Range(0, state.Cells.Count))
                 {
                     var cell = state.Cells[i];
-                    var stationed = occupants.TryGetValue(i, out var group) ? group : Array.Empty<UnitState>();
-                    if (!cell.Terrain.CanTraverse() || cell.Owner != opponent.Id && !stationed.Any(u => u.Owner == opponent.Id)) continue;
+                    var stationed = layered ? state.Units.Where(u => u.Cell == i && WorldUnitLayers.CanAttack(state, unit, u)).ToArray()
+                        : occupants.TryGetValue(i, out var group) ? group : Array.Empty<UnitState>();
+                    if (!(air ? cell.Terrain.Active : cell.Terrain.CanTraverse()) || cell.Owner != opponent.Id && !stationed.Any(u => u.Owner == opponent.Id)
+                        || air && !stationed.Any(u => Hostile(u.Owner))) continue;
                     if (stationed.Length > 0 && stationed.All(u => !Hostile(u.Owner))) continue;
                     if (!goalFacts.TryGetValue(i, out var goal))
                     {
@@ -111,13 +116,14 @@ public static partial class WorldAi
                     }
                     var endpoints = new List<int>();
                     // HexMap.Within preserves ascending cell order, including edge maps.
-                    foreach (int i in goal.Facts.HasUnit ? map.Within(goal.Cell, unit.Combatant.Profile.MaximumRange, true) : new[] { goal.Cell })
+                    foreach (int i in goal.Facts.HasUnit ? map.Within(goal.Cell, unit.Combatant.MaximumRange, true) : new[] { goal.Cell })
                     {
                         var cell = state.Cells[i];
-                        if (!cell.Terrain.CanTraverse() || occupants.ContainsKey(i) && i != unit.Cell
-                            || strategyUnit.Naval && !cell.Terrain.Sea || !strategyUnit.Naval && cell.Terrain.Sea && !mover.Transport) continue;
+                        if (!(air ? cell.Terrain.Active : cell.Terrain.CanTraverse())
+                            || (layered ? !WorldUnitLayers.HasSpace(state, unit.Combatant.Profile, unit.Owner, i, unit.Id) : occupants.ContainsKey(i) && i != unit.Cell)
+                            || !air && (strategyUnit.Naval && !cell.Terrain.Sea || !strategyUnit.Naval && cell.Terrain.Sea && !mover.Transport)) continue;
                         int d = map.Distance(i, goal.Cell);
-                        if (i == goal.Cell && !goal.Facts.HasUnit || goal.Facts.HasUnit && d >= unit.Combatant.Profile.MinimumRange && d <= unit.Combatant.Profile.MaximumRange)
+                        if (i == goal.Cell && !goal.Facts.HasUnit || goal.Facts.HasUnit && d >= unit.Combatant.Profile.MinimumRange && d <= unit.Combatant.MaximumRange)
                             endpoints.Add(i);
                     }
                     if (endpoints.Count == 0) continue;
@@ -159,7 +165,9 @@ public static partial class WorldAi
                         if (index == unit.Cell || !distances.TryGetValue(index, out long distance) || distance >= sourceDistance) continue;
                         var cell = state.Cells[index];
                         bool allied = cell.Owner != null && cell.Owner != faction.Id && WorldDiplomacy.Allied(state, cell.Owner, faction.Id);
-                        landings.Add(new(index, distance, map.Distance(unit.Cell, index), occupants.ContainsKey(index), cell.Environment, allied, cell.BuildingKind));
+                        landings.Add(new(index, distance, map.Distance(unit.Cell, index),
+                            layered ? !WorldUnitLayers.HasSpace(state, unit.Combatant.Profile, unit.Owner, index, unit.Id) : occupants.ContainsKey(index),
+                            air ? 0 : cell.Environment, air ? false : allied, air ? null : cell.BuildingKind));
                     }
                     int chosen = AiStrategy.SelectDestination(landings, behavior.AdjacentOnly, rules.Strategy.Landing, random.Next);
                     if (chosen < 0) continue;

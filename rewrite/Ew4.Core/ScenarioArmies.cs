@@ -93,7 +93,7 @@ public static class ScenarioArmies
         foreach (var effect in effects.Where(e => e.Type is "unit_spawn" or "unit_remove" or "commander_assign" or "commander_detach"))
         {
             ValidateEffect(effect);
-            if (effect.Cells.Any(i => i < 0 || i >= world.Cells.Count || !world.Cells[i].Terrain.CanTraverse()))
+            if (effect.Cells.Any(i => !ValidLocation(world, effect, i)))
                 throw new RuleViolation("scenario.reference", "Invalid army event location");
         }
         var declarations = effects.Where(e => e.Type == "unit_spawn").ToArray();
@@ -107,6 +107,11 @@ public static class ScenarioArmies
     public static IEnumerable<ScenarioEffect> Effects(WorldState world) => world.ScenarioEvents.SelectMany(ScenarioRules.Effects)
         .Concat(world.Story?.Library.Scenes.Values.SelectMany(s => s.Steps!).SelectMany(s => s.Choices).SelectMany(c => c.Effects)
             ?? Enumerable.Empty<ScenarioEffect>());
+
+    internal static bool ValidLocation(WorldState world, ScenarioEffect effect, int cell) =>
+        effect.Type == "unit_spawn" && effect.UnitTemplate != null
+            ? WorldUnitLayers.ValidTerrain(world, effect.UnitTemplate.Combatant.Profile, cell)
+            : cell >= 0 && cell < world.Cells.Count && world.Cells[cell].Terrain.CanTraverse();
 
     public static bool Declared(string pattern, string id) => pattern == id || pattern.Contains("{occurrence}", StringComparison.Ordinal)
         && Regex.IsMatch(id, "^" + Regex.Escape(pattern).Replace("\\{occurrence}", "[1-9][0-9]*", StringComparison.Ordinal) + "$");
@@ -150,7 +155,8 @@ public static class ScenarioArmies
             RetiredScenarioUnits = world.RetiredScenarioUnits.Append(unit.Id).Distinct(StringComparer.Ordinal).ToArray(),
             Commanders = world.Commanders.Select(c => c.Id == unit.CommanderId && effect.Disposition == "withdrawn" ? c with { Withdrawn = true } : c).ToArray()
         };
-        if (world.Cells[unit.Cell].Terrain.Sea && world.Cells[unit.Cell].BuildingKind == null && next.Units.All(u => u.Cell != unit.Cell))
+        if (!WorldUnitLayers.Air(world, unit) && world.Cells[unit.Cell].Terrain.Sea && world.Cells[unit.Cell].BuildingKind == null
+            && WorldUnitLayers.Surface(next).All(u => u.Cell != unit.Cell))
             next = next with { Cells = next.Cells.Select((c, i) => i == unit.Cell ? c with { Owner = null } : c).ToArray() };
         notices.Add(new("unit.removed", unit.Id, unit.Cell));
         return next;
@@ -185,11 +191,13 @@ public static class ScenarioArmies
         bool Site(int cell)
         {
             var site = world.Cells[cell];
-            var occupants = world.Units.Where(u => u.Cell == cell).ToArray();
-            return site.Terrain.CanTraverse() && (category == "naval" ? site.Terrain.Sea : !site.Terrain.Sea)
-                && (site.Owner == owner || category == "naval" && site.Owner == null)
-                && occupants.Length < world.Limits.UnitsPerCell && occupants.All(u => u.Owner == owner)
-                && (category != "fort" || JurisdictionClaims.CanBuildFort(world, cell, owner));
+            var occupants = world.Units.Where(u => u.Cell == cell && WorldUnitLayers.Layer(world, u.Combatant.Profile)
+                == WorldUnitLayers.Layer(world, template.Combatant.Profile)).ToArray();
+            bool air = WorldUnitLayers.Air(world, template.Combatant.Profile);
+            return WorldUnitLayers.ValidTerrain(world, template.Combatant.Profile, cell) && (air || (category == "naval" ? site.Terrain.Sea : !site.Terrain.Sea))
+                && (site.Owner == owner || (air || category == "naval") && site.Owner == null)
+                && occupants.Length < WorldUnitLayers.Capacity(world, template.Combatant.Profile) && occupants.All(u => u.Owner == owner)
+                && (air || category != "fort" || JurisdictionClaims.CanBuildFort(world, cell, owner));
         }
         int cell = effect.Cells.Where(Site).DefaultIfEmpty(-1).First();
         if (cell < 0 || !WorldArmyCapacity.CanAdd(world, owner))
@@ -197,15 +205,16 @@ public static class ScenarioArmies
         var unit = new UnitState
         {
             Id = effect.Unit!, Owner = owner, Cell = cell, Combatant = template.Combatant with
-            { Health = template.Combatant.Profile.MaxHealth, AtSea = world.Cells[cell].Terrain.Sea, BuildingKind = world.Cells[cell].BuildingKind },
+            { Health = template.Combatant.MaximumHealth, AtSea = !WorldUnitLayers.Air(world, template.Combatant.Profile) && world.Cells[cell].Terrain.Sea,
+                BuildingKind = WorldUnitLayers.Air(world, template.Combatant.Profile) ? null : world.Cells[cell].BuildingKind },
             Support = template.Support, Experience = effect.Experience, Acted = true, RemainingMovement = 0,
             ExtensionMovementLimit = template.MovementBudget
         };
         var next = world with { Units = world.Units.Append(unit).ToArray(), SpawnedScenarioUnits = world.SpawnedScenarioUnits.Append(unit.Id).ToArray() };
         if (effect.Commander != null) next = Assign(next, effect, owner, notices);
         var spawned = next.Units.Single(u => u.Id == unit.Id);
-        int health = effect.Health ?? spawned.Combatant.Profile.MaxHealth;
-        if (health < 1 || health > spawned.Combatant.Profile.MaxHealth)
+        int health = effect.Health ?? spawned.Combatant.MaximumHealth;
+        if (health < 1 || health > spawned.Combatant.MaximumHealth)
             throw new RuleViolation("scenario.army_health", "Initial health exceeds resolved maximum");
         next = next with { Units = next.Units.Select(u => u.Id == unit.Id ? u with { Combatant = u.Combatant with { Health = health } } : u).ToArray() };
         if (effect.Cost is { } cost)

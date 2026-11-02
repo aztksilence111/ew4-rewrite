@@ -30,7 +30,7 @@ internal static class ScenarioArmyContent
             {
                 if (!content.Catalogs.Runtime.Profiles.TryGetValue(effect.Profile, out var profile))
                     throw new RuleViolation("scenario.army_definition", "Unknown reinforcement profile: " + effect.Profile);
-                next = next with { UnitTemplate = new(new() { Profile = profile.Profile, Health = profile.Profile.MaxHealth },
+                next = next with { UnitTemplate = new(content.Extensions.Bus.RefreshAttributes(new() { Profile = profile.Profile, Health = profile.Profile.MaxHealth }),
                     new() { FoodConsumption = profile.FoodConsumption },
                     content.Extensions.Bus.MovementBudget(new() { Profile = profile.Profile, Health = profile.Profile.MaxHealth })) };
             }

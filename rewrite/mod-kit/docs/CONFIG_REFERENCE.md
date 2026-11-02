@@ -1,5 +1,7 @@
 # 配置索引：从目标定位到文件
 
+将领能力栏：API3 `commanderAbilities`，支持新增能力、原/新增栏位混排、名称/图标覆盖、将领初值、兵种星级绑定及教学；见[自定义将领能力](porting/COMMANDER_ABILITIES.md)。
+
 指挥部完整布局、增删按钮、数据/命令绑定及自定义子页使用 API 3 `headquartersPresentation`，见[指挥部界面指南](porting/HEADQUARTERS_LAYOUT.md)及[最小示例](../examples/headquarters-layout/README.md)。
 
 国家地块颜色：`client/countries.json` 的 `color`；新增/现有势力：`faction_create.color` / `faction_identity.color`；阵营地图：API 3 `mapColors` 引用 `rewrite/map-colors.json`。见[格式、优先级与模板](porting/MAP_COLORS.md)。

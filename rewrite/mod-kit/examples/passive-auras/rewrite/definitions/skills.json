@@ -1,0 +1,18 @@
+[
+  {"id":"example.aura","nameKey":"周围友军光环","effects":[
+    {"event":"turn.start","operation":"apply_status","status":"example.inspired","duration":2,"value":1,"scope":"area","radius":1,"relation":"ally"}
+  ]},
+  {"id":"example.capacity","nameKey":"生命与射程","effects":[
+    {"event":"unit.attributes","operation":"max_health_add","value":100},
+    {"event":"unit.attributes","operation":"range_add","value":1},
+    {"event":"unit.attributes","operation":"food_exempt","value":1},
+    {"event":"unit.attributes","operation":"ignore_terrain","value":1}
+  ]},
+  {"id":"example.morale","nameKey":"鼓舞友军","effects":[
+    {"event":"turn.start","operation":"morale","value":1,"scope":"area","radius":1,"relation":"ally"}
+  ]},
+  {"id":"example.conditions","nameKey":"条件伤害示例","effects":[
+    {"event":"combat.modify_damage","operation":"damage_multiplier","value":1.25,
+     "when":{"minDistance":2,"maxDistance":2,"sourceTerrains":["land"],"targetBuildings":["city"]}}
+  ]}
+]

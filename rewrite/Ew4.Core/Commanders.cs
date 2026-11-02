@@ -41,7 +41,7 @@ public static class Ew4Commander
                 : commander.Skills.Select((id, i) => new SkillSlot(id, "legacy." + i)))
                 .Concat(commander.Items.Where(i => i.TargetCategory == null || i.TargetCategory == unit.Profile.Category)
                     .SelectMany(i => i.SkillSlots ?? Array.Empty<SkillSlot>())).ToArray(),
-            Stars = commander.Stars.TryGetValue(unit.Profile.Category, out int stars) ? stars : 0,
+            Stars = commander.Stars.TryGetValue(unit.Profile.CommanderAbility ?? unit.Profile.Category, out int stars) ? stars : 0,
             AttackBonus = checked(unit.AttackBonus + effects.AttackEquipment),
             DefenseBonus = checked(unit.DefenseBonus + effects.DefenseEquipment),
             FullAttackRolls = effects.FullAttackRolls,

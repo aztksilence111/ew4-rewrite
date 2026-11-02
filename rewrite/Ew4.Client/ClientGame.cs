@@ -152,6 +152,10 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         }
         bool upgradedCapacity = JsonSerializer.Serialize(state.World.ArmyCapacity, Json)
             != JsonSerializer.Serialize(start.Session.World.ArmyCapacity, Json);
+        if (JsonSerializer.Serialize(state.World.UnitLayers, Json) != JsonSerializer.Serialize(start.Session.World.UnitLayers, Json))
+            throw new RuleViolation("layers.save", "Saved unit layers do not match the active Mod");
+        if (JsonSerializer.Serialize(state.World.Construction, Json) != JsonSerializer.Serialize(start.Session.World.Construction, Json))
+            throw new RuleViolation("construction.save", "Saved construction rules do not match the active Mod");
         state = state with { World = ScenarioArmyContent.Prepare(content,
             state.World with { ArmyCapacity = start.Session.World.ArmyCapacity?.Copy() }, start.Rules.Commanders) };
         if (content.Scenarios.Single(s => s.Id == slot.Scenario).Mode == 2 && state.World.Demands == null)
@@ -237,7 +241,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         if (command.Op == "ai_batch") return AiBatch(command.Compact);
         var active = world.Factions.Single(f => f.Id == world.ActiveFaction);
         if (command.Op.StartsWith("player_ai_", StringComparison.Ordinal)) return PlayerAiAction(command);
-        if (command.Op == "select") return Selection(command.Cell);
+        if (command.Op == "select") return Selection(command.Cell, command.Unit);
         if (command.Op == "event_choice")
         {
             var chosen = ScenarioRules.Choose(world, world.Revision, command.Offer!, command.Target!, content.Extensions.Bus.Scripts);
@@ -315,7 +319,8 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             "upgrade" => WorldImprovements.UpgradeBuilding(world, world.Revision, command.Cell, rules.Upgrades),
             "transport" => WorldSupportActions.BuyTransport(world, world.Revision, command.Unit!, rules.Transport),
             "installation" => WorldSupportActions.BuildInstallation(world, world.Revision, command.Unit!, rules.Installations[command.Offer!]),
-            "recruit" => WorldActions.Recruit(world, world.Revision, command.Cell, "client.unit." + world.Revision, rules.Recruitment[active.Id][command.Offer!]),
+            "building" => WorldConstruction.Build(world, world.Revision, command.Unit!, command.Offer!),
+            "recruit" => WorldActions.Recruit(world, world.Revision, command.Cell, "client.unit." + world.Revision, rules.Recruitment[active.Id][command.Offer!], content.Extensions.Bus),
             _ => throw new RuleViolation("client.command", "Unknown action")
         };
         int[]? movedPath = command.Op == "move" ? action.Movements.Single(m => m.Unit == command.Unit).Path.ToArray() : null;
@@ -328,6 +333,8 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         if (command.Op == "skill") movementHistory.Reset(action.State);
         if (command.Op == "disband") { movementHistory.Forget(command.Unit!); AutoSave(); }
         return View(world, combat: preview == null ? null : new { attacker = preview.Attacker, defender = preview.Defender, counterattack = preview.Main.Counterattack,
+            attackLayer = WorldUnitLayers.AttackLayer(world, world.Units.Single(u => u.Id == preview.Attacker), world.Units.Single(u => u.Id == preview.Defender)),
+            counterLayer = WorldUnitLayers.AttackLayer(world, world.Units.Single(u => u.Id == preview.Defender), world.Units.Single(u => u.Id == preview.Attacker), true),
             damage = preview.Main.DefenderDamage, counterDamage = preview.Main.AttackerDamage,
             critical = preview.Main.OffensiveProc && !preview.Main.DefensiveProc, counterCritical = false,
             splashTarget = preview.SplashTarget, splashDamage = preview.SplashDamage });
@@ -400,17 +407,21 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                 && (next.World.ScenarioEvents.Count > 0 || next.World.Phase == TurnPhase.Finished)))
             AutoSave();
     }
-    private object Selection(int cell)
+    private object Selection(int cell, string? unitId = null)
     {
         var current = Require(); var world = current.Session.World;
         if (cell < 0 || cell >= world.Cells.Count) throw new RuleViolation("map.cell", "Cell outside map");
         bool ready = world.Phase == TurnPhase.Active && world.PendingDialogue == null && world.ActiveFaction == current.Session.PlayerFaction;
-        var unit = world.Units.FirstOrDefault(u => u.Cell == cell);
+        var occupants = world.Units.Where(u => u.Cell == cell).ToArray();
+        var unit = unitId != null ? occupants.SingleOrDefault(u => u.Id == unitId)
+            ?? throw new RuleViolation("selection.unit", "Selected unit is not at this cell")
+            : WorldUnitLayers.Enabled(world) ? occupants.OrderBy(u => WorldUnitLayers.Air(world, u)).FirstOrDefault() : occupants.FirstOrDefault();
         var offers = ready ? current.Rules.Recruitment[world.ActiveFaction].Values.Where(o => WorldActions.CanRecruit(world, cell, o))
             .Select(o => new { o.Id, profile = o.Template?.Profile.Id, o.Cost }).ToArray() : [];
         var occupied = world.Units.Select(u => u.Cell).ToHashSet();
         var range = ready && unit?.Owner == world.ActiveFaction
-            ? WorldActions.Reachable(world, unit.Id, current.Rules.Movement).Keys.Where(c => !occupied.Contains(c)).ToArray() : [];
+            ? WorldActions.Reachable(world, unit.Id, current.Rules.Movement).Keys.Where(c => c != unit.Cell && (WorldUnitLayers.Enabled(world)
+                ? WorldUnitLayers.HasSpace(world, unit.Combatant.Profile, unit.Owner, c, unit.Id) : !occupied.Contains(c))).ToArray() : [];
         var targets = ready && unit?.Owner == world.ActiveFaction ? AttackTargets(world, unit).Select(u => u.Cell).ToArray() : [];
         var disbandRules = DisbandConfiguration();
         var refund = ready && unit != null && WorldDisband.CanDisband(world, unit.Id, disbandRules)
@@ -425,12 +436,18 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                 name = content.Catalogs.Cards.Cards.Values.Single(c => c.Id == p.Key).Name,
                 quote = ActionQuote(() => WorldSupportActions.InstallationCost(world, unit.Id, p.Value)) })
             .Where(p => p.quote != null).ToArray() : [];
+        var buildingOffers = ready && unit != null && world.Construction?.Enabled == true ? world.Construction.Buildings
+            .Where(p => WorldConstruction.CanBuild(world, unit.Id, p.Key, false))
+            .Select(p => new { id = p.Key, kind = p.Key, name = p.Value.Name, image = p.Value.Levels[0].Image,
+                quote = ActionQuote(() => p.Value.Cost) }).ToArray() : [];
         string? disbandWarning = refund != null && unit!.Combatant.Profile.Category == "fort"
             && current.Rules.Recruitment[world.ActiveFaction].Values.Any(o => o.Template?.Profile.Category == "fort"
                 && o.PerTurnLimit.HasValue && world.Factions.Single(f => f.Id == world.ActiveFaction)
                     .TurnUses.GetValueOrDefault(o.TurnGroup) >= o.PerTurnLimit.Value)
             ? "解散后本回合内不能再建造要塞。" : null;
         return new { cell, range, targets, offers, disband = refund, disbandWarning,
+            occupants = WorldUnitLayers.Enabled(world) ? occupants.Select(u => new { u.Id, layer = WorldUnitLayers.Layer(world, u.Combatant.Profile) }).ToArray() : [],
+            targetUnits = ready && unit?.Owner == world.ActiveFaction ? AttackTargets(world, unit).Select(u => u.Id).ToArray() : [],
             actionQuotes = new { train = trainingQuote, upgrade = upgradeQuote, transport = transportQuote },
             items = ready && unit?.Owner == world.ActiveFaction && unit.Combatant.ConstructionTurns == 0,
             skills = ready && unit?.Owner == world.ActiveFaction ? ActiveSkills(world, unit) : [],
@@ -439,7 +456,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             market = ready && world.Cells[cell].Owner == world.ActiveFaction && Service(cell) == "trade",
             upgrade = ready && WorldImprovements.CanUpgradeBuilding(world, cell, current.Rules.Upgrades),
             deploy = ready && unit?.Owner == world.ActiveFaction && unit.CommanderId == null && RosterDeployment.IsDeploymentLocation(world, unit),
-            unit = unit?.Id, installationOffers, installations = installationOffers.Where(p => p.quote!.Affordable).Select(p => p.id).ToArray(),
+            unit = unit?.Id, installationOffers, buildingOffers, installations = installationOffers.Where(p => p.quote!.Affordable).Select(p => p.id).ToArray(),
             undo = ready && unit != null && movementHistory.Available(world, unit.Id) != null,
             transport = ready && unit?.Owner == world.ActiveFaction && WorldSupportActions.CanBuyTransport(world, unit.Id, current.Rules.Transport) };
     }
@@ -447,8 +464,9 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
     {
         var map = new HexMap(world.Width, world.Height);
         return world.Units.Where(target => !WorldDiplomacy.Allied(world, target.Owner, unit.Owner)
+            && WorldUnitLayers.CanAttack(world, unit, target)
             && AttackLegality.Check(true, true, unit.Combatant.ConstructionTurns, unit.Acted, unit.Morale.Effective,
-                map.Distance(unit.Cell, target.Cell), unit.Combatant.Profile.MinimumRange, unit.Combatant.Profile.MaximumRange) == AttackBlock.None);
+                map.Distance(unit.Cell, target.Cell), unit.Combatant.Profile.MinimumRange, unit.Combatant.MaximumRange) == AttackBlock.None);
     }
     private object View(WorldState? previous = null, object? movementOverride = null, object? combat = null, WorldState? cellDeltaFrom = null, string? suppliedUnit = null)
     {
@@ -476,8 +494,8 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             factionColors.Add(creation.Faction, factionColors[template]);
         }
         var sites = battle.EffectiveSites.ToDictionary(s => (int)s.Cell);
-        var economicCommanders = world.Units.Where(u => u.CommanderId != null).GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => g.First());
-        var previousEconomics = cellDeltaFrom?.Units.Where(u => u.CommanderId != null).GroupBy(u => u.Cell)
+        var economicCommanders = WorldUnitLayers.Surface(world).Where(u => u.CommanderId != null).GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => g.First());
+        var previousEconomics = cellDeltaFrom == null ? null : WorldUnitLayers.Surface(cellDeltaFrom).Where(u => u.CommanderId != null).GroupBy(u => u.Cell)
             .ToDictionary(g => g.Key, g => g.First().Support.IncomeMultiplier);
         var originalUnits = battle.Armies.Select((army, index) => (army, id: world.ScenarioId + ".unit." + index))
             .ToDictionary(p => p.id, p => p.army);
@@ -505,6 +523,8 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         string? BuildingImage(int index, CellState cell)
         {
             if (cell.BuildingKind == null) return null;
+            if (world.Construction?.Buildings.TryGetValue(cell.BuildingKind, out var custom) == true)
+                return custom.Levels[cell.BuildingLevel - 1].Image;
             if (cell.BuildingKind == "city" && sites.TryGetValue(index, out var site)
                 && content.Catalogs.Buildings.Capitals.TryGetValue(site.State8, out var capital)) return capital.Image;
             var definition = content.Catalogs.Buildings.Definitions.Values.SingleOrDefault(d => d.Kind == cell.BuildingKind);
@@ -520,7 +540,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                 && content.Catalogs.Combat.Context.InstallationDefense.TryGetValue(cell.InstallationKind, out var installation))
                 penalties = (penalties ?? new Dictionary<string, int>()).Concat(installation)
                     .GroupBy(p => p.Key, StringComparer.Ordinal).ToDictionary(g => g.Key, g => g.Max(p => p.Value), StringComparer.Ordinal);
-            return new { income, defense = level?.DefensePercent ?? 0, penalties,
+            return new { income, defense = current.Rules.Battle.Context.Buildings.FirstOrDefault(b => b.Kind == cell.BuildingKind && b.Level == cell.BuildingLevel)?.Percent ?? level?.DefensePercent ?? 0, penalties,
                 armyCapacity = WorldArmyCapacity.BuildingCapacity(world, cell) };
         }
         var navigationMoves = world.Phase == TurnPhase.Active && world.ActiveFaction == session.PlayerFaction
@@ -534,10 +554,10 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         bool CanAttack(UnitState unit)
         {
             if (unit.Owner != world.ActiveFaction || world.Phase != TurnPhase.Active || world.PendingDialogue != null) return false;
-            int range = unit.Combatant.Profile.MaximumRange;
+            int range = unit.Combatant.MaximumRange;
             var candidates = (long)range * range > world.Units.Count ? world.Units
                 : attackMap.Within(unit.Cell, range, includeCenter: true).SelectMany(cell => unitsAt[cell]);
-            return candidates.Any(target => enemies.Contains(target.Owner)
+            return candidates.Any(target => enemies.Contains(target.Owner) && WorldUnitLayers.CanAttack(world, unit, target)
                 && AttackLegality.Check(true, true, unit.Combatant.ConstructionTurns, unit.Acted, unit.Morale.Effective,
                     attackMap.Distance(unit.Cell, target.Cell), unit.Combatant.Profile.MinimumRange, range) == AttackBlock.None);
         }
@@ -572,15 +592,19 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             jurisdictionCenter = world.Jurisdictions?.CellCenters[i] is int center && center >= 0 ? center : (int?)null,
             tileInfo = TileInfo(i, c),
             facility = sites.TryGetValue(i, out var service) ? service.State6 switch { 1 => "trade", 2 => "shop", 3 => "bar", _ => (string?)null } : null,
-            buildingImage = BuildingImage(i, c), buildingStyle = sites.TryGetValue(i, out var site) ? site.State7 : 1 };
+            buildingImage = BuildingImage(i, c), buildingMaximumLevel = c.BuildingKind != null && world.Construction?.Buildings.TryGetValue(c.BuildingKind, out var customBuilding) == true ? customBuilding.Levels.Count : (int?)null,
+            buildingStyle = sites.TryGetValue(i, out var site) ? site.State7 : 1 };
         var unitViews = world.Units.Select(u => JsonSerializer.SerializeToElement(new { u.Id, u.Owner, u.Cell, profile = u.Combatant.Profile.Id, category = u.Combatant.Profile.Category,
+            layer = WorldUnitLayers.Enabled(world) ? WorldUnitLayers.Layer(world, u.Combatant.Profile) : null,
+            occupiedLayers = WorldUnitLayers.Enabled(world) ? WorldUnitLayers.Occupies(world, u.Combatant.Profile) : null,
             skills = SkillViews(u.Combatant), statuses = StatusViews(u.Combatant), traits = u.Combatant.Profile.Traits.Where(content.Extensions.Bus.Skills.ContainsKey)
                 .Select(id => SkillView(new SkillSlot(id, "trait." + id))).ToArray(),
             attack = AttackView(u.Combatant),
-            health = u.Combatant.Health, maxHealth = u.Combatant.Profile.MaxHealth, u.Combatant.ConstructionTurns, u.RemainingMovement, u.Acted, u.CommanderId, u.Transport, u.Burning, u.Objective,
+            health = u.Combatant.Health, maxHealth = u.Combatant.MaximumHealth, maximumRange = u.Combatant.MaximumRange,
+            u.Combatant.ConstructionTurns, u.RemainingMovement, u.Acted, u.CommanderId, u.Transport, u.Burning, u.Objective,
             aiControlled = PlayerAi.Managed(world, u), aiPolicy = PlayerAi.Order(u).Policy, aiGoal = PlayerAi.Order(u).Goal, aiGoals = PlayerAi.Targets(PlayerAi.Order(u)), aiTask = PlayerAi.Order(u).TaskId,
             objectiveMarker = u.Objective ? 1 : originalUnits.TryGetValue(u.Id, out var markedUnit) && markedUnit.Objective == 2 ? 2 : 0,
-            canMove = u.Combatant.Profile.Category != "fort" && u.RemainingMovement > 0 && u.Morale.Effective != -3 && u.Combatant.ConstructionTurns == 0,
+            canMove = (u.Combatant.Profile.Category != "fort" || WorldUnitLayers.Air(world, u)) && u.RemainingMovement > 0 && u.Morale.Effective != -3 && u.Combatant.ConstructionTurns == 0,
             canAttack = CanAttack(u), canNavigateMove = navigationMoves.Contains(u.Id), veterancy = u.Veterancy, morale = u.Morale.Effective,
             facing = originalUnits.TryGetValue(u.Id, out var source) ? source.Facing : 1,
             commanderDefinitionId = CommanderDefinitionId(u),
@@ -595,6 +619,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         return new
         {
             session.Revision, scenario = world.ScenarioId, map = content.MapNames[battle.MapId], world.Width, world.Height,
+            unitLayers = WorldUnitLayers.Enabled(world),
             stageIntro = StageIntro(world.ScenarioId), session.BattleId,
             battleResult = BattleResultView(session), story = StoryView(world),
             tutorialCheckpoint,
@@ -619,6 +644,8 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             aiPresentation = content.Extensions.AiControl,
             diplomacyEnabled = ConquestDiplomacy(),
             medals = session.Account.Medals,
+            foodEconomy = ScenarioEconomy.Enabled(world) || content.Extensions.Economy.ContainsKey(world.ScenarioId)
+                ? ScenarioEconomy.Food(world, world.Factions.Single(f => f.Id == session.PlayerFaction), current.Rules.Turns) : null,
             factions = world.Factions.Select(f => new { f.Id, f.Name, f.Camp, f.Human, f.Defeated, f.Resources, f.TurnSummary,
                 unitCount = world.Units.Count(u => u.Owner == f.Id), unitLimit = WorldArmyCapacity.Limit(world, f.Id),
                 relation = WorldDiplomacy.Relation(world, session.PlayerFaction, f.Id, current.Rules.Turns.NeutralCamps),

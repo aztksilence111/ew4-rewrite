@@ -4,6 +4,24 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Xml.Linq;
 using Ew4.Mods;
+if (args.ElementAtOrDefault(1) == "--commander-abilities-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { commanderAbilityChecks = CommanderAbilityModChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+if (args.ElementAtOrDefault(1) == "--passive-interfaces-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { passiveInterfaceModChecks = PassiveInterfaceModChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--advanced-units-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { advancedUnitModChecks = AdvancedUnitModChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--unit-layers-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { unitLayerModChecks = UnitLayerModChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
 
 if (args.ElementAtOrDefault(1) == "--building-presentation-only")
 {

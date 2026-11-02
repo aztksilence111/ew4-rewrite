@@ -22,6 +22,8 @@ public sealed record LegacyScenarioRequest
     public ulong CombatSeed { get; init; }
     public ulong AiSeed { get; init; }
     public WorldLimits Limits { get; init; } = new();
+    public UnitLayerRules? UnitLayers { get; init; }
+    public ModConstructionRules? Construction { get; init; }
     public IReadOnlyDictionary<int, string> CityNames { get; init; } = new Dictionary<int, string>();
     public IReadOnlyDictionary<string, string> CountryNames { get; init; } = new Dictionary<string, string>();
     public IReadOnlyDictionary<string, string> CountryUnitVariants { get; init; } = new Dictionary<string, string>();
@@ -150,8 +152,11 @@ public static class LegacyScenarioHost
                 initialized.TurnOrder.Select(i => ids[i]).Where(request.LocalPlayers.Contains).ToArray(), ShareAlliedVictory: request.Mode == 1),
             Factions = initialized.TurnOrder.Select(i => bySource[i]).ToArray(), ActiveFaction = player, Cells = importedMap.Cells,
             Units = bindings.Select(b => b.Unit).ToArray(), Commanders = bindings.Where(b => b.Commander != null).Select(b => b.Commander!).ToArray(),
-            Events = events.Events, TriggeredEvents = events.TriggeredEvents, Limits = request.Limits with { },
-            RandomState = request.CombatSeed, AiRandomState = request.AiSeed, Phase = TurnPhase.RoundEvents };
+            Events = events.Events, TriggeredEvents = events.TriggeredEvents, Limits = request.Limits with { }, UnitLayers = request.UnitLayers?.Copy(),
+            Construction = request.Construction?.Copy(), RandomState = request.CombatSeed, AiRandomState = request.AiSeed, Phase = TurnPhase.RoundEvents };
+        if (WorldUnitLayers.Enabled(initial))
+            initial = initial with { Units = initial.Units.Select(u => !WorldUnitLayers.Air(initial, u) ? u : u with {
+                Combatant = u.Combatant with { AtSea = false, BuildingKind = null } }).ToArray() };
         if (initial.LocalMultiplayer != null)
             initial = initial with { LocalMultiplayer = initial.LocalMultiplayer with {
                 InitialObjectiveOwner = LocalMultiplayerGame.InitialObjectiveOwner(initial with {
@@ -200,6 +205,8 @@ public static class LegacyScenarioHost
                     if (property.Name == nameof(LocalMultiplayerState.ShareAlliedVictory)) continue;
                     if (property.Name == nameof(WorldState.Jurisdictions) && property.Value.ValueKind == JsonValueKind.Null) continue;
                     if (property.Name == nameof(WorldState.ArmyCapacity) && property.Value.ValueKind == JsonValueKind.Null) continue;
+                    if (property.Name == nameof(WorldState.UnitLayers) && property.Value.ValueKind == JsonValueKind.Null) continue;
+                    if (property.Name == nameof(WorldState.Construction) && property.Value.ValueKind == JsonValueKind.Null) continue;
                     if (property.Name == nameof(WorldState.Demands) && property.Value.ValueKind == JsonValueKind.Null) continue;
                     if (property.Name == nameof(WorldState.DiplomacyAdjustments) && property.Value.ValueKind == JsonValueKind.Null) continue;
                     if (property.Name == nameof(FactionState.Appearance) && property.Value.ValueKind == JsonValueKind.Null) continue;
