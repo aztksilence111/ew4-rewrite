@@ -1,5 +1,7 @@
 # 重构短锚点
 
+- **2026-11-02 0.2.31双端正式发行完成：[记录](RELEASE_PROGRESS_0.2.31_20261102.md)、[Release](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.31-20261102)。** 本批R运行时及全部Mod接口源码351df06已推main和标签，含将领能力新增与原/新栏混排。ARM64 APK、Windows Web ZIP与两校验附件已公开，四附件大小/SHA-256一致。Web内容3398、包校验3788、浏览器220及核心/Mod专项通过；双端保留主菜单/暂停设定存档导出，无Android真机验收。清95目标11987文件2987373366字节，剩余0/错误0/Git保持，1413玩家文件变化0；保留0.2.31/30/29三批六包和既有玩家服务，凭据先存、最后日志。
+
 - **2026-11-02 将领能力栏通用接口完成：[接口](mod-kit/docs/porting/COMMANDER_ABILITIES.md)、[示例](mod-kit/examples/commander-abilities/README.md)、[记录](../reverse/COMMANDER_ABILITIES_20261102.md)。** API3可增加32项能力、配置初值/图标/名称、原八栏与新增栏混排及呈现覆盖、兵种攻击星级来源和整编教学；稳定ID贯穿账户/战局/二进制导入补值/Mod导入导出，五星以上保留实际值。固定区域滚动，无配置保持原规则。实际Mod32、原将领/任免/名册/旧档13991、相关回归49269、桌面/手机浏览器37通过，缺图/脚本错误0；用户要求先完成再打包，正纳入0.2.31双端发行，无Android真机验收。
 
 - **2026-11-02 API3被动光环与技能缺口补齐：[记录](../reverse/PASSIVE_SKILL_INTERFACES_20261102.md)、[接口](mod-kit/docs/porting/RULE_EXTENSIONS.md)、[最小示例](mod-kit/examples/passive-auras/README.md)。** turn.start等普通被动事件可apply_status/remove_status，状态不可递归；unit.attributes提供max_health_add/range_add/food_exempt/ignore_terrain，morale复用原士气结算。when直接匹配来源/目标兵种、地形、建筑、有无建筑及距离，不需Lua；复杂脚本可读同样战斗上下文。首回合补触发，基础兵种不改写，状态刷新/到期/将领更换及存读档不重复加成，有效值覆盖战斗/反击/AI/治疗/整编/事件军队及客户端。核心49269＋实际ModStore9、Web Release/Android ARM64 Compile零警告错误；原版槽字节保持。清3482文件339708963字节，剩余0/错误0/Git保持，收据先存；源码测试/示例保留。未修改具体外部Mod定义、在线玩家服务或正式发行包，无真机/浏览器交互验收，新操作需配套新构建。
