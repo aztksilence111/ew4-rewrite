@@ -119,6 +119,21 @@ app.MapPost("/api/mod-prepare", async (HttpRequest request) =>
     { return Results.Json(new { error = e.Message }, statusCode: 400); }
     finally { if (temp != null) File.Delete(temp); }
 }).DisableAntiforgery();
+app.MapPost("/api/save-import", async (HttpRequest request) =>
+{
+    if (request.Headers["Sec-Fetch-Site"] == "cross-site" || request.Headers.Origin.Count > 0 && request.Headers.Origin != request.Scheme + "://" + request.Host)
+        return Results.StatusCode(403);
+    try
+    {
+        var form = await request.ReadFormAsync();
+        var file = form.Files.GetFile("file") ?? throw new InvalidDataException("请选择存档ZIP");
+        if (file.Length > 256L * 1024 * 1024) throw new InvalidDataException("存档包超过256MiB");
+        using var input = file.OpenReadStream();
+        return Results.Json(store.ImportSaves(input, form["overwrite"] == "true"));
+    }
+    catch (Exception error) when (error is IOException or UnauthorizedAccessException or InvalidOperationException or ArgumentException or System.Text.Json.JsonException or KeyNotFoundException or OverflowException)
+    { return Results.Json(new { error = "存档导入失败：" + error.Message }, statusCode: 400); }
+}).DisableAntiforgery();
 app.MapPost("/api/save-export", (HttpResponse response) =>
 {
     FileStream? output = null;

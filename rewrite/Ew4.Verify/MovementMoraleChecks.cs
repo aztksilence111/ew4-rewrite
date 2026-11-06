@@ -11,8 +11,38 @@ internal static class MovementMoraleChecks
         void Check(bool value, string label) { checks++; if (!value) throw new InvalidOperationException("Movement morale: " + label); }
         var basis = WorldChecks.Example();
         var map = new HexMap(7, 7);
+        var defenderBasis = basis.Units[0] with { Cell = 24 };
+        var ownershipBasis = basis with { Width = 7, Height = 7,
+            Factions = basis.Factions.Concat(new[] {
+                new FactionState { Id = "defender.ally", Camp = "a" },
+                new FactionState { Id = "attacker.ally", Camp = "b" },
+                new FactionState { Id = "neutral", Camp = "4" } }).ToArray() };
+        foreach (string? landOwner in new string?[] { defenderBasis.Owner, "winner", "defender.ally", "neutral", null })
+        foreach (int center in new[] { 24, 31 })
+        foreach (int direction in Enumerable.Range(0, 6))
+        foreach (var owners in new[] {
+            ("winner", "winner", 1), ("winner", "attacker.ally", 1),
+            ("winner", "loser", 0), ("winner", "defender.ally", 0), ("loser", "defender.ally", 0) })
+        {
+            var target = defenderBasis with { Cell = center };
+            var sides = new[] {
+                basis.Units[1] with { Id = "left", Cell = map.Neighbor(center, direction), Owner = owners.Item1 },
+                basis.Units[1] with { Id = "right", Cell = map.Neighbor(center, (direction + 3) % 6), Owner = owners.Item2 } };
+            var state = ownershipBasis with { Cells = Enumerable.Range(0, map.Count)
+                .Select(_ => new CellState { Owner = landOwner }).ToArray(), Units = new[] { target }.Concat(sides).ToArray() };
+            Check(WorldTurns.LocalPenalty(state, map, center, target.Owner, ["4"]) == owners.Item3,
+                $"flank uses armies {owners.Item1}/{owners.Item2} on {landOwner ?? "unowned"} land at {center}/{direction}");
+            var surrounded = state with { Units = new[] { target }.Concat(Enumerable.Range(0, 6).Select(d =>
+                basis.Units[1] with { Id = "ring." + d, Cell = map.Neighbor(center, d), Owner = d % 2 == 0 ? owners.Item1 : owners.Item2 })).ToArray() };
+            Check(WorldTurns.LocalPenalty(surrounded, map, center, target.Owner, ["4"]) == (owners.Item3 == 1 ? 2 : 0),
+                "full surround uses every army's allegiance independently of land");
+            var allied = WorldDiplomacy.Set(state, target.Owner, "winner", "allied");
+            Check(WorldTurns.LocalPenalty(allied, map, center, target.Owner, ["4"]) == 0,
+                "bilateral alliance overrides camp for flanking");
+        }
         foreach (int center in new[] { 24, 31 })
         for (int direction = 0; direction < 6; direction++)
+        foreach (string? landOwner in new string?[] { "winner", "loser", null })
         foreach (var effect in new[] { "normal", "leadership", "temporary", "shortage", "surround" })
         {
             int destination = map.Neighbor(center, direction);
@@ -26,7 +56,7 @@ internal static class MovementMoraleChecks
             var allies = (effect == "surround" ? Enumerable.Range(0, 6).Where(d => d != direction)
                 .Select(d => map.Neighbor(center, d)) : new[] { opposite }).Select((cell, i) =>
                 mover with { Id = "flanker." + i, Cell = cell }).ToArray();
-            var cells = Enumerable.Range(0, map.Count).Select(_ => new CellState { Owner = mover.Owner }).ToArray();
+            var cells = Enumerable.Range(0, map.Count).Select(_ => new CellState { Owner = landOwner }).ToArray();
             cells[center] = cells[center] with { Owner = defender.Owner };
             var state = basis with { Width = map.Width, Height = map.Height, Cells = cells,
                 Units = new[] { defender, mover }.Concat(allies).ToArray(),
@@ -75,8 +105,8 @@ internal static class MovementMoraleChecks
         var flank = world.Units.First(u => u.Owner == campaign.Session.PlayerFaction && u.Combatant.Profile.Category == "cavalry") with { Cell = left };
         var infantry = world.Units.First(u => u.Owner == campaign.Session.PlayerFaction && u.Combatant.Profile.Category == "infantry")
             with { Cell = approach };
-        var fixtureCells = world.Cells.Select((c, i) => i == left || i == approach
-            ? c with { Owner = campaign.Session.PlayerFaction } : c).ToArray();
+        var fixtureCells = world.Cells.Select((c, i) => i == left ? c with { Owner = targetGeneral.Owner }
+            : i == approach ? c with { Owner = campaign.Session.PlayerFaction } : c).ToArray();
         // Recreate the screenshot's flank geometry with the actual scenario's map and units.
         world = world with { Round = 3, Phase = TurnPhase.Active, PendingDialogue = null,
             Units = [targetGeneral, flank, infantry], Cells = fixtureCells };

@@ -110,6 +110,7 @@ public static class WorldCommanders
         var next = (state with { Units = state.Units.Select(u => u.Id == unitId ? updated : u).ToArray(), Revision = checked(state.Revision + 1) }).Copy();
         next.Validate();
         var notices = new List<WorldNotice>();
+        next = TacticalSkills.Prune(next, rules.Extensions);
         if (unit.CommanderId != null) notices.Add(new("commander.detached", unit.CommanderId, unit.Cell));
         notices.Add(new("commander.assigned", commanderId, unit.Cell));
         return new(next, notices);
@@ -143,7 +144,7 @@ public static class WorldCommanders
         detached = RefreshMorale(state, detached);
         var next = (state with { Units = state.Units.Select(u => u.Id == unitId ? detached : u).ToArray(), Revision = checked(state.Revision + 1) }).Copy();
         next.Validate();
-        return new(next, new[] { new WorldNotice("commander.detached", unit.CommanderId, unit.Cell) });
+        return new(TacticalSkills.Prune(next, rules.Extensions), new[] { new WorldNotice("commander.detached", unit.CommanderId, unit.Cell) });
     }
 
     private static UnitState RefreshMorale(WorldState state, UnitState unit)

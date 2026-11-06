@@ -64,6 +64,10 @@ internal static class UnitVisualConfiguration
             foreach (var action in definition["motions"]!.AsArray())
             {
                 if (!items.Contains((string)action!["name"]!)) throw new InvalidDataException("Unit visual action missing: " + key + "/" + action["name"]);
+                if (action["loop"] != null && (action["loop"] is not JsonValue loop || !loop.TryGetValue<bool>(out _)))
+                    throw new InvalidDataException("Invalid unit visual loop: " + key);
+                if (action["static"] != null && (action["static"] is not JsonValue stationary || !stationary.TryGetValue<bool>(out _)))
+                    throw new InvalidDataException("Invalid static unit visual: " + key);
                 if (action["speed"] != null && (!double.TryParse(action["speed"]!.ToString(), CultureInfo.InvariantCulture, out double speed) || !double.IsFinite(speed) || speed <= 0))
                     throw new InvalidDataException("Invalid unit visual speed: " + key);
             }

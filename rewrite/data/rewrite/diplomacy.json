@@ -1,6 +1,11 @@
 {
   "schema": 1,
-  "rules": { "lossWeight": 75, "occupationWeight": 25, "maximumChance": 95, "coreWeight": 25, "capitalLootPercent": 20, "coreLootBonus": 20 },
+  "rules": {
+    "lossWeight": 75, "occupationWeight": 25, "maximumChance": 95, "coreWeight": 25,
+    "pressure": { "commanderBonus": 25, "legionAdvantageBonus": 5, "legionAdvantageCap": 25,
+      "buildingLevelPenalty": 2, "buildingPenaltyCap": 50, "superiorityBonus": 15 },
+    "capitalLootPercent": 20, "coreLootBonus": 20
+  },
   "scenarioLocks": {},
   "scenarioPairs": {},
   "scenarioCapitals": {},

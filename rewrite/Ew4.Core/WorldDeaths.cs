@@ -50,13 +50,13 @@ internal static class WorldDeaths
     {
         var map = new HexMap(state.Width, state.Height);
         var factions = state.Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
-        var occupied = new HashSet<int>(WorldUnitLayers.Surface(state).Select(u => u.Cell));
+        var occupants = WorldUnitLayers.Surface(state).ToLookup(u => u.Cell, u => u.Owner);
         UnitState[]? units = null;
         for (int slot = 0; slot < state.Units.Count; slot++)
         {
             var unit = state.Units[slot];
             if (affectedCells != null && !affectedCells.Contains(unit.Cell)) continue;
-            int local = WorldUnitLayers.Air(state, unit) ? 0 : WorldTurns.LocalPenalty(state, map, unit.Cell, unit.Owner, neutralCamps, occupied);
+            int local = WorldUnitLayers.Air(state, unit) ? 0 : WorldTurns.LocalPenalty(state, map, unit.Cell, unit.Owner, neutralCamps, occupants);
             int morale = TurnEconomy.Morale(unit.Morale.Baseline, unit.Morale.Duration, local, factions[unit.Owner].Shortage,
                 unit.Support.Logistics || unit.Combatant.FoodExempt || unit.Combatant.Has(Ew4Combat.Skill(22)), unit.Combatant.Has(Ew4Combat.Skill(3)));
             if (unit.LocalPenalty == local && unit.Morale.Effective == morale && unit.Combatant.Morale == morale) continue;

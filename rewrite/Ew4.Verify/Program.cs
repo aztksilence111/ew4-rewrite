@@ -1,5 +1,14 @@
 using System.Text.Json;
 using Ew4.Core;
+if (args.ElementAtOrDefault(1) == "--tactical-skills-only")
+{
+    string project = Path.GetFullPath(args[0]);
+    Console.WriteLine(JsonSerializer.Serialize(new { tacticalSkills = TacticalSkillChecks.Run(project), errors = 0 })); return;
+}
+if (args.ElementAtOrDefault(1) == "--commander-stars-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { commanderStars = CommanderStarChecks.Run(), errors = 0 })); return;
+}
 if (args.ElementAtOrDefault(1) == "--commander-abilities-only")
 {
     string project = Path.GetFullPath(args[0]);
@@ -97,6 +106,9 @@ if (args.ElementAtOrDefault(1) == "--display-effects-only")
 
 if (args.ElementAtOrDefault(1) == "--diplomacy-only")
 {
+    Console.WriteLine(JsonSerializer.Serialize(new { surrenderProbability = SurrenderProbabilityChecks.Run(Path.GetFullPath(args[0])), errors = 0 }));
+    Console.WriteLine(JsonSerializer.Serialize(new { saveCompatibility = SaveCompatibilityChecks.Run(Path.GetFullPath(args[0])), errors = 0 }));
+    Console.WriteLine(JsonSerializer.Serialize(new { paidSurrender = PaidSurrenderChecks.Run(), errors = 0 }));
     Console.WriteLine(JsonSerializer.Serialize(new { diplomacyChecks = DiplomacyChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
 }
 

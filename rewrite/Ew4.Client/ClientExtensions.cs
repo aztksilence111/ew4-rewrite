@@ -35,14 +35,30 @@ public sealed partial class ClientGame
             var def = content.Extensions.Bus.Skills[s.Id];
             var cells = def.Target != "cell" ? [] : Enumerable.Range(0, world.Cells.Count)
                 .Where(cell => content.Extensions.Bus.ValidCellTarget(world, unit, def, cell)).ToArray();
-            long ready = world.ExtensionState.GetValueOrDefault(unit.Id + "/" + s.InstanceId + "/ready");
+            long ready = world.ExtensionState.GetValueOrDefault(TacticalSkills.CooldownKey(unit, def, s.InstanceId));
             var targets = def.Target == "cell" ? [] : world.Units.Where(t => new HexMap(world.Width, world.Height).Distance(unit.Cell, t.Cell) <= def.Range
                 && (def.Target == "self" ? t.Id == unit.Id : def.Target == "ally"
                     ? WorldDiplomacy.Allied(world, t.Owner, faction.Id)
                     : !WorldDiplomacy.Allied(world, t.Owner, faction.Id))).Select(t => t.Id).ToArray();
-            bool available = !unit.Acted && unit.Morale.Effective != -3 && ready <= world.Round && (targets.Length > 0 || cells.Length > 0)
-                && faction.Resources.Money >= def.Cost.Money && faction.Resources.Industry >= def.Cost.Industry && faction.Resources.Food >= def.Cost.Food;
-            return (object)new { skill = s, available, remainingCooldown = Math.Max(0, ready - world.Round), targets, cells };
+            if (def.Maneuver != null) targets = world.Units.Where(t => TacticalSkills.Eligible(world, unit, t, def)).Select(t => t.Id).ToArray();
+            bool available = !unit.Acted && unit.Morale.Effective != -3 && ready <= world.Round && (targets.Length > 0 || cells.Length > 0 || def.Maneuver != null)
+                && (def.Cost.Money == 0 || faction.Resources.Money >= def.Cost.Money)
+                && (def.Cost.Industry == 0 || faction.Resources.Industry >= def.Cost.Industry) && (def.Cost.Food == 0 || faction.Resources.Food >= def.Cost.Food);
+            if (def.Maneuver != null) available &= TacticalSkills.CanActivate(world, unit);
+            return (object)new { skill = s, available, remainingCooldown = Math.Max(0, ready - world.Round), targets, cells,
+                multiple = def.Maneuver != null, maximumTargets = def.Maneuver?.MaximumOthers ?? 1, includesSelf = def.Maneuver != null };
         }).ToArray();
     }
+    private ClientSkillView[] ManeuverViews(WorldState world, UnitState unit) => unit.Maneuvers
+        .Where(g => content.Extensions.Bus.Skills.ContainsKey(g.Skill) && world.Units.Any(s => s.Id == g.Source
+            && s.CommanderId == g.SourceCommander && s.Owner == g.Owner && RuleEventBus.Slots(s.Combatant).Any(slot => slot.Id == g.Skill && slot.InstanceId == g.Instance))
+            && unit.CommanderId == g.RecipientCommander)
+        .Select(g =>
+        {
+            var skill = content.Extensions.Bus.Skills[g.Skill];
+            string stage = world.Round == g.StartRound ? "转进阶段" : g.CounterReady && !g.Used ? "反攻待命" : "回避保护";
+            return new ClientSkillView(g.Skill, "maneuver." + g.Source + "." + g.Instance, 1, 0, null, null,
+                content.Label(skill.NameKey) + " · " + stage, content.Label(skill.DescriptionKey),
+                skill.Icon == null ? null : "extensions/" + skill.Icon[8..], "status", "self", 0, new(0, 0, 0));
+        }).ToArray();
 }

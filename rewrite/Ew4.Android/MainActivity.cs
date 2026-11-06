@@ -19,6 +19,8 @@ public sealed partial class MainActivity : Activity
     private ImportBridge? bridge;
     private bool picking;
     private bool exportingSaves;
+    private bool importingSaves;
+    private string? pendingSaveImport;
     private FrameLayout? surface;
     private SafeInsets? safeInsets;
     private SystemBack? systemBack;
@@ -106,6 +108,12 @@ public sealed partial class MainActivity : Activity
     private void EnterFullscreen()
     {
         if (Window == null) return;
+        // Keep the decor's compatibility policy sticky on every Android version too:
+        // a tap on the game's top bar must not opt into revealing the system bars.
+#pragma warning disable CS0618
+        Window.DecorView.SystemUiVisibility = (StatusBarVisibility)(SystemUiFlags.Fullscreen | SystemUiFlags.HideNavigation
+            | SystemUiFlags.ImmersiveSticky | SystemUiFlags.LayoutFullscreen | SystemUiFlags.LayoutHideNavigation | SystemUiFlags.LayoutStable);
+#pragma warning restore CS0618
         if (OperatingSystem.IsAndroidVersionAtLeast(28))
         {
             var attributes = Window.Attributes!;
@@ -122,13 +130,6 @@ public sealed partial class MainActivity : Activity
                 controller.SystemBarsBehavior = (int)WindowInsetsControllerBehavior.ShowTransientBarsBySwipe;
                 controller.Hide(WindowInsets.Type.SystemBars());
             }
-        }
-        else
-        {
-#pragma warning disable CS0618
-            Window.DecorView.SystemUiVisibility = (StatusBarVisibility)(SystemUiFlags.Fullscreen | SystemUiFlags.HideNavigation
-                | SystemUiFlags.ImmersiveSticky | SystemUiFlags.LayoutFullscreen | SystemUiFlags.LayoutHideNavigation | SystemUiFlags.LayoutStable);
-#pragma warning restore CS0618
         }
         surface?.RequestApplyInsets();
     }
@@ -152,6 +153,7 @@ public sealed partial class MainActivity : Activity
     protected override void OnResume()
     {
         base.OnResume();
+        EnterFullscreen();
         web?.ResumeTimers();
         web?.OnResume();
         web?.EvaluateJavascript("window.ew4SetAppVisible?.(true)", null);
@@ -264,6 +266,39 @@ public sealed partial class MainActivity : Activity
         }
         catch (Exception error) { SaveExportFinished(false, "无法打开保存窗口：" + error.Message); }
     });
+    private void PickSaveImport() => RunOnUiThread(() =>
+    {
+        if (importingSaves || IsFinishing || store == null) return;
+        importingSaves = true;
+        try
+        {
+            var intent = new Intent(Intent.ActionOpenDocument); intent.AddCategory(Intent.CategoryOpenable); intent.SetType("*/*");
+            StartActivityForResult(intent, 443);
+        }
+        catch (Exception error) { SaveImportFinished(new { error = error.Message }); }
+    });
+    private void SaveImportFinished(object result) => RunOnUiThread(() =>
+    {
+        importingSaves = false;
+        web?.EvaluateJavascript("window.ew4SaveImportFinished?.(" + System.Text.Json.JsonSerializer.Serialize(result,
+            new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web)) + ")", null);
+    });
+    private void ImportSaveFile(bool overwrite) => _ = Task.Run(() =>
+    {
+        try
+        {
+            var path = pendingSaveImport ?? throw new IOException("请选择存档包");
+            using var input = File.OpenRead(path);
+            var result = store!.Value.ImportSaves(input, overwrite);
+            if (result.Imported) { input.Dispose(); File.Delete(path); pendingSaveImport = null; }
+            SaveImportFinished(result);
+        }
+        catch (Exception error)
+        {
+            if (pendingSaveImport != null) { File.Delete(pendingSaveImport); pendingSaveImport = null; }
+            SaveImportFinished(new { error = error.Message });
+        }
+    });
     private void SaveExportFinished(bool ok, string message) => RunOnUiThread(() =>
     {
         exportingSaves = false;
@@ -295,6 +330,31 @@ public sealed partial class MainActivity : Activity
     protected override void OnActivityResult(int requestCode, Result resultCode, Intent? data)
     {
         base.OnActivityResult(requestCode, resultCode, data);
+        if (requestCode == 443)
+        {
+            if (resultCode != Result.Ok || data?.Data is not { } source || store == null) { SaveImportFinished(new { cancelled = true }); return; }
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    if (pendingSaveImport != null) File.Delete(pendingSaveImport);
+                    pendingSaveImport = Path.Combine(CacheDir!.AbsolutePath, "save-import-" + Guid.NewGuid().ToString("N"));
+                    using (var input = ContentResolver!.OpenInputStream(source) ?? throw new IOException("无法读取存档包"))
+                    using (var output = File.Create(pendingSaveImport))
+                    {
+                        byte[] buffer = new byte[65536]; long total = 0; int count;
+                        while ((count = input.Read(buffer)) > 0) { if ((total += count) > 256L * 1024 * 1024) throw new IOException("存档包超过256MiB"); output.Write(buffer, 0, count); }
+                    }
+                    ImportSaveFile(false);
+                }
+                catch (Exception error)
+                {
+                    if (pendingSaveImport != null) { File.Delete(pendingSaveImport); pendingSaveImport = null; }
+                    SaveImportFinished(new { error = error.Message });
+                }
+            });
+            return;
+        }
         if (requestCode == 442)
         {
             if (resultCode == Result.Ok && data?.Data is { } target && store != null) ExportSaves(target);
@@ -332,6 +392,19 @@ public sealed partial class MainActivity : Activity
         public void Choose(string id, string name) => activity.Pick(id, name);
         [JavascriptInterface, Java.Interop.Export("exportSaves")]
         public void ExportSaves() => activity.PickSaveExport();
+        [JavascriptInterface, Java.Interop.Export("importSaves")]
+        public void ImportSaves() => activity.PickSaveImport();
+        [JavascriptInterface, Java.Interop.Export("confirmSaveImport")]
+        public void ConfirmSaveImport(bool overwrite)
+        {
+            if (activity.importingSaves) return;
+            if (!overwrite)
+            {
+                if (activity.pendingSaveImport != null) { File.Delete(activity.pendingSaveImport); activity.pendingSaveImport = null; }
+                return;
+            }
+            activity.importingSaves = true; activity.ImportSaveFile(true);
+        }
         [JavascriptInterface, Java.Interop.Export("startup")]
         public void Startup(string state, string message)
         {

@@ -55,6 +55,7 @@ public sealed partial class ModStore
             }
             lock (gate)
             {
+                if (path == "/api/save-manager") return JsonSerializer.Serialize(new { ok = true, data = ManageSaves(body) }, ModFiles.Json);
                 game ??= NewGame(activeKey, activeManifest);
                 return game.Dispatch(path, body);
             }
@@ -63,8 +64,11 @@ public sealed partial class ModStore
             code = e is Ew4.Core.RuleViolation rule ? rule.Code : "mod.failure", message = e.Message, error = e.Message }, ModFiles.Json); }
     }
     private ClientGame NewGame(string? key, ModManifest? manifest) => new(baseline.Content(p => ReadFrom(key, manifest, p), manifest?.Scenarios ?? baseline.Scenarios, showHiddenCampaigns: manifest == null),
-        manifest == null ? baseline.SaveNamespace == null ? saves : ModFiles.Under(saves, baseline.SaveNamespace)
-            : ModFiles.Under(saves, $"mods/{manifest.Id}/{manifest.LogicRevision}"));
+        SaveDirectory(manifest), modName: manifest?.Name ?? "原版", saveIdentity: SaveIdentity(manifest));
+    private string SaveIdentity(ModManifest? manifest) => manifest == null ? baseline.SaveNamespace ?? "builtin"
+        : $"mods/{manifest.Id}/{manifest.LogicRevision}";
+    private string SaveDirectory(ModManifest? manifest) => manifest == null && baseline.SaveNamespace == null ? saves
+        : ModFiles.Under(saves, SaveIdentity(manifest));
     public string Status()
     {
         lock (gate) return JsonSerializer.Serialize(new { active = activeKey, baseRevision = baseline.Revision, mods = List(), import = progress }, ModFiles.Json);

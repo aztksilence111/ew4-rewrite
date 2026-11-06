@@ -23,7 +23,7 @@ internal static class DiplomacyChecks
             DiplomacyNeutralCamps = ["n"], Cells = Enumerable.Range(0,25).Select(i => new CellState {
                 Owner = i < 5 ? "loser" : i == 5 ? "ally" : i == 6 ? "neutral" : "winner",
                 BuildingKind = i switch {0=>"city",1=>"industry",2=>"stable",3=>"port",4=>"farmland",_=>null}, BuildingLevel = i<5?1:0
-            }).ToArray(), Demands = new() { Seed = 1946 } };
+            }).ToArray(), Demands = new() { Seed = 1946, Rules = new() { Pressure = null } } };
         initial = DemandDiplomacy.Initialize(initial); initial.Validate();
         checks += DiplomacyHomelandChecks.Run(initial, root);
         checks += DiplomacyExpansionChecks.Run(root);
@@ -78,7 +78,7 @@ internal static class DiplomacyChecks
             var b=DemandDiplomacy.Demand(reloaded,reloaded.Revision,"winner","loser");
             Check(a.Notices.Last().Kind==b.Notices.Last().Kind, "reload and unrelated RNG cannot redraw attempt "+seed);
         }
-        var success = first with { Demands=first.Demands! with { Rules=new() { LossWeight=100,OccupationWeight=100,MaximumChance=100 } },
+        var success = first with { Demands=first.Demands! with { Rules=new() { LossWeight=100,OccupationWeight=100,MaximumChance=100,Pressure=null } },
             Cells=first.Cells.Select((c,i)=>i==2?c with { Owner="winner" }:c).ToArray(),
             Units=basis.Units.Select(u=>u.Owner=="loser"?u:u with { Owner="ally" }).ToArray() };
         var accepted=DemandDiplomacy.Demand(success,success.Revision,"winner","loser");
@@ -194,6 +194,19 @@ internal static class DiplomacyChecks
         Check(Call("diplomacy",new{}).GetProperty("factions").EnumerateArray().Single(f=>f.GetProperty("id").GetString()==enemy.Id).GetProperty("quote").GetProperty("demandBlocked").GetString()=="legacy","old client slot has no invented occupation history");
         string browserFixtures=Path.Combine(root,"build/diplomacy-20261028/browser-fixtures");
         Fixture(browserFixtures,2,failureWorld);Fixture(browserFixtures,3,successWorld);Fixture(browserFixtures,4,live with { Demands=null });
+        var paidWorld = live with { Factions = live.Factions.Select(f => f.Id == started.Session.PlayerFaction
+            ? f with { Resources = new(999999,999999,100) } : f).ToArray() };
+        Fixture(profile,5,paidWorld);
+        var paidLoaded = Call("load",new{slot=5});
+        var purchase = Call("diplomacy",new{}).GetProperty("factions").EnumerateArray().Single(f=>f.GetProperty("id").GetString()==enemy.Id).GetProperty("purchase");
+        Check(purchase.GetProperty("blocked").ValueKind==JsonValueKind.Null,"real target units all have paid surrender prices");
+        long paidMoney = purchase.GetProperty("cost").GetProperty("money").GetInt64();
+        var purchased = Call("action",new{op="purchase_surrender",revision=paidLoaded.GetProperty("revision").GetInt64(),target=enemy.Id});
+        Check(purchased.GetProperty("factions").EnumerateArray().Single(f=>f.GetProperty("id").GetString()==enemy.Id).GetProperty("defeated").GetBoolean(),"real client paid surrender defeats target");
+        Check(purchased.GetProperty("factions").EnumerateArray().Single(f=>f.GetProperty("id").GetString()==started.Session.PlayerFaction)
+            .GetProperty("resources").GetProperty("money").GetInt64()==999999-paidMoney,"real client uses quoted payment");
+        var paidReloaded=Call("load",new{slot=0,mode=2});
+        Check(paidReloaded.GetProperty("factions").EnumerateArray().Single(f=>f.GetProperty("id").GetString()==enemy.Id).GetProperty("defeated").GetBoolean(),"paid surrender survives autosave reload");
         return checks;
     }
 }

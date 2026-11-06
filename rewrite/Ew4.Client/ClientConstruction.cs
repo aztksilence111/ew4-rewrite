@@ -25,13 +25,16 @@ public sealed partial class ClientContent
         foreach (string faction in recruitment.Keys.ToArray())
         {
             var extra = new Dictionary<string, RecruitmentOffer>(StringComparer.Ordinal);
-            foreach (var b in buildings) foreach (var r in b.Value.Recruitment)
+            var siteOffers = buildings.SelectMany(b => b.Value.Recruitment.Select(r => (Offer: r, Kinds: (IReadOnlyList<string>)new[] { b.Key })))
+                .Concat((config.Recruitment ?? Array.Empty<ModBuildingRecruit>()).Select(r => (Offer: r, Kinds: r.BuildingKinds!)));
+            foreach (var entry in siteOffers)
             {
+                var r = entry.Offer;
                 if (r.Scenarios.Count > 0 && !r.Scenarios.Contains(world.ScenarioId)
                     || r.Countries.Count > 0 && (!countries.TryGetValue(faction, out string? country) || !r.Countries.Contains(country))) continue;
                 var definition = Catalogs.Runtime.Profiles[r.Profile];
                 extra.Add(r.Id, new RecruitmentOffer { Id = r.Id, Template = new Combatant { Profile = definition.Profile, Health = definition.Profile.MaxHealth },
-                    Cost = r.Cost, BuildingKinds = new[] { b.Key }, MinimumBuildingLevel = r.MinimumLevel, AllowSea = false,
+                    Cost = r.Cost, BuildingKinds = entry.Kinds, MinimumBuildingLevel = r.MinimumLevel, AllowSea = false,
                     Support = new UnitSupport { FoodConsumption = definition.FoodConsumption } });
             }
             if (extra.Keys.Any(recruitment[faction].ContainsKey)) throw new RuleViolation("construction.recruitment", "Custom recruitment IDs collide with existing cards");

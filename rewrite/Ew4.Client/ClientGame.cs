@@ -12,10 +12,11 @@ public sealed record ClientCommand(string Op = "", long Revision = -1, string? S
     int? TaskId = null, string? Kind = null, int? Radius = null, int[]? Line = null, bool? DeployFirst = null, bool Compact = false);
 public sealed record ClientSlot(string Scenario, string? Country, byte[] Session, MovementHistoryState? MovementHistory = null, JsonElement? Tutorial = null,
     int Round = 0, DateTimeOffset? SavedAt = null, IReadOnlyList<string>? LocalPlayers = null, string? DisplayCountry = null,
-    IReadOnlyList<int>? TechnologySnapshot = null);
+    IReadOnlyList<int>? TechnologySnapshot = null, string? ModName = null, string? SaveIdentity = null);
 
 // Both hosts serialize commands here, so rendering cannot bypass turn ownership or stale-state checks.
-public sealed partial class ClientGame(ClientContent content, string saveDirectory, Func<DateTimeOffset>? clock = null)
+public sealed partial class ClientGame(ClientContent content, string saveDirectory, Func<DateTimeOffset>? clock = null,
+    string modName = "原版", string? saveIdentity = null)
 {
     public static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
     private readonly object gate = new();
@@ -138,6 +139,8 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
     private object Load(ClientCommand command)
     {
         var slot = ReadSlot(SavePath(command.Slot, command.Mode, true));
+        if (slot.SaveIdentity != null && slot.SaveIdentity != saveIdentity)
+            throw new RuleViolation("save.mod", "此存档属于其他Mod或逻辑版本，请先切换对应Mod");
         var start = content.Start(slot.Scenario, slot.Country, localPlayers: slot.LocalPlayers, technologySnapshot: slot.TechnologySnapshot);
         GameSession state;
         bool migratedContent = false;
@@ -207,7 +210,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         tutorialCheckpoint = command.Tutorial;
         var slot = new ClientSlot(current.Session.World.ScenarioId, country, SessionSave.Encode(current.Session), movementHistory.Save(), tutorialCheckpoint,
             current.Session.World.Round, DateTimeOffset.Now, current.Session.World.LocalMultiplayer?.HumanFactions,
-            FactionCountries(current.Session.World).GetValueOrDefault(current.Session.PlayerFaction), current.TechnologySnapshot);
+            FactionCountries(current.Session.World).GetValueOrDefault(current.Session.PlayerFaction), current.TechnologySnapshot, modName, saveIdentity);
         string temporary = path + ".tmp";
         using (var stream = new FileStream(temporary, FileMode.Create, FileAccess.Write, FileShare.None)) { JsonSerializer.Serialize(stream, slot, Json); stream.Flush(true); }
         if (File.Exists(path)) File.Replace(temporary, path, path + ".bak"); else File.Move(temporary, path);
@@ -275,7 +278,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         }
         if (active.Id != session.PlayerFaction || !active.Human) throw new RuleViolation("client.player_turn", "Player does not own the active turn");
         if (PlayerAi.Pending(world)) throw new RuleViolation("player_ai.ending", "请先停止执行再操作单位");
-        if (command.Op is "declare_war" or "demand_surrender") return DiplomacyAction(command);
+        if (command.Op is "declare_war" or "demand_surrender" or "purchase_surrender") return DiplomacyAction(command);
         if (command.Op == "use_item")
         {
             var itemRules = content.Catalogs.Items.Rules();
@@ -310,7 +313,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         WorldChange action = command.Op switch
         {
             "skill" => WorldSkillActions.Execute(world, world.Revision, command.Unit!, command.Offer!, command.Target, content.Extensions.Bus, rules.Movement,
-                command.Cell < 0 ? null : command.Cell),
+                command.Cell < 0 ? null : command.Cell, command.Units),
             "move" => WorldActions.Move(world, world.Revision, command.Unit!, command.Cell, rules.Movement),
             "disband" => WorldDisband.Execute(world, world.Revision, command.Unit!, DisbandConfiguration()),
             "attack" => WorldBattle.Attack(world, world.Revision, command.Unit!, command.Target!, rules.Battle),
@@ -437,8 +440,11 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                 quote = ActionQuote(() => WorldSupportActions.InstallationCost(world, unit.Id, p.Value)) })
             .Where(p => p.quote != null).ToArray() : [];
         var buildingOffers = ready && unit != null && world.Construction?.Enabled == true ? world.Construction.Buildings
-            .Where(p => WorldConstruction.CanBuild(world, unit.Id, p.Key, false))
+            .Where(p => WorldConstruction.CanBuild(world, unit.Id, p.Key, false, checkAction: false))
             .Select(p => new { id = p.Key, kind = p.Key, name = p.Value.Name, image = p.Value.Levels[0].Image,
+                constructionTurns = p.Value.Levels[0].ConstructionTurns,
+                available = WorldConstruction.CanBuild(world, unit.Id, p.Key, false),
+                unavailableReason = unit.Acted ? "本回合已行动，下一所属方回合可施工。" : null,
                 quote = ActionQuote(() => p.Value.Cost) }).ToArray() : [];
         string? disbandWarning = refund != null && unit!.Combatant.Profile.Category == "fort"
             && current.Rules.Recruitment[world.ActiveFaction].Values.Any(o => o.Template?.Profile.Category == "fort"
@@ -592,12 +598,13 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             jurisdictionCenter = world.Jurisdictions?.CellCenters[i] is int center && center >= 0 ? center : (int?)null,
             tileInfo = TileInfo(i, c),
             facility = sites.TryGetValue(i, out var service) ? service.State6 switch { 1 => "trade", 2 => "shop", 3 => "bar", _ => (string?)null } : null,
-            buildingImage = BuildingImage(i, c), buildingMaximumLevel = c.BuildingKind != null && world.Construction?.Buildings.TryGetValue(c.BuildingKind, out var customBuilding) == true ? customBuilding.Levels.Count : (int?)null,
+            buildingImage = BuildingImage(i, c), c.BuildingConstructionTurns, c.BuildingRecruitsThisTurn,
+            buildingMaximumLevel = c.BuildingKind != null && world.Construction?.Buildings.TryGetValue(c.BuildingKind, out var customBuilding) == true ? customBuilding.Levels.Count : (int?)null,
             buildingStyle = sites.TryGetValue(i, out var site) ? site.State7 : 1 };
         var unitViews = world.Units.Select(u => JsonSerializer.SerializeToElement(new { u.Id, u.Owner, u.Cell, profile = u.Combatant.Profile.Id, category = u.Combatant.Profile.Category,
             layer = WorldUnitLayers.Enabled(world) ? WorldUnitLayers.Layer(world, u.Combatant.Profile) : null,
             occupiedLayers = WorldUnitLayers.Enabled(world) ? WorldUnitLayers.Occupies(world, u.Combatant.Profile) : null,
-            skills = SkillViews(u.Combatant), statuses = StatusViews(u.Combatant), traits = u.Combatant.Profile.Traits.Where(content.Extensions.Bus.Skills.ContainsKey)
+            skills = SkillViews(u.Combatant), statuses = StatusViews(u.Combatant).Concat(ManeuverViews(world, u)).ToArray(), traits = u.Combatant.Profile.Traits.Where(content.Extensions.Bus.Skills.ContainsKey)
                 .Select(id => SkillView(new SkillSlot(id, "trait." + id))).ToArray(),
             attack = AttackView(u.Combatant),
             health = u.Combatant.Health, maxHealth = u.Combatant.MaximumHealth, maximumRange = u.Combatant.MaximumRange,

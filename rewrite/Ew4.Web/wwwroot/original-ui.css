@@ -100,18 +100,17 @@ input,select,textarea{font-family:inherit;font-synthesis:none}
 .skill-row>img{position:absolute;left:1px;top:1px;width:19px;height:17px}
 .skill-row .skill-info{position:absolute;left:auto;right:1px;top:0;width:20px;height:18px;pointer-events:auto}
 .skill-row>.original-text{max-width:117px}
-.commander-detail .commander-abilities{left:82px;right:auto;top:79px;width:356px;height:109px;border:1px solid #888;display:grid;grid-template-columns:178px 178px;grid-template-rows:repeat(4,27px);grid-auto-flow:row}
+.commander-detail .commander-abilities{left:82px;right:auto;top:79px;width:356px;height:109px;border:1px solid #888;display:grid;grid-template-columns:178px 178px;grid-auto-rows:27px;grid-auto-flow:row}
 .commander-abilities .commander-ability{position:relative;height:27px;width:178px;border-bottom:1px solid #aaa;background:url("/content/ui/image_ui_hd/Board_generalinfomarker.png") left top/40px 27.5px no-repeat}
 .commander-ability>img{position:absolute;left:9px;top:3px;width:22px;height:21.5px}
 .commander-ability .ability-stars{position:absolute;left:49px;top:7px;height:14px;display:flex;gap:3.5px;max-width:126px;overflow:hidden}
 .ability-stars img{width:13.5px;height:12.5px;flex:none}
+.ability-stars[data-mode="fiveSlots"]{overflow:visible}
+.ability-stars[data-mode="fiveSlots"] img[data-promoted="true"]{filter:var(--ability-star-outline-filter,none)}
 .commander-ability .ability-stars-count{top:4px;height:19px;align-items:center}
 .ability-stars-count>.original-text{flex:none;max-width:106px}
-.commander-detail .commander-abilities.has-custom-abilities{grid-template-rows:none;grid-auto-rows:42px;overflow-y:auto;overflow-x:hidden;grid-template-columns:repeat(2,minmax(0,1fr));touch-action:pan-y;scrollbar-width:thin}
-.has-custom-abilities .commander-ability{height:42px;width:100%;min-width:0}
-.has-custom-abilities .commander-ability>img{top:10px;object-fit:contain}
-.has-custom-abilities .ability-name{position:absolute;left:44px;top:1px;max-width:calc(100% - 48px);height:16px}
-.has-custom-abilities .ability-stars,.has-custom-abilities .ability-stars-count{top:21px;left:44px;max-width:calc(100% - 48px)}
+.commander-ability>img{object-fit:contain}
+.commander-ability[data-ability="cavalry"]>img[src$="/icons/cavalry-armor.png"]{left:5px;top:1.5px;width:30px;height:24px}
 .commander-ranks{position:absolute;left:2px;top:103px;width:78px;height:85px;border:1px solid #888}
 .commander-ranks>div{position:relative;height:42px;border-bottom:1px solid #aaa}
 .rank-gauge{position:relative;display:inline-block;flex:none;width:28.5px;height:28.5px;vertical-align:middle}
@@ -310,7 +309,7 @@ body:has(#play:not([hidden])>#pause:not([hidden])) :is(#pause,#settings,#detail-
 .skill-tooltip.tip-right::after{left:-18px;right:auto;transform:scaleX(-1)}
 .commander-skills .skill-info{padding:0;border:0;background:none}
 .commander-skills .skill-info>img{display:block;width:18px;height:18px}
-.commander-skills.extension-skills{overflow:auto;scrollbar-width:thin;height:74px;max-height:74px;display:grid;grid-template-columns:repeat(var(--skill-columns,1),minmax(0,1fr));gap:var(--skill-gap,2px);align-content:start}
+.commander-skills.extension-skills{overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;touch-action:pan-y;scrollbar-width:thin;height:74px;max-height:74px;display:grid;grid-template-columns:repeat(var(--skill-columns,1),minmax(0,1fr));gap:var(--skill-gap,2px);align-content:start}
 .commander-skills.extension-skills .skill-row{width:auto;min-width:0;height:max(20px,var(--skill-icon,19px));padding-left:calc(var(--skill-icon,19px) + 3px);padding-right:20px}
 .commander-skills.extension-skills .skill-row>img{width:var(--skill-icon,19px);height:var(--skill-icon,19px);object-fit:contain}
 .commander-skills.extension-skills .skill-row>.original-text{flex:1;min-width:0;max-width:100%}
@@ -330,12 +329,18 @@ body:has(#play:not([hidden])>#pause:not([hidden])) :is(#pause,#settings,#detail-
 .layer-targets>button{flex:none;min-height:36px;padding:4px 8px;white-space:normal;overflow-wrap:anywhere}
 .defense-cards.has-buildings{overflow-x:auto;overflow-y:hidden;max-width:100%;box-sizing:border-box;height:76px;touch-action:pan-x}
 .defense-cards.has-buildings canvas{display:block}
+.defense-cards.has-buildings>button{width:70px;flex:0 0 70px}
+.defense-cards.has-buildings>button>img,.defense-cards.has-buildings canvas{width:70px!important;height:48px!important;object-fit:contain}
 .skill-action-description{position:absolute;inset:7px 8px 25px;display:flex;flex-direction:column;gap:7px;overflow:auto}
 .skill-action-cost{display:flex;justify-content:center;gap:14px}
 .skill-action-cost>span{display:flex;align-items:center;gap:3px}
 .skill-targets{display:flex;flex-direction:column;gap:3px;overflow:auto}
 .skill-targets>button{min-height:26px;background:#d5d5d2;border:1px solid #999;color:#404040;padding:3px}
 .skill-targets>button[aria-pressed=true]{outline:2px solid #438b39;outline-offset:-2px}
+.skill-action-description.multi-target>.skill-action-text{max-height:74px;overflow:auto;flex-shrink:0;touch-action:pan-y}
+.skill-action-description.multi-target{overflow:hidden}
+.skill-action-description.multi-target>.original-text,.skill-action-description.multi-target>.skill-target-summary{flex-shrink:0}
+.skill-action-description.multi-target>.skill-targets{flex:1 0 84px;min-height:84px;touch-action:pan-y}
 .loading-stage{position:absolute;left:50%;top:50%;width:568px;height:320px;transform:translate(-50%,-50%) scale(var(--ui-scale));transform-origin:center}
 #loading-screen{position:fixed;inset:0;z-index:20;background:#000;color:#ebe6e1}
 .loading-stage>img{position:absolute;left:10px;top:8px;width:190px;height:auto}

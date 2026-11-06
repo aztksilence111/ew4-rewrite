@@ -97,7 +97,8 @@ public sealed partial class ExtensionLoader
             commanderAbilities = Read<CommanderAbilityConfiguration>(m.CommanderAbilities);
             commanderAbilities.Validate();
             foreach (string icon in commanderAbilities.Abilities.Select(a => a.Icon)
-                .Concat(commanderAbilities.Presentation.Values.Select(p => p.Icon).OfType<string>()).Distinct()
+                .Concat(commanderAbilities.Presentation.Values.Select(p => p.Icon).OfType<string>())
+                .Concat(commanderAbilities.Stars?.Palette.Values ?? Enumerable.Empty<string>()).Distinct()
                 .Where(icon => icon.StartsWith("rewrite/", StringComparison.Ordinal)))
                 if (read(icon).Length > 4 * 1024 * 1024) throw new RuleViolation("extension.size", icon);
         }
@@ -199,6 +200,7 @@ public sealed partial class ExtensionLoader
                     || skill.Icon != null && (!PathValid(skill.Icon) || !skill.Icon.EndsWith(".png", StringComparison.Ordinal)))
                     throw new RuleViolation("extension.skill", "Invalid/duplicate skill: " + skill?.Id);
                 skill.Cost.Validate();
+                TacticalSkills.Validate(skill, m.ApiVersion);
                 if (skill.Cost.Money < 0 || skill.Cost.Industry < 0 || skill.Cost.Food < 0) throw new RuleViolation("extension.cost", skill.Id);
                 foreach (var e in skill.Effects)
                 {

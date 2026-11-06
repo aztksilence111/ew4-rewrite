@@ -91,9 +91,12 @@ public static class WorldBattle
             distance, attacker.Combatant.Profile.MinimumRange, attacker.Combatant.MaximumRange) != AttackBlock.None)
             throw new RuleViolation("attack.unavailable", "Attacker cannot attack this target");
         var a = CombatContext.Resolve(state, attacker, defender.Combatant.Profile.Category, rules.Context);
+        var bus = rules.Combat.Extensions;
+        if (bus?.TacticalEnabled == true) a = a with { Tactical = TacticalSkills.Resolve(state, attacker, bus), GroundMobile = TacticalSkills.Mobile(state, attacker) };
         if (!WorldUnitLayers.CanAttack(state, defender, attacker, counterattack: true))
             a = a with { Profile = a.Profile with { Traits = a.Profile.Traits.Append("no_retaliation").Distinct().ToArray() } };
         var d = CombatContext.Resolve(state, defender, attacker.Combatant.Profile.Category, rules.Context);
+        if (bus?.TacticalEnabled == true) d = d with { Tactical = TacticalSkills.Resolve(state, defender, bus), GroundMobile = TacticalSkills.Mobile(state, defender) };
         var splash = SplashCombat.Target(state, attacker, defender, rules.Splash);
         CombatExchange? secondary = splash == null ? null : new(
             CombatContext.Resolve(state, attacker, splash.Combatant.Profile.Category, rules.Context),
@@ -147,6 +150,11 @@ public static class WorldBattle
         internal WorldChange Resolve(ResolvedBattle battle)
         {
             state = state with { RandomState = battle.RandomState };
+            if (rules.Combat.Extensions?.TacticalEnabled == true)
+                state = TacticalSkills.ConsumeAttack(state, battle.Attacker, rules.Combat.Extensions);
+            var initiator = Unit(battle.Attacker)!;
+            SetUnit(initiator with { AttackedThisTurn = true,
+                RemainingMovement = initiator.Maneuvers.Count > 0 ? 0 : initiator.RemainingMovement });
             var attacker = Unit(battle.Attacker)!;
             var defender = Unit(battle.Defender)!;
             var splash = battle.SplashTarget == null ? null : Unit(battle.SplashTarget);

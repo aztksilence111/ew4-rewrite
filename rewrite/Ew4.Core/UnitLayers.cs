@@ -10,6 +10,7 @@ public sealed record UnitLayerProfile
     public IReadOnlyList<string>? Occupies { get; init; }
     public IReadOnlyList<string> AttackLayers { get; init; } = new[] { "surface" };
     public IReadOnlyList<string>? CounterattackLayers { get; init; }
+    public IReadOnlyList<string>? TargetCategories { get; init; }
 }
 
 public sealed record UnitLayerRules
@@ -29,10 +30,14 @@ public sealed record UnitLayerRules
             throw new RuleViolation("layers.configuration", "Invalid unit layers, capacities or target layers");
         if (Profiles.Values.Any(p => p.Occupies != null && (!Layers(p.Occupies) || !p.Occupies.Contains(p.Layer))))
             throw new RuleViolation("layers.configuration", "Occupied layers must include the primary layer");
+        if (Profiles.Values.Any(p => p.TargetCategories != null && (p.TargetCategories.Count > 5
+            || p.TargetCategories.Distinct(StringComparer.Ordinal).Count() != p.TargetCategories.Count
+            || p.TargetCategories.Any(c => c is not ("infantry" or "cavalry" or "artillery" or "naval" or "fort")))))
+            throw new RuleViolation("layers.configuration", "Invalid attack target categories");
     }
 
     public UnitLayerRules Copy() => this with { Profiles = Profiles.ToDictionary(p => p.Key, p => p.Value with {
-        Occupies = p.Value.Occupies?.ToArray(), AttackLayers = p.Value.AttackLayers.ToArray(), CounterattackLayers = p.Value.CounterattackLayers?.ToArray()
+        Occupies = p.Value.Occupies?.ToArray(), AttackLayers = p.Value.AttackLayers.ToArray(), CounterattackLayers = p.Value.CounterattackLayers?.ToArray(), TargetCategories = p.Value.TargetCategories?.ToArray()
     }, StringComparer.Ordinal) };
 }
 
@@ -70,6 +75,8 @@ public static class WorldUnitLayers
     }
     public static string? AttackLayer(WorldState world, UnitState source, UnitState target, bool counterattack = false)
     {
+        if (Enabled(world) && world.UnitLayers!.Profiles.TryGetValue(source.Combatant.Profile.Id, out var restrictions)
+            && restrictions.TargetCategories != null && !restrictions.TargetCategories.Contains(target.Combatant.Profile.Category)) return null;
         var layers = world.UnitLayers?.Profiles.TryGetValue(source.Combatant.Profile.Id, out var policy) == true
             ? counterattack ? policy.CounterattackLayers ?? policy.AttackLayers : policy.AttackLayers : new[] { "surface" };
         bool sourceAtSea = Composite(world, source.Combatant.Profile) && world.Cells[source.Cell].Terrain.Sea;

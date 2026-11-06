@@ -26,6 +26,8 @@
 *.log
 
 # User accounts, installed Mods, local servers, and generated test artifacts.
+/mingguo-mod
+/mingguo-mod-plan
 /rewrite/local/
 /rewrite/reports/
 /reverse/references/

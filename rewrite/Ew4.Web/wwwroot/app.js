@@ -502,6 +502,10 @@ async function installState(next, center = false) {
 function playAttachedEffects(previous,next){
   const oldUnits=new Map(previous.units.map(u=>[u.id,u])),units=new Map(next.units.map(u=>[u.id,u])),upgraded=new Set(),healed=new Set(),commanders=new Set(),speed=Math.sqrt(settings.speed);
   for(const notice of next.notices||[]){
+    if(notice.kind==='building.constructed'){
+      const unit=units.get(notice.subject),profile=unit&&visualProfile(unit);
+      if(profile?.motions.build){const now=performance.now();battlefield.unitMotions.set(unit.id,{action:'build',started:now,playing:true,until:now+1000});}
+    }
     if(['battle.experience','unit.trained','unit.item_used'].includes(notice.kind)){
       const unit=units.get(notice.subject),old=oldUnits.get(notice.subject);
       if(unit&&old&&unit.veterancy!==old.veterancy&&!upgraded.has(unit.id)){
@@ -1092,16 +1096,21 @@ function openSkillDescription(skill,onClose){
   detailReturn=onClose||(()=>{if(selected)openUnitInfo(selected);});
 }
 function openSkillAction(unit,entry){
-  const skill=entry.skill,isCell=skill.target==='cell',choices=isCell?(entry.cells||[]):entry.targets;let target=choices[0];
-  const body=detailWindow('info_label',300,220,()=>act('skill',{offer:skill.instanceId,...(isCell?{cell:target}:{target})}));
-  $('detail-confirm').disabled=!entry.available||target===undefined;
-  const box=document.createElement('div');box.className='skill-action-description';
-  box.append(originalTextRenderer.element(skill.name,'font_text_2_cn_hd','#404040'),originalTextRenderer.element(skill.description,'font_text_2_cn_hd','#404040',270));
+  const skill=entry.skill,isCell=skill.target==='cell',choices=isCell?(entry.cells||[]):entry.targets,multiple=!!entry.multiple,chosen=new Set();let target=choices[0];
+  const body=detailWindow('info_label',300,multiple?280:220,()=>act('skill',{offer:skill.instanceId,...(multiple?{units:[...chosen]}:isCell?{cell:target}:{target})}));
+  $('detail-confirm').disabled=!entry.available||!multiple&&target===undefined;
+  const box=document.createElement('div');box.className='skill-action-description'+(multiple?' multi-target':'');
+  const description=document.createElement('div');description.className='skill-action-text';description.append(originalTextRenderer.element(skill.description,'font_text_2_cn_hd','#404040',270));
+  box.append(originalTextRenderer.element(skill.name,'font_text_2_cn_hd','#404040'),description);
   const cost=document.createElement('div');cost.className='skill-action-cost';
-  for(const [key,icon] of [['money','money'],['industry','industry'],['food','food']]){const span=document.createElement('span');span.append(uiImage('marker_'+icon+'.png',16),originalTextRenderer.element(skill.cost[key]||0,'font_char_2_hd','#404040'));cost.append(span);}box.append(cost);
+  for(const [key,icon] of [['money','money'],['industry','industry'],['food','food']]){const span=document.createElement('span');span.append(uiImage('marker_'+icon+'.png',16),originalTextRenderer.element(skill.cost[key]||0,'font_char_2_hd','#404040'));cost.append(span);}if(!multiple||Object.values(skill.cost).some(v=>v>0))box.append(cost);
   const targets=document.createElement('div');targets.className='skill-targets';
-  for(const id of choices){const t=isCell?null:state.units.find(u=>u.id===id),cell=isCell?id:t.cell,b=button('',()=>{target=id;for(const n of targets.children)n.setAttribute('aria-pressed',String(n===b));},targets);
-    b.setAttribute('aria-pressed',String(id===target));b.append(originalTextRenderer.element((isCell?'':manifest.profiles[t.profile].name+' ')+'('+(cell%state.width)+','+Math.floor(cell/state.width)+')','font_text_2_cn_hd','#404040'));}
+  const summary=document.createElement('div');summary.className='skill-target-summary';
+  const refresh=()=>{if(!multiple)return;const text='自身默认受益，另选 '+chosen.size+' / '+entry.maximumTargets+' 支';summary.setAttribute('aria-label',text);summary.replaceChildren(originalTextRenderer.element(text,'font_text_2_cn_hd','#404040'));for(const b of targets.children){b.setAttribute('aria-pressed',String(chosen.has(b.dataset.unit)));b.disabled=!chosen.has(b.dataset.unit)&&chosen.size>=entry.maximumTargets;}};
+  if(multiple)box.append(summary);
+  for(const id of choices){const t=isCell?null:state.units.find(u=>u.id===id),cell=isCell?id:t.cell,b=button('',()=>{if(multiple){if(chosen.has(id))chosen.delete(id);else if(chosen.size<entry.maximumTargets)chosen.add(id);refresh();}else{target=id;for(const n of targets.children)n.setAttribute('aria-pressed',String(n===b));}},targets);
+    b.dataset.unit=id;b.setAttribute('aria-pressed',String(!multiple&&id===target));b.append(originalTextRenderer.element((isCell?'':manifest.profiles[t.profile].name+' ')+'('+(cell%state.width)+','+Math.floor(cell/state.width)+')','font_text_2_cn_hd','#404040'));}
+  refresh();
   box.append(targets);body.append(box);
 }
 let pendingAction=null;
@@ -1198,7 +1207,7 @@ function openDefense(){
   const offers=[...(selection.installationOffers||[]),...(selection.buildingOffers||[]).map(o=>({...o,building:true}))];if(!offers.length)return;
   let chosen=offers[0];const unit=selected.id,revision=state.revision,cell=selection.cell;
   const body=detailWindow(selection.buildingOffers?.length?'建造':'defense_label',300,185,async()=>{
-    if(!chosen.quote.affordable||busy)return;
+    if(!chosen.quote.affordable||chosen.available===false||busy)return;
     if(revision!==state.revision||cell!==selection?.cell||unit!==selected?.id)throw new Error('状态已更新，请重新选择');
     await act(chosen.building?'building':'installation',{offer:chosen.id,unit,revision});
   });
@@ -1206,8 +1215,10 @@ function openDefense(){
   function choose(offer,b){
     chosen=offer;for(const c of row.children)c.setAttribute('aria-pressed',String(c===b));
     body.querySelector('.unit-description')?.remove();
-    descriptionBox(body,manifest.strings['name_'+offer.name]||offer.name,manifest.strings['desc_'+offer.name]||'');
-    $('detail-confirm').disabled=!offer.quote.affordable;
+    descriptionBox(body,manifest.strings['name_'+offer.name]||offer.name,offer.building&&offer.constructionTurns>0
+      ? `施工${offer.constructionTurns}个所属方回合。工兵修筑一次后即可离开；施工完成前不能招募或升级。${offer.unavailableReason||''}`
+      : manifest.strings['desc_'+offer.name]||'');
+    $('detail-confirm').disabled=!offer.quote.affordable||offer.available===false;
   }
   const funds=state.factions.find(f=>f.id===state.playerFaction).resources;
   for(const [index,offer] of offers.entries()){
@@ -1505,6 +1516,7 @@ $('restart').onclick=async()=>{
 };
 $('return-menu').onclick=()=>{if(busy&&!aiRunning){notice('请等待当前行动完成');return;}return showMain();};
 window.ew4Back=()=>{
+  if(window.ew4SaveManagerBack?.())return 'handled';
   if(diplomacyUi.back())return 'handled';
   if(aiControl.closeMission(true))return 'handled';
   if(!storyPlayer.host.hidden){storyPlayer.back();return 'handled';}
@@ -1572,6 +1584,13 @@ async function initializeClient(){
     startupReady=true;
     Ew4Startup.ready();
     document.querySelectorAll('.main-entry').forEach(button=>button.disabled=false);$('continue').disabled=false;
+    // Read-only links let authors review a commander without changing academy offers or recruiting them.
+    const commanderPreview=new URLSearchParams(location.search).get('commander');
+    if(/^\d+$/.test(commanderPreview||'')){
+      await menus.headquarters();
+      const definition=menus.data.definitions.find(d=>d.legacyId===Number(commanderPreview)&&d.recruitable);
+      if(definition)menus.commanderInfo(definition,menus.data.roster.find(c=>c.definitionId===definition.id));
+    }
   }catch(error){startupError=error.message||String(error);Ew4Startup.fail(startupError,error.name);}
   finally{Ew4Startup.stop();startupRunning=false;startupStatus();}
 }

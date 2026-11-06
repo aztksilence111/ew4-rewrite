@@ -45,7 +45,8 @@ if (args.ElementAtOrDefault(1) == "--legacy-map-extensions-only")
 
 if (args.ElementAtOrDefault(1) == "--save-export-only")
 {
-    Console.WriteLine(JsonSerializer.Serialize(new { saveExportChecks = SaveExportChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+    Console.WriteLine(JsonSerializer.Serialize(new { saveExportChecks = SaveExportChecks.Run(Path.GetFullPath(args[0])),
+        saveImportChecks = SaveImportChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
 }
 
 if (args.ElementAtOrDefault(1) == "--startup-performance-only")

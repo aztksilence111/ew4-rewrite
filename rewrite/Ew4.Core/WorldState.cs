@@ -52,6 +52,8 @@ public sealed record CellState
     public string? BuildingKind { get; init; }
     public int BuildingLevel { get; init; }
     public int BuildingUpgradesThisTurn { get; init; }
+    public int BuildingConstructionTurns { get; init; }
+    public int BuildingRecruitsThisTurn { get; init; }
     public bool Objective { get; init; }
     public bool BlocksTerritoryExpansion { get; init; }
     public int Environment { get; init; }
@@ -86,6 +88,9 @@ public sealed record UnitState
     public int RemainingMovement { get; init; }
     public int? ExtensionMovementLimit { get; init; }
     public bool Acted { get; init; }
+    public bool MovedThisTurn { get; init; }
+    public bool AttackedThisTurn { get; init; }
+    public IReadOnlyList<ManeuverGrant> Maneuvers { get; init; } = Array.Empty<ManeuverGrant>();
     public PlayerUnitControl? PlayerControl { get; init; }
     public bool Objective { get; init; }
     public long Experience { get; init; }
@@ -307,6 +312,11 @@ public sealed record WorldState
         var commanders = new HashSet<string>(StringComparer.Ordinal);
         foreach (var unit in Units)
         {
+            if (unit.Maneuvers == null || unit.Maneuvers.Count > 32 || unit.Maneuvers.Any(g => g == null
+                || string.IsNullOrWhiteSpace(g.Skill) || string.IsNullOrWhiteSpace(g.Instance) || string.IsNullOrWhiteSpace(g.Source)
+                || !factionIds.Contains(g.Owner) || g.StartRound < 1 || g.StartRound > Round
+                || g.StartCell < 0 || g.StartCell >= Cells.Count || g.EndCell < 0 || g.EndCell >= Cells.Count))
+                throw new RuleViolation("world.maneuver", "Invalid saved maneuver grant");
             unit.Combatant.Validate(); unit.Morale.Validate();
             if (unit.CommanderBase != null)
             {
@@ -415,8 +425,9 @@ public sealed record WorldState
         }
         // All other UnitState fields are values or sealed immutable records.
         return ReferenceEquals(combatant, value.Combatant) && ReferenceEquals(control, value.PlayerControl)
-            && ReferenceEquals(commanderBase, value.CommanderBase) ? value
-            : value with { Combatant = combatant, PlayerControl = control, CommanderBase = commanderBase };
+            && ReferenceEquals(commanderBase, value.CommanderBase) && value.Maneuvers.Count == 0 ? value
+            : value with { Combatant = combatant, PlayerControl = control, CommanderBase = commanderBase,
+                Maneuvers = Array.AsReadOnly(value.Maneuvers.ToArray()) };
     }
 
     internal static void ValidateCellValue(CellState cell)
@@ -427,6 +438,7 @@ public sealed record WorldState
             || income.Money < 0 || income.Industry < 0 || income.Food < 0))
             throw new RuleViolation("world.cell_income", "Invalid site income adjustment");
         if (cell.Environment < 0 || cell.Terrain.TerrainCost <= 0 || cell.BuildingLevel < 0 || cell.BuildingUpgradesThisTurn < 0
+            || cell.BuildingConstructionTurns < 0 || cell.BuildingRecruitsThisTurn < 0
             || cell.InstallationKind != null && string.IsNullOrWhiteSpace(cell.InstallationKind)
             || string.IsNullOrWhiteSpace(cell.FireTerrain) || string.IsNullOrWhiteSpace(cell.DefenseTerrain))
             throw new RuleViolation("world.cell", "Invalid cell state or owner");

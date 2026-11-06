@@ -6,6 +6,29 @@ namespace Ew4.Legacy;
 
 public sealed record CommanderAbilityDefinition(string Id, string NameKey, string Icon, int DefaultValue = 0);
 public sealed record CommanderAbilityPresentation(string? NameKey = null, string? Icon = null);
+public sealed record CommanderStarPresentation
+{
+    public string Mode { get; init; } = "fiveSlots";
+    public Dictionary<string, string> Palette { get; init; } = new(StringComparer.Ordinal);
+    public Dictionary<string, string> GlowColors { get; init; } = new(StringComparer.Ordinal);
+    public string DefaultColor { get; init; } = "";
+    public Dictionary<string, string> Countries { get; init; } = new(StringComparer.Ordinal);
+    public Dictionary<string, string> Commanders { get; init; } = new(StringComparer.Ordinal);
+
+    internal void Validate(Func<string?, bool> icon)
+    {
+        bool Key(string? value) => value is { Length: > 0 and <= 128 }
+            && value.All(c => char.IsAsciiLetterOrDigit(c) || c is '.' or '_' or '-');
+        if (Mode != "fiveSlots" || Palette == null || GlowColors == null || Countries == null || Commanders == null
+            || Palette.Count is < 1 or > 16 || Countries.Count > 256 || Commanders.Count > 4096
+            || Palette.Any(p => !Key(p.Key) || !icon(p.Value)) || !Palette.ContainsKey(DefaultColor ?? "")
+            || GlowColors.Any(p => !Palette.ContainsKey(p.Key) || p.Value == null || p.Value.Length != 7
+                || p.Value[0] != '#' || !p.Value.Skip(1).All(char.IsAsciiHexDigit))
+            || Countries.Concat(Commanders).Any(p => !Key(p.Key) || p.Value == null || !Palette.ContainsKey(p.Value))
+            || Commanders.Keys.Any(id => !id.StartsWith("ew4.commander.", StringComparison.Ordinal)))
+            throw new RuleViolation("extension.commander_stars", "Invalid optional five-slot star presentation");
+    }
+}
 public sealed record CommanderAbilityConfiguration
 {
     public int Schema { get; init; }
@@ -15,6 +38,7 @@ public sealed record CommanderAbilityConfiguration
     public InheritedAbilityRule[] Inheritance { get; init; } = [];
     public string[] Order { get; init; } = [];
     public Dictionary<string, CommanderAbilityPresentation> Presentation { get; init; } = new(StringComparer.Ordinal);
+    public CommanderStarPresentation? Stars { get; init; }
 
     public void Validate()
     {
@@ -23,6 +47,7 @@ public sealed record CommanderAbilityConfiguration
             && id.All(c => char.IsAsciiLetterOrDigit(c) || c is '.' or '_' or '-');
         bool Icon(string? icon) => icon != null && icon.EndsWith(".png", StringComparison.Ordinal)
             && (ExtensionLoader.PathValid(icon) || icon.Length < 128 && icon.All(c => char.IsAsciiLetterOrDigit(c) || c is '.' or '_' or '-'));
+        Stars?.Validate(Icon);
         if (Schema != 1 || Abilities == null || Commanders == null || Units == null || Inheritance == null || Order == null || Presentation == null
             || Abilities.Length > 32 || Abilities.Any(a => a == null || !Id(a.Id) || reserved.Contains(a.Id)
                 || string.IsNullOrWhiteSpace(a.NameKey) || a.NameKey.Length > 128 || !Icon(a.Icon) || a.DefaultValue < 0)
@@ -48,6 +73,7 @@ public sealed record CommanderAbilityConfiguration
         var units = catalog["profiles"]!.AsArray().ToDictionary(c => (string)c!["id"]!, StringComparer.Ordinal);
         var skills = catalog["skills"]!.AsArray().Select(s => (string)s!["id"]!).Concat(extensionSkills).ToHashSet(StringComparer.Ordinal);
         if (Commanders.Keys.Any(id => !commanders.ContainsKey(id)) || Units.Keys.Any(id => !units.ContainsKey(id))
+            || Stars?.Commanders.Keys.Any(id => !commanders.ContainsKey(id)) == true
             || Inheritance.Any(r => !skills.Contains(r.Skill)))
             throw new RuleViolation("extension.commander_abilities", "Unknown commander, unit or teaching skill");
         foreach (var (id, commander) in commanders)

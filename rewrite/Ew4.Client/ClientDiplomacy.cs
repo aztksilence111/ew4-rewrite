@@ -15,6 +15,8 @@ public sealed partial class ClientGame
             playerCapital = player.Capital, playerCapitalName = player.Capital is { } ownCapital ? current.Session.World.Cells[ownCapital.Cell].Name ?? (ownCapital.Cell + 1).ToString() : null,
             factions = current.Session.World.Factions.Where(f => f.Id != current.Session.PlayerFaction)
                 .Select(f => new { f.Id, quote = DemandDiplomacy.Quote(current.Session.World, current.Session.PlayerFaction, f.Id),
+                    purchase = PaidSurrender.Quote(current.Session.World, current.Session.PlayerFaction, f.Id,
+                        current.Rules.Recruitment.GetValueOrDefault(f.Id)?.Values ?? Enumerable.Empty<RecruitmentOffer>()),
                     capital = f.Capital, capitalName = f.Capital is { } capital ? current.Session.World.Cells[capital.Cell].Name ?? (capital.Cell + 1).ToString() : null }).ToArray() };
     }
 
@@ -24,7 +26,10 @@ public sealed partial class ClientGame
         var current = Require();
         var change = command.Op == "declare_war"
             ? DemandDiplomacy.DeclareWar(current.Session.World, current.Session.World.Revision, current.Session.PlayerFaction, command.Target!)
-            : DemandDiplomacy.Demand(current.Session.World, current.Session.World.Revision, current.Session.PlayerFaction, command.Target!);
+            : command.Op == "purchase_surrender"
+                ? PaidSurrender.Demand(current.Session.World, current.Session.World.Revision, current.Session.PlayerFaction, command.Target!,
+                    current.Rules.Recruitment.GetValueOrDefault(command.Target!)?.Values ?? Enumerable.Empty<RecruitmentOffer>())
+                : DemandDiplomacy.Demand(current.Session.World, current.Session.World.Revision, current.Session.PlayerFaction, command.Target!);
         Commit(change, autoSave: false);
         movementHistory.Reset(game!.Session.World);
         AutoSave();

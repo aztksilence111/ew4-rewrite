@@ -8,6 +8,8 @@ namespace Ew4.Core;
 
 public sealed record DemandRules
 {
+    public PaidSurrenderRules Purchase { get; init; } = new();
+    public SurrenderPressureRules? Pressure { get; init; } = new();
     public int LossWeight { get; init; } = 75;
     public int OccupationWeight { get; init; } = 25;
     public int MaximumChance { get; init; } = 95;
@@ -18,6 +20,9 @@ public sealed record DemandRules
     public IReadOnlyList<string> LockedFactions { get; init; } = Array.Empty<string>();
     public void Validate()
     {
+        if (Purchase == null) throw new RuleViolation("diplomacy.purchase_rules", "Missing paid surrender rules");
+        Purchase.Validate();
+        Pressure?.Validate();
         if (LossWeight < 0 || LossWeight > 100 || OccupationWeight < 0 || OccupationWeight > 100
             || MaximumChance < 0 || MaximumChance > 100 || CoreWeight < 0 || CoreWeight > 100
             || CapitalLootPercent < 0 || CapitalLootPercent > 100 || CoreLootBonus < 0 || CoreLootBonus > 100
@@ -42,14 +47,18 @@ public sealed record DemandState
     public DemandRules Rules { get; init; } = new();
     public IReadOnlyList<HomelandBuilding> Buildings { get; init; } = Array.Empty<HomelandBuilding>();
     public IReadOnlyList<DemandProgress> Progress { get; init; } = Array.Empty<DemandProgress>();
+    public IReadOnlyDictionary<string, string>? Leaders { get; init; }
+    public IReadOnlyDictionary<string, string[]>? InitialCommanders { get; init; }
     public DemandState Copy() => this with {
         Rules = Rules with { LockedFactions = Rules.LockedFactions.ToArray(), PairModifiers = Rules.PairModifiers.ToArray() }, Buildings = Buildings.ToArray(),
+        Leaders = Leaders?.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal),
+        InitialCommanders = InitialCommanders?.ToDictionary(p => p.Key, p => p.Value.ToArray(), StringComparer.Ordinal),
         Progress = Progress.Select(p => p with { Captured = p.Captured.ToArray(), Consumed = p.Consumed.ToArray() }).ToArray()
     };
 }
 
 public sealed record DiplomacyQuote(int Initial, int Remaining, int Occupied, int Chance, string? WarBlocked, string? DemandBlocked,
-    int SharedCores = 0, int CoreBonus = 0, int PairBonus = 0, int LootPercent = 20);
+    int SharedCores = 0, int CoreBonus = 0, int PairBonus = 0, int LootPercent = 20, SurrenderChanceBreakdown? Breakdown = null);
 
 public static class DemandDiplomacy
 {
@@ -61,6 +70,13 @@ public static class DemandDiplomacy
             || StoryPlayback.Current(world) != null || world.Phase != TurnPhase.Active) return world;
         world = CapitalTreasury.Initialize(world);
         return world with { Demands = pending with { Ready = true,
+            InitialCommanders = world.Factions.ToDictionary(f => f.Id, f => world.Units
+                .Where(u => u.Owner == f.Id && u.CommanderId != null).Select(u => u.CommanderId!).Distinct(StringComparer.Ordinal)
+                .OrderBy(id => id, StringComparer.Ordinal).ToArray(), StringComparer.Ordinal),
+            Leaders = world.Factions.Select(f => new { f.Id, Leader = world.Commanders.Where(c => c.Owner == f.Id && !c.Withdrawn
+                && world.Units.Any(u => u.CommanderId == c.Id && u.Owner == f.Id && world.Cells[u.Cell].Owner == f.Id))
+                .OrderByDescending(c => c.Rank.Level).ThenBy(c => world.Units.First(u => u.CommanderId == c.Id).Cell).FirstOrDefault()?.Id })
+                .Where(p => p.Leader != null).ToDictionary(p => p.Id, p => p.Leader!, StringComparer.Ordinal),
             Buildings = world.Factions.SelectMany(f => (f.HomelandBuildings ?? world.Cells.Select((c, i) => (c, i))
                 .Where(p => p.c.Owner == f.Id && Counts(p.c)).Select(p => p.i).ToArray())
                 .Select(i => new HomelandBuilding(i, f.Id))).ToArray() } };
@@ -112,6 +128,14 @@ public static class DemandDiplomacy
         if (world.Demands is not { } state) return;
         state.Rules.Validate();
         var factions = world.Factions.Select(f => f.Id).ToHashSet(StringComparer.Ordinal);
+        if (state.Leaders != null && state.Leaders.Any(p => !factions.Contains(p.Key) || !world.Commanders.Any(c => c.Id == p.Value)))
+            throw new RuleViolation("diplomacy.state", "Invalid initial surrender commanders");
+        if (state.InitialCommanders != null && (state.InitialCommanders.Any(p => !factions.Contains(p.Key) || p.Value == null
+            || p.Value.Length > world.Commanders.Count || p.Value.Distinct(StringComparer.Ordinal).Count() != p.Value.Length
+            || p.Value.Any(id => !world.Commanders.Any(c => c.Id == id)))
+            || state.InitialCommanders.Values.SelectMany(ids => ids).Distinct(StringComparer.Ordinal).Count()
+                != state.InitialCommanders.Values.Sum(ids => ids.Length)))
+            throw new RuleViolation("diplomacy.state", "Invalid initial commander roster");
         if (state.Buildings == null || state.Progress == null || state.Buildings.Count > (long)world.Cells.Count * factions.Count
             || state.Buildings.Any(b => b == null || b.Cell < 0 || b.Cell >= world.Cells.Count || !factions.Contains(b.Faction))
             || state.Buildings.Select(b => (b.Cell, b.Faction)).Distinct().Count() != state.Buildings.Count
@@ -173,9 +197,22 @@ public static class DemandDiplomacy
         int coreBonus = n == 0 ? 0 : (int)Math.Round((double)rules.CoreWeight * shared / n, MidpointRounding.AwayFromZero);
         int pairBonus = world.DiplomacyAdjustments?.SingleOrDefault(p => p.Actor == actor && p.Target == target)?.SurrenderBonus
             ?? rules.PairModifiers.SingleOrDefault(p => p.Actor == actor && p.Target == target)?.SurrenderBonus ?? 0;
-        int chance = n == 0 ? 0 : Math.Max(0, Math.Min(rules.MaximumChance,
-            (int)Math.Round(((double)rules.LossWeight * (n - r) + (double)rules.OccupationWeight * k + (double)rules.CoreWeight * shared) / n
-                + pairBonus, MidpointRounding.AwayFromZero)));
+        decimal lossPercent = n == 0 ? 0 : (decimal)rules.LossWeight * (n - r) / n;
+        decimal occupationPercent = n == 0 ? 0 : (decimal)rules.OccupationWeight * k / n;
+        decimal corePercent = n == 0 ? 0 : (decimal)rules.CoreWeight * shared / n;
+        var situation = rules.Pressure == null ? null : SurrenderSituation.Measure(world, actor, target);
+        var pressure = rules.Pressure;
+        var initialCommanders = state?.InitialCommanders?.GetValueOrDefault(target);
+        int deadCommanders = initialCommanders?.Count(id => world.DeadScenarioCommanders.Contains(id)) ?? 0;
+        decimal commander = pressure == null || initialCommanders is not { Length: > 0 } ? 0
+            : (decimal)pressure.CommanderBonus * deadCommanders / initialCommanders.Length;
+        int legion = situation == null ? 0 : (int)Math.Min(pressure!.LegionAdvantageCap, (long)situation.LegionLead * pressure.LegionAdvantageBonus);
+        int building = situation == null ? 0 : -(int)Math.Min(pressure!.BuildingPenaltyCap, (long)situation.BuildingLevels * pressure.BuildingLevelPenalty);
+        int superiority = situation?.Superior == true ? pressure!.SuperiorityBonus : 0;
+        // Combine the core numerator before division and round only the final probability.
+        decimal coreScore = n == 0 ? 0 : ((decimal)rules.LossWeight * (n - r) + (decimal)rules.OccupationWeight * k + (decimal)rules.CoreWeight * shared) / n;
+        int chance = n == 0 ? 0 : Math.Clamp((int)decimal.Round(coreScore + commander + legion + building + superiority + pairBonus,
+            0, MidpointRounding.AwayFromZero), 0, rules.MaximumChance);
         string? common = CommonBlock(world, actor, target);
         bool enemy = common == "target" ? false : WorldDiplomacy.Relation(world, actor, target) == "hostile";
         string? demand = common;
@@ -188,7 +225,9 @@ public static class DemandDiplomacy
                     .Any(c => homes.Any(b => b.Cell == c) && world.Cells[c].Owner == actor) ? "progress" : null;
         }
         return new(n, r, k, chance, common ?? (enemy ? "war" : null), demand, shared, coreBonus, pairBonus,
-            CapitalTreasury.Percent(world, actor, target));
+            CapitalTreasury.Percent(world, actor, target), new(lossPercent, occupationPercent, corePercent,
+                commander, legion, building, superiority, situation?.LegionLead ?? 0, situation?.BuildingLevels ?? 0, rules.MaximumChance,
+                initialCommanders?.Length, deadCommanders));
     }
 
     public static WorldChange DeclareWar(WorldState world, long revision, string actor, string target)

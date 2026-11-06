@@ -97,21 +97,43 @@
         const action=node('button','diplomacy-action');action.type='button';action.title=action.ariaLabel=enemy?p.demandText:p.warText;action.disabled=!!block||this.submitting;
         const face=node('span','native-command diplomacy-action-face '+(enemy?'':'red'));face.append(this.icon(enemy?p.demandIcon:p.warIcon));
         action.dataset.op=enemy?'demand_surrender':'declare_war';action.dataset.target=id;action.append(face);action.onclick=()=>this.ask(f,q,action.dataset.op);
-        row.append(identity,details,action);rows.push(row);
+        const actions=node('div','diplomacy-actions');
+        if(enemy&&data.purchase){
+          const paid=node('button','diplomacy-action');paid.type='button';paid.title=paid.ariaLabel='招降（支付金币与工业）';paid.dataset.op='purchase_surrender';paid.dataset.target=id;
+          paid.disabled=!!data.purchase.blocked&&data.purchase.blocked!=='resources'||this.submitting;
+          const face=node('span','native-command diplomacy-action-face');face.append(this.icon('client/ui/image_ui_hd/marker_money.png'));paid.append(face);
+          paid.onclick=()=>this.ask(f,data.purchase,'purchase_surrender');actions.append(paid);
+          details.append(node('div','diplomacy-stats','招降：金币 '+data.purchase.cost.money+' / 工业 '+data.purchase.cost.industry+(data.purchase.blocked==='resources'?'（资源不足）':data.purchase.blocked==='unpriced'?'（部队缺少造价）':'')));
+          action.title=action.ariaLabel=p.demandText+'（概率）';
+        }
+        actions.append(action);row.append(identity,details,actions);rows.push(row);
       }
       this.list.replaceChildren(...rows);this.fit();this.list.scrollTop=scroll;
     }
     ask(f,q,op){
       if(this.submitting||this.revision!==this.state.revision)return;
       const p=this.presentation;this.pending={id:f.id,op,revision:this.revision};this.result.hidden=true;
+      this.submit.disabled=false;
+      if(op==='purchase_surrender'){
+        this.submit.disabled=!!q.blocked;
+        const percent=n=>(n>=0?'+':'')+n+'%';this.confirmCopy.textContent='招降 '+f.name+'？';
+        this.confirmStats.textContent='存活单位造价合计：金 '+q.baseCost.money+' / 工 '+q.baseCost.industry+'\n指挥官阵亡 '+percent(q.commanderPercent)+' · 阵营军团多 '+q.legionLead+' 支 '+percent(q.legionPercent)+' · 建筑 '+q.buildingLevels+' 级 '+percent(q.buildingPercent)+' · 兵力占优 '+percent(q.superiorityPercent)+' · 合计 '+percent(q.totalPercent)+'\n应付：金 '+q.cost.money+' / 工 '+q.cost.industry+'　现有：金 '+q.available.money+' / 工 '+q.available.industry+'\n招降后该军团直接战败：所有单位解散，名下城市、工厂、机场与港口由你接管，其余无设施领土转为无主。';
+        this.confirmStats.hidden=false;this.list.hidden=true;this.confirm.hidden=false;this.cancel.focus();this.fit();return;
+      }
       this.confirmCopy.textContent=format(op==='declare_war'?p.warConfirmation:p.demandConfirmation,{name:f.name})+(op==='declare_war'&&f.relation==='allied'?' '+p.alliedWarning:'');
       this.confirmStats.textContent=op==='declare_war'?'':format(p.buildingsText,{remaining:q.remaining,initial:q.initial})+' · '+format(p.occupiedText,{count:q.occupied})+' · '+format(p.chanceText,{chance:q.chance});
-      if(op!=='declare_war')this.confirmStats.textContent+='\n'+format(p.coreText,{count:q.sharedCores,initial:q.initial,bonus:q.coreBonus,pair:q.pairBonus>0?'+'+q.pairBonus:q.pairBonus})+'\n'+this.capitalText(this.snapshot.factions.find(d=>d.id===f.id),q);
+      if(op!=='declare_war')this.confirmStats.textContent+='\n'+format(p.coreText,{count:q.sharedCores,initial:q.initial,bonus:q.breakdown?Number(q.breakdown.corePercent.toFixed(2)):q.coreBonus,pair:q.pairBonus>0?'+'+q.pairBonus:q.pairBonus})+'\n'+this.capitalText(this.snapshot.factions.find(d=>d.id===f.id),q);
+      if(op==='demand_surrender'&&q.breakdown){
+        const b=q.breakdown,points=n=>(n>0?'+':'')+Number(n.toFixed(2))+' 个百分点';
+        this.confirmStats.textContent+='\n核心失守 '+points(b.lossPercent)+' · 我方占领 '+points(b.occupationPercent)+' · 重叠核心 '+points(b.corePercent)
+          +'\n将领阵亡 '+(b.initialCommanders==null?'（初始记录缺失）':b.deadCommanders+'/'+b.initialCommanders)+' '+points(b.commanderPercent)+' · 阵营军团多 '+b.legionLead+' 支 '+points(b.legionPercent)
+          +'\n建筑 '+b.buildingLevels+' 级 '+points(b.buildingPercent)+' · 兵力占优 '+points(b.superiorityPercent)+' · 概率上限 '+b.maximumChance+'%';
+      }
       this.confirmStats.hidden=op==='declare_war';this.list.hidden=true;this.confirm.hidden=false;this.cancel.focus();this.fit();
     }
     cancelConfirmation(){if(this.submitting)return;this.pending=null;this.confirm.hidden=true;this.list.hidden=false;this.closeButton.focus();this.fit();}
     async execute(){
-      if(this.submitting||!this.pending||this.api.busy())return;
+      if(this.submitting||this.submit.disabled||!this.pending||this.api.busy())return;
       if(this.pending.revision!==this.state.revision){this.cancelConfirmation();await this.refresh();return;}
       this.submitting=true;this.submit.disabled=this.cancel.disabled=this.closeButton.disabled=true;
       const pending=this.pending,name=this.state.factions.find(f=>f.id===pending.id)?.name||pending.id;

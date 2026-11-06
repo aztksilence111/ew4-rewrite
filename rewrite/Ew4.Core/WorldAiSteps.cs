@@ -80,6 +80,21 @@ public static partial class WorldAi
         ai.Validate(); production.Validate(); turns.Validate();
         if (state.AiRandomState != plan.Production.InitialRandomState)
             throw new RuleViolation("ai.step_stale_random", "AI random state changed after planning");
+        var bus = battle.Combat.Extensions;
+        if (bus?.TacticalEnabled == true && !WorldDiplomacy.Dormant(state, state.ActiveFaction, ai.NeutralCamps))
+            foreach (var source in state.Units.Where(u => u.Owner == state.ActiveFaction && TacticalSkills.CanActivate(state, u)).OrderBy(u => u.Id, StringComparer.Ordinal))
+                foreach (var (skill, slot) in bus.Bound(source.Combatant).Where(p => p.Skill.Maneuver != null))
+                {
+                    var map = new HexMap(state.Width, state.Height);
+                    var money = state.Factions.Single(f => f.Id == source.Owner).Resources;
+                    if (state.ExtensionState.TryGetValue(TacticalSkills.CooldownKey(source, skill, slot.InstanceId), out long ready) && ready > state.Round
+                        || skill.Cost.Money > 0 && money.Money < skill.Cost.Money || skill.Cost.Industry > 0 && money.Industry < skill.Cost.Industry || skill.Cost.Food > 0 && money.Food < skill.Cost.Food
+                        || !state.Units.Any(e => !WorldDiplomacy.Allied(state, e.Owner, source.Owner) && map.Distance(e.Cell, source.Cell) <= skill.Range + 2)) continue;
+                    var targets = state.Units.Where(t => TacticalSkills.Eligible(state, source, t, skill))
+                        .OrderBy(t => (double)t.Combatant.Health / t.Combatant.MaximumHealth).ThenBy(t => t.Id, StringComparer.Ordinal)
+                        .Take(skill.Maneuver!.MaximumOthers).Select(t => t.Id).ToArray();
+                    return WorldSkillActions.Execute(state, state.Revision, source.Id, slot.InstanceId, null, bus, ai.Movement, targets: targets);
+                }
         if (plan.Production.Command != null)
         {
             if (plan.Unit != null || plan.Commander != null) throw new RuleViolation("ai.step_selection", "Step cannot execute production and a fallback command");

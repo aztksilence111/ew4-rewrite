@@ -20,7 +20,7 @@ internal static class DiplomacyExpansionChecks
             Factions = example.Factions.Select(f => f with { Resources = f.Id == "loser" ? new(1001, 501, 49) : new(10, 20, 30) }).ToArray(),
             Cells = Enumerable.Range(0, 25).Select(i => new CellState { Owner = i < 5 ? "loser" : "winner",
                 BuildingKind = i switch { 0 => "city", 1 => "industry", 2 => "stable", 3 => "port", 4 => "farmland", 6 => "city", _ => null },
-                BuildingLevel = i <= 6 ? 1 : 0 }).ToArray(), Demands = new() { Seed = 99 } };
+                BuildingLevel = i <= 6 ? 1 : 0 }).ToArray(), Demands = new() { Seed = 99, Rules = new() { Pressure = null } } };
         world = DemandDiplomacy.Initialize(world); world.Validate();
         Check(world.Factions.Single(f => f.Id == "loser").Capital!.Cell == 0 && world.Factions.Single(f => f.Id == "winner").Capital!.Cell == 6, "default capitals prefer owned cities");
         Check(CapitalTreasury.Percent(world, "winner", "loser") == 20, "default treasury percentage is 20");

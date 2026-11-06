@@ -232,14 +232,18 @@
       const previous=this.motionSelection?.id;
       if(previous&&!this.combatMotions?.has(previous))this.unitMotions.set(previous,{action:'undoready',started:this.time,playing:true});
       this.motionSelection=eligible?{id:unit.id,token}:null;
-      if(eligible)this.unitMotions.set(unit.id,{action:'ready',started:this.selectedAt??this.time,playing:true});
+      if(eligible&&!(this.unitMotions.get(unit.id)?.until>this.time))this.unitMotions.set(unit.id,{action:'ready',started:this.selectedAt??this.time,playing:true});
     }
     stationedHasUnit(id){return this.unitIds.has(id);}
     motionPose(unit,profile,lib,facing,time,moving=false){
       let pose=this.unitMotions.get(unit.id)||{action:'ready',playing:false};
-      if(moving||unit.constructionTurns>0){pose={action:unit.constructionTurns>0?'build':'ready',playing:false};this.unitMotions.set(unit.id,pose);}
+      if(pose.until!=null&&time>=pose.until){pose={action:'ready',playing:false};this.unitMotions.set(unit.id,pose);}
+      if(!moving&&pose.action==='move'){pose={action:'ready',playing:false};this.unitMotions.set(unit.id,pose);}
+      if(moving||unit.constructionTurns>0){pose={action:unit.constructionTurns>0?'build':profile.motions.move?'move':'ready',playing:false};this.unitMotions.set(unit.id,pose);}
       let native=this.api.effects?.motion(profile,pose.action,facing),item=lib.byName.get(native?.name||profile.motions[pose.action]||profile.motions.ready);
       if(pose.action==='undoready'&&!native&&!profile.motions.undoready){pose={action:'ready',playing:false};this.unitMotions.set(unit.id,pose);native=this.api.effects?.motion(profile,'ready',facing);item=lib.byName.get(native?.name||profile.motions.ready);}
+      if(native?.static===true){this.unitMotions.set(unit.id,{action:pose.action,playing:false});return {native,item,tick:0};}
+      if(native?.loop===true&&item?.duration>0)return {native,item,tick:(time/1000*lib.fps*Number(native.speed||1))%item.duration};
       let tick=pose.playing?(time-pose.started)/1000*lib.fps*Number(native?.speed||1):0;
       if(pose.playing&&(!item||tick>=item.duration)){
         pose={action:pose.action==='ready'?'attack':'ready',playing:false};this.unitMotions.set(unit.id,pose);
@@ -279,7 +283,7 @@
         this.objectiveCells=[...new Set([...this.siteObjectives,...this.state.units.filter(u=>u.objectiveMarker||u.objective).map(u=>u.cell)])].sort((a,b)=>a-b);
         this.indexMap(this.map);
         if(prior&&prior.cells!==this.state.cells){
-          const fields=['owner','active','sea','geographyType','geographySprite','buildingKind','buildingLevel','buildingImage','buildingStyle','installationKind','facility','jurisdictionCenter','bridgeEdges','bridgeStyle0','bridgeStyle1','bridgeStyle2'];
+          const fields=['owner','active','sea','geographyType','geographySprite','buildingKind','buildingLevel','buildingImage','buildingStyle','buildingConstructionTurns','installationKind','facility','jurisdictionCenter','bridgeEdges','bridgeStyle0','bridgeStyle1','bridgeStyle2'];
           const candidates=this.state.baseRevision===prior.revision&&this.state.changedCells?this.state.changedCells:this.state.cells.map((_,i)=>i);
           const changed=candidates.filter(i=>fields.some(key=>this.state.cells[i]?.[key]!==prior.cells[i]?.[key]));
           if(changed.length){this.staticKey=null;this.groundSignature=(this.groundSignature||0)+1;}
@@ -305,7 +309,7 @@
         this.markerScale=(nativeSize+(compactSize-nativeSize)*blend)/24/this.zoom;
       }
       this.syncMorale();
-      this.animated=arrowActive||!!this.selection||this.visibleUnits.some(u=>badgeAlpha(u,this.state,300)!==1||!this.badgeOnly&&(this.moraleTransitions.has(u.id)||this.unitMotions.get(u.id)?.playing||u.burning>0||u.category==='fort'&&u.health>0&&u.maxHealth-u.health>=80||flagAnimated(u,this.state)&&this.factions.get(u.owner)?.flag&&!this.factions.get(u.owner)?.flagImage))||
+      this.animated=arrowActive||!!this.selection||this.visibleUnits.some(u=>badgeAlpha(u,this.state,300)!==1||!this.badgeOnly&&(this.api.effects?.motion(this.api.effects.profile(u.profile,this.factions.get(u.owner)),'ready',1)?.loop===true||this.moraleTransitions.has(u.id)||this.unitMotions.get(u.id)?.playing||u.burning>0||u.category==='fort'&&u.health>0&&u.maxHealth-u.health>=80||flagAnimated(u,this.state)&&this.factions.get(u.owner)?.flag&&!this.factions.get(u.owner)?.flagImage))||
         this.visibleCells.some(({site,cell})=>site.active&&(objectiveMarker(site,this.stationed.get(cell))||!this.badgeOnly&&facilityFlagAnimated(site,this.state)&&this.factions.get(site.owner)?.flag&&!this.factions.get(site.owner)?.flagImage&&!this.stationed.has(cell)));
       // Grid covers the ground/buildings, while units, flags and portraits stay above it.
       this.staticGround();this.grid();this.objectives();this.units();this.flags();this.unitMarkers();this.labels();this.highlights();this.playerOrders();this.tutorialArrow();this.scheduleCityLabels();
@@ -576,9 +580,10 @@
         if(c.buildingKind){
           const level=Math.max(1,c.buildingLevel),style=c.buildingStyle??1,region=style===1?'west':'east';
           const art=({city:`city_${region}_lv${level}.png`,industry:`factory_${region}_lv${level}.png`,stable:`stable_${region}_lv${level}.png`,port:`port_${style}.png`,farmland:`farm_${style}_lv${level}.png`})[c.buildingKind];
-          this.draw.save();this.draw.globalAlpha=.85;this.api.sprite('buildings',art||c.buildingImage,p.x,p.y,1,this.draw);
+          this.draw.save();this.draw.globalAlpha=c.buildingConstructionTurns>0?.45:.85;this.api.sprite('buildings',art||c.buildingImage,p.x,p.y,1,this.draw);
           if(c.buildingImage?.startsWith('capital_')){this.api.sprite('buildings',c.buildingImage,p.x,p.y,1,this.draw);this.api.sprite('buildings',`city_${region}_lv${level}_up.png`,p.x,p.y,1,this.draw);}
           this.draw.restore();
+          if(c.buildingConstructionTurns>0){this.draw.save();this.draw.font='bold 11px sans-serif';this.draw.textAlign='center';this.draw.lineWidth=3;this.draw.strokeStyle='#242015';this.draw.fillStyle='#ffe6a0';const label=`施工 ${c.buildingConstructionTurns}`;this.draw.strokeText(label,p.x,p.y-28);this.draw.fillText(label,p.x,p.y-28);this.draw.restore();}
           if(!farms){const levels=this.api.manifest.buildings[c.buildingKind];
             const maximum=c.buildingMaximumLevel??this.api.manifest.buildingUpgradeLimits?.[c.buildingKind]??levels?.length;
             if(maximum&&level>=maximum)this.api.sprite('buildings','buildinglevel_max.png',p.x,p.y+25,1,this.draw);
@@ -664,9 +669,10 @@
           const lib=this.api.libraries.get(body.library);if(!lib){this.requestLibrary(body.library);continue;}
           const segment=active&&elapsed>=0?(combat?.segments.find(s=>elapsed<s.end)||combat?.segments.at(-1)):null;
           if(combat)this.unitMotions.set(unit.id,{action:'ready',playing:false});
-          const idle=this.motionPose(unit,body,lib,facing,time,motion&&p.moving),native=idle.native,item=segment?lib.byName.get(segment.name):idle.item;
-          const tick=segment?Math.min((elapsed-segment.start)*segment.speed/1000*lib.fps,Math.max(0,(item?.duration||1)-1)):idle.tick;
-          const directional=segment?segment.directional:native?.dir==='left'||native?.dir==='right';
+          const idle=this.motionPose(unit,body,lib,facing,time,motion&&p.moving),dying=death&&body.motions.die?this.api.effects?.motion(body,'die',facing):null;
+          const native=dying||idle.native,item=dying?lib.byName.get(dying.name||body.motions.die):segment?lib.byName.get(segment.name):idle.item;
+          const tick=dying?deathProgress*Math.max(0,(item?.duration||1)-1):segment?Math.min((elapsed-segment.start)*segment.speed/1000*lib.fps,Math.max(0,(item?.duration||1)-1)):idle.tick;
+          const directional=!dying&&segment?segment.directional:native?.dir==='left'||native?.dir==='right';
           draw.save();draw.translate(p.x+(part.partX||0)+facing*body.x,p.y+(part.partY||0)+body.y);draw.scale((directional?1:facing)*body.scale*.5,.5);
           this.unitAnimation(lib,item,tick);draw.restore();
         }

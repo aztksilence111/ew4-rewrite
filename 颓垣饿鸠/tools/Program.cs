@@ -48,7 +48,7 @@ var rosterRules = JsonNode.Parse(File.ReadAllBytes(Inside("source/roster-rules.j
 var generals = new List<General>();
 if (File.Exists(Inside("source/generals.json"))) generals.AddRange(Load<General[]>("source/generals.json"));
 else {
-    string plan = Encoding.UTF8.GetString(Reference("mingguo-mod-plan/GENERALS.md"));
+    string plan = Encoding.UTF8.GetString(Reference("颓垣饿鸠-策划/GENERALS.md"));
     int id = 1001;
     foreach (string line in plan.Split('\n').Where(l => Regex.IsMatch(l, @"^\| J\d+ \|"))) {
         string[] columns = line.Split('|').Select(c => c.Trim()).ToArray();

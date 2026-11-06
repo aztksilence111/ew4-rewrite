@@ -16,6 +16,7 @@ const base=process.argv[2]||'http://127.0.0.1:5572',out=path.resolve(process.arg
       for(const screen of [80,100,150]){
         await page.evaluate(screen=>{settings.screen=screen;sizeUi();},screen);
         await page.locator('[data-mode="1"]').click();
+        await page.waitForFunction(()=>!menus.pageTransition&&!$('scenario-menu').hidden&&$('scenarios').classList.contains('chapter-list'));
         const layout=await page.evaluate(()=>{
           const list=$('scenarios'),r=list.getBoundingClientRect(),stage=$('scenario-menu').getBoundingClientRect();
           return {fills:Math.abs(r.width-stage.width)<.1&&Math.abs(r.height-stage.height)<.1,
@@ -46,7 +47,7 @@ const base=process.argv[2]||'http://127.0.0.1:5572',out=path.resolve(process.arg
         await page.evaluate(()=>document.querySelector('.chapter-preview')?.remove());
         if(screen===100)await page.screenshot({path:path.join(out,`chapters-${width}x${height}.png`)});
         for(const mode of [1,2]){
-          if(mode===2){await page.evaluate(()=>showMain());await page.locator('[data-mode="2"]').click();await page.waitForFunction(()=>!conquestEntering);}
+          if(mode===2){await page.evaluate(()=>showMain());await page.locator('[data-mode="2"]').click();await page.waitForFunction(()=>!menus.pageTransition&&!$('scenario-menu').hidden&&!conquestEntering);}
           check(await page.locator('#continue').evaluate(el=>{
             const text=el.querySelector('.original-text'),canvas=text?.querySelector('canvas');if(!canvas)return false;
             const r=el.getBoundingClientRect(),t=text.getBoundingClientRect(),pixels=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;

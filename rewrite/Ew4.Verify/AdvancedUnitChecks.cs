@@ -38,6 +38,9 @@ internal static class AdvancedUnitChecks
         Check(fortified.Units.Single(u => u.Id == engineer.Id).Acted, "fort construction consumes engineer action");
         Check(!WorldConstruction.CanBuild(world with { Construction = null }, engineer.Id, "airfield"), "custom construction defaults off");
         Check(!WorldConstruction.CanBuild(world with { Units = [initial.Units[0], engineer with { Acted = true }] }, engineer.Id, "airfield"), "acted engineer cannot build");
+        Check(WorldConstruction.CanBuild(world with { Units = [initial.Units[0], engineer with { Acted = true }] }, engineer.Id, "airfield", false, checkAction: false),
+            "acted engineer still has a construction card at a legal site");
+        Check(!WorldConstruction.CanBuild(rifleWorld, ordinary.Id, "airfield", false, checkAction: false), "preview cards do not bypass engineer qualification");
         Check(!WorldConstruction.CanBuild(world with { Cells = world.Cells.Select((c, i) => i == engineer.Cell ? c with { Owner = "loser" } : c).ToArray() }, engineer.Id, "airfield"), "enemy land cannot be built on");
         Check(!WorldConstruction.CanBuild(world with { Cells = world.Cells.Select((c, i) => i == engineer.Cell ? c with { Terrain = c.Terrain with { Sea = true } } : c).ToArray() }, engineer.Id, "airfield"), "airport cannot be built at sea");
         Check(!WorldConstruction.CanBuild(world with { Factions = world.Factions.Select(f => f with { Resources = new(0, 0, 0) }).ToArray() }, engineer.Id, "airfield"), "building must be affordable");
@@ -55,6 +58,50 @@ internal static class AdvancedUnitChecks
         var save = WorldSave.Decode(WorldSave.Encode(upgraded), upgraded.ContentRevision);
         Check(save.Cells[engineer.Cell].BuildingKind == "airfield" && save.Construction!.BuilderProfiles.Single() == "fixture.engineer", "construction and building persist");
         Check(JsonSerializer.Serialize(config) == JsonSerializer.Serialize(config.Copy()), "construction copy preserves data");
+        var timedConfig = config with { Buildings = new Dictionary<string, ModBuildingDefinition> {
+            ["airfield"] = config.Buildings["airfield"] with { RecruitmentPerTurn = 1, BuilderKeepsMovement = true,
+                Levels = [new() { Image = "stable_west_lv1.png", ConstructionTurns = 2 },
+                    new() { Image = "stable_west_lv2.png", ConstructionTurns = 1 }] }
+        } };
+        var timed = WorldConstruction.Build(world with { Construction = timedConfig }, world.Revision, engineer.Id, "airfield").State;
+        Check(timed.Cells[8].BuildingConstructionTurns == 2, "airport independently starts two own-turn construction");
+        Check(timed.Units.Single(u => u.Id == engineer.Id).Combatant.ConstructionTurns == 0, "engineer is not bound to airport construction");
+        Check(timed.Units.Single(u => u.Id == engineer.Id).RemainingMovement == engineer.RemainingMovement, "airport builder retains remaining movement");
+        var immediateDeparture = WorldActions.Move(timed, timed.Revision, engineer.Id, 7).State;
+        Check(immediateDeparture.Units.Single(u => u.Id == engineer.Id).Cell == 7 && immediateDeparture.Cells[8].BuildingConstructionTurns == 2,
+            "engineer may depart immediately without altering airport countdown");
+        Check(!WorldConstruction.CanBuild(immediateDeparture, engineer.Id, "airfield"), "departed engineer cannot build twice this turn");
+        Check(!WorldImprovements.CanUpgradeBuilding(timed, 8, upgrades), "construction blocks upgrade");
+        Reject(() => WorldImprovements.UpgradeBuilding(timed, timed.Revision, 8, upgrades), "upgrade.construction");
+        var turnRules = new WorldTurnRules { Buildings = [new("airfield", 1, new(0, 0, 0)), new("airfield", 2, new(0, 0, 0))] };
+        WorldState End(WorldState w) => WorldTurns.EndTurn(w, w.Revision, turnRules).State;
+        var opposingTurn = End(timed);
+        Check(opposingTurn.ActiveFaction == "loser" && opposingTurn.Cells[8].BuildingConstructionTurns == 2, "other faction turn does not advance construction");
+        var ownTurn = End(opposingTurn);
+        Check(ownTurn.ActiveFaction == "winner" && ownTurn.Cells[8].BuildingConstructionTurns == 1, "first owner turn advances construction once");
+        ownTurn = WorldActions.Move(ownTurn, ownTurn.Revision, engineer.Id, 7).State;
+        Check(ownTurn.Units.Single(u => u.Id == engineer.Id).Cell == 7 && ownTurn.Cells[8].BuildingConstructionTurns == 1, "engineer can leave while airport builds");
+        ownTurn = WorldSave.Decode(WorldSave.Encode(ownTurn), ownTurn.ContentRevision);
+        Check(ownTurn.Cells[8].BuildingConstructionTurns == 1, "construction survives save reload");
+        ownTurn = End(End(ownTurn));
+        Check(ownTurn.Cells[8].BuildingConstructionTurns == 0, "second owner turn finishes without engineer");
+        var planeProfile = engineer.Combatant.Profile with { Id = "fixture.aircraft" };
+        var planeOffer = new RecruitmentOffer { Id = "fixture.aircraft.card", BuildingKinds = ["airfield"],
+            Template = new() { Profile = planeProfile, Health = planeProfile.MaxHealth } };
+        var readyAirfield = ownTurn with { UnitLayers = new() { Enabled = true, Profiles = new Dictionary<string, UnitLayerProfile> {
+            [planeProfile.Id] = new() { Layer = "air", AttackLayers = ["air"] } } },
+            Factions = ownTurn.Factions.Select(f => f.Id != ownTurn.ActiveFaction ? f : f with {
+                Recruitment = new Dictionary<string, RecruitmentGrant> { [planeOffer.Id] = new() } }).ToArray() };
+        Check(!WorldActions.CanRecruit(readyAirfield with { Cells = timed.Cells }, 8, planeOffer), "airport under construction cannot recruit");
+        Check(WorldActions.CanRecruit(readyAirfield, 8, planeOffer), "completed airport recruits aircraft");
+        var recruited = WorldActions.Recruit(readyAirfield, readyAirfield.Revision, 8, "new.plane", planeOffer).State;
+        Check(recruited.Cells[8].BuildingRecruitsThisTurn == 1, "airport records site-local recruitment");
+        var vacated = recruited with { Units = recruited.Units.Where(u => u.Id != "new.plane").ToArray() };
+        Check(!WorldActions.CanRecruit(vacated, 8, planeOffer), "vacating air slot cannot bypass airport turn limit");
+        var loadedRecruit = WorldSave.Decode(WorldSave.Encode(vacated), vacated.ContentRevision);
+        Check(!WorldActions.CanRecruit(loadedRecruit, 8, planeOffer), "recruitment limit survives reload");
+        loadedRecruit = End(End(loadedRecruit));
+        Check(WorldActions.CanRecruit(loadedRecruit, 8, planeOffer), "airport recruitment renews next owner turn");
         var heli = engineer with { Id = "heli", Cell = 7, Combatant = engineer.Combatant with { Profile = engineer.Combatant.Profile with {
             Id = "fixture.heli", MinimumRange = 0, MaximumRange = 3 } } };
         var layers = new UnitLayerRules { Enabled = true, Profiles = new Dictionary<string, UnitLayerProfile> {

@@ -2,6 +2,7 @@
   "source": "https://www.bilibili.com/video/BV1QC8t6rEs2/",
   "capturedDate": "2026-10-20",
   "primaryFrames": 7,
+  "c15Supplement": {"capturedDate":"2026-10-31","time":"31:13","period":"1915-12","dimensions":[1114,956],"userHdReference":true,"northXinjiangLabelConfirmedByUser":"程克"},
   "contextFrames": 3,
   "originalDimensions": [
     920,
@@ -14,6 +15,21 @@
     "width": 920
   },
   "files": [
+    {
+      "name": "C15_1915-12_user-hd.png",
+      "bytes": 2279976,
+      "sha256": "37cec8ce5ab7b98b6706c3dc0a110dcd80573f992c5a77d1e685cde5fd382d57"
+    },
+    {
+      "name": "C15_1915-12_user-xinjiang.png",
+      "bytes": 340069,
+      "sha256": "d4bd8343a766b406bb37b9595e79638356d2a38d01f90443d4af502c51bacc7c"
+    },
+    {
+      "name": "C15_1915-12_t31m13s.jpg",
+      "bytes": 88249,
+      "sha256": "3d86b8da1e294b43ff3700bf383a013a7fd591361449c902d4a3c0f14690781f"
+    },
     {
       "name": "C24_1924-09_t36m07s-map.png",
       "bytes": 743141,

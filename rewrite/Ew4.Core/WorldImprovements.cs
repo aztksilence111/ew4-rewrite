@@ -65,7 +65,7 @@ public static class WorldImprovements
     {
         if (cellId < 0 || cellId >= state.Cells.Count) return false;
         var cell = state.Cells[cellId];
-        if (!cell.Terrain.Active || cell.Owner != faction.Id || cell.BuildingKind == null || cell.BuildingUpgradesThisTurn >= rules.PerTurnLimit) return false;
+        if (!cell.Terrain.Active || cell.Owner != faction.Id || cell.BuildingKind == null || cell.BuildingConstructionTurns > 0 || cell.BuildingUpgradesThisTurn >= rules.PerTurnLimit) return false;
         var step = rules.Steps.SingleOrDefault(s => s.Kind == cell.BuildingKind && s.FromLevel == cell.BuildingLevel);
         return step != null && Affordable(faction.Resources, UpgradePrice(state, cellId, step, rules));
     }
@@ -124,6 +124,7 @@ public static class WorldImprovements
         rules.Validate();
         if (cellId < 0 || cellId >= state.Cells.Count) throw new RuleViolation("upgrade.site", "Unknown building site");
         var cell = state.Cells[cellId];
+        if (cell.BuildingConstructionTurns > 0) throw new RuleViolation("upgrade.construction", "Building is still under construction");
         if (!cell.Terrain.Active || cell.Owner != faction.Id || cell.BuildingKind == null)
             throw new RuleViolation("upgrade.site", "Building must be on an active faction site");
         if (cell.BuildingUpgradesThisTurn >= rules.PerTurnLimit)
@@ -139,7 +140,9 @@ public static class WorldImprovements
         var faction = WorldActions.Ready(state, expectedRevision);
         var (cell, step, cost) = PrepareUpgrade(state, faction, cellId, rules);
         if (!Affordable(faction.Resources, cost)) throw new RuleViolation("upgrade.resources", "Insufficient building upgrade resources");
-        var upgraded = cell with { BuildingLevel = step.ToLevel, BuildingUpgradesThisTurn = checked(cell.BuildingUpgradesThisTurn + 1) };
+        int turns = state.Construction?.Enabled == true && cell.BuildingKind != null
+            && state.Construction.Buildings.TryGetValue(cell.BuildingKind, out var building) ? building.Levels[step.ToLevel - 1].ConstructionTurns : 0;
+        var upgraded = cell with { BuildingLevel = step.ToLevel, BuildingUpgradesThisTurn = checked(cell.BuildingUpgradesThisTurn + 1), BuildingConstructionTurns = turns };
         var next = (state with
         {
             Cells = state.Cells.Select((c, i) => i == cellId ? upgraded : c).ToArray(),

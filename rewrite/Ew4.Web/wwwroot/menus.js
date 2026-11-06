@@ -516,6 +516,7 @@
         const panel=document.createElement('section');panel.className='save-slot';
         Object.assign(panel.style,{left:attrs.x+'px',top:(Number(attrs.y)-27)+'px',width:attrs.w+'px',height:attrs.h+'px'});
         const title=document.createElement('div');title.className='save-name';title.append(this.lettering(slot.corrupt?'存档损坏':slot.exists?slot.name:this.text('text_empty'),'font_text_2_cn_hd','#ebe6e1',110,'center'));panel.append(title);
+        const mod=document.createElement('div');mod.className='save-mod-name';mod.textContent=slot.modName||'原版';mod.title=mod.textContent;panel.append(mod);
         const date=document.createElement('div');date.className='save-date';
         if(slot.savedAt){const d=new Date(slot.savedAt),pad=n=>String(n).padStart(2,'0');date.append(this.lettering(d.getFullYear()+'/'+pad(d.getMonth()+1)+'/'+pad(d.getDate())+'\n'+pad(d.getHours())+':'+pad(d.getMinutes()),'font_char_1_hd','#404040',110,'center'));}panel.append(date);
         if(slot.country){const flag=this.countryFlag(slot.country,25.5,15);flag.className='save-country';panel.append(flag);}
@@ -525,7 +526,7 @@
           else await this.api.load(slot.slot,mode);
         },panel);
         command.className='save-slot-confirm';command.setAttribute('aria-label',titleText);command.title=titleText;
-        command.disabled=saving?slot.slot===0:!slot.exists||slot.corrupt;
+        command.disabled=saving?slot.slot===0:!slot.exists||slot.corrupt||slot.compatible===false;
         command.append(this.api.uiImage('button_ok_gray_noshadow.png',30));body.append(panel);
       }
     }
@@ -541,9 +542,26 @@
       if(!ability.icon.startsWith('rewrite/'))return this.api.uiImage(ability.icon,width,height);
       const image=document.createElement('img');image.src='/content/extensions/'+ability.icon.slice(8).split('/').map(encodeURIComponent).join('/');image.width=width;image.height=height;image.alt='';return image;
     }
+    abilityStarOutline(color){
+      const id='ability-star-outline-'+color.slice(1).toLowerCase();
+      if(!document.getElementById(id)){
+        const ns='http://www.w3.org/2000/svg';
+        const node=(name,attrs)=>{const el=document.createElementNS(ns,name);for(const [key,value] of Object.entries(attrs))el.setAttribute(key,String(value));return el;};
+        let bank=document.getElementById('ability-star-outline-filters');
+        if(!bank){bank=node('svg',{id:'ability-star-outline-filters',width:0,height:0,'aria-hidden':'true'});bank.style.position='absolute';bank.style.pointerEvents='none';document.body.append(bank);}
+        const filter=node('filter',{id,x:'-30%',y:'-30%',width:'160%',height:'160%','color-interpolation-filters':'sRGB'});
+        for(const [radius,tint,result] of [[1.15,color,'outer'],[.5,'#ffffff','core']]){
+          filter.append(node('feMorphology',{in:'SourceAlpha',operator:'dilate',radius,result:result+'Alpha'}),node('feFlood',{'flood-color':tint,result:result+'Tint'}),node('feComposite',{in:result+'Tint',in2:result+'Alpha',operator:'in',result}));
+        }
+        const merge=node('feMerge',{});for(const name of ['outer','core','SourceGraphic'])merge.append(node('feMergeNode',{in:name}));
+        filter.append(merge);bank.append(filter);
+      }
+      return 'url(#'+id+')';
+    }
     commanderInfo(definition,held,onClose){
       this.commanderReturn=onClose;
-      const body=this.api.detail('title_unitinfo',440,217,null,onClose||(()=>{this.drawRoster();}));body.className='commander-detail';
+      const abilityDefinitions=this.abilityDefinitions(),abilityRows=Math.ceil(abilityDefinitions.length/2);
+      const body=this.api.detail('title_unitinfo',440,217+(abilityRows-4)*27,null,onClose||(()=>{this.drawRoster();}));body.className='commander-detail';
       const card=document.createElement('div');card.className='commander-detail-card';const portrait=this.card(definition,held,()=>{});portrait.querySelector('.commander-info').remove();portrait.querySelector('.commander-tag')?.remove();delete portrait.dataset.locked;card.append(portrait);body.append(card);
       const equipment=document.createElement('div');equipment.className='commander-equipment';const title=document.createElement('div');title.className='commander-equipment-title';title.append(this.lettering(this.text('text_equipitem')));equipment.append(title);
       const items=document.createElement('div');items.className='commander-equipment-slots';for(let i=0;i<(this.data.equipmentCapacity??2);i++){const marker=this.data.items.find(m=>m.id===held?.items[i]);items.append(this.api.uiImage(marker?.image||'item_blank.png',45));}equipment.append(items);body.append(equipment);
@@ -560,15 +578,24 @@
       const ranks=document.createElement('div');ranks.className='commander-ranks';
       for(const [track,effect,value] of [['rank','hp',held?.healthBonus??definition.healthBonus],['title','recover',held?.healing??definition.healing]]){const row=document.createElement('div');row.append(this.progressionBadge(track,held?.learning[track]??{level:definition[track],experience:0}));const icon=this.api.uiImage('marker_'+effect+'_dark.png',17);icon.className='rank-effect';row.append(icon,this.lettering(value,'font_char_2_hd'));ranks.append(row);}body.append(ranks);
       const abilities=document.createElement('div');abilities.className='commander-abilities';const values=held?.learning.abilities||definition.abilities;
-      const custom=!!this.data.commanderAbilities?.length||!!Object.keys(this.data.commanderAbilityPresentation||{}).length;abilities.classList.toggle('has-custom-abilities',custom);abilities.tabIndex=custom?0:-1;
-      for(const ability of this.abilityDefinitions()){
+      abilities.style.height=(abilityRows*27+1)+'px';
+      for(const ability of abilityDefinitions){
         const key=ability.id,count=key==='training'?(held?.training??definition.training):values[key]??0;
         const row=document.createElement('div');row.className='commander-ability';row.dataset.ability=key;row.title=ability.name+' '+count;row.setAttribute('aria-label',key+' '+count);row.append(this.abilityIcon(ability));
-        if(custom){const name=this.lettering(ability.name,'font_char_2_hd','#404040',126,'left',{size:11,singleLine:true,shrinkWidth:true,maxHeight:16});name.classList.add('ability-name');row.append(name);}
         const stars=document.createElement('div');stars.className='ability-stars';stars.dataset.value=String(count);
-        // Mod abilities are not limited to the original five-star artwork.
-        for(let i=0;i<(count>5?1:count);i++)stars.append(this.api.uiImage('star_middle.png',13.5,12.5));
-        if(count>5){stars.classList.add('ability-stars-count');stars.append(this.lettering('\u00d7'+count,'font_char_2_hd','#404040',106,'left',{size:12,singleLine:true,shrinkWidth:true,inkCenter:true,maxHeight:19}));}
+        // Color promotion is opt-in Mod presentation; unconfigured content keeps the default artwork/count.
+        const starRule=this.data.commanderAbilityStars;
+        const fiveSlots=starRule?.mode==='fiveSlots'&&count<=10;
+        const color=fiveSlots?(starRule.commanders[definition.id]??starRule.countries[definition.country]??starRule.defaultColor):null;
+        const promoted=fiveSlots?Math.max(0,count-5):0;
+        const starCount=fiveSlots?Math.min(5,count):(count>5?1:count);
+        if(fiveSlots){stars.dataset.mode='fiveSlots';stars.dataset.color=color;stars.dataset.promoted=String(promoted);const glow=starRule.glowColors?.[color]||'#ffffff';stars.style.setProperty('--ability-star-glow',glow);if(promoted)stars.style.setProperty('--ability-star-outline-filter',this.abilityStarOutline(glow));}
+        for(let i=0;i<starCount;i++){
+          const colored=fiveSlots&&i<promoted;
+          const image=colored?this.abilityIcon({icon:starRule.palette[color]},13.5,12.5):this.api.uiImage('star_middle.png',13.5,12.5);
+          if(colored)image.dataset.promoted='true';stars.append(image);
+        }
+        if(count>10||!fiveSlots&&count>5){stars.classList.add('ability-stars-count');stars.append(this.lettering('\u00d7'+count,'font_char_2_hd','#404040',106,'left',{size:12,singleLine:true,shrinkWidth:true,inkCenter:true,maxHeight:19}));}
         row.append(stars);abilities.append(row);
       }body.append(abilities);
       if(held&&!this.deployment&&!held.battle){const regroup=this.api.button('',()=>this.regroup(held.id),equipment);regroup.className='native-command orange regroup';regroup.disabled=held.locked;regroup.setAttribute('aria-label',this.text('btn_regroup'));regroup.append(this.lettering(this.text('btn_regroup'),'font_text_3_cn_hd','#ebe6e1'));}

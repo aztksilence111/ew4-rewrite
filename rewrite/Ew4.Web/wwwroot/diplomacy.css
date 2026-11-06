@@ -1,3 +1,4 @@
+.diplomacy-actions{display:flex;flex-direction:column;gap:2px}
 .diplomacy-entry{position:absolute;z-index:3;display:flex;align-items:flex-end;justify-content:flex-start;padding:0;background:none;border:0;transform:none;box-sizing:border-box}
 .diplomacy-entry-face{position:relative;display:flex;flex:none;align-items:center;justify-content:center;overflow:hidden;isolation:isolate;box-sizing:border-box;padding:4px;pointer-events:none}
 .diplomacy-entry-face::before{content:"";position:absolute;left:-1.851852%;top:-37.037037%;width:135.185185%;height:137.037037%;background:var(--diplomacy-entry-background) center/100% 100% no-repeat;z-index:-1}

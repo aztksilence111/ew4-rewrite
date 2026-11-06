@@ -227,7 +227,7 @@ public static class WorldTurns
         state = state with { Units = workingUnits };
         var unitSlots = workingUnits.Select((u, i) => (u.Id, i)).ToDictionary(p => p.Id, p => p.i);
         var unitsByCell = workingUnits.Where(u => u.Owner == faction).ToLookup(u => u.Cell, u => u.Id);
-        var allOccupied = workingUnits.Where(u => !WorldUnitLayers.Air(state, u)).Select(u => u.Cell).ToHashSet();
+        var allOccupants = workingUnits.Where(u => !WorldUnitLayers.Air(state, u)).ToLookup(u => u.Cell, u => u.Owner);
         var healers = workingUnits.Where(u => !WorldUnitLayers.Air(state, u) && u.CommanderId != null && state.Cells[u.Cell].Terrain.Active)
             .ToLookup(u => u.Cell);
         bool deaths = false;
@@ -273,13 +273,13 @@ public static class WorldTurns
                     state = state with { Units = workingUnits };
                     unitSlots = workingUnits.Select((u, i) => (u.Id, i)).ToDictionary(p => p.Id, p => p.i);
                     unitsByCell = workingUnits.Where(u => u.Owner == faction).ToLookup(u => u.Cell, u => u.Id);
-                    allOccupied = workingUnits.Where(u => !WorldUnitLayers.Air(state, u)).Select(u => u.Cell).ToHashSet();
+                    allOccupants = workingUnits.Where(u => !WorldUnitLayers.Air(state, u)).ToLookup(u => u.Cell, u => u.Owner);
                     healers = workingUnits.Where(u => !WorldUnitLayers.Air(state, u) && u.CommanderId != null && state.Cells[u.Cell].Terrain.Active).ToLookup(u => u.Cell);
                     random = new Ew4Random(state.RandomState);
                     deaths = true;
                     continue;
                 }
-                int penalty = WorldUnitLayers.Air(state, unit) ? 0 : LocalPenalty(state, sites, cellId, unit.Owner, rules.NeutralCamps, allOccupied);
+                int penalty = WorldUnitLayers.Air(state, unit) ? 0 : LocalPenalty(state, sites, cellId, unit.Owner, rules.NeutralCamps, allOccupants);
                 int effective = TurnEconomy.Morale(unit.Morale.Baseline, unit.Morale.Duration, penalty,
                     state.Factions.Single(f => f.Id == faction).Shortage,
                     unit.Support.Logistics || unit.Combatant.FoodExempt || unit.Combatant.Has(Ew4Combat.Skill(22)), unit.Combatant.Has(Ew4Combat.Skill(3)));
@@ -296,6 +296,7 @@ public static class WorldTurns
         {
             var before = state;
             state = rules.Extensions.DispatchFactionTurn(state, faction, "turn.end");
+            state = TacticalSkills.EndTurn(state, faction, rules.Extensions);
             state = rules.Extensions.ExpireStatuses(state, faction);
             notices.AddRange(RuleEventBus.ChangeNotices(before, state));
         }
@@ -355,13 +356,14 @@ public static class WorldTurns
         if (farms.Length > 0)
             cells = JurisdictionClaims.Filter(state with { Cells=cells },
                 TerritoryClaims.Expand(map, cells, farms, WorldUnitLayers.Surface(state).Select(u=>u.Cell).ToArray(), faction.Id), faction.Id, requireFrontier: true);
-        cells = cells.Select(c => c.Owner == faction.Id ? c with { BuildingUpgradesThisTurn = 0 } : c).ToArray();
+        cells = cells.Select(c => c.Owner == faction.Id ? c with { BuildingUpgradesThisTurn = 0, BuildingRecruitsThisTurn = 0,
+            BuildingConstructionTurns = Math.Max(0, c.BuildingConstructionTurns - 1) } : c).ToArray();
         var expanded = state with { Cells = cells };
-        var occupied = new HashSet<int>(WorldUnitLayers.Surface(expanded).Select(u => u.Cell));
+        var occupants = WorldUnitLayers.Surface(expanded).ToLookup(u => u.Cell, u => u.Owner);
         var units = expanded.Units.Select(unit =>
         {
             if (unit.Owner != faction.Id) return unit;
-            int local = WorldUnitLayers.Air(expanded, unit) ? 0 : LocalPenalty(expanded, map, unit.Cell, unit.Owner, rules.NeutralCamps, occupied);
+            int local = WorldUnitLayers.Air(expanded, unit) ? 0 : LocalPenalty(expanded, map, unit.Cell, unit.Owner, rules.NeutralCamps, occupants);
             var refreshed = UnitLifecycle.Refresh(new()
             {
                 Health = unit.Combatant.Health, MaximumHealth = unit.Combatant.MaximumHealth, BaseHealth = unit.Combatant.MaximumHealth,
@@ -374,7 +376,7 @@ public static class WorldTurns
             return unit with
             {
                 RemainingMovement = refreshed.Movement, ExtensionMovementLimit = rules.Extensions == null ? null : refreshed.Movement,
-                Acted = refreshed.Acted, Morale = refreshed.Morale, LocalPenalty = local,
+                Acted = refreshed.Acted, MovedThisTurn = false, AttackedThisTurn = false, Morale = refreshed.Morale, LocalPenalty = local,
                 PlayerControl = unit.PlayerControl == null ? null : PlayerAi.Order(unit) with { ActionRound = 0 },
                 Behavior = refreshed.Behavior, BehaviorExpiry = refreshed.BehaviorExpiry,
                 Combatant = unit.Combatant with { Health = refreshed.Health, Morale = refreshed.Morale.Effective,
@@ -387,25 +389,28 @@ public static class WorldTurns
         {
             var before = state;
             state = rules.Extensions.DispatchFactionTurn(state, faction.Id, "turn.start");
+            state = TacticalSkills.StartTurn(state, faction.Id, rules.Extensions);
             notices.AddRange(RuleEventBus.ChangeNotices(before, state));
         }
         return state;
     }
 
     public static int LocalPenalty(WorldState state, HexMap map, int center, string owner, IReadOnlyCollection<string>? neutralCamps = null)
-        => LocalPenalty(state, map, center, owner, neutralCamps, new HashSet<int>(WorldUnitLayers.Surface(state).Select(u => u.Cell)));
+        => LocalPenalty(state, map, center, owner, neutralCamps, WorldUnitLayers.Surface(state).ToLookup(u => u.Cell, u => u.Owner));
 
     internal static int LocalPenalty(WorldState state, HexMap map, int center, string owner, IReadOnlyCollection<string>? neutralCamps,
-        HashSet<int> occupied)
+        ILookup<int, string> occupants)
     {
         map.Check(center);
         var neighbors = Enumerable.Range(0, 6).Select(direction => map.Neighbor(center, direction)).ToArray();
-        bool hostile(int cell) => cell >= 0 && state.Cells[cell].Owner is string faction && !WorldDiplomacy.Allied(state, faction, owner);
+        // Land ownership can differ from the army occupying it, especially with fixed jurisdictions.
+        bool hostile(int cell, bool excludeNeutral = false) => cell >= 0 && occupants[cell].Any(faction =>
+            !WorldDiplomacy.Allied(state, faction, owner) && (!excludeNeutral || neutralCamps == null
+                || !WorldDiplomacy.NeutralTo(state, faction, owner, neutralCamps)));
         var active = neighbors.Where(i => i >= 0 && state.Cells[i].Terrain.Active).ToArray();
-        if (active.All(i => hostile(i) && (neutralCamps == null || !WorldDiplomacy.NeutralTo(state, state.Cells[i].Owner!, owner, neutralCamps)) && occupied.Contains(i))) return 2;
+        if (active.All(i => hostile(i, excludeNeutral: true))) return 2;
         for (int direction = 0; direction < 3; direction++)
-            if (hostile(neighbors[direction]) && hostile(neighbors[direction + 3])
-                && occupied.Contains(neighbors[direction]) && occupied.Contains(neighbors[direction + 3])) return 1;
+            if (hostile(neighbors[direction]) && hostile(neighbors[direction + 3])) return 1;
         return 0;
     }
 }

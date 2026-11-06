@@ -57,15 +57,16 @@ public sealed partial class ClientGame
         try
         {
             string path = SavePath(index, command.Mode, true);
-            if (!File.Exists(path)) return new { slot = index, exists = false, corrupt = false, scenario = "", name = "", country = (string?)null, round = 0, savedAt = (DateTimeOffset?)null };
+            if (!File.Exists(path)) return new { slot = index, exists = false, corrupt = false, scenario = "", name = "", country = (string?)null, round = 0, savedAt = (DateTimeOffset?)null, modName, compatible = true };
             var saved = ReadSlot(path);
             return new { slot = index, exists = true, corrupt = false, scenario = saved.Scenario,
                 name = content.Scenarios.Single(s => s.Id == saved.Scenario).Name, country = SaveCountry(saved),
-                round = saved.Round, savedAt = (DateTimeOffset?)(saved.SavedAt ?? new DateTimeOffset(File.GetLastWriteTime(path))) };
+                round = saved.Round, savedAt = (DateTimeOffset?)(saved.SavedAt ?? new DateTimeOffset(File.GetLastWriteTime(path))),
+                modName = saved.ModName ?? modName, compatible = saved.SaveIdentity == null || saved.SaveIdentity == saveIdentity };
         }
         catch (Exception error) when (error is JsonException or IOException or RuleViolation or InvalidOperationException or KeyNotFoundException)
         {
-            return new { slot = index, exists = true, corrupt = true, scenario = "", name = "", country = (string?)null, round = 0, savedAt = (DateTimeOffset?)null };
+            return new { slot = index, exists = true, corrupt = true, scenario = "", name = "", country = (string?)null, round = 0, savedAt = (DateTimeOffset?)null, modName, compatible = false };
         }
     }).ToArray();
 

@@ -456,4 +456,6 @@ export产生规则本身，不是按剧本ID嵌套的字典；apply/strip保留�
 | UI布局/说明/主动请求 | `rewrite/Ew4.Web/wwwroot/skill-ui.js` Ew4SkillUI.layout/icon；`menus.js` commanderInfo/skillTip；`app.js` openUnitInfo/openSkillAction |
 | 回归与离线包验证 | `rewrite/Ew4.Verify/ExtensionChecks.cs` Run；`rewrite/Ew4.ModChecks/ExtensionModChecks.cs` Run；`tools/verify_extensions_web.cjs` |
 
+机动支援、领土攻防光环与设施恢复网络的 API 3 可选配置见 [战术技能接口](TACTICAL_SKILLS.md)。人物专属定义应放在各 Mod 自身源码目录。
+
 源码验证命令：`dotnet run --project rewrite/Ew4.Verify -- <仓库根> --extension-only`；再运行`Ew4.ModChecks`同参数，均包含API 1/2专项。API 1浏览器脚本使用独立5185；API 2为`tools/verify_common_skills_web.cjs`，使用独立5206及独立存档，运行前确认端口属于本次预览进程，禁止对玩家服务执行自动化动作。Android用Compile验证共享接口，实机运行需另行验收。

@@ -151,6 +151,7 @@ public sealed partial class ClientContent
         if (Extensions.UnitLayers?.Profiles.Keys.Any(id => !Catalogs.Runtime.Profiles.ContainsKey(id)) == true)
             throw new RuleViolation("layers.profile", "Unit layers reference an unknown unit profile");
         if (Extensions.Construction is { } construction && construction.BuilderProfiles
+            .Concat((construction.Recruitment ?? Array.Empty<ModBuildingRecruit>()).Select(r => r.Profile))
             .Concat(construction.Buildings.Values.SelectMany(b => b.Recruitment.Select(r => r.Profile)))
             .Any(id => !Catalogs.Runtime.Profiles.ContainsKey(id)))
             throw new RuleViolation("construction.profile", "Construction references an unknown unit profile");
@@ -330,7 +331,10 @@ public sealed partial class ClientContent
                 foreach (string unit in world.Units.Select(u => u.Id).ToArray())
                     world = Extensions.Bus.Dispatch(world, "scenario.start", unit, new Ew4Random(world.RandomState));
                 if (Extensions.ApiVersion >= 3 && world.Phase == TurnPhase.Active)
+                {
                     world = Extensions.Bus.DispatchFactionTurn(world, world.ActiveFaction, "turn.start");
+                    world = TacticalSkills.StartTurn(world, world.ActiveFaction, Extensions.Bus);
+                }
                 world = world with { ArmyCapacity = ArmyCapacity.Resolve(id, CapacityCountries(world)) };
                 world.Validate();
                 started = started with { Session = started.Session with { World = world } };

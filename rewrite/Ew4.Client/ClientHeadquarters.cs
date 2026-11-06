@@ -67,6 +67,7 @@ public sealed partial class ClientGame
             refresh = Enumerable.Range(0, 3).ToDictionary(i => i, i => RefreshView(account, "academy." + i)),
             commanderAbilities = content.Extensions.CommanderAbilities?.Abilities.Select(a => new { a.Id, name = content.Label(a.NameKey), a.Icon }),
             commanderAbilityOrder = content.Extensions.CommanderAbilities?.Order,
+            commanderAbilityStars = content.Extensions.CommanderAbilities?.Stars,
             commanderAbilityPresentation = content.Extensions.CommanderAbilities?.Presentation.ToDictionary(p => p.Key,
                 p => new { name = p.Value.NameKey == null ? null : content.Label(p.Value.NameKey), p.Value.Icon }),
             skillLayout = content.Extensions.Layouts.GetValueOrDefault("commander"), offers = account.CommanderOffers, roster = account.Roster.Select(c => new { c.Id, c.DefinitionId, c.Learning, c.Training, c.Items, c.Tag,

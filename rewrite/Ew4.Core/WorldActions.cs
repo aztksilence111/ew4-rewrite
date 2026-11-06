@@ -81,9 +81,14 @@ public static class WorldActions
     {
         if (cell < 0 || cell >= state.Cells.Count || state.PendingDialogue != null || state.Phase != TurnPhase.Active) return false;
         var site = state.Cells[cell];
+        if (site.BuildingConstructionTurns > 0) return false;
+        if (state.Construction?.Enabled == true && site.BuildingKind != null
+            && state.Construction.Buildings.TryGetValue(site.BuildingKind, out var production)
+            && production.RecruitmentPerTurn > 0 && site.BuildingRecruitsThisTurn >= production.RecruitmentPerTurn) return false;
         if (state.Construction?.Enabled == true && offer.Template != null)
         {
             var configured = state.Construction.Buildings.SelectMany(b => b.Value.Recruitment.Select(r => (Kind: b.Key, Offer: r)))
+                .Concat((state.Construction.Recruitment ?? Array.Empty<ModBuildingRecruit>()).SelectMany(r => r.BuildingKinds!.Select(kind => (Kind: kind, Offer: r))))
                 .Where(p => p.Offer.Profile == offer.Template.Profile.Id).ToArray();
             if (configured.Length > 0 && !configured.Any(p => p.Kind == site.BuildingKind && p.Offer.Id == offer.Id
                 && site.BuildingLevel >= p.Offer.MinimumLevel)) return false;
@@ -140,6 +145,9 @@ public static class WorldActions
         var next = (state with
         {
             Factions = state.Factions.Select(f => f.Id == faction.Id ? updated : f).ToArray(),
+            Cells = state.Cells.Select((c, i) => i == cell && state.Construction?.Enabled == true
+                && c.BuildingKind != null && state.Construction.Buildings.ContainsKey(c.BuildingKind)
+                ? c with { BuildingRecruitsThisTurn = checked(c.BuildingRecruitsThisTurn + 1) } : c).ToArray(),
             Units = state.Units.Select(u => u.Id == builderId ? u with { Acted = true, RemainingMovement = 0 } : u).Append(unit).ToArray(), Revision = checked(state.Revision + 1)
         }).Copy();
         next.Validate();
@@ -179,7 +187,7 @@ public static class WorldActions
         var claimed = ownership.Cells;
         var moved = unit with
         {
-            Cell = destination, RemainingMovement = rules.SpendAllMovement ? 0 : Math.Max(0, reachable.Remaining),
+            Cell = destination, MovedThisTurn = true, RemainingMovement = rules.SpendAllMovement ? 0 : Math.Max(0, reachable.Remaining),
             Combatant = unit.Combatant with { AtSea = !air && claimed[destination].Terrain.Sea, BuildingKind = air ? null : claimed[destination].BuildingKind }
         };
         var notices = new List<WorldNotice> { new("unit.moved", unitId, destination) };

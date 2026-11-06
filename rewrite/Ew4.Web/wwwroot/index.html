@@ -93,7 +93,7 @@
   <div id="settings" class="modal" hidden><div class="dialog settings-dialog">
     <header class="menu-bar"><button id="close-settings" class="close-icon" aria-label="关闭" title="关闭"></button><h2 data-label="settings_label">设定</h2></header>
     <div id="settings-content" tabindex="0" role="region" aria-label="设定选项">
-      <div id="save-export-row" class="setting-row"><span>存档备份</span><button id="save-export" class="native-command blue" type="button">导出存档</button></div>
+      <div id="save-export-row" class="setting-row"><span>存档管理</span><div class="save-transfer-actions"><button id="save-manager" class="native-command blue" type="button">备份槽</button><button id="save-import" class="native-command blue" type="button">导入</button><button id="save-export" class="native-command blue" type="button">导出存档</button></div><input id="save-import-file" type="file" accept=".zip,application/zip" hidden></div>
       <div class="settings-audio">
         <label class="volume music"><span data-label="name_music">音乐</span><input id="music-volume" type="range" min="0" max="100" aria-label="音乐音量"></label>
         <label class="volume sound"><span data-label="name_sound">音效</span><input id="sound-volume" type="range" min="0" max="100" aria-label="音效音量"></label>

@@ -34,18 +34,45 @@ public static class WorldSave
                     info.Properties.Single(p => p.Name == "homelandBuildings").ShouldSerialize = (_, value) => value != null;
                     info.Properties.Single(p => p.Name == "turnSummary").ShouldSerialize = (_, value) => value != null;
                 }
+                if (info.Type == typeof(DemandRules)) {
+                    // A save without these weights keeps its original probability formula.
+                    info.CreateObject = () => new DemandRules { Pressure = null };
+                    info.Properties.Single(p => p.Name == "pressure").ShouldSerialize = (_, value) => value != null;
+                }
+                if (info.Type == typeof(DemandState))
+                    info.Properties.Single(p => p.Name == "initialCommanders").ShouldSerialize = (_, value) => value != null;
                 if (info.Type == typeof(CommanderRuntime)) {
                     info.Properties.Single(p => p.Name == "definitionId").ShouldSerialize = (_, value) => value != null;
                     info.Properties.Single(p => p.Name == "displayName").ShouldSerialize = (_, value) => value != null;
                 }
                 if (info.Type == typeof(ScenarioCommanderTemplate))
                     info.Properties.Remove(info.Properties.Single(p => p.Name == "extensions"));
-                if (info.Type == typeof(CellState))
+                if (info.Type == typeof(CellState)) {
                     info.Properties.Single(p => p.Name == "incomeAdjustment").ShouldSerialize = (_, value) => value != null;
+                    foreach (string name in new[] { "buildingConstructionTurns", "buildingRecruitsThisTurn" })
+                        info.Properties.Single(p => p.Name == name).ShouldSerialize = (_, value) => (int)value! != 0;
+                }
+                if (info.Type == typeof(ModBuildingLevel))
+                    info.Properties.Single(p => p.Name == "constructionTurns").ShouldSerialize = (_, value) => (int)value! != 0;
+                if (info.Type == typeof(UnitLayerProfile))
+                    info.Properties.Single(p => p.Name == "targetCategories").ShouldSerialize = (_, value) => value != null;
+                if (info.Type == typeof(ModBuildingDefinition)) {
+                    info.Properties.Single(p => p.Name == "recruitmentPerTurn").ShouldSerialize = (_, value) => (int)value! != 0;
+                    info.Properties.Single(p => p.Name == "builderKeepsMovement").ShouldSerialize = (_, value) => (bool)value!;
+                }
+                if (info.Type == typeof(ModBuildingRecruit))
+                    info.Properties.Single(p => p.Name == "buildingKinds").ShouldSerialize = (_, value) => value != null;
+                if (info.Type == typeof(ModConstructionRules))
+                    info.Properties.Single(p => p.Name == "recruitment").ShouldSerialize = (_, value) => value != null;
                 if (info.Type == typeof(Combatant)) {
                     info.Properties.Single(p => p.Name == "attributeModifiers").ShouldSerialize = (_, value) => value != null;
-                    foreach (string name in new[] { "maximumHealth", "maximumRange", "foodExempt", "ignoreTerrain", "ruleLocation" })
+                    foreach (string name in new[] { "maximumHealth", "maximumRange", "foodExempt", "ignoreTerrain", "ruleLocation", "tactical", "groundMobile" })
                         info.Properties.Remove(info.Properties.Single(p => p.Name == name));
+                }
+                if (info.Type == typeof(UnitState)) {
+                    info.Properties.Single(p => p.Name == "movedThisTurn").ShouldSerialize = (_, value) => (bool)value!;
+                    info.Properties.Single(p => p.Name == "attackedThisTurn").ShouldSerialize = (_, value) => (bool)value!;
+                    info.Properties.Single(p => p.Name == "maneuvers").ShouldSerialize = (_, value) => ((IReadOnlyList<ManeuverGrant>)value!).Count > 0;
                 }
                 if (info.Type == typeof(UnitProfile))
                     info.Properties.Single(p => p.Name == "commanderAbility").ShouldSerialize = (_, value) => value != null;

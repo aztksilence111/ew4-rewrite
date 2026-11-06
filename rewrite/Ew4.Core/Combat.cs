@@ -71,6 +71,8 @@ public sealed record UnitProfile
 
 public sealed record Combatant
 {
+    public TacticalCombatBonus? Tactical { get; init; }
+    public bool GroundMobile { get; init; }
     public UnitAttributeModifiers? AttributeModifiers { get; init; }
     public int MaximumHealth => checked(Profile.MaxHealth + (AttributeModifiers?.Health ?? 0));
     public int MaximumRange => checked(Profile.MaximumRange + (AttributeModifiers?.Range ?? 0));
@@ -232,12 +234,30 @@ public static class Ew4Combat
         float evasion = ignore ? 0 : source.Has(Skill(29)) && target.BuildingKind != null ? target.EvasionIgnoringBuilding : target.Evasion;
         float combined = factor * (1f - evasion);
         double damage = Math.Max(rules.MinimumDamage, checked((int)(raw * combined)));
+        double basisDamage = damage, outgoing = damage;
         if (rules.Extensions != null)
         {
             damage = rules.Extensions.Modify("combat.modify_damage", "damage_multiplier", damage, source, target, random, distance);
             damage = rules.Extensions.Modify("combat.modify_damage", "damage_add", damage, source, target, random, distance);
+            outgoing = damage;
             damage = rules.Extensions.Modify("combat.modify_incoming_damage", "damage_multiplier", damage, target, source, random, distance);
             damage = rules.Extensions.Modify("combat.modify_incoming_damage", "damage_add", damage, target, source, random, distance);
+        }
+        if (source.Tactical != null || target.Tactical != null)
+        {
+            double attack = Math.Min(.35, (source.Tactical?.Attack ?? 0) + (retaliation ? 0 : source.Tactical?.FirstAttack ?? 0));
+            double defense = target.Tactical?.Defense ?? 0;
+            if (!retaliation && source.GroundMobile && target.Tactical is { Evasion: > 0 } shield)
+            {
+                double extra = Math.Min(shield.Evasion, Math.Max(0, shield.EvasionCeiling - target.Evasion));
+                if (ignore) extra *= shield.IgnoreRetention;
+                defense = Math.Max(defense, evasion >= 1 ? 0 : extra / (1 - evasion));
+            }
+            defense = Math.Min(.25, defense);
+            double genericAttack = outgoing / basisDamage, genericDefense = outgoing > 0 ? damage / outgoing : 1;
+            double gain = Math.Min(1, genericAttack) * (1 + Math.Min(.5, Math.Max(0, genericAttack - 1) + attack));
+            double protection = Math.Max(1, genericDefense) * (1 - Math.Min(.4, Math.Max(0, 1 - genericDefense) + defense));
+            damage = Math.Round(basisDamage * gain * protection * (retaliation ? 1 : 1 - (source.Tactical?.MainAttackPenalty ?? 0)), 9);
         }
         return Math.Max(rules.MinimumDamage, checked((int)damage));
     }

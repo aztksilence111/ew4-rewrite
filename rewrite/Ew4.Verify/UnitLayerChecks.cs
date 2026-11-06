@@ -25,6 +25,15 @@ internal static class UnitLayerChecks
         var layers = new UnitLayerRules { Enabled = true, Profiles = policies };
         var world = basis with { UnitLayers = layers, Units = [basis.Units[0], ground, plane] };
         world.Validate(); Check(true, "one surface and one air share a cell");
+        var restricted = world with { UnitLayers = layers with { Profiles = new Dictionary<string, UnitLayerProfile> {
+            ["fixture.air"] = policies["fixture.air"] with { TargetCategories = ["infantry", "cavalry", "artillery", "fort"] }
+        } } };
+        Check(WorldUnitLayers.CanAttack(restricted, plane, ground with { Combatant = ground.Combatant with {
+            Profile = ground.Combatant.Profile with { Category = "infantry" } } }), "ground-strike aircraft can target infantry");
+        Check(!WorldUnitLayers.CanAttack(restricted, plane, ground with { Combatant = ground.Combatant with {
+            Profile = ground.Combatant.Profile with { Category = "naval" } } }), "ground-strike category filter excludes ships");
+        Check(WorldSave.Decode(WorldSave.Encode(restricted), restricted.ContentRevision).UnitLayers!.Profiles["fixture.air"].TargetCategories!.Count == 4,
+            "target categories survive save reload");
         Reject((world with { UnitLayers = null }).Validate, "world.capacity");
         Reject((world with { UnitLayers = layers with { Enabled = false } }).Validate, "world.capacity");
         (world with { Units = [basis.Units[0], ground, plane with { Owner = "loser" }] }).Validate();

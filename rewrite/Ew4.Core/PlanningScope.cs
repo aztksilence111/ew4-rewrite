@@ -82,7 +82,7 @@ internal sealed class PlanningScope : IDisposable
     {
         if (destination < 0 || destination >= cells.Count)
             throw new RuleViolation("world.unit", "Invalid unit state, commander assignment or owner");
-        var moved = unit with { Cell = destination, RemainingMovement = remaining,
+        var moved = unit with { Cell = destination, MovedThisTurn = true, RemainingMovement = remaining,
             Combatant = unit.Combatant with { AtSea = !WorldUnitLayers.Air(state, unit) && cells[destination].Terrain.Sea,
                 BuildingKind = WorldUnitLayers.Air(state, unit) ? null : cells[destination].BuildingKind } };
         var next = state with { Cells = cells, Units = Array.AsReadOnly(state.Units.Select(u => ReferenceEquals(u, unit) ? moved : u).ToArray()),

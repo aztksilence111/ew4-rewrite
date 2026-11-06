@@ -107,7 +107,7 @@ public sealed partial class RuleEventBus
             if (caster == null || cell == caster.Cell || !CanPlace(world, caster.Combatant.Profile, caster.Transport, caster.Owner, cell))
                 throw new RuleViolation("skill.teleport", "Invalid teleport destination");
             var next = world with { Units = world.Units.Select(u => u.Id != caster.Id ? u : u with {
-                Cell = cell, RemainingMovement = 0, Combatant = u.Combatant with {
+                Cell = cell, MovedThisTurn = true, RemainingMovement = 0, Combatant = u.Combatant with {
                     AtSea = !WorldUnitLayers.Air(world, u) && world.Cells[cell].Terrain.Sea,
                     BuildingKind = WorldUnitLayers.Air(world, u) ? null : world.Cells[cell].BuildingKind } }).ToArray() };
             // Teleportation does not traverse or claim territory; only neutral or friendly destinations are allowed.
