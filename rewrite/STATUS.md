@@ -1,5 +1,7 @@
 # 重构短锚点
 
+- **2026-11-06 0.2.32/code35 双端正式发布：[Release](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.32-20261106)、[记录](RELEASE_PROGRESS_0.2.32_20261106.md)。** 全部未发布R运行修改及接口文档/回归程序纳入，源码/标签51abc34已上传；独立Mod素材和历次工程未混入发行。核心与Mod160521/浏览器338/Web3399/包3789及实际APK启动22/导出35/导入41通过，四远端附件大小/SHA一致，原签名及ARM64/16KiB保持，无真机验收。仅停本轮三宿主，核路径/链接/Git/消费者后清52目标16241文件4681847704字节、残留0/错误0/Git保持，39份玩家文件变化0；留0.2.32/31/30三批六包。凭据先存、最后根日志。
+
 - **2026-11-06 机场卡展示与航空静态动作已修：[记录](../颓垣饿鸠/art/airfield-v1/issues/20261106/README.md)、[预览56180](http://127.0.0.1:56180)。** CanBuild增加仅展示用途的行动检查开关，buildingOffers返回available/unavailableReason；已行动工兵仍显示机场且禁用确认，四卡同屏，执行资格完整校验。动作static=true固定首帧并终止待机播放，覆盖选中/取消选中；七航空只ready/move/attack绑定，去掉机体网格、机头裁缩与航空去绿，原像素保留。64施工/65分层和相关回归/11兼容、实际Mod17、四视口61、像素/证据527、Web及Android ARM64 Compile通过。0.1.16/PID21832/hasSave=false，原12888文件摘要保持，原逻辑身份及第二套保持。核进程/真实路径/Git后清50目标11992文件1161254158字节，残留0/错误0/Git保持，凭据先存；无新APK/正式发行/Android真机验收。最后根日志。
 
 - **2026-11-06 Android系统栏滑动策略补强：[记录](../reverse/ANDROID_SYSTEM_BAR_GESTURE_20261106.md)。** 新旧API统一设置ImmersiveSticky，现代API继续ShowTransientBarsBySwipe，OnResume恢复全屏。ARM64 Compile零警告错误；ADB无设备、无新APK，顶栏点击/顶边下滑及ROM行为待真机回归。清本轮bin/obj，凭据先存、残留0/Git保持；保留既有导入修改及玩家服务资料，最后根日志。

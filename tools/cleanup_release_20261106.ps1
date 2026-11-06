@@ -9,12 +9,13 @@ if ($Execute) {
     if ($audit.errors -or $verification.errors -or $verification.nativeLibraries -ne 10) { throw 'Release verification incomplete' }
 }
 $status = @(git -C $workspace status --porcelain=v1 --untracked-files=normal)
-$protected = @(Get-Content "$batch/player-data-before.json" -Raw | ConvertFrom-Json)
+$protected = Get-Content "$batch/player-data-before.json" -Raw | ConvertFrom-Json
 foreach ($entry in $protected) {
     if (!(Test-Path -LiteralPath $entry.path) -or (Get-FileHash -LiteralPath $entry.path).Hash -ne $entry.sha256) { throw "Player data changed: $($entry.path)" }
 }
 if ($Execute) {
-    foreach ($hostEntry in @(Get-Content "$batch/test-hosts.json" -Raw | ConvertFrom-Json)) {
+    $hostEntries = Get-Content "$batch/test-hosts.json" -Raw | ConvertFrom-Json
+    foreach ($hostEntry in $hostEntries) {
         $process = Get-CimInstance Win32_Process -Filter "ProcessId=$($hostEntry.pid)"
         if (!$process) { continue }
         if ($process.ExecutablePath -ne $hostEntry.path -or $process.CommandLine -notlike "*127.0.0.1:$($hostEntry.port)*") { throw 'Test process identity changed' }

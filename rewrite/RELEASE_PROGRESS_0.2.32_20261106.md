@@ -8,4 +8,10 @@
 
 发行范围为全部 R 版运行源码、接口文档、回归程序和工作区已跟踪改动；约 20.5 GB 的独立 Mod 素材库、历次作者工程与预览不混入本体发行包或本次 Git 新增内容。原资料保持本地。
 
-当前处于最终包校验阶段，尚未发布；最终源码、校验和、远端结果及清理记录在本文件补齐。
+正式发布：[GitHub Release](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.32-20261106)。源码 `51abc3464e5c6ef6a7bfcf4c8f9b4a0b88db0bf4` 已同步 main，标签 `v0.2.32-20261106` 指向相同提交，非草稿、非预发布。
+
+Android ARM64 APK 190587950 字节，SHA-256 `f3e015de4ae260b1d66592372d9e11c57627d4378f83226a309ab5ba5cad095d`；Windows x64 Web ZIP 216707947 字节，SHA-256 `5bf4c10743d88f20e757e5aa5f6686f4b8cec950d43a0e029e32579b6f9b427d`。另附 `release-manifest.json` 和 `SHA256SUMS.txt`，远端四附件大小与摘要全部一致。
+
+正式 Web 3399 项、最终双端包 3789 项通过，Android 仅 ARM64、原证书连续及 10 个运行库 16 KiB 对齐通过。首次构建命令仍带 x64 测试 ABI，未发布该包；最终明确限制 RuntimeIdentifiers=android-arm64，重建并重新核验实际 APK 程序集及导入导出。常规 Git HTTPS 推送连接重置后，使用仓库既有 GitHub API 流程上传并验证相同 Git 对象。
+
+核真实路径、链接、Git、活动消费者和玩家文件后，关闭本轮三个隔离测试宿主，清 52 目标、16241 文件、4681847704 字节，残留 0、错误 0。保留 0.2.32／0.2.31／0.2.30 三批六包，摘要错误 0，39 份玩家文件变化 0、Git 状态保持。收据 `cleanup.json` 先保存，再维护说明和双 STATUS，最后 WORK_LOG。清理工具修正 Windows PowerShell 解析 JSON 数组时的兼容问题，数据摘要复核无变化；后续收尾提交仅记录本次发行与维护修正，不更换已发布包。
