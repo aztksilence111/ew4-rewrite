@@ -21,16 +21,20 @@
         this.api.main();
       };
       document.getElementById('hq-recruit').onclick=()=>{this.closeHeadquartersFilter?.(true);this.recruiting=true;this.rating=0;this.offer=null;this.drawRoster();};
-      const roster=document.getElementById('hq-roster');let drag=null,dragged=false;
-      roster.onpointerdown=e=>{if(this.recruiting||e.button!==0)return;dragged=false;drag={id:e.pointerId,x:e.clientX,scroll:roster.scrollLeft};};
+      this.bindHorizontalDrag(document.getElementById('hq-roster'),()=>!this.recruiting);
+    }
+    bindHorizontalDrag(roster,enabled=()=>true){
+      let drag=null,dragged=false;
+      roster.onpointerdown=e=>{if(!enabled()||e.button!==0)return;dragged=false;drag={id:e.pointerId,x:e.clientX,scroll:roster.scrollLeft};};
       roster.onpointermove=e=>{
         if(!drag||e.pointerId!==drag.id)return;
         const scale=roster.getBoundingClientRect().width/roster.offsetWidth,dx=(e.clientX-drag.x)/scale;
         if(!dragged&&Math.abs(e.clientX-drag.x)>6){dragged=true;roster.setPointerCapture(e.pointerId);roster.classList.add('dragging');}
         if(dragged){e.preventDefault();roster.scrollLeft=drag.scroll-dx;}
       };
-      const endDrag=()=>{drag=null;roster.classList.remove('dragging');};
+      const endDrag=()=>{const id=drag?.id;drag=null;roster.classList.remove('dragging');if(id!==undefined&&roster.hasPointerCapture(id))roster.releasePointerCapture(id);};
       roster.onpointerup=endDrag;roster.onpointercancel=endDrag;
+      roster.onpointerleave=()=>{if(drag&&!dragged)endDrag();};
       // Touch capture transfers from the card to the roster; ignore the child's loss.
       roster.onlostpointercapture=e=>{if(e.target===roster)endDrag();};
       roster.addEventListener('click',e=>{if(dragged){e.preventDefault();e.stopImmediatePropagation();dragged=false;}},true);

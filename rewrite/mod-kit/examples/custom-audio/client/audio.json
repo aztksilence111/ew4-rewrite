@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "sounds": {
+    "sfx_click.wav": "sfx_select.wav",
+    "sfx_cancel.wav": "sfx_click.wav",
+    "mod.alert": "sfx_lvup2.wav"
+  }
+}

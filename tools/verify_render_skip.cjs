@@ -48,7 +48,19 @@ const folder=process.env.EW4_RENDER_REPORT||'E:/Workplace/game/o4mod/rewrite/rep
       check(report.turn.skippedFrames===0,'skipped intermediate actions do not repaint battlefield');
       const gpu=await page.evaluate(()=>!!ctx.gpu);
       check(report.render.idle.frames<=(gpu?115:52),'animated idle scene respects renderer frame schedule');
-      if(gpu)check(report.render.idle.frames>52,'Pixi animated scene exceeds old 30 FPS cap');
+      // Wall-clock throughput varies with software GPU load. Check the actual
+      // render gate at a simulated high refresh rate instead of requiring FPS.
+      report.schedule=await page.evaluate(()=>{
+        const original=battlefield.frame,start=performance.now();let frames=0;
+        battlefield.frame=function(){frames++;this.animated=true;};
+        try{
+          lastRenderTime=-Infinity;renderDirty=false;cameraInputUntil=0;
+          for(let i=0;i<120;i++){renderDirty=false;battlefieldNeedsFrame=true;render(start+i*1000/120);suspendRendering();}
+          return {frames,touch:(navigator.maxTouchPoints||0)>0||matchMedia('(pointer: coarse)').matches,
+            active:!!(pointers.size||aiRunning||motions.size||arrivals.size||deaths.size||combatMotions.size||effects?.instances.length||damageNumbers?.instances.length)};
+        }finally{battlefield.frame=original;lastRenderTime=-Infinity;requestRender();}
+      });
+      check(report.schedule.frames===(report.schedule.touch?(report.schedule.active?60:30):120),'touch idle budget and unthrottled desktop scheduling: '+JSON.stringify(report.schedule));
       report.cache=await page.evaluate(()=>{
         const scene={draw:ctx,state,map:manifest.maps[state.map],visibleRect:battlefield.visibleRect,zoom:view.zoom,showGrid:false,selection:null,selected:null,selectedAt:0,motions:new Map(),facings,arrivals:new Map(),combatMotions:new Map()};
         battlefield.frame(scene,500);const canvas=battlefield.staticCanvas,key=battlefield.groundSignature;

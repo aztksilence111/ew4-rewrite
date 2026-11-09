@@ -135,7 +135,8 @@
     }
   }
   class ShortAudio {
-    constructor(volume,files){this.volume=volume;this.files=files;this.buffers=new Map();this.loads=new Map();this.voices=new Set();this.context=undefined;this.visible=true;this.generation=0;this.disposed=false;}
+    constructor(volume,files,aliases={}){this.volume=volume;this.aliases=aliases;this.files=[...new Set([...files,...Object.values(aliases).filter(Boolean)])];this.buffers=new Map();this.loads=new Map();this.voices=new Set();this.context=undefined;this.visible=true;this.generation=0;this.disposed=false;}
+    resolve(file){return own(this.aliases,file)??file;}
     getContext(){
       if(this.context===undefined){
         const Context=root.AudioContext||root.webkitAudioContext;
@@ -153,9 +154,9 @@
       if(this.loads.has(file))return this.loads.get(file);
       const context=this.getContext();
       if(!context){
-        const audio=new Audio('/content/sounds/'+file);audio.preload='auto';this.buffers.set(file,audio);return Promise.resolve(audio);
+        const audio=new Audio('/content/sounds/'+encodeURIComponent(file));audio.preload='auto';this.buffers.set(file,audio);return Promise.resolve(audio);
       }
-      const task=fetch('/content/sounds/'+file).then(response=>{
+      const task=fetch('/content/sounds/'+encodeURIComponent(file)).then(response=>{
         if(!response.ok)throw Error('Sound load failed: '+file);
         return response.arrayBuffer();
       }).then(bytes=>context.decodeAudioData(bytes)).then(buffer=>{
@@ -163,8 +164,9 @@
       }).finally(()=>this.loads.delete(file));
       this.loads.set(file,task);return task;
     }
-    preload(files){return Promise.all((files||[]).filter(file=>this.files.includes(file)).map(file=>this.load(file).catch(()=>null)));}
+    preload(files){return Promise.all([...new Set((files||[]).map(file=>this.resolve(file)))].filter(file=>file&&this.files.includes(file)).map(file=>this.load(file).catch(()=>null)));}
     play(file){
+      file=this.resolve(file);
       if(!file||!this.files.includes(file)||!this.volume()||!this.visible||this.disposed||root.document?.hidden)return;
       const context=this.getContext(),started=performance.now(),generation=this.generation;
       let buffer=this.buffers.get(file);
@@ -199,7 +201,7 @@
     dispose(){this.disposed=true;this.clear();this.buffers.clear();if(this.context&&this.context.state!=='closed')this.context.close().catch(()=>{});}
   }
   class Effects {
-    constructor(api,data,visuals){this.api=api;this.data=data;this.visuals=new UnitVisuals(api.manifest||{profiles:{}},data,visuals);this.instances=[];this.tints=new Map();this.sounds=new ShortAudio(api.volume,data.sounds);this.voices=this.sounds.voices;this.audio=this.sounds.buffers;this.trails=new Map();this.serial=1;}
+    constructor(api,data,visuals){this.api=api;this.data=data;this.visuals=new UnitVisuals(api.manifest||{profiles:{}},data,visuals);this.instances=[];this.tints=new Map();this.sounds=new ShortAudio(api.volume,data.sounds,api.audio?.sounds);this.voices=this.sounds.voices;this.audio=this.sounds.buffers;this.trails=new Map();this.serial=1;}
     profile(id,faction){return this.visuals.resolve(id,faction);}
     parts(profile,sea){return this.visuals.parts(profile,sea);}
     attackProfile(profile,layer){return this.visuals.attack(profile,layer);}

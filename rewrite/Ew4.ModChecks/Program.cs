@@ -89,6 +89,11 @@ if (args.ElementAtOrDefault(1) == "--campaign-music-only")
     Console.WriteLine(JsonSerializer.Serialize(new { campaignMusicModChecks = CampaignMusicModChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
 }
 
+if (args.ElementAtOrDefault(1) == "--custom-audio-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { customAudioModChecks = CustomAudioModChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
 if (args.ElementAtOrDefault(1) == "--formation-counts-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { formationCountChecks = FormationCountChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;

@@ -3,7 +3,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('nod
 const source=fs.readFileSync('rewrite/Ew4.Web/wwwroot/effects.js','utf8');
 let checks=0;
 const check=(value,label)=>{assert.ok(value,label);checks++;};
-function fixture(webAudio=true){
+function fixture(webAudio=true,aliases={}){
   const log={starts:[],fetches:0,decodes:0,contexts:0},clock={now:0},document={hidden:false};let volume=60;
   class Media {
     constructor(){this.currentTime=9;this.paused=true;}
@@ -23,7 +23,7 @@ function fixture(webAudio=true){
   const sandbox={document,performance:{now:()=>clock.now},Audio:Media,AudioContext:webAudio?Context:undefined,
     fetch:async()=>{log.fetches++;return {ok:true,arrayBuffer:async()=>new ArrayBuffer(4)};}};
   vm.createContext(sandbox);vm.runInContext(source,sandbox);
-  const effects=new sandbox.Ew4Effects.Effects({volume:()=>volume},{sounds:['click.wav','other.wav'],motions:{}},null);
+  const effects=new sandbox.Ew4Effects.Effects({volume:()=>volume,audio:{sounds:aliases}},{sounds:['click.wav','other.wav'],motions:{}},null);
   return {effects,audio:effects.sounds,log,clock,document,sandbox,volume:value=>volume=value};
 }
 const flush=async()=>{for(let i=0;i<12;i++)await Promise.resolve();};
@@ -84,5 +84,16 @@ const flush=async()=>{for(let i=0;i<12;i++)await Promise.resolve();};
   fallback.log.starts[0].onended();fallback.effects.sound('click.wav');
   check(fallback.log.starts[2]===fallback.log.starts[0]&&fallback.log.starts[2].currentTime===0,'ended fallback pool restarts');
   fallback.effects.clear();check(fallback.log.starts.every(v=>v.paused),'fallback clear pauses voices');
+  for(const webAudio of [true,false]){
+    const mapped=fixture(webAudio,{'click.wav':'新点击.ogg','other.wav':'','mod.alert':'click.wav'});
+    const requests=[];mapped.sandbox.fetch=async url=>{requests.push(url);return {ok:true,arrayBuffer:async()=>new ArrayBuffer(4)};};
+    await mapped.effects.preloadSounds(['click.wav','other.wav','mod.alert']);await mapped.effects.unlockAudio();
+    mapped.effects.sound('click.wav');mapped.effects.sound('other.wav');mapped.effects.sound('mod.alert');await flush();
+    check(mapped.log.starts.length===2,'mapped and new alias play, silenced entry skips: '+webAudio);
+    check(mapped.effects.audio.has('新点击.ogg')&&mapped.effects.audio.has('click.wav'),'mapping resolves once and preloads targets: '+webAudio);
+    check(!mapped.effects.audio.has('other.wav'),'silenced entry never preloaded: '+webAudio);
+    if(webAudio)check(requests.includes('/content/sounds/'+encodeURIComponent('新点击.ogg')),'unicode filenames URL encoded');
+    mapped.effects.dispose();
+  }
   console.log(JSON.stringify({checks,errors:0}));
 })().catch(error=>{console.error(error.message);process.exitCode=1;});

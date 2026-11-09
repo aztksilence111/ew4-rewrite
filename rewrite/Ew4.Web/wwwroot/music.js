@@ -3,10 +3,11 @@
   class Player {
     constructor(configuration,volume){
       this.configuration=configuration;this.volume=volume;this.audio=new Audio();this.audio.preload='none';this.audio.loop=true;
-      this.key=null;this.file=null;this.visible=true;this.unlocked=!!root.navigator?.userActivation?.hasBeenActive;this.pending=null;this.failed=false;
+      this.key=null;this.file=null;this.playlist=[];this.index=-1;this.visible=true;this.unlocked=!!root.navigator?.userActivation?.hasBeenActive;this.pending=null;this.failed=false;
       this.generation=0;this.retries=0;this.lastRetry=0;this.retryTimer=null;this.loadTimer=null;this.loading=null;this.controller=null;this.objectUrl=null;this.disposed=false;this.lastError=null;this.resumeRequested=false;
       this.audio.addEventListener('error',()=>{if(this.audio.getAttribute('src')&&this.audio.error)this.fail(this.audio.error);});
       this.audio.addEventListener('playing',()=>{clearTimeout(this.loadTimer);this.loadTimer=null;this.retries=0;this.lastError=null;});
+      this.audio.addEventListener('ended',()=>{if(!this.disposed&&!this.audio.loop&&this.playlist.length>1){this.index=(this.index+1)%this.playlist.length;this.select(this.key,this.playlist[this.index],true);}});
       this.gesture=()=>this.activate();
       // Touch activation is granted at pointerup/click, not pointerdown. Capture also
       // reaches controls that stop propagation; retry after a rejected early play.
@@ -14,13 +15,25 @@
       for(const event of this.gestures)document.addEventListener(event,this.gesture,{passive:true,capture:true});
       this.visibility=()=>this.resume(true);document.addEventListener('visibilitychange',this.visibility);
     }
-    menu(){this.select('menu',this.configuration.menu);}
+    entry(state,name){
+      const scenario=this.configuration.scenarios?.[state.scenario];
+      return Object.prototype.hasOwnProperty.call(scenario||{},name)?scenario[name]:this.configuration[name];
+    }
+    start(key,entry,restart=false,random=false){
+      if(!restart&&this.key===key)return;
+      this.playlist=Array.isArray(entry)?entry:entry?[entry]:[];
+      this.index=this.playlist.length?(random?Math.floor(Math.random()*this.playlist.length):0):-1;
+      this.audio.loop=this.configuration.playlistMode!=='sequence'||this.playlist.length<=1;
+      this.select(key,this.playlist[this.index]||null,restart);
+    }
+    menu(){this.start('menu',this.configuration.menu);}
     sync(state,restart=false){
-      if(state.battleResult?.outcome==='Defeat'){this.select('defeat:'+state.battleResult.id,this.configuration.defeat);return;}
+      const outcome=state.battleResult?.outcome;
+      if(outcome==='Defeat'){this.start('defeat:'+state.battleResult.id,this.entry(state,'defeat'));return;}
+      if(outcome==='Victory'&&this.entry(state,'victory')!==undefined){this.start('victory:'+state.battleResult.id,this.entry(state,'victory'));return;}
       const key='battle:'+state.scenario;
       if(!restart&&this.key===key)return;
-      const tracks=this.configuration.battle;
-      this.select(key,tracks.length?tracks[Math.floor(Math.random()*tracks.length)]:null,restart);
+      this.start(key,this.entry(state,'battle'),restart,true);
     }
     select(key,file,reset=false){
       if(this.key===key&&!reset)return;

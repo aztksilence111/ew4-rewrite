@@ -50,9 +50,19 @@ public static partial class WorldAi
         bool layered = WorldUnitLayers.Enabled(state), air = WorldUnitLayers.Air(state, unit);
         var queries = PlanningScope.Queries(state);
         var factions = queries?.Factions ?? state.Factions.ToDictionary(f => f.Id, StringComparer.Ordinal);
-        var occupants = WorldUnitLayers.Enabled(state)
+        var allOccupants = queries?.Occupants ?? state.Units.GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => g.ToArray());
+        var occupants = layered
             ? state.Units.Where(u => WorldUnitLayers.Same(state, unit, u)).GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => g.ToArray())
-            : queries?.Occupants ?? state.Units.GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => g.ToArray());
+            : allOccupants;
+        var targetCells = queries?.Targets;
+        if (targetCells == null)
+        {
+            var targets = state.Factions.ToDictionary(f => f.Id, _ => new HashSet<int>(), StringComparer.Ordinal);
+            for (int i = 0; i < state.Cells.Count; i++)
+                if (state.Cells[i].Owner is string owner) targets[owner].Add(i);
+            foreach (var soldier in state.Units) targets[soldier.Owner].Add(soldier.Cell);
+            targetCells = targets.ToDictionary(p => p.Key, p => p.Value.OrderBy(i => i).ToArray(), StringComparer.Ordinal);
+        }
         var goalFacts = !layered ? queries?.Ai(rules).Goals ?? new Dictionary<int, AiStrategyGoal>() : new Dictionary<int, AiStrategyGoal>();
         bool Hostile(string owner) => WorldDiplomacy.Hostile(state, faction.Id, owner, rules.NeutralCamps) && !factions[owner].Defeated;
         var facts = Facts(state, unit, rules);
@@ -84,10 +94,10 @@ public static partial class WorldAi
             foreach (var opponent in state.Factions.Where(f => Hostile(f.Id)).OrderBy(f => f.Id, StringComparer.Ordinal))
             {
                 var goals = new List<AiStrategyGoalOption>();
-                foreach (int i in !layered && queries != null ? queries.Targets[opponent.Id] : Enumerable.Range(0, state.Cells.Count))
+                foreach (int i in targetCells[opponent.Id])
                 {
                     var cell = state.Cells[i];
-                    var stationed = layered ? state.Units.Where(u => u.Cell == i && WorldUnitLayers.CanAttack(state, unit, u)).ToArray()
+                    var stationed = layered ? (allOccupants.GetValueOrDefault(i) ?? []).Where(u => WorldUnitLayers.CanAttack(state, unit, u)).ToArray()
                         : occupants.TryGetValue(i, out var group) ? group : Array.Empty<UnitState>();
                     if (!(air ? cell.Terrain.Active : cell.Terrain.CanTraverse()) || cell.Owner != opponent.Id && !stationed.Any(u => u.Owner == opponent.Id)
                         || air && !stationed.Any(u => Hostile(u.Owner))) continue;
@@ -103,7 +113,11 @@ public static partial class WorldAi
                     }
                     if (AiStrategy.Eligible(strategyUnit, goal, rules.Strategy.Scoring)) goals.Add(new(i, goal));
                 }
-                foreach (var goal in goals.OrderByDescending(g => AiStrategy.GoalScore(strategyUnit, g.Facts, rules.Strategy.Scoring)).ThenBy(g => g.Cell))
+                // Rank travel-adjusted value before committing to one objective
+                // per opponent; raw value + cell order favors distant corners.
+                foreach (var goal in goals.OrderByDescending(g => AiStrategy.Weight(strategyUnit, g.Facts,
+                    map.Distance(unit.Cell, g.Cell), rules.Strategy.Scoring))
+                    .ThenBy(g => map.Distance(unit.Cell, g.Cell)).ThenBy(g => g.Cell))
                 {
                     // SelectDestination can consume draws at allied buildings. Only skip
                     // nonpositive goals when no reachable landing can consume one.

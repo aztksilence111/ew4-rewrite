@@ -359,7 +359,8 @@ body:has(#play:not([hidden])>#pause:not([hidden])) :is(#pause,#settings,#detail-
 .promotion-row{position:absolute;left:88px;width:228px;height:56px;display:flex;align-items:center;gap:8px;border:1px solid #999}
 .promotion-row .native-command{position:absolute;right:3px;width:83px;height:35px;gap:2px}
 .regroup-confirm{display:flex;align-items:center;flex-direction:column;gap:3px;padding-top:3px}
-.native-layout[data-layout=form_regroup] [data-native-id=lbox_general]{width:520px!important}
+.native-layout[data-layout=form_regroup] [data-native-id=lbox_general]{width:520px!important;overflow-x:auto;overflow-y:hidden;touch-action:pan-y;overscroll-behavior-x:contain;cursor:grab;user-select:none}
+.native-layout[data-layout=form_regroup] [data-native-id=lbox_general].dragging{cursor:grabbing}
 .native-layout[data-layout=form_princess] [data-native-id^=lbox_princess]{width:372px!important}
 .native-layout[data-layout=form_shop] [data-native-id=btn_buy]{z-index:5;box-shadow:none}
 .native-layout .native-button{display:flex}

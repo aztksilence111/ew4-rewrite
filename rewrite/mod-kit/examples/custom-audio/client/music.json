@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "playlistMode": "sequence",
+  "menu": ["battle2.mp3", "battle3.mp3"],
+  "battle": ["battle1.mp3", "battle2.mp3", "battle3.mp3", "battle4.mp3"],
+  "victory": "battle4.mp3",
+  "defeat": "defeat_music.mp3",
+  "scenarios": {
+    "conquest1": {
+      "battle": ["battle3.mp3", "battle4.mp3"],
+      "victory": "battle2.mp3"
+    }
+  }
+}

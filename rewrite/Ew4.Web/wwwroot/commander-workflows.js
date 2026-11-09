@@ -147,12 +147,15 @@
     l.text('group_fullrank/btn_allfull/text_medal',held.fullPrice||'MAX');
     l.action('btn_allfull','军衔爵位升至满级',async()=>{await this.updateAccount({op:'full',commander:id});this.promotion(id,onClose);},!held.locked&&held.fullPrice>0&&held.fullPrice<=this.data.medals);
   };
-  proto.regroup=async function(id,donorId){
+  proto.regroup=async function(id,donorId,scroll=0){
     const receiver=this.held(id),definition=this.definition(receiver),l=this.native('form_regroup',()=>this.reopenCommander(id));
     l.fill('tcmder_source',this.card(definition,receiver,()=>{}));
     l.text('text_notice',this.text('text_regroupnotice'));
     const donors=this.data.roster.filter(c=>c.id!==id&&!c.locked);donorId=donors.some(c=>c.id===donorId)?donorId:donors[0]?.id;
-    for(const held of donors){const b=this.card(this.definition(held),held,()=>this.regroup(id,held.id));b.setAttribute('aria-pressed',String(held.id===donorId));l.get('lbox_general').append(b);}
+    const list=l.get('lbox_general');this.bindHorizontalDrag(list);
+    list.tabIndex=0;list.setAttribute('aria-label','整编将领列表');
+    for(const held of donors){const b=this.card(this.definition(held),held,()=>this.regroup(id,held.id,list.scrollLeft));b.setAttribute('aria-pressed',String(held.id===donorId));list.append(b);}
+    list.scrollLeft=scroll;
     if(!donorId){l.action('btn_regroup',this.text('btn_regroup'),()=>{},false);return;}
     const donor=this.held(donorId);l.fill('tcmder_target',this.card(this.definition(donor),donor,()=>{}));
     for(let i=0;i<(this.data.equipmentCapacity??2);i++)l.get('lbox_equipitem').append(this.api.uiImage(this.data.items.find(d=>d.id===donor.items[i])?.image||'item_blank.png',45));
@@ -176,7 +179,8 @@
       row.append(stars);grid.append(row);
     }
     l.action('btn_regroup',this.text('btn_regroup'),()=>{
-      const confirm=this.api.detail('title_notice',320,170,async()=>{await this.updateAccount({op:'inherit',commander:id,target:donorId});this.reopenCommander(id);},()=>this.regroup(id,donorId));confirm.className='regroup-confirm';
+      const position=list.scrollLeft;
+      const confirm=this.api.detail('title_notice',320,170,async()=>{await this.updateAccount({op:'inherit',commander:id,target:donorId});this.reopenCommander(id);},()=>this.regroup(id,donorId,position));confirm.className='regroup-confirm';
       confirm.append(this.lettering(this.text('text_regroup'),'font_text_2_cn_hd','#404040'),this.card(this.definition(donor),donor,()=>{}),this.lettering(this.text('text_regroupnotice'),'font_text_1_cn_hd','#a02320',270));
     },!receiver.locked&&preview.price<=this.data.medals);
   };

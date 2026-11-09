@@ -92,5 +92,26 @@ function fixture(){
     f.player.lastRetry=0;f.gesture();await flush();
     check(!f.player.failed&&f.player.audio.src.startsWith('blob:'),'user can recover after retries are exhausted');f.player.dispose();
   }
+  {
+    const f=fixture(),p=f.player;p.configuration={schema:1,playlistMode:'sequence',menu:['a.mp3','b.ogg'],battle:['a.mp3','b.ogg'],
+      defeat:'defeat.mp3',victory:['win.mp3','win2.mp3'],scenarios:{custom:{battle:'custom.mp3',defeat:null,victory:[]}}};
+    p.menu();check(p.file==='a.mp3'&&!p.audio.loop,'menu playlist starts from first track');
+    p.audio.dispatchEvent(new Event('ended'));check(p.file==='b.ogg','natural ending advances playlist');
+    p.menu();check(p.file==='b.ogg','menu refresh preserves playback');
+    p.audio.dispatchEvent(new Event('ended'));check(p.file==='a.mp3','playlist wraps to first');
+    p.sync({scenario:'custom'});check(p.file==='custom.mp3'&&p.audio.loop,'scenario overrides global battle');
+    p.sync({scenario:'custom',battleResult:{id:1,outcome:'Defeat'}});check(p.file===null&&!p.audio.src,'scenario null silences defeat');
+    p.sync({scenario:'custom',battleResult:{id:2,outcome:'Victory'}});check(p.file===null,'empty victory list silences victory');
+    p.sync({scenario:'other',battleResult:{id:3,outcome:'Victory'}});check(p.file==='win.mp3','global victory inherited');
+    p.audio.dispatchEvent(new Event('ended'));p.sync({scenario:'other',battleResult:{id:3,outcome:'Victory'}});
+    check(p.file==='win2.mp3','result refresh preserves current victory track');
+    p.sync({scenario:'other'});const chosen=p.file,loads=p.audio.loads;
+    p.sync({scenario:'other'});check(p.file===chosen&&p.audio.loads===loads,'battle update does not restart or reselect');
+    p.sync({scenario:'other'},true);check(p.audio.loads>loads,'loading battle can restart music');
+    delete p.configuration.victory;p.sync({scenario:'other',battleResult:{id:4,outcome:'Victory'}});
+    check(p.key==='battle:other','absent victory retains battle');
+    p.configuration.playlistMode='loop';p.menu();check(p.audio.loop,'legacy loop mode keeps single-track loop');
+    p.dispose();const file=p.file;p.audio.dispatchEvent(new Event('ended'));check(p.file===file&&f.timers.size===0,'disposed playlist never restarts');
+  }
   console.log(JSON.stringify({checks,errors:0}));
 })().catch(error=>{console.error(error.message);process.exitCode=1;});

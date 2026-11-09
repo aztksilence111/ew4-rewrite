@@ -18,7 +18,7 @@ API 3 [空地分层](docs/porting/UNIT_LAYERS.md)：核心默认关闭，Mod 显
 可直接放入覆盖包 `legacy/` 编辑；文件与字段见[独立规则配置](docs/porting/SPLIT_CATALOG.md)。
 旧 APK/XML 导入继续兼容，`catalog.json` 现在仅作索引。
 
-战役初始显示与隐藏使用 [campaignVisibility 模板](examples/campaign-visibility/README.md)；背景音乐可通过 [client/music.json](data/client/music/README.md) 配置主菜单、随机战斗曲目和失败曲。
+战役初始显示与隐藏使用 [campaignVisibility 模板](examples/campaign-visibility/README.md)；[自定义音乐与音效示例](examples/custom-audio/README.md) 支持替换/新增 BGM、播放列表、按关卡及胜负配乐、点击与战斗音效映射，使用 `client/music.json` 和 `client/audio.json`。
 
 全局国家表为 `client/countries.json`，独立于剧本；支持自由命名 ID、国旗/战斗/兵模分别配置，以及 BTL 内嵌 CNTR 长 ID 扩展，见[指南](docs/porting/GLOBAL_COUNTRIES.md)及[示例](examples/global-countries/README.md)。
 

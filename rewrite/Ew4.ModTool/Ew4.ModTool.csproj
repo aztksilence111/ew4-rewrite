@@ -1,7 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><TreatWarningsAsErrors>true</TreatWarningsAsErrors></PropertyGroup>
-  <ItemGroup><ProjectReference Include="../Ew4.Mods/Ew4.Mods.csproj" />
+  <ItemGroup Condition="'$(Ew4RuntimeRoot)' == ''"><ProjectReference Include="../Ew4.Mods/Ew4.Mods.csproj" />
     <Content Include="../data/original/**/*;../data/client/**/*" Link="data/%(RecursiveDir)%(Filename)%(Extension)" CopyToPublishDirectory="Never" />
     <Content Include="../mod-kit/**/*" Link="%(RecursiveDir)%(Filename)%(Extension)" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Ew4RuntimeRoot)' != ''">
+    <Reference Include="Ew4.Mods"><HintPath>$(Ew4RuntimeRoot)/Ew4.Mods.dll</HintPath></Reference>
+    <Reference Include="Ew4.Client"><HintPath>$(Ew4RuntimeRoot)/Ew4.Client.dll</HintPath></Reference>
+    <Reference Include="Ew4.Core"><HintPath>$(Ew4RuntimeRoot)/Ew4.Core.dll</HintPath></Reference>
+    <Reference Include="Ew4.Legacy"><HintPath>$(Ew4RuntimeRoot)/Ew4.Legacy.dll</HintPath></Reference>
+    <Reference Include="Ew4.Persistence"><HintPath>$(Ew4RuntimeRoot)/Ew4.Persistence.dll</HintPath></Reference>
+    <Reference Include="MoonSharp.Interpreter"><HintPath>$(Ew4RuntimeRoot)/MoonSharp.Interpreter.dll</HintPath></Reference>
+    <Reference Include="AssetRipper.TextureDecoder"><HintPath>$(Ew4RuntimeRoot)/AssetRipper.TextureDecoder.dll</HintPath></Reference>
+    <Reference Include="StbImageSharp"><HintPath>$(Ew4RuntimeRoot)/StbImageSharp.dll</HintPath></Reference>
+    <Reference Include="StbImageWriteSharp"><HintPath>$(Ew4RuntimeRoot)/StbImageWriteSharp.dll</HintPath></Reference>
   </ItemGroup>
 </Project>

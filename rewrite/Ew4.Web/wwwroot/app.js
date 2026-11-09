@@ -1341,6 +1341,13 @@ function render(time,forceBattlefield=false) {
   renderRequest=0;
   if(document.hidden||!appVisible)return;
   if(state?.story&&!stageIntroOpen&&!forceBattlefield)return;
+  // Idle flags and selection pulses need fewer redraws on touch devices.
+  // Keep input/state changes immediate and moving/combat scenes at 60 Hz;
+  // animation clocks continue to use elapsed time rather than frame counts.
+  const touch=(navigator.maxTouchPoints||0)>0||matchMedia('(pointer: coarse)').matches;
+  const active=pointers.size||time<cameraInputUntil||aiRunning||motions.size||arrivals.size||deaths.size||combatMotions.size||effects?.instances.length||damageNumbers?.instances.length;
+  const interval=touch?1000/(active?60:30):0;
+  if(!forceBattlefield&&!renderDirty&&time-lastRenderTime<interval-.75){renderRequest=requestAnimationFrame(render);return;}
   renderDirty=false;lastRenderTime=time;
   const playVisible=state&&!$('play').hidden;
   const menuVisible=!$('menu').hidden;
@@ -1577,7 +1584,7 @@ async function initializeClient(){
   document.querySelectorAll('.main-entry').forEach(button=>button.disabled=true);$('continue').disabled=true;
   try{
     Ew4Startup.pending('游戏目录与资源索引');
-    const [c,m,names,fx,pages,visuals,presentation,musicConfiguration]=await Promise.all([rpc('catalog'),startupJson('/content/manifest.json'),startupJson('city-names.json'),startupJson('/content/effects.json'),startupJson('conquest-pages.json'),startupJson('/content/unit-visuals.json'),startupJson('/content/presentation.json'),startupJson('/content/music.json')]);
+    const [c,m,names,fx,pages,visuals,presentation,musicConfiguration,audioConfiguration]=await Promise.all([rpc('catalog'),startupJson('/content/manifest.json'),startupJson('city-names.json'),startupJson('/content/effects.json'),startupJson('conquest-pages.json'),startupJson('/content/unit-visuals.json'),startupJson('/content/presentation.json'),startupJson('/content/music.json'),startupJson('/content/audio.json')]);
     music?.dispose();music=new Ew4Music.Player(musicConfiguration,()=>settings.music);music.setVisible(appVisible);
     Ew4Startup.pending('内置字库');
     const text=new Ew4OriginalUI.TextRenderer(m);await text.prepare();
@@ -1587,7 +1594,7 @@ async function initializeClient(){
     const buildInfo=await startupJson('/build-info.json');
     performanceLog.build=buildInfo.source.slice(0,12)+'/'+(c.build||'unknown').slice(0,8)+'/'+(c.buildVariant||'unknown');
     fx.elements??=presentation.elements;fx.sounds=[...new Set([...fx.sounds,...presentation.sounds])];
-    effects?.dispose();effects=new Ew4Effects.Effects({image,sprite,animation,libraries,get manifest(){return manifest;},volume:()=>settings.sound},fx,visuals);
+    effects?.dispose();effects=new Ew4Effects.Effects({image,sprite,animation,libraries,get manifest(){return manifest;},volume:()=>settings.sound,audio:audioConfiguration},fx,visuals);
     effects.setVisible(appVisible&&!document.hidden);
     await effects.preloadSounds(presentation.sounds);
     Ew4Startup.pending('战斗图像与界面');

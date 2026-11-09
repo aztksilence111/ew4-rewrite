@@ -1,5 +1,17 @@
 using System.Text.Json;
 using Ew4.Core;
+if (args.ElementAtOrDefault(1) == "--strategic-focus-only")
+{
+    string project = Path.GetFullPath(args[0]);
+    Console.WriteLine(JsonSerializer.Serialize(new { focus = StrategicFocusChecks.Run(),
+        strategy = AiStrategySelectionChecks.Run(project), movement = AiMovementChecks.Run(project),
+        planning = AiPlanningWorkChecks.Run(), units = AiUnitChecks.Run(project),
+        playerAi = PlayerAiChecks.Run(project), layers = UnitLayerChecks.Run(project), errors = 0 })); return;
+}
+if (args.ElementAtOrDefault(1) == "--strategic-index-benchmark")
+{
+    StrategicFocusChecks.Benchmark(); return;
+}
 if (args.ElementAtOrDefault(1) == "--tactical-skills-only")
 {
     string project = Path.GetFullPath(args[0]);

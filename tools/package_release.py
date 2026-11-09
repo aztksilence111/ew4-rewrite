@@ -16,6 +16,7 @@ parser.add_argument("--date", default="20261020")
 parser.add_argument("--notes", default="rewrite/RELEASE_0.2.4_20261020.md")
 parser.add_argument("--rule-api", type=int, choices=(1, 2, 3), default=1)
 parser.add_argument("--android-only", action="store_true")
+parser.add_argument("--author-kit", type=Path, help="Verified matching author toolkit ZIP")
 parser.add_argument("--android-abis", nargs="+", choices=("arm64-v8a", "x86_64"), default=["arm64-v8a", "x86_64"])
 args = parser.parse_args()
 build = ROOT / args.build
@@ -23,7 +24,7 @@ assets = build / "assets"
 assets.mkdir(exist_ok=True)
 head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
 inputs = ["rewrite/Frontend.Build.targets", "rewrite/data", "rewrite/mod-kit", "tools/frontend",
-          "tools/package_release.py"]
+          "tools/package_release.py", "tools/author-kit", "tools/publish_mod_kit.ps1"]
 inputs.extend(str(p.relative_to(ROOT)) for p in (ROOT / "rewrite").glob("Ew4.*") if p.is_dir())
 assert not subprocess.check_output(["git", "status", "--porcelain", "--untracked-files=all", "--", *inputs], cwd=ROOT).strip(), "Commit distribution inputs before packaging"
 web = build / "web"
@@ -59,6 +60,20 @@ if not args.android_only:
         assert output.testzip() is None
         assert json.loads(output.read("release-info.json"))["source"] == head
     packages.append(archive)
+if args.author_kit:
+    kit = args.author_kit.resolve()
+    with zipfile.ZipFile(kit) as archive:
+        assert archive.testzip() is None
+        roots = {name.split('/')[0] for name in archive.namelist()}
+        assert len(roots) == 1
+        metadata = json.loads(archive.read(next(iter(roots)) + '/author-kit.json'))
+        assert metadata['gameVersion'] == args.version and metadata['sourceCommit'] == head, 'Author toolkit source/version mismatch'
+    validation = json.loads((kit.parent / 'validation-summary.json').read_text(encoding='utf-8'))
+    assert validation['failures'] == 0 and validation['archiveSha256'] == hashlib.sha256(kit.read_bytes()).hexdigest(), 'Author toolkit validation missing/stale'
+    target = assets / kit.name
+    shutil.copyfile(kit, target)
+    packages.append(target)
+    info['authorKitVersion'] = metadata['authorKitVersion']
 files = [dict(name=p.name, bytes=p.stat().st_size, sha256=hashlib.sha256(p.read_bytes()).hexdigest())
          for p in packages]
 (assets / "SHA256SUMS.txt").write_text("".join(f"{p['sha256']}  {p['name']}\n" for p in files), encoding="ascii", newline="\n")

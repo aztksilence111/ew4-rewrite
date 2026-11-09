@@ -5,7 +5,7 @@
 - `animations/`：BILE转换后的动画层级和关键帧；`effects.json`：攻击、移动、粒子、声音绑定。
 - `maps/`：分块地图底图；其地形及剧本数据仍位于 original。
 - `fonts/`：当前文字使用的离线TTF及许可；不沿用Mod位图字库样式。
-- `music/`、`sounds/`：音频资源。`import-baseline.json`：转换器判断原资源是否变化的基础指纹，请勿修改。
+- `music/`、`sounds/`：音频资源；`music.json` 配置 BGM 列表及关卡/胜负配乐，`audio.json` 配置点击和其他音效映射，见[示例](../../examples/custom-audio/README.md)。`import-baseline.json`：转换器判断原资源是否变化的基础指纹，请勿修改。
 
 同尺寸同布局PNG可覆盖实际读取的client文件；主菜单/选择页背景先确认布局引用纹理，不能假定读取派生ui背景。改源图集布局应重导入，更新ui裁剪图与manifest。只改images可能仍显示旧ui。动画引用必须有效，不可循环嵌套。
 
