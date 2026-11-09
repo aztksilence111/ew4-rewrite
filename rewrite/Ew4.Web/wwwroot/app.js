@@ -142,6 +142,7 @@ function sizeUi() {
   const root=document.documentElement,style=getComputedStyle(root);
   const insets=Object.fromEntries(['left','right','top','bottom'].map(side=>[side,parseFloat(style.getPropertyValue('--screen-safe-'+side))||0]));
   screenLayout=Ew4ScreenLayout.measure({width:innerWidth,height:innerHeight,screen:settings.screen,reserve,insets,
+    sizes:window.Ew4ModImport?{}:Ew4UiSizes.normalize(settings.uiSizes),
     touch:matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>0});
   const {uiScale:scale,width,height,safeWidth,safeHeight}=screenLayout;
   root.dataset.screenProfile=screenLayout.profile;root.dataset.screenOrientation=screenLayout.orientation;
@@ -164,7 +165,7 @@ function sizeUi() {
   const eventScale=baseEventScale*eventSize/100;
   document.documentElement.style.setProperty('--event-scale', eventScale);
   document.documentElement.style.setProperty('--event-available-height', eventHeight+'px');
-  document.documentElement.style.setProperty('--settings-scale',Math.min(scale,(safeWidth-32)/362,(safeHeight-32)/340));
+  document.documentElement.style.setProperty('--settings-scale',Math.min(screenLayout.settingsScale,(safeWidth-32)/362,(safeHeight-32)/340));
   $('event-size').max=maxEventSize;$('event-size').value=eventSize;
   $('event-size-value').textContent=eventSize+'%';
   clampView();
@@ -1508,7 +1509,8 @@ for(const [id,key] of [['skip-turn-fast','autoTurnFast'],['follow-ai','followAi'
   requestRender();
 };
 $('local-multiplayer-mode').onchange=e=>{if(!$('play').hidden){e.target.checked=!!state?.localMultiplayer;return;}settings.localMultiplayer=e.target.checked;persistSettings();};
-function persistSettings(){try{localStorage.setItem('ew4.settings',JSON.stringify(settings));}catch(_){} }
+function persistSettings(){try{localStorage.setItem('ew4.settings',JSON.stringify(settings));return true;}catch(_){return false;} }
+Ew4UiSizes.mount({settings,apply:()=>{sizeUi();requestRender();},persist:persistSettings});
 $('close-detail').onclick=async()=>{closeDetail();await tutorialUi('winbtn_close');};
 $('show-grid').onchange=e=>{showGrid=e.target.checked;try{localStorage.setItem('ew4.showGrid',String(showGrid));}catch(_){notice('无法保存设定');}};
 $('menu-button').onclick=()=>{mapViews.close();aiControl.openPause();};

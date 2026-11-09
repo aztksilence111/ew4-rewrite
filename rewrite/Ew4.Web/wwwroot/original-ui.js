@@ -238,7 +238,7 @@
     paintTree(rootElement){
       const walker=document.createTreeWalker(rootElement,NodeFilter.SHOW_TEXT),nodes=[];
       // Event prose is rendered in bounded chunks by refreshHud.
-      while(walker.nextNode()){const node=walker.currentNode;if(!node.textContent.trim()||node.parentElement.closest('#startup-status,#scenario-event-text,#pause-objectives,#story-player,.original-text,script,style,canvas,select,option,textarea,output,[hidden]')||!node.parentElement.getClientRects().length)continue;nodes.push(node);}
+      while(walker.nextNode()){const node=walker.currentNode;if(!node.textContent.trim()||node.parentElement.closest('#startup-status,#scenario-event-text,#pause-objectives,#story-player,#ui-sizes-panel,.original-text,script,style,canvas,select,option,textarea,output,[hidden]')||!node.parentElement.getClientRects().length)continue;nodes.push(node);}
       for(const node of nodes)node.replaceWith(this.forElement(node.parentElement,node.textContent));
     }
   }

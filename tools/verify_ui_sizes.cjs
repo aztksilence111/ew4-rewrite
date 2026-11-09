@@ -1,0 +1,76 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs/promises'),path=require('node:path'),{createRequire}=require('node:module');
+const {chromium}=createRequire('C:/Users/WIN11/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/_probe.cjs')('playwright');
+const base=process.argv[2]||'http://127.0.0.1:56235',out=path.resolve(process.argv[3]||'build/ui-sizes-20261109');
+(async()=>{
+  await fs.mkdir(out,{recursive:true});
+  const report={checks:0,errors:[],missing:[],views:[]},check=(value,label)=>{assert.ok(value,label);report.checks++;};
+  const browser=await chromium.launch({headless:true,executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',args:['--mute-audio']});
+  try{
+    for(const compat of [false,true])for(const [width,height] of [[1280,720],[844,390],[390,844]]){
+      const context=await browser.newContext({viewport:{width,height},hasTouch:width<1000});
+      const page=await context.newPage();
+      page.on('pageerror',e=>report.errors.push(e.message));page.on('response',r=>{if(r.status()>=400)report.missing.push(r.url());});
+      if(!compat)await page.route(/\/compat\/[^/]+\.js(?:\?|$)/,route=>route.fulfill({path:path.resolve('rewrite/Ew4.Web/wwwroot',new URL(route.request().url()).pathname.split('/').pop())}));
+      await page.goto(base);await page.waitForFunction(()=>startupReady);
+      await page.locator('#main-settings').click();await page.locator('#ui-sizes-open').click();
+      check(await page.locator('#ui-sizes-panel').isVisible(),'Web settings opens unified sizes');
+      check(await page.locator('#ui-sizes-panel input').count()===8,'eight independent size controls');
+      const before=await page.evaluate(()=>localStorage.getItem('ew4.settings'));
+      await page.locator('#ui-size-buttons').focus();await page.locator('#ui-size-buttons').press('Home');await page.locator('#ui-size-buttons').press('ArrowRight');
+      check(await page.evaluate(()=>settings.uiSizes.buttons===61),'keyboard slider previews immediately');
+      check(await page.evaluate(()=>localStorage.getItem('ew4.settings'))===before,'preview does not overwrite saved preference');
+      await page.locator('#ui-sizes-cancel').click();
+      await page.waitForFunction(()=>settings.uiSizes.buttons===100);
+      check(await page.evaluate(()=>settings.uiSizes.buttons===100),'cancel restores prior size');
+      await page.locator('#ui-sizes-open').click();
+      const target={menu:80,dialogs:70,buttons:75,actions:65,info:85,dialogue:60,screen:90,eventSize:60};
+      for(const [key,value] of Object.entries(target))await page.locator('#ui-size-'+key).evaluate((input,value)=>{input.value=value;input.dispatchEvent(new Event('input',{bubbles:true}));},value);
+      const box=await page.locator('#ui-sizes-panel').boundingBox();
+      check(box.x>=0&&box.y>=0&&box.x+box.width<=width+1&&box.y+box.height<=height+1,'editor fits viewport at reduced settings');
+      await page.locator('#ui-sizes-save').click();await page.reload();await page.waitForFunction(()=>startupReady);
+      check(await page.evaluate(target=>Object.entries(target).every(([key,value])=>(key==='screen'||key==='eventSize'?settings[key]:settings.uiSizes[key])===value),target),'all preferences survive reload');
+      await page.evaluate(()=>start('conquest1','fra'));await page.waitForFunction(()=>!busy&&!sessionTransition);
+      if(await page.evaluate(()=>stageIntroOpen))await page.locator('#detail-confirm').click();
+      // Isolate the appearance test from scripted opening conversations.
+      await page.evaluate(()=>{$('dialogue').hidden=true;$('scenario-event').hidden=true;});
+      const metrics=await page.evaluate(()=>{sizeUi();return {corner:$('menu-button').getBoundingClientRect().width,menu:screenLayout.menuScale,dialog:screenLayout.uiScale,talk:screenLayout.talkScale,hud:screenLayout.hudScale,actions:screenLayout.compactScale};});
+      const expected=await page.evaluate(()=>Ew4ScreenLayout.measure({width:innerWidth,height:innerHeight,screen:settings.screen,touch:navigator.maxTouchPoints>0}));
+      check(metrics.corner<expected.cornerSize&&metrics.actions<expected.compactScale,'battle buttons and action bar shrink independently');
+      check(metrics.talk<expected.talkScale&&metrics.hud<expected.hudScale,'dialogue and information scale separately');
+      await page.evaluate(()=>{$('pause').hidden=false;openSettings();});await page.locator('#ui-sizes-open').click();
+      check(await page.locator('#ui-sizes-panel').isVisible(),'same entry works from paused game');
+      await page.locator('#ui-sizes-reset').click();
+      check(await page.evaluate(()=>Object.values(settings.uiSizes).every(v=>v===100)&&settings.screen===100&&settings.eventSize===100),'reset previews all defaults');
+      await page.locator('#ui-sizes-panel').press('Escape');
+      await page.waitForFunction(()=>settings.uiSizes.actions===65&&settings.screen===90);
+      check(await page.evaluate(()=>settings.uiSizes.actions===65&&settings.screen===90),'Escape cancels reset');
+      await page.locator('#ui-sizes-open').click();
+      for(const key of Object.keys(target))await page.locator('#ui-size-'+key).evaluate(input=>{input.value=input.max;input.dispatchEvent(new Event('input',{bubbles:true}));});
+      await page.locator('#ui-sizes-save').click();
+      const safe=await page.evaluate(async()=>{detailWindow('测试信息',520,290);sizeUi();await new Promise(resolve=>setTimeout(resolve,250));const b=$('detail-modal').firstElementChild.getBoundingClientRect();return b.left>=0&&b.top>=0&&b.right<=innerWidth+1&&b.bottom<=innerHeight+1;});
+      check(safe,'largest popup setting still fits actual information dialog');
+      await page.evaluate(()=>{$('detail-modal').hidden=true;});await page.locator('#ui-sizes-open').click();
+      await page.screenshot({path:path.join(out,(compat?'compat':'source')+'-'+width+'x'+height+'.png')});
+      await page.locator('#ui-sizes-reset').click();await page.locator('#ui-sizes-save').click();
+      check(await page.evaluate(()=>Object.values(JSON.parse(localStorage.getItem('ew4.settings')).uiSizes).every(v=>v===100)),'reset can be saved');
+      report.views.push({compat,width,height,metrics});await context.close();
+    }
+    const native=await browser.newContext();await native.addInitScript(()=>{window.Ew4ModImport={};localStorage.setItem('ew4.settings',JSON.stringify({uiSizes:{buttons:150,dialogs:180}}));});
+    const nativePage=await native.newPage();await nativePage.goto(base);await nativePage.waitForFunction(()=>startupReady);
+    check(await nativePage.locator('#ui-sizes-open').count()===0,'Android bridge keeps its existing settings entry');
+    check(await nativePage.evaluate(()=>{sizeUi();const before={buttons:screenLayout.battleScale,dialogs:screenLayout.uiScale};settings.uiSizes={buttons:60,dialogs:60};sizeUi();return before.buttons===screenLayout.battleScale&&before.dialogs===screenLayout.uiScale;}),'native layout ignores Web size preferences');
+    await native.close();
+    const corrupt=await browser.newContext();await corrupt.addInitScript(()=>localStorage.setItem('ew4.settings',JSON.stringify({uiSizes:{buttons:'invalid',info:-100,actions:500,dialogs:null}})));
+    const corruptPage=await corrupt.newPage();await corruptPage.goto(base);await corruptPage.waitForFunction(()=>startupReady);
+    check(await corruptPage.evaluate(()=>settings.uiSizes.buttons===100&&settings.uiSizes.info===60&&settings.uiSizes.actions===150&&settings.uiSizes.dialogs===100),'invalid saved values recover with bounded defaults');
+    await corrupt.close();
+    const restricted=await browser.newContext();await restricted.addInitScript(()=>{Storage.prototype.setItem=function(){throw new Error('Storage blocked');};});
+    const restrictedPage=await restricted.newPage();await restrictedPage.goto(base);await restrictedPage.waitForFunction(()=>startupReady);
+    await restrictedPage.locator('#main-settings').click();await restrictedPage.locator('#ui-sizes-open').click();await restrictedPage.locator('#ui-sizes-save').click();
+    check(await restrictedPage.locator('#ui-sizes-panel').isVisible()&&await restrictedPage.locator('#ui-sizes-panel p').textContent().then(text=>text.includes('未允许保存')),'blocked storage reports failure and retains editable preview');
+    await restrictedPage.locator('#ui-sizes-cancel').click();await restricted.close();
+    check(!report.errors.length&&!report.missing.length,'no script errors or missing resources: '+JSON.stringify({errors:report.errors,missing:report.missing}));
+    await fs.writeFile(path.join(out,'result.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
+  }finally{await browser.close();}
+})().catch(error=>{console.error(String(error.stack||error.message).split('\n').slice(0,5).join('\n'));process.exitCode=1;});
