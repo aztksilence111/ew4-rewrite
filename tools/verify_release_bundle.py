@@ -14,6 +14,7 @@ parser.add_argument("build", type=Path)
 parser.add_argument("apk", type=Path)
 parser.add_argument("--sdk", type=Path, required=True)
 parser.add_argument("--previous-signature", type=Path, required=True)
+parser.add_argument("--android-abis", nargs="+", choices=("arm64-v8a", "x86_64"), default=["arm64-v8a", "x86_64"])
 args = parser.parse_args()
 build, apk = root / args.build, root / args.apk
 tools = sorted((args.sdk / "build-tools").iterdir())[-1]
@@ -35,6 +36,7 @@ badging = subprocess.check_output([str(tools / "aapt2.exe"), "dump", "badging", 
 check("name='org.ew4.reconstruction'" in badging and f"versionCode='{project.findtext('.//ApplicationVersion')}'" in badging
       and f"versionName='{project.findtext('.//ApplicationDisplayVersion')}'" in badging, "Package identity/version")
 native = 0
+native_by_abi = {abi: 0 for abi in args.android_abis}
 with zipfile.ZipFile(apk) as archive:
     for source in (root / "rewrite/Ew4.Web/wwwroot").rglob("*"):
         if source.is_file():
@@ -42,13 +44,21 @@ with zipfile.ZipFile(apk) as archive:
             check(archive.read(name) == source.read_bytes(), "APK frontend: " + name)
     for name in archive.namelist():
         if name.startswith("lib/") and name.endswith(".so"):
-            check(name.startswith("lib/arm64-v8a/") and "/libaot-" not in name, "Unexpected ABI or AOT: " + name)
+            abi = name.split("/")[1]
+            check(abi in native_by_abi and "/libaot-" not in name, "Unexpected ABI or AOT: " + name)
             data = archive.read(name)
             header = struct.unpack_from("<16sHHIQQQIHHHHHH", data)
-            check(header[0][:6] == b"\x7fELF\x02\x01" and header[2] == 183, "Expected ARM64 ELF: " + name)
+            check(header[0][:6] == b"\x7fELF\x02\x01" and header[2] == {"arm64-v8a": 183, "x86_64": 62}[abi], "Unexpected ELF architecture: " + name)
             segments = [struct.unpack_from("<IIQQQQQQ", data, header[5] + i * header[9]) for i in range(header[10])]
             check(all(segment[7] >= 16384 for segment in segments if segment[0] == 1), "ELF 16 KiB alignment: " + name)
             native += 1
+            native_by_abi[abi] += 1
+check(all(count > 0 for count in native_by_abi.values()), "Missing requested Android ABI")
+with zipfile.ZipFile(apk) as archive:
+    inventories = [{name.rsplit("/", 1)[1].replace(".arm64-v8a.", ".ABI.").replace(".x86_64.", ".ABI.")
+                   for name in archive.namelist() if name.startswith("lib/" + abi + "/") and name.endswith(".so")}
+                   for abi in native_by_abi]
+    check(all(files == inventories[0] for files in inventories), "Android ABI runtime inventories differ")
 zip_checks = 0
 for package in (build / "assets").glob("*-web-win-x64.zip"):
     with zipfile.ZipFile(package) as archive:
@@ -58,7 +68,7 @@ for package in (build / "assets").glob("*-web-win-x64.zip"):
         for name, source in expected.items():
             check(archive.read(name) == source.read_bytes(), "Web ZIP file: " + name)
             zip_checks += 1
-report = dict(checks=checks, errors=0, nativeLibraries=native, zipFiles=zip_checks, signer=signer,
+report = dict(checks=checks, errors=0, nativeLibraries=native, nativeLibrariesByAbi=native_by_abi, zipFiles=zip_checks, signer=signer,
               apkSha256=hashlib.sha256(apk.read_bytes()).hexdigest(), androidDeviceExecution=False)
 (build / "verification.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
 (build / "signature.txt").write_text(signature, encoding="utf-8")

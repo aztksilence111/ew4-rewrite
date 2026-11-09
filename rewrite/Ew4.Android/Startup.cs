@@ -95,6 +95,7 @@ public sealed partial class MainActivity
     private void SetStartupStage(string stage, string error = "", bool complete = false)
     {
         if (destroyed) return;
+        global::Android.Util.Log.Info("EW4", "Startup: " + stage + (error.Length == 0 ? "" : " | " + error));
         string text;
         lock (startupGate)
         {

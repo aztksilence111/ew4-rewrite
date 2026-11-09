@@ -16,6 +16,7 @@ parser.add_argument("--date", default="20261020")
 parser.add_argument("--notes", default="rewrite/RELEASE_0.2.4_20261020.md")
 parser.add_argument("--rule-api", type=int, choices=(1, 2, 3), default=1)
 parser.add_argument("--android-only", action="store_true")
+parser.add_argument("--android-abis", nargs="+", choices=("arm64-v8a", "x86_64"), default=["arm64-v8a", "x86_64"])
 args = parser.parse_args()
 build = ROOT / args.build
 assets = build / "assets"
@@ -35,10 +36,15 @@ source_apk = ROOT / report["apk"]
 assert hashlib.sha256(source_apk.read_bytes()).hexdigest() == report["sha256"]
 maps = [node.attrib["file"].removesuffix(".bin") for node in ET.parse(ROOT / "rewrite/data/original/def_map.xml").getroot() if "file" in node.attrib]
 info = dict(version=args.version, source=head, ruleApi=args.rule_api, builtinMaps=maps,
-            formalScenarios=95, androidDeviceExecution=False, apkCertificate="Android development certificate")
+            formalScenarios=95, androidDeviceExecution=False, androidAbis=sorted(set(args.android_abis)),
+            apkCertificate="Android development certificate")
+with zipfile.ZipFile(source_apk) as archive:
+    packaged_abis = {name.split("/")[1] for name in archive.namelist() if name.startswith("lib/") and name.endswith(".so")}
+assert packaged_abis == set(args.android_abis), "APK ABI inventory does not match this release"
 if args.android_only:
-    info["platforms"] = ["android-arm64"]
-apk = assets / f"ew4-rewrite-{args.version}-{args.date}-arm64.apk"
+    info["platforms"] = ["android-" + ("arm64" if abi == "arm64-v8a" else "x64") for abi in sorted(packaged_abis)]
+apk_label = "android" if len(packaged_abis) > 1 else "arm64" if "arm64-v8a" in packaged_abis else "x64"
+apk = assets / f"ew4-rewrite-{args.version}-{args.date}-{apk_label}.apk"
 shutil.copyfile(source_apk, apk)
 packages = [apk]
 if not args.android_only:
