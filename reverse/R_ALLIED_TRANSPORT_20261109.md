@@ -8,6 +8,6 @@
 
 - 单项客户端 191、建筑改进 8767、支援操作 7546，共 16504 项，错误 0。
 - 验证程序、Windows Web Compile、Android ARM64 Compile 均零警告、零错误；Android 使用项目既有独立 SDK 工具链。
-- 未打新 APK、正式发行或更新玩家运行目录；未做 Android 真机验收。
+- 修复阶段未打包；后续已纳入 [0.2.33双端正式发行](../rewrite/RELEASE_PROGRESS_0.2.33_20261109.md)。没有更新玩家运行目录或进行 Android 真机验收。
 
 本轮临时编译和测试账户清理凭据：`build/maintenance-20261109/allied-transport-cleanup.json`。源码测试保留，原账户、存档、已安装 Mod 和同期修改保持。
