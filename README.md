@@ -1,5 +1,7 @@
 # EW4 rewrite
 
+2026-11-09：[0.2.34双端下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.34-20261109)，Android ARM64＋x64通用APK code37及Windows x64 Web。本机MuMu覆盖安装后两次启动成功，修复ARM64转译启动停顿；包含友方领土运输船改造修复。见[发行说明](rewrite/RELEASE_0.2.34_20261109.md)和[发布记录](rewrite/RELEASE_PROGRESS_0.2.34_20261109.md)。
+
 规则配置现已拆为独立 JSON：[文件与修改指南](rewrite/mod-kit/docs/porting/SPLIT_CATALOG.md)。
 源码数据位于 `rewrite/data/legacy/`，覆盖包使用 `legacy/` 路径；旧 APK/XML 导入继续兼容。
 
@@ -15,7 +17,7 @@ Mod 制作资料见 [rewrite/mod-kit/README.md](rewrite/mod-kit/README.md)。
 
 ## 当前快照
 
-当前发行 0.2.27（APK code30），内容与验证见[发行说明](rewrite/RELEASE_0.2.27_20261029.md)及[发布进度](rewrite/RELEASE_PROGRESS_0.2.27_20261029.md)，下载见[GitHub Releases](https://github.com/aztksilence111/ew4-rewrite/releases/latest)。远端完成依据为本次构建目录的 `remote-audit.json`；以下未打包记录为开发历史，真机验收仍待。
+当前发行 0.2.34（APK code37，ARM64＋x64），内容与验证见[发行说明](rewrite/RELEASE_0.2.34_20261109.md)及[发布进度](rewrite/RELEASE_PROGRESS_0.2.34_20261109.md)，下载见[GitHub Releases](https://github.com/aztksilence111/ew4-rewrite/releases/latest)。远端完成依据为本次构建目录的 `remote-audit.json`；本机MuMu已验证，ARM64手机实机验收仍待。以下未打包记录为开发历史。
 
 2026-10-22：[四项反馈修复](reverse/FEEDBACK_UNDO_FIX_20261022.md)已修存档国旗、空地撤回入口、保存拆行和说明将领块，新增占城事件/红黄圈不能撤回条件；93新增专项、108配置、20+172浏览器及Web/Android Compile通过。[5395独立预览](http://127.0.0.1:5395)，未打新APK或发布。[当前待办](rewrite/GOALS.md)同步，士气演出、随机掉落、OTF及长期目标另列，真机验收保留。
 

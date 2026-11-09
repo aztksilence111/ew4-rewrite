@@ -1,5 +1,7 @@
 # 现代核心重构
 
+2026-11-09：[0.2.34双端正式下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.34-20261109)，Android ARM64＋x64通用APK code37／规则API3。本机MuMu原生x64覆盖安装，两次冷进程17.14／5.09秒进菜单，解决0.2.33转译启动停顿；保留友方运输改造及固定存档导出。四附件远端摘要通过，见[发行说明](RELEASE_0.2.34_20261109.md)和[记录](RELEASE_PROGRESS_0.2.34_20261109.md)。未做ARM64手机实机验收。
+
 2026-11-09：[0.2.33双端正式下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.33-20261109)，Android code36／规则 API3；修复友方领土运输船改造、复合空地部队陆地占领及竖屏确认按钮边界，纳入当前移动／剧情／显示接口。保留双端固定存档导出；四附件远端摘要通过，见[发行说明](RELEASE_0.2.33_20261109.md)及[发布记录](RELEASE_PROGRESS_0.2.33_20261109.md)。本批未做Android真机验收。
 
 2026-10-29：[0.2.27双端下载](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.27-20261029)，Android code30／规则 API3；含 AI 分段规划、指挥部 Mod 布局、启动画面、界面音效、回合名单与 HUD、攻击区间及炮兵操作解锁，保留双端固定存档导出。详见[发行说明](RELEASE_0.2.27_20261029.md)及[发布记录](RELEASE_PROGRESS_0.2.27_20261029.md)。下方旧版本为历史记录，未做本轮 Android 真机验收。

@@ -6,4 +6,10 @@
 
 正式0.2.34／code37通用APK已覆盖安装，Android选择x86_64，两次冷进程启动17.14／5.09秒进入主菜单，设定及导出入口响应正常。没有卸载或清除原应用数据。APK的两个ABI分别通过资源22／导出35／导入41项，启动资源专项43项、Windows发布目录3399项通过，错误0。游戏逻辑沿用0.2.33的友方运输改造等修复，没有ARM64手机实机验收。
 
-当前阶段：冻结源码、封包、上传Git与Release，复核远端四附件及清理测试产物。正式Android构建须直接publish项目，不传单一`-r`或覆盖`RuntimeIdentifiers`；发行工具默认要求ARM64＋x64完整运行库并校验16KiB对齐。
+正式发布：[GitHub Release](https://github.com/aztksilence111/ew4-rewrite/releases/tag/v0.2.34-20261109)。源码及标签为`fd6a6a4731166120d6803c63b347821d704269aa`，main已同步；非草稿、非预发布，四远端附件大小与SHA-256全部一致。最终包3765项通过，20运行库（每ABI10）架构与16KiB对齐、原签名连续通过。
+
+Android APK为212522860字节，SHA-256 `631c62d0f47f12e1ff0b8266418b2938eeba5a29683cc8b62cda046519590694`；Windows ZIP为216725156字节，SHA-256 `fea46368a32404012795b6ab35cb8e19bfeb67f7b997235f7552fe5c42621db1`。另附`release-manifest.json`与`SHA256SUMS.txt`。本地`validation-summary.json`保留实际MuMu启动摘要；包清单的`androidDeviceExecution=false`不表示已做ARM64手机实机验收。
+
+正式Android构建须直接publish项目，不传单一`-r`或覆盖`RuntimeIdentifiers`；发行工具默认要求ARM64＋x64完整运行库并校验16KiB对齐。封包期间发现同期整编滚动修订，使用独立干净源码检出固定本次版本，未把未验证的新改动混入发布，原工作区保留。隔离检出为Codex当前主检出，归档工具拒绝移除；仅保留干净源码，无测试运行副本或编译输出。
+
+卸载两份独立诊断应用，移除临时ADB转发与UI dump；正式0.2.34继续运行，应用数据未清。核真实路径、链接、活动进程、Git与39份玩家文件后，清20目标19833文件5828663922字节，残留0／玩家变化0／Git保持；仅留0.2.34／0.2.33／0.2.32三批六包，摘要错误0。`emulator-cleanup.json`与`cleanup.json`先保存，再更新维护／双STATUS，最后WORK_LOG。收尾文档提交不改变已发布包。
