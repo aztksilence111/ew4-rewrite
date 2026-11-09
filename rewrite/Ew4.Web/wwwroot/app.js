@@ -608,6 +608,7 @@ async function playCombat(combat,destroyed=new Set()){
     const origin=unitPoint(unit),p={x:origin.x+(profile.partX||0),y:origin.y+(profile.partY||0)},q=unitPoint(target);
     effects?.timeline(timeline,p.x+facing*profile.x,p.y+profile.y,{speed,scale:profile.scale,started:started+delay});
     combatMotions.set(id,{started,delay,speed,segments,profile,part:profile.part});
+    if(profile.aircraftFire==='gun')effects?.effect('effect_gunfire.xml',origin.x+facing*28,origin.y-20,{speed,scale:.5,started:started+delay+100/speed});
     await presentationDelay(Math.max(0,started+impactAt-performance.now()));
     if(!(aiRunning&&skipAi)){
       damageNumbers?.add(damage,critical,q.x,q.y,speed);
@@ -622,7 +623,7 @@ async function playCombat(combat,destroyed=new Set()){
 function playImpact(profile,target,damage,facing,speed){
   if(damage<=0)return;
   const p=unitPoint(target),rocket=profile.kind==='Rocket';
-  effects?.timeline(rocket?'rocketstrike':Ew4Effects.impact(profile.stats.weapon,target.category,damage,state.cells[target.cell].sea&&!(state.unitLayers&&target.layer==='air'),facing),p.x+(rocket?30*facing:0),p.y,{speed});
+  effects?.timeline(profile.aircraftFire==='bomb'?'strike2':rocket?'rocketstrike':Ew4Effects.impact(profile.stats.weapon,target.category,damage,state.cells[target.cell].sea&&!(state.unitLayers&&target.layer==='air'),facing),p.x+(rocket?30*facing:0),p.y,{speed});
 }
 async function start(scenario, country, localPlayers) {
   if(busy)return;
@@ -930,30 +931,34 @@ async function selectCell(cell,restore=false,selectOnly=false,unitId=null) {
   if ((!restore&&busy) || !state || cell < 0 || cell >= state.cells.length || !state.cells[cell].active) return;
   closeSingleAction();
   if(!restore&&tutorial?.wait?.name==='wait area'&&Number(tutorial.wait.id)!==cell)return;
-  if(!state.unitLayers&&!restore&&!selectOnly&&selection?.cell===cell){
+  const occupants=state.units.filter(u=>u.cell===cell).sort((a,b)=>Number(a.layer==='air')-Number(b.layer==='air'));
+  const same=!restore&&!selectOnly&&selection?.cell===cell;
+  const nextIndex=occupants.findIndex(u=>u.id===selected?.id)+1;
+  const buildingSlot=!!state.unitLayers&&!!(state.cells[cell].buildingKind||state.cells[cell].facility);
+  const cycle=!!state.unitLayers&&same&&(!unitId||unitId===selected?.id);
+  const groundOnly=restore&&!!selection?.groundOnly||cycle&&buildingSlot&&!!selected&&nextIndex===occupants.length;
+  if(same&&(!state.unitLayers||cycle&&(selection.groundOnly||nextIndex>=occupants.length&&!groundOnly))){
     selectionRequest++;selected=undefined;selection=undefined;$('selection').hidden=true;
     refreshHud();requestRender();await tutorial?.notify({type:'area',cell});return;
   }
-  const occupants=state.units.filter(u=>u.cell===cell);
-  const cycle=state.unitLayers&&!restore&&!selectOnly&&!unitId&&selection?.cell===cell&&occupants.length>1;
-  const preferred=unitId||(cycle?occupants[(occupants.findIndex(u=>u.id===selected?.id)+1)%occupants.length]?.id:restore&&selected?.cell===cell?selected.id:null);
-  const target = occupants.find(u=>u.id===preferred)||(state.unitLayers?occupants.find(u=>u.layer!=='air'):null)||occupants[0];
-  if (!restore && !selectOnly && selected && selection && state.activeFaction === state.playerFaction && !state.dialogue) {
-    const attackChoices=state.unitLayers?occupants.filter(u=>selection.targetUnits?.includes(u.id)):[];
+  const preferred=unitId||(cycle?occupants[nextIndex]?.id:restore&&selected?.cell===cell?selected.id:null);
+  const target = groundOnly?undefined:(cycle?occupants[nextIndex]:occupants.find(u=>u.id===preferred)||(state.unitLayers?occupants.find(u=>u.layer!=='air'):null)||occupants[0]);
+  if (!restore && !selectOnly && !same && selected && selection && state.activeFaction === state.playerFaction && !state.dialogue) {
+    const attackChoices=state.unitLayers?occupants.filter(u=>selection.targetUnits?.includes(u.id)&&(!unitId||u.id===unitId)):[];
     if(attackChoices.length>1){
       const body=detailWindow('选择目标',260,150);body.className='layer-targets';
-      for(const u of attackChoices)button((u.layer==='air'?'空中 · ':'地表 · ')+(manifest.profiles[u.profile]?.name||u.id),async()=>{closeDetail();await act('attack',{target:u.id});},body);
+      for(const u of attackChoices)button((u.layer==='air'?'空中 · ':'地表 · ')+(visualProfile(u)?.name||u.id),async()=>{closeDetail();await act('attack',{target:u.id});},body);
       return;
     }
     const attackTarget=state.unitLayers?attackChoices[0]:target;
     if (attackTarget && selection.targets?.includes(cell))
       return act('attack', {target:attackTarget.id}).then(()=>tutorial?.notify({type:'area',cell}));
-    if ((!target||state.unitLayers) && selection.range.includes(cell)) return act('move', {cell}).then(()=>tutorial?.notify({type:'area',cell}));
+    if (!unitId&&(!target||state.unitLayers) && selection.range.includes(cell)) return act('move', {cell}).then(()=>tutorial?.notify({type:'area',cell}));
   }
   const source=state,request=++selectionRequest;
   const next=await rpc('action', {op:'select', cell, ...(state.unitLayers&&target?{unit:target.id}:{}), revision:source.revision});
   if(request!==selectionRequest||state!==source||aiControl.mode)return;
-  selection=next;
+  selection=groundOnly?{...next,groundOnly:true,range:[],targets:[],targetUnits:[],deploy:false,items:false,disband:null,skills:[],undo:false,installationOffers:[],buildingOffers:[],actionQuotes:{upgrade:next.actionQuotes?.upgrade}}:next;
   selected = target;if(!restore)selectedAt = performance.now(); const site = state.cells[cell];
   $('selection').hidden = false;
   const own = target?.owner === state.playerFaction;
@@ -964,7 +969,7 @@ async function selectCell(cell,restore=false,selectOnly=false,unitId=null) {
   if(selection.installationOffers?.length||selection.buildingOffers?.length) toolButton('builddefense','建造',()=>openDefense(cell));
   if(selection.actionQuotes?.train) singleActionButton('training','培训','train',selection.actionQuotes.train);
   if(selection.items) toolButton('items','使用物品',()=>menus.useItems(target.id));
-  if(selection.offers.length) toolButton(({city:'city',industry:'factory',stable:'stable',port:'dock'})[site.buildingKind]||'buildfortress',site.buildingKind?'雇佣':'建造要塞',()=>openRecruitment(cell));
+  if(selection.offers.length) toolButton(({city:'city',industry:'factory',stable:'stable',port:'dock',airfield:'city'})[site.buildingKind]||'buildfortress',site.buildingKind==='airfield'?'招募空军':site.buildingKind?'雇佣':'建造要塞',()=>openRecruitment(cell));
   if(selection.actionQuotes?.transport) singleActionButton('buyship','改装运输船','transport',selection.actionQuotes.transport);
   if(selection.tavern)toolButton('bar','酒馆',()=>menus.tavern(cell));
   if(selection.shop)toolButton('shop','商店',()=>menus.shop(cell));
@@ -1035,8 +1040,8 @@ function tintedUi(name,color,width,height){
   function paint(){const draw=result.getContext('2d');draw.clearRect(0,0,result.width,result.height);draw.globalCompositeOperation='source-over';draw.drawImage(source,0,0,result.width,result.height);draw.globalCompositeOperation='multiply';draw.fillStyle=color;draw.fillRect(0,0,result.width,result.height);draw.globalCompositeOperation='destination-in';draw.drawImage(source,0,0,result.width,result.height);draw.globalCompositeOperation='source-over';}
   if(source.complete&&source.naturalWidth)paint();else source.onload=paint;return result;
 }
-function unitCard(profile,cost){
-  const p=manifest.profiles[profile];const card=document.createElement('div');card.className='unit-card';
+function unitCard(profile,cost,owner=state?.playerFaction){
+  const p=visualProfile({profile,owner})||manifest.profiles[profile];const card=document.createElement('div');card.className='unit-card';
   card.style.setProperty('--formation-color',formationColors[p.grade]||formationColors[0]);
   card.append(uiImage(p.card,72,54));const marker=uiImage(p.cardMarker,19,19);marker.className='card-marker';card.append(marker);
   const strip=document.createElement('span');strip.className='cost-strip';
@@ -1059,11 +1064,11 @@ function abilityGrid(profile,unit){
 }
 function descriptionBox(parent,name,text){const desc=document.createElement('section');desc.className='unit-description';const h=document.createElement('h3');h.textContent=name;const p=document.createElement('p');p.textContent=text;desc.append(h,p);parent.append(desc);}
 async function openUnitInfo(unit){
-  const p=manifest.profiles[unit.profile],entries=[...(unit.traits||[]),...(unit.skills||[]),...(unit.statuses||[])];
+  const p=visualProfile(unit),entries=[...(unit.traits||[]),...(unit.skills||[]),...(unit.statuses||[])];
   const l=menus.native('form_unitinfo');l.body.classList.add('unit-detail');
   // Keep the original 330 x 187 contents intact; reserve a separate band below.
   l.body.parentElement.style.height='255px';
-  const card=unitCard(unit.profile);card.classList.add('info-unit-card');l.fill('group_unit',card);
+  const card=unitCard(unit.profile,undefined,unit.owner);card.classList.add('info-unit-card');l.fill('group_unit',card);
   card.querySelector('.card-marker').remove();
   for(let i=0;i<=p.grade;i++){const marker=document.createElement('span');marker.className='info-formation-marker';marker.style.left=(i*4)+'px';marker.append(tintedUi('buildmaker.png',formationColors[p.grade]||formationColors[0],19,20),uiImage(p.cardMarker,19,19));card.append(marker);}
   const grid=abilityGrid(unit.profile,unit);grid.classList.add('info-abilities');l.fill('grid_ability',grid);
@@ -1109,7 +1114,7 @@ function openSkillAction(unit,entry){
   const refresh=()=>{if(!multiple)return;const text='自身默认受益，另选 '+chosen.size+' / '+entry.maximumTargets+' 支';summary.setAttribute('aria-label',text);summary.replaceChildren(originalTextRenderer.element(text,'font_text_2_cn_hd','#404040'));for(const b of targets.children){b.setAttribute('aria-pressed',String(chosen.has(b.dataset.unit)));b.disabled=!chosen.has(b.dataset.unit)&&chosen.size>=entry.maximumTargets;}};
   if(multiple)box.append(summary);
   for(const id of choices){const t=isCell?null:state.units.find(u=>u.id===id),cell=isCell?id:t.cell,b=button('',()=>{if(multiple){if(chosen.has(id))chosen.delete(id);else if(chosen.size<entry.maximumTargets)chosen.add(id);refresh();}else{target=id;for(const n of targets.children)n.setAttribute('aria-pressed',String(n===b));}},targets);
-    b.dataset.unit=id;b.setAttribute('aria-pressed',String(!multiple&&id===target));b.append(originalTextRenderer.element((isCell?'':manifest.profiles[t.profile].name+' ')+'('+(cell%state.width)+','+Math.floor(cell/state.width)+')','font_text_2_cn_hd','#404040'));}
+    b.dataset.unit=id;b.setAttribute('aria-pressed',String(!multiple&&id===target));b.append(originalTextRenderer.element((isCell?'':visualProfile(t).name+' ')+'('+(cell%state.width)+','+Math.floor(cell/state.width)+')','font_text_2_cn_hd','#404040'));}
   refresh();
   box.append(targets);body.append(box);
 }
@@ -1149,7 +1154,7 @@ function positionSingleAction(){
   if(!anchor.isConnected||revision!==state?.revision||cell!==selection?.cell){closeSingleAction();return;}
   const host=$('single-action'),panel=$('single-action-cost'),parent=$('selection').getBoundingClientRect(),rect=anchor.getBoundingClientRect();
   if(!rect.width){closeSingleAction();return;}
-  const scale=rect.width/33,left=rect.left-parent.left;
+  const scale=rect.width/33,left=Math.max(2,Math.min(rect.left-parent.left,parent.width-rect.width-2,innerWidth-parent.left-rect.width-2));
   host.style.transform='scale('+scale+')';
   host.style.left=left+'px';host.style.top=(rect.top-parent.top)+'px';
   const panelLeft=Math.max(2,Math.min(parent.width-84*scale-2,left-25.5*scale));
@@ -1182,10 +1187,10 @@ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&pendingActi
 function openRecruitment(cell){
   const offers=selection.offers;let chosen=offers[0];
   if(!chosen)return;
-  const body=detailWindow('recruit_label',441,185,()=>act('recruit',{cell,offer:chosen.id}));
+  const groups=new Map();for(const offer of offers){const p=manifest.profiles[offer.profile],key=p.kind??p.unitIndex;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(offer);}
+  const body=detailWindow('recruit_label',Math.max(441,groups.size*73+3),185,()=>act('recruit',{cell,offer:chosen.id}));
   const row=document.createElement('div');row.className='recruit-cards';body.append(row);const details=document.createElement('div');details.className='recruit-description';body.append(details);
-  function choose(offer,b){chosen=offer;const library=visualProfile({profile:offer.profile,owner:state.playerFaction})?.library;if(library)void loadLibrary(library).catch(()=>{});for(const c of row.children)c.setAttribute('aria-pressed',String(c===b));details.replaceChildren(abilityGrid(offer.profile));descriptionBox(details,manifest.profiles[offer.profile].name,manifest.profiles[offer.profile].description);const funds=state.factions.find(f=>f.id===state.playerFaction).resources;$('detail-confirm').disabled=['money','industry','food'].some(key=>(offer.cost[key]||0)>funds[key]);}
-  const groups=new Map();for(const offer of offers){const key=manifest.profiles[offer.profile].unitIndex;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(offer);}
+  function choose(offer,b){chosen=offer;const profile=visualProfile({profile:offer.profile,owner:state.playerFaction}),library=profile?.library;if(library)void loadLibrary(library).catch(()=>{});for(const c of row.children)c.setAttribute('aria-pressed',String(c===b));details.replaceChildren(abilityGrid(offer.profile));descriptionBox(details,profile.name,profile.description);const funds=state.factions.find(f=>f.id===state.playerFaction).resources;$('detail-confirm').disabled=['money','industry','food'].some(key=>(offer.cost[key]||0)>funds[key]);}
   [...groups.values()].forEach((group,index)=>{group.sort((a,b)=>manifest.profiles[a.profile].grade-manifest.profiles[b.profile].grade);let grade=0;
     function render(b,animate){
       const outgoing=animate?b.querySelector('.unit-card'):null;
@@ -1199,7 +1204,7 @@ function openRecruitment(cell){
       }
     }
     const b=button('',()=>{const cycle=chosen===group[grade]&&group.length>1;if(cycle)grade=(grade+1)%group.length;chosen=group[grade];render(b,cycle);choose(chosen,b);},row);
-    b.dataset.tutorialId='lbox_unit';b.dataset.tutorialRow=index;b.setAttribute('aria-label',manifest.profiles[group[0].profile].name);render(b,false);});
+    b.dataset.tutorialId='lbox_unit';b.dataset.tutorialRow=index;b.dataset.recruitKind=manifest.profiles[group[0].profile].kind??String(manifest.profiles[group[0].profile].unitIndex);b.setAttribute('aria-label',visualProfile({profile:group[0].profile,owner:state.playerFaction}).name);render(b,false);});
   while(row.children.length<6){const empty=document.createElement('div');empty.className='empty-recruit-card';row.append(empty);}
   choose(chosen,row.firstElementChild);
 }
@@ -1248,6 +1253,19 @@ function clampView() {
 }
 function point(cell) { return Ew4Battlefield.point(cell,state.width); }
 function unitPoint(unit) { return Ew4Battlefield.unitPoint(state,unit); }
+function mapPick(x,y){
+  if(state?.unitLayers){
+    const p=screenToWorld(x,y);
+    const grid=cellAt(x,y),center=grid>=0?point(grid):null;
+    if(center&&Math.hypot(p.x-center.x,p.y-center.y)<=12)return {cell:grid};
+    if(selection&&Math.hypot(p.x-point(selection.cell).x,p.y-point(selection.cell).y)<=12)return {cell:selection.cell};
+    for(const id of selection?.targetUnits||[]){const unit=state.units.find(u=>u.id===id);if(!unit)continue;const q=Ew4Battlefield.interactionPoint(state,unit);if(Math.hypot(p.x-q.x,p.y-q.y)<=18)return {cell:unit.cell,unit:id};}
+    const unit=Ew4Battlefield.hitAirUnit(state,p,battlefield.visibleUnitMarkers);
+    if(unit)return {cell:unit.cell,unit:unit.id};
+    if(selected?.layer==='air')for(const cell of selection?.range||[]){if(cell===selected.cell)continue;const q=Ew4Battlefield.movementPoint(state,selected,cell);if(Math.hypot(p.x-q.x,p.y-q.y)<=18)return {cell};}
+  }
+  return {cell:cellAt(x,y)};
+}
 function screenToWorld(x, y) { return {x:(x - viewport.w/2)/view.zoom + view.x, y:(y - viewport.h/2)/view.zoom + view.y}; }
 function cellAt(x, y) {
   const p = screenToWorld(x, y); const approximateRow = Math.round((p.y+18) / 54); let best = -1, distance = Infinity;
@@ -1430,7 +1448,7 @@ canvas.addEventListener('pointermove',e=>{
   if(pointers.size===1){view.x-=dx/view.zoom;view.y-=dy/view.zoom;clampView();if(Math.hypot(e.clientX-last.startX,e.clientY-last.startY)>4)dragged=true;}
   else{const[a,b]=[...pointers.values()],distance=Math.hypot(a.x-b.x,a.y-b.y);if(lastDistance)zoom(distance/lastDistance,(a.x+b.x)/2,(a.y+b.y)/2);lastDistance=distance;}
 });
-canvas.addEventListener('pointerup',e=>{if(aiControl.input('up',e))return;pointers.delete(e.pointerId);if(!dragged&&pointers.size===0)selectCell(cellAt(e.clientX,e.clientY)).catch(error=>notice(error.message));});
+canvas.addEventListener('pointerup',e=>{if(aiControl.input('up',e))return;pointers.delete(e.pointerId);if(!dragged&&pointers.size===0){const hit=mapPick(e.clientX,e.clientY);selectCell(hit.cell,false,false,hit.unit).catch(error=>notice(error.message));}});
 canvas.addEventListener('pointercancel',e=>{aiControl.input('cancel',e);pointers.delete(e.pointerId);dragged=true;});
 canvas.addEventListener('contextmenu',e=>{if(aiControl.mode)e.preventDefault();});
 canvas.addEventListener('wheel',e=>{e.preventDefault();if(!followingAi())zoom(Math.exp(-e.deltaY*.001),e.clientX,e.clientY);},{passive:false});

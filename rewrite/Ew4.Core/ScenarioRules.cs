@@ -57,6 +57,7 @@ public sealed record ScenarioEffect
     public ScenarioCommanderTemplate? CommanderTemplate { get; init; }
     public int? Health { get; init; }
     public long Experience { get; init; }
+    public bool Ready { get; init; }
     public string? Disposition { get; init; }
     public string? ExpectedOwner { get; init; }
     public Resources? Cost { get; init; }

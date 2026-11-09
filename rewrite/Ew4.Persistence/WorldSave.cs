@@ -54,8 +54,10 @@ public static class WorldSave
                 }
                 if (info.Type == typeof(ModBuildingLevel))
                     info.Properties.Single(p => p.Name == "constructionTurns").ShouldSerialize = (_, value) => (int)value! != 0;
-                if (info.Type == typeof(UnitLayerProfile))
+                if (info.Type == typeof(UnitLayerProfile)) {
                     info.Properties.Single(p => p.Name == "targetCategories").ShouldSerialize = (_, value) => value != null;
+                    info.Properties.Single(p => p.Name == "movementCost").ShouldSerialize = (_, value) => (int)value! != 1;
+                }
                 if (info.Type == typeof(ModBuildingDefinition)) {
                     info.Properties.Single(p => p.Name == "recruitmentPerTurn").ShouldSerialize = (_, value) => (int)value! != 0;
                     info.Properties.Single(p => p.Name == "builderKeepsMovement").ShouldSerialize = (_, value) => (bool)value!;
@@ -78,8 +80,10 @@ public static class WorldSave
                     info.Properties.Single(p => p.Name == "commanderAbility").ShouldSerialize = (_, value) => value != null;
                 if (info.Type == typeof(ExtensionEffect))
                     info.Properties.Single(p => p.Name == "when").ShouldSerialize = (_, value) => value != null;
-                if (info.Type == typeof(ScenarioEffect))
+                if (info.Type == typeof(ScenarioEffect)) {
                     info.Properties.Single(p => p.Name == "income").ShouldSerialize = (_, value) => value != null;
+                    info.Properties.Single(p => p.Name == "ready").ShouldSerialize = (_, value) => (bool)value!;
+                }
                 if (info.Type == typeof(MovementCell)) {
                     info.Properties.Single(p => p.Name == "barrier").ShouldSerialize = (_, value) => (TerrainBarrier)value! != TerrainBarrier.None;
                     info.Properties.Single(p => p.Name == "minimumEntryCost").ShouldSerialize = (_, value) => (int)value! != 0;

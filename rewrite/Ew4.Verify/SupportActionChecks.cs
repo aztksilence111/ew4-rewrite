@@ -84,6 +84,35 @@ internal static class SupportActionChecks
         Reject(() => WorldSupportActions.BuyTransport(transported, sea.Revision, actor.Id, new()), "action.stale");
         var used = sea with { Units = [actor with { Acted = true, RemainingMovement = 0, Morale = new(-3, 0, -3), Combatant = actor.Combatant with { Morale = -3 } }] };
         var installationRules = new InstallationBuildRules { Kind = "custom.trench", Purchase = new() { Cost = new(30, 10, 0) } };
+        var transportRules = new TransportPurchaseRules { Purchase = new() { Cost = new(40, 10, 5) } };
+        var foreign = sea with { Cells = sea.Cells.Select((c, i) => i == actor.Cell ? c with { Owner = "loser" } : c).ToArray() };
+        var sameCamp = foreign with { Factions = foreign.Factions.Select(f => f with { Camp = "b" }).ToArray() };
+        foreach (var friendly in new[] { sameCamp, WorldDiplomacy.Set(foreign, "winner", "loser", "allied") })
+        {
+            byte[] before = WorldSave.Encode(friendly);
+            Check(WorldSupportActions.CanBuyTransport(friendly, actor.Id, transportRules), "transport offered on allied territory");
+            Check(WorldSupportActions.TransportCost(friendly, actor.Id, transportRules) == transportRules.Purchase.Cost, "allied transport quote");
+            var bought = WorldSupportActions.BuyTransport(friendly, friendly.Revision, actor.Id, transportRules).State;
+            Check(bought.Units.Single().Transport && bought.Units.Single().RemainingMovement == actor.RemainingMovement,
+                "allied transport purchase preserves movement");
+            Check(bought.Cells[actor.Cell].Owner == "loser" && bought.Factions.Single(f => f.Id == "loser").Resources == new Resources(1000, 1000, 1000)
+                && bought.Factions.Single(f => f.Id == "winner").Resources == new Resources(960, 990, 995), "allied transport charges only unit owner without capturing land");
+            Check(before.SequenceEqual(WorldSave.Encode(friendly)), "allied transport leaves input unchanged");
+            Check(WorldSave.Decode(WorldSave.Encode(bought), bought.ContentRevision).Units.Single().Transport, "allied transport survives save/load");
+            Check(!WorldSupportActions.CanBuildInstallation(friendly, actor.Id, installationRules), "alliance does not allow installation construction");
+            Reject(() => WorldSupportActions.BuildInstallation(friendly, friendly.Revision, actor.Id, installationRules), "purchase.site");
+            var poorAlly = friendly with { Factions = friendly.Factions.Select(f => f.Id == "winner" ? f with { Resources = new(39, 10, 5) } : f).ToArray() };
+            Check(!WorldSupportActions.CanBuyTransport(poorAlly, actor.Id, transportRules), "allied transport still requires funds");
+            Reject(() => WorldSupportActions.BuyTransport(poorAlly, poorAlly.Revision, actor.Id, transportRules), "purchase.resources");
+        }
+        foreach (var blocked in new[] { foreign, WorldDiplomacy.Set(sameCamp, "winner", "loser", "neutral"),
+            WorldDiplomacy.Set(sameCamp, "winner", "loser", "hostile"),
+            foreign with { Cells = foreign.Cells.Select((c, i) => i == actor.Cell ? c with { Owner = null } : c).ToArray() } })
+        {
+            Check(!WorldSupportActions.CanBuyTransport(blocked, actor.Id, transportRules), "transport unavailable outside own or allied territory");
+            Reject(() => WorldSupportActions.TransportCost(blocked, actor.Id, transportRules), "purchase.site");
+            Reject(() => WorldSupportActions.BuyTransport(blocked, blocked.Revision, actor.Id, transportRules), "purchase.site");
+        }
         var built = WorldSupportActions.BuildInstallation(used, used.Revision, actor.Id, installationRules).State;
         Check(built.Cells[4].InstallationKind == "custom.trench" && built.Units.Single().Acted, "native stationary builder branch does not require unused attack or positive morale");
         var context = new CombatContextRules { InstallationDefense = new Dictionary<string, IReadOnlyDictionary<string, int>>

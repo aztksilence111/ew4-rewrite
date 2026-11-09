@@ -40,6 +40,10 @@
     get catalog(){return this.api.catalog;}
     countryFlag(id,width,height){return this.api.countryImage?.(id,width,height)||this.api.uiImage(id+'1.png',width,height);}
     text(key){return this.manifest.strings[key]||key;}
+    presentedCommander(definition){
+      const name=this.manifest.commanderPresentation?.[definition.id]?.name;
+      return typeof name==='string'&&name.trim()?{...definition,name}:definition;
+    }
     lettering(text,font='font_text_2_cn_hd',color='#404040',width,align,options){return this.api.text(text,font,color,width,align,options);}
     async transitionPage(change){
       if(this.pageTransition)return;
@@ -327,6 +331,7 @@
     }
     closeRoster(){this.cancelRecruitmentReveal();document.getElementById('hq-screen').hidden=true;if(this.deployment){document.getElementById('menu').hidden=true;document.getElementById('play').hidden=false;}this.deployment=null;}
     card(definition,held,action){
+      definition=this.presentedCommander(definition);
       const card=document.createElement('div');card.className='commander-card';card.setAttribute('role','group');card.setAttribute('aria-label',definition.name);card.append(this.portrait(definition.image));
       const name=document.createElement('span');name.className='commander-name';name.append(this.lettering(definition.name,'font_text_2_cn_hd','#ebe6e1',74,'center',{singleLine:true}));card.append(name);
       const rank=held?.learning.rank.level??definition.rank,title=held?.learning.title.level??definition.title;
@@ -559,6 +564,7 @@
       return 'url(#'+id+')';
     }
     commanderInfo(definition,held,onClose){
+      definition=this.presentedCommander(definition);
       this.commanderReturn=onClose;
       const abilityDefinitions=this.abilityDefinitions(),abilityRows=Math.ceil(abilityDefinitions.length/2);
       const body=this.api.detail('title_unitinfo',440,217+(abilityRows-4)*27,null,onClose||(()=>{this.drawRoster();}));body.className='commander-detail';

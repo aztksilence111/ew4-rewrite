@@ -32,15 +32,16 @@ public sealed record TransportPurchaseRules
 public static class WorldSupportActions
 {
     private static (FactionState faction, UnitState unit, CellState cell) Ready(WorldState state, long expectedRevision,
-        string unitId, UnitPurchaseRules rules)
+        string unitId, UnitPurchaseRules rules, bool allowAlliedTerritory = false)
     {
         var faction = WorldActions.Ready(state, expectedRevision);
         rules.Validate();
         var unit = state.Units.SingleOrDefault(u => u.Id == unitId);
         if (unit == null || unit.Owner != faction.Id || WorldUnitLayers.Air(state, unit)) throw new RuleViolation("purchase.unit", "Unit is not an eligible surface unit");
         var cell = state.Cells[unit.Cell];
-        if (cell.Owner != faction.Id || !cell.Terrain.Active || !rules.AllowSea && cell.Terrain.Sea)
-            throw new RuleViolation("purchase.site", "Purchase requires an eligible owned site");
+        if (!cell.Terrain.Active || !rules.AllowSea && cell.Terrain.Sea
+            || cell.Owner != faction.Id && !(allowAlliedTerritory && cell.Owner != null && WorldDiplomacy.Allied(state, faction.Id, cell.Owner)))
+            throw new RuleViolation("purchase.site", "Purchase requires an eligible owned or permitted allied site");
         return (faction, unit, cell);
     }
 
@@ -121,7 +122,7 @@ public static class WorldSupportActions
         long expectedRevision, string unitId, TransportPurchaseRules rules)
     {
         if (rules.ExcludedCategories.Any(string.IsNullOrWhiteSpace)) throw new RuleViolation("transport.configuration", "Invalid transport category policy");
-        var (faction, unit, _) = Ready(state, expectedRevision, unitId, rules.Purchase);
+        var (faction, unit, _) = Ready(state, expectedRevision, unitId, rules.Purchase, allowAlliedTerritory: true);
         if (unit.Transport || rules.ExcludedCategories.Contains(unit.Combatant.Profile.Category))
             throw new RuleViolation("transport.unavailable", "Unit already has transport or its category is excluded");
         return (faction, unit, Price(unit, rules.Purchase));
@@ -147,7 +148,8 @@ public static class WorldSupportActions
     {
         if (unit.Owner != faction.Id || WorldUnitLayers.Air(state, unit) || unit.Transport || rules.ExcludedCategories.Contains(unit.Combatant.Profile.Category)) return false;
         var cell = state.Cells[unit.Cell];
-        if (!cell.Terrain.Active || cell.Owner != faction.Id || !rules.Purchase.AllowSea && cell.Terrain.Sea) return false;
+        if (!cell.Terrain.Active || cell.Owner == null || !WorldDiplomacy.Allied(state, faction.Id, cell.Owner)
+            || !rules.Purchase.AllowSea && cell.Terrain.Sea) return false;
         var price = Price(unit, rules.Purchase);
         return faction.Resources.Money >= price.Money && faction.Resources.Industry >= price.Industry && faction.Resources.Food >= price.Food;
     }

@@ -38,7 +38,7 @@ public static class ScenarioArmies
             || e.Type is "commander_assign" or "commander_detach" && string.IsNullOrWhiteSpace(e.Commander)
             || e.Type is "unit_spawn" or "commander_assign" && (e.CommanderDefinition != null && e.Commander == null || e.CommanderDefinition < 0)
             || e.Type is not ("unit_spawn" or "commander_assign" or "commander_detach") && (e.Commander != null || e.CommanderDefinition != null || e.CommanderTemplate != null)
-            || e.Type != "unit_spawn" && (e.Profile != null || e.UnitTemplate != null || e.Health != null || e.Experience != 0 || e.Cost != null)
+            || e.Type != "unit_spawn" && (e.Profile != null || e.UnitTemplate != null || e.Health != null || e.Experience != 0 || e.Ready || e.Cost != null)
             || e.Type is not ("unit_remove" or "commander_detach") && e.Disposition != null
             || e.Disposition != null && e.Disposition is not ("available" or "withdrawn")
             || e.Health < 1 || e.Experience < 0 || e.ExpectedOwner != null && (string.IsNullOrWhiteSpace(e.ExpectedOwner)
@@ -207,7 +207,8 @@ public static class ScenarioArmies
             Id = effect.Unit!, Owner = owner, Cell = cell, Combatant = template.Combatant with
             { Health = template.Combatant.MaximumHealth, AtSea = !WorldUnitLayers.Air(world, template.Combatant.Profile) && world.Cells[cell].Terrain.Sea,
                 BuildingKind = WorldUnitLayers.Air(world, template.Combatant.Profile) ? null : world.Cells[cell].BuildingKind },
-            Support = template.Support, Experience = effect.Experience, Acted = true, RemainingMovement = 0,
+            Support = template.Support, Experience = effect.Experience, Acted = !effect.Ready,
+            RemainingMovement = effect.Ready ? template.MovementBudget ?? template.Combatant.Profile.Movement : 0,
             ExtensionMovementLimit = template.MovementBudget
         };
         var next = world with { Units = world.Units.Append(unit).ToArray(), SpawnedScenarioUnits = world.SpawnedScenarioUnits.Append(unit.Id).ToArray() };

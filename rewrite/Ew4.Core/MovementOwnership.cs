@@ -35,10 +35,20 @@ internal sealed class MovementOwnership
         Cells = buffer.Seal();
     }
     internal static MovementOwnership Move(WorldState source, HexMap map, IReadOnlyCollection<int> occupied,
-        IReadOnlyList<int> path, string owner, TerritoryMoveRules rules, bool capture = true)
+        IReadOnlyList<int> path, string owner, TerritoryMoveRules rules, bool capture = true, bool captureLanding = false)
     {
         var buffer = new OwnershipBuffer(source.Cells);
-        if (!capture) return new(source, buffer);
+        if (!capture)
+        {
+            // An airborne composite deploys its ground component only at the
+            // landing hex; flying over a district does not occupy its path.
+            if (captureLanding && rules.ClaimEndpoint)
+            {
+                buffer.SetOwner(path[^1], owner);
+                JurisdictionClaims.MoveOwners(source, buffer, new[] { path[0], path[^1] }, owner);
+            }
+            return new(source, buffer);
+        }
         TerritoryClaims.MoveOwners(map, source.Cells, occupied, path, owner, rules, buffer);
         JurisdictionClaims.MoveOwners(source, buffer, path, owner);
         return new(source, buffer);

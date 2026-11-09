@@ -129,7 +129,7 @@ public static class WorldActions
             Id = unitId, Owner = faction.Id, Cell = cell, Veterancy = grant.Veterancy, Transport = grant.Transport,
             Combatant = offer.Template with { Health = offer.Template.MaximumHealth, Morale = 0, ConstructionTurns = offer.ConstructionTurns,
                 AtSea = !WorldUnitLayers.Air(state, offer.Template.Profile) && state.Cells[cell].Terrain.Sea,
-                BuildingKind = WorldUnitLayers.Air(state, offer.Template.Profile) ? null : state.Cells[cell].BuildingKind },
+                BuildingKind = WorldUnitLayers.GroundAt(state, offer.Template.Profile, cell) ? state.Cells[cell].BuildingKind : null },
             RemainingMovement = 0, Acted = true, Support = offer.Support
         };
         var uses = faction.TurnUses.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal);
@@ -180,15 +180,15 @@ public static class WorldActions
             throw new RuleViolation("move.destination", "Destination is occupied or unchanged");
         if (!(range ?? MovementRange(state, unit, rules)).TryGetValue(destination, out var reachable))
             throw new RuleViolation("move.unreachable", "No affordable legal route to destination");
-        var otherUnits = state.Units.Where(u => u.Id != unitId).ToArray();
         bool air = WorldUnitLayers.Air(state, unit);
-        var ownership = MovementOwnership.Move(state, map, otherUnits.Where(u => !WorldUnitLayers.Air(state, u)).Select(u => u.Cell).Distinct().ToArray(),
-            reachable.Path, faction.Id, rules.Territory, capture: !air);
+        bool groundAtDestination = WorldUnitLayers.GroundAt(state, unit.Combatant.Profile, destination);
+        var ownership = MovementOwnership.Move(state, map, WorldUnitLayers.Surface(state).Where(u => u.Id != unitId).Select(u => u.Cell).Distinct().ToArray(),
+            reachable.Path, faction.Id, rules.Territory, capture: !air, captureLanding: air && groundAtDestination);
         var claimed = ownership.Cells;
         var moved = unit with
         {
             Cell = destination, MovedThisTurn = true, RemainingMovement = rules.SpendAllMovement ? 0 : Math.Max(0, reachable.Remaining),
-            Combatant = unit.Combatant with { AtSea = !air && claimed[destination].Terrain.Sea, BuildingKind = air ? null : claimed[destination].BuildingKind }
+            Combatant = unit.Combatant with { AtSea = !air && claimed[destination].Terrain.Sea, BuildingKind = groundAtDestination ? claimed[destination].BuildingKind : null }
         };
         var notices = new List<WorldNotice> { new("unit.moved", unitId, destination) };
         foreach (int i in ownership.Changed) notices.Add(new("cell.owner_changed", i.ToString()));
@@ -275,7 +275,8 @@ public static class WorldActions
     internal static IReadOnlyDictionary<int, ReachableCell> MovementRange(WorldState state, UnitState unit, WorldMoveRules rules)
     {
         var context = MovementContext(state, unit, rules);
-        return Movement.Reachable(new(state.Width, state.Height), context.Cells, unit.Cell, context.Actor, rules.Search);
+        var search = WorldUnitLayers.Air(state, unit) ? rules.Search with { AllowFirstStepOverdraw = false, AllowOverdrawnEntry = false } : rules.Search;
+        return Movement.Reachable(new(state.Width, state.Height), context.Cells, unit.Cell, context.Actor, search);
     }
 
     public static IReadOnlyCollection<string> MovableUnits(WorldState state, string owner, WorldMoveRules configuration)
@@ -347,7 +348,8 @@ public static class WorldActions
         var occupied = state.Units.Where(u => WorldUnitLayers.Same(state, unit, u)).GroupBy(u => u.Cell).ToDictionary(g => g.Key,
             g => campIndex[(g.FirstOrDefault(u => campIndex[u.Owner] != campIndex[unit.Owner]) ?? g.First()).Owner]);
         var cells = state.Cells.Select((c, i) => c.Terrain with { OccupantCamp = occupied.TryGetValue(i, out string camp) ? camp : null }).ToArray();
-        if (air) cells = cells.Select(c => c with { Barrier = TerrainBarrier.None, Sea = false, TerrainCost = 1, MinimumEntryCost = 0,
+        int airCost = air && state.UnitLayers!.Profiles.TryGetValue(unit.Combatant.Profile.Id, out var airPolicy) ? airPolicy.MovementCost : 1;
+        if (air) cells = cells.Select(c => c with { Barrier = TerrainBarrier.None, Sea = false, TerrainCost = airCost, MinimumEntryCost = 0,
             RiverEdges = 0, BridgeEdges = 0, BlockedSeaEdges = 0 }).ToArray();
         var actor = MovementActorFor(unit, campIndex[unit.Owner]);
         if (air) actor = actor with { Category = "layer.air", Transport = false, Geography = false };

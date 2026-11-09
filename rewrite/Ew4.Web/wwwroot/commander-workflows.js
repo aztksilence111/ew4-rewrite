@@ -83,7 +83,7 @@
   proto.princesses=function(){
     const l=this.native('form_princess',()=>this.drawRoster());
     for(const [index,p] of this.data.princesses.entries()){
-      const d=this.data.definitions.find(d=>d.id===p.definitionId),card=this.card({...d,image:p.unlocked?p.image:p.image.replace('.png','_sketch.png')},null,()=>this.commanderInfo(d,this.data.roster.find(c=>c.definitionId===d.id),()=>this.princesses()));
+      const d=this.presentedCommander(this.data.definitions.find(d=>d.id===p.definitionId)),card=this.card({...d,image:p.unlocked?p.image:p.image.replace('.png','_sketch.png')},null,()=>this.commanderInfo(d,this.data.roster.find(c=>c.definitionId===d.id),()=>this.princesses()));
       card.querySelector('.commander-info').onclick=e=>{e.stopPropagation();this.commanderInfo(d,this.data.roster.find(c=>c.definitionId===d.id),()=>this.princesses());};
       card.classList.toggle('reward-claimed',p.claimed);l.get(index<4?'lbox_princess_up':'lbox_princess_dn').append(card);
       l.action('btn_go_'+(index+1),p.claimed?'已领取':'领取 '+d.name,async()=>{await this.updateAccount({op:'claim',offer:p.id});this.princesses();},p.unlocked&&!p.claimed);

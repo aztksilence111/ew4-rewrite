@@ -75,7 +75,7 @@
     fromDefinition(base,key){
       const source=this.definition(key);if(!source)throw new Error('Unknown unit visual: '+key);
       const motions={};for(const m of source.motions)if(!m.dir||['all','1','right'].includes(m.dir))motions[m.type]=m.name;
-      return {...base,library:source.res,x:Number(source.x||0),y:Number(source.y||0),scale:Number(source.scale??1),motions,visualMotion:key};
+      return {...base,library:source.res,x:Number(source.x||0),y:Number(source.y||0),scale:Number(source.scale??1),airTrail:source.airTrail??base.airTrail,motions,visualMotion:key};
     }
     parts(profile,sea=false){
       const parts=profile.compositeParts;
@@ -85,9 +85,12 @@
     attack(profile,layer){const key=this.definition(profile.visualMotion)?.attackVisuals?.[layer];return key?this.fromDefinition(profile,key):profile;}
     libraries(profile){return [...new Set(this.parts(profile).flatMap(p=>[p.library,...Object.values(this.definition(p.visualMotion)?.attackVisuals||{}).map(key=>this.fromDefinition(p,key).library)]))];}
     resolve(id,faction){
-      const base=this.manifest.profiles[id];if(!base)return base;
+      const original=this.manifest.profiles[id];if(!original)return original;
+      const presentations=original.presentations;
+      const presentation=own(presentations?.factions,faction?.id)??own(presentations?.countries,faction?.country)??own(presentations?.unitVariants,faction?.unitVariant);
+      const base=presentation?{...original,...Object.fromEntries(['name','description','cardMarker','mapMarker','mapMarkerAtlas'].filter(k=>own(presentation,k)!=null).map(k=>[k,presentation[k]]))}:original;
       const variant=own(this.config.factions,faction?.id)??faction?.visualVariant??faction?.unitVariant;
-      const cacheKey=JSON.stringify([id,variant]);if(this.cache.has(cacheKey))return this.cache.get(cacheKey);
+      const cacheKey=JSON.stringify([id,variant,faction?.id,faction?.country,faction?.unitVariant]);if(this.cache.has(cacheKey))return this.cache.get(cacheKey);
       const slot=base.kind.toLowerCase().replace(/ /g,'_')+'.'+base.grade;
       let key=own(this.config.profiles,id)??own(own(this.config.variants,variant),slot);
       if(key==null&&variant!=null){
@@ -231,10 +234,10 @@
       this.instances.push(instance);return this.lastEvent(name)*1000/instance.speed;
     }
     effect(name,x,y,options={}){const instance={x,y,events:[{type:'effect',name,at:0}],started:options.started??performance.now(),speed:options.speed||1,scale:options.scale||1,layer:options.layer,continuous:options.continuous,emissionLife:options.emissionLife,done:new Set(),emitters:[],get particles(){return this.emitters.flatMap(e=>e.particles);},seed:this.serial++};this.instances.push(instance);return instance;}
-    trail(id,x,y,grade,sea,time,visible=true,speed=1){
-      const kind=sea?4:grade===0?1:grade===1?2:3;let trail=this.trails.get(id);
+    trail(id,x,y,grade,sea,time,visible=true,speed=1,options=null){
+      const kind=options?.effect?options.effect+':'+options.facing:(sea?4:grade===0?1:grade===1?2:3);let trail=this.trails.get(id);
       if(trail&&trail.kind!==kind){this.stopTrail(trail,time);this.trails.delete(id);trail=null;}
-      if(!trail){const instance=this.effect('effect_moving'+kind+'.xml',x,y,{continuous:true,scale:.5,layer:'ground',started:time,speed});trail={kind,instance};this.trails.set(id,trail);}
+      if(!trail){const instance=this.effect(options?.effect||'effect_moving'+kind+'.xml',x,y,{continuous:true,scale:options?.scale??.5,layer:options?.layer||'ground',started:time,speed});if(options)instance.events[0].rot=Number(options.rotation||0)+(options.facing<0?180:0);trail={kind,instance};this.trails.set(id,trail);}
       const instance=trail.instance,elapsed=(time-instance.started)/1000*instance.speed;
       instance.enabled=visible;instance.trailPosition={x:(x-instance.x)/instance.scale,y:(y-instance.y)/instance.scale,time:elapsed};
     }

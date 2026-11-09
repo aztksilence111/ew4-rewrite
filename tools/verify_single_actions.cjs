@@ -55,7 +55,10 @@ const base = process.argv[2] || 'http://127.0.0.1:5222';
           positionSingleAction();
           const p = $('single-action-cost').getBoundingClientRect(), b = $('single-action-confirm').getBoundingClientRect();
           return [p, b].every(r => r.width > 0 && r.height > 0 && r.x >= 0 && r.y >= 0 && r.right <= innerWidth + 1 && r.bottom <= innerHeight + 1);
-        });
+        }).catch(async error => { throw new Error(op + ' layout ' + JSON.stringify(await page.evaluate(() => ({
+          pending: !!pendingAction, panel: $('single-action-cost').getBoundingClientRect().toJSON(),
+          button: $('single-action-confirm').getBoundingClientRect().toJSON(), width: innerWidth, height: innerHeight
+        }))) + ': ' + error.message); });
         check(true, op + ' fits ' + size.width + 'x' + size.height);
         await shot(op + '-' + size.width);
       }
@@ -69,6 +72,24 @@ const base = process.argv[2] || 'http://127.0.0.1:5222';
       check(['money', 'industry', 'food'].every(key => quote.funds[key] - result.funds[key] === sign * quote.cost[key]), op + ' exact cost/refund applied');
       if (op === 'disband') check(!result.exists, 'disband removes selected unit');
     }
+    for (const size of [{ width: 1280, height: 720 }, { width: 844, height: 390 }]) {
+      await page.setViewportSize(size);
+      await seed('allied-transport');
+      const before = await page.evaluate(() => ({ owner: state.cells[selection.cell].owner,
+        movement: selected.remainingMovement, allyFunds: state.factions.find(f => f.id === state.cells[selection.cell].owner).resources }));
+      const quote = await open('transport');
+      check(quote.affordable && quote.fits, 'allied transport quote fits ' + size.width);
+      await page.locator('#single-action-confirm').click();
+      await page.waitForFunction(revision => !busy && state.revision > revision, quote.revision);
+      const after = await page.evaluate(() => ({ owner: state.cells[selection.cell].owner, movement: selected.remainingMovement,
+        funds: state.factions.find(f => f.id === state.playerFaction).resources,
+        allyFunds: state.factions.find(f => f.id === state.cells[selection.cell].owner).resources,
+        available: selection.transport }));
+      check(after.owner === before.owner && JSON.stringify(after.allyFunds) === JSON.stringify(before.allyFunds), 'allied transport preserves territory and ally funds');
+      check(after.movement === before.movement && !after.available, 'allied transport preserves movement and prevents repeat purchase');
+      check(['money', 'industry', 'food'].every(key => quote.funds[key] - after.funds[key] === quote.cost[key]), 'allied transport spends the displayed quote');
+    }
+    await page.setViewportSize({ width: 1280, height: 720 });
     await seed('poor');
     for (const op of ['train', 'upgrade', 'transport']) {
       const quote = await open(op);

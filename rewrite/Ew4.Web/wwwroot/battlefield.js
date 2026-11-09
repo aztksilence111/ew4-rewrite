@@ -42,6 +42,20 @@
     const p=position||point(unit.cell,state.width);
     return state.unitLayers&&unit.layer==='air'?{...p,x:p.x+18,y:p.y-24}:p;
   }
+  function interactionPoint(state,unit,position){
+    const p=unitPoint(state,unit,position);
+    return state.unitLayers&&unit.layer==='air'?{...p,y:p.y-20}:p;
+  }
+  function movementPoint(state,unit,cell){return interactionPoint(state,{cell,layer:unit?.layer});}
+  function hitAirUnit(state,p,markers){
+    if(!state.unitLayers)return null;
+    let hit=null,best=Infinity;
+    for(const marker of markers||[]){const u=marker.unit;if(u.layer!=='air')continue;
+      const q=interactionPoint(state,u),distance=((p.x-q.x)/32)**2+((p.y-q.y)/15)**2;
+      if(distance<=1&&distance<best){best=distance;hit=u;}
+    }
+    return hit;
+  }
   function cameraBounds(state, texture) {
     const scenario=state.cameraBounds||{left:0,top:0,width:texture.width,height:texture.height};
     if(!texture.cameraBounds)return {...scenario};
@@ -240,13 +254,24 @@
       if(pose.until!=null&&time>=pose.until){pose={action:'ready',playing:false};this.unitMotions.set(unit.id,pose);}
       if(!moving&&pose.action==='move'){pose={action:'ready',playing:false};this.unitMotions.set(unit.id,pose);}
       if(moving||unit.constructionTurns>0){pose={action:unit.constructionTurns>0?'build':profile.motions.move?'move':'ready',playing:false};this.unitMotions.set(unit.id,pose);}
+      if(pose.action==='ready'&&pose.playing&&profile.motions.select)pose={...pose,action:'select'};
       let native=this.api.effects?.motion(profile,pose.action,facing),item=lib.byName.get(native?.name||profile.motions[pose.action]||profile.motions.ready);
       if(pose.action==='undoready'&&!native&&!profile.motions.undoready){pose={action:'ready',playing:false};this.unitMotions.set(unit.id,pose);native=this.api.effects?.motion(profile,'ready',facing);item=lib.byName.get(native?.name||profile.motions.ready);}
       if(native?.static===true){this.unitMotions.set(unit.id,{action:pose.action,playing:false});return {native,item,tick:0};}
       if(native?.loop===true&&item?.duration>0)return {native,item,tick:(time/1000*lib.fps*Number(native.speed||1))%item.duration};
       let tick=pose.playing?(time-pose.started)/1000*lib.fps*Number(native?.speed||1):0;
       if(pose.playing&&(!item||tick>=item.duration)){
-        pose={action:pose.action==='ready'?'attack':'ready',playing:false};this.unitMotions.set(unit.id,pose);
+        const action=pose.action,started=pose.started;
+        pose={action:native?.rest|| (action==='ready'?'attack':'ready'),playing:false};
+        // A composite shares its clock. A stationary airframe must not finish
+        // the infantry's longer preparation before that part is drawn.
+        const whole=this.api.effects?.profile(unit.profile,this.factions.get(unit.owner));
+        const parts=this.api.effects?.parts?.(whole,!!this.state.cells[unit.cell]?.sea)||[profile];
+        const duration=Math.max(0,...parts.map(part=>{
+          const motion=this.api.effects?.motion(part,action,facing),library=this.api.libraries.get(part.library);
+          return (library?.byName.get(motion?.name||part.motions[action])?.duration||0)/((library?.fps||24)*Number(motion?.speed||1));
+        }));
+        if(time-started>=duration*1000)this.unitMotions.set(unit.id,pose);
         native=this.api.effects?.motion(profile,pose.action,facing);item=lib.byName.get(native?.name||profile.motions[pose.action]||profile.motions.ready);tick=0;
       }
       return {native,item,tick};
@@ -580,10 +605,20 @@
         if(c.buildingKind){
           const level=Math.max(1,c.buildingLevel),style=c.buildingStyle??1,region=style===1?'west':'east';
           const art=({city:`city_${region}_lv${level}.png`,industry:`factory_${region}_lv${level}.png`,stable:`stable_${region}_lv${level}.png`,port:`port_${style}.png`,farmland:`farm_${style}_lv${level}.png`})[c.buildingKind];
-          this.draw.save();this.draw.globalAlpha=c.buildingConstructionTurns>0?.45:.85;this.api.sprite('buildings',art||c.buildingImage,p.x,p.y,1,this.draw);
+          this.draw.save();this.draw.globalAlpha=c.buildingConstructionTurns>0&&c.buildingKind!=='airfield'?.45:.85;this.api.sprite('buildings',art||c.buildingImage,p.x,p.y,1,this.draw);
           if(c.buildingImage?.startsWith('capital_')){this.api.sprite('buildings',c.buildingImage,p.x,p.y,1,this.draw);this.api.sprite('buildings',`city_${region}_lv${level}_up.png`,p.x,p.y,1,this.draw);}
           this.draw.restore();
-          if(c.buildingConstructionTurns>0){this.draw.save();this.draw.font='bold 11px sans-serif';this.draw.textAlign='center';this.draw.lineWidth=3;this.draw.strokeStyle='#242015';this.draw.fillStyle='#ffe6a0';const label=`施工 ${c.buildingConstructionTurns}`;this.draw.strokeText(label,p.x,p.y-28);this.draw.fillText(label,p.x,p.y-28);this.draw.restore();}
+          if(c.buildingConstructionTurns>0&&c.buildingKind!=='airfield'){
+            this.constructionLabels??=new Map();
+            const turns=c.buildingConstructionTurns;
+            if(!this.constructionLabels.has(turns)){
+              const canvas=document.createElement('canvas');canvas.width=128;canvas.height=36;
+              const ctx=canvas.getContext('2d');ctx.scale(2,2);ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#242015';ctx.fillStyle='#ffe6a0';
+              ctx.strokeText(`施工 ${turns}`,32,13);ctx.fillText(`施工 ${turns}`,32,13);
+              this.constructionLabels.set(turns,canvas);
+            }
+            this.draw.drawImage(this.constructionLabels.get(turns),p.x-32,p.y-41,64,18);
+          }
           if(!farms){const levels=this.api.manifest.buildings[c.buildingKind];
             const maximum=c.buildingMaximumLevel??this.api.manifest.buildingUpgradeLimits?.[c.buildingKind]??levels?.length;
             if(maximum&&level>=maximum)this.api.sprite('buildings','buildinglevel_max.png',p.x,p.y+25,1,this.draw);
@@ -637,7 +672,15 @@
       const activeTrails=new Set();
       if(!this.badgeOnly)for(const [id,motion] of this.motions){const unit=this.unitById.get(id);if(!unit)continue;
         const p=pose(motion,state.width,time),profile=this.api.effects?.profile(unit.profile,this.factions.get(unit.owner))||this.api.manifest.profiles[unit.profile];
-        if(p.moving){activeTrails.add(id);this.api.effects?.trail(unit.id,p.x,p.y,Number(profile?.grade||0),state.cells[p.cell??unit.cell]?.sea,time,this.visible(p),this.arrivalSpeed||1);}
+        if(p.moving){
+          const sea=state.cells[p.cell??unit.cell]?.sea,air=state.unitLayers&&unit.layer==='air';
+          if(air){
+            const surface=profile?.compositeParts?.some(part=>part.layer==='surface');
+            if(surface&&!sea){activeTrails.add(id);this.api.effects?.trail(id,p.x,p.y,0,false,time,this.visible(p),this.arrivalSpeed||1);}
+            if(profile?.airTrail?.effect){const q=unitPoint(state,unit,p),idAir=id+':air',trail=profile.airTrail;
+              activeTrails.add(idAir);this.api.effects?.trail(idAir,q.x+p.facing*Number(trail.x||0),q.y+Number(trail.y||0),0,false,time,this.visible(q),this.arrivalSpeed||1,{...trail,facing:p.facing,layer:'air'});}
+          }else{activeTrails.add(id);this.api.effects?.trail(id,p.x,p.y,Number(profile?.grade||0),sea,time,this.visible(p),this.arrivalSpeed||1);}
+        }
       }
       this.api.effects?.finishTrails?.(activeTrails,time,this.badgeOnly);
       this.api.effects?.frame(draw,time,'ground',this.visibleRect);
@@ -646,6 +689,13 @@
         for(const id of this.motions.keys()){const unit=this.unitById.get(id);if(unit)activeUnits.add(unit);}
         units=[...activeUnits].sort((a,b)=>this.unitOrder.get(a.id)-this.unitOrder.get(b.id));}
       if(state.unitLayers)units=[...units].sort((a,b)=>Number(a.layer==='air')-Number(b.layer==='air'));
+      if(!this.badgeOnly)for(const unit of units){
+        const profile=this.api.manifest.profiles[unit.profile];if(!profile?.groundShadow)continue;
+        const motion=this.motions.get(unit.id),p=motion?pose(motion,state.width,time):point(unit.cell,state.width);
+        const facing=motion?p.facing:this.facings.get(unit.id)??(unit.facing===0?-1:1);
+        if(profile.groundShadowDirectional&&facing<0){draw.save();draw.translate(p.x,p.y+3);draw.scale(-1,1);this.api.sprite('buildings',profile.groundShadow,0,0,1,draw);draw.restore();continue;}
+        this.api.sprite('buildings',profile.groundShadow,p.x,p.y+3,1,draw);
+      }
       for(const unit of units){
         const motion=this.motions.get(unit.id),p=unitPoint(state,unit,motion?pose(motion,state.width,time):null);
         if(!this.visible(p))continue;
@@ -685,6 +735,7 @@
         if(!death)this.visibleUnitMarkers.push({unit,p});
         draw.restore();
       }
+      this.api.effects?.frame(draw,time,'air',this.visibleRect);
     }
     requestLibrary(name){
       if(!this.api.loadLibrary)return;
@@ -705,7 +756,7 @@
       this.api.sprite('buildings','hpbar_'+color+'.png',p.x,p.y);
       const arc=!death&&this.healthArc(unit.health,unit.maxHealth);
       if(arc)draw.drawImage(arc,p.x-12,p.y-12,24,24);
-      this.api.sprite('buildings','mark_unit_'+profile.unitIndex+'.png',p.x,p.y);
+      this.api.sprite(profile.mapMarkerAtlas||'buildings',profile.mapMarker||'mark_unit_'+profile.unitIndex+'.png',p.x,p.y);
       const camp=!this.badgeOnly&&this.campMark(unit.owner);
       if(camp){const height=10,width=Math.min(12,camp.width/camp.height*height);draw.drawImage(camp,p.x+9-width,p.y,width,height);}
       if(unit.aiControlled&&!death){
@@ -717,13 +768,13 @@
     farBadge(unit,profile,color,alpha=1){
       const revision=this.api.imageRevision||0;
       if(this.farBadgeRevision!==revision||this.farBadgeManifest!==this.api.manifest){for(const badge of this.farBadges?.values()||[])this.draw.release?.(badge.canvas);this.farBadges=new Map();this.farBadgePixels=0;this.farBadgeRevision=revision;this.farBadgeManifest=this.api.manifest;}
-      const key=[color,profile.unitIndex,unit.health,unit.maxHealth,alpha].join(':');
+      const key=[color,profile.mapMarkerAtlas||'buildings',profile.mapMarker||profile.unitIndex,unit.health,unit.maxHealth,alpha].join(':');
       if(this.farBadges.has(key))return this.farBadges.get(key);
       const uses=(this.farBadgeUses?.get(key)||0)+1;this.farBadgeUses?.set(key,uses);
       if(uses<2||this.farBadgeBuilds>=8)return null;
-      const names=['hpbar_'+color+'.png','mark_unit_'+profile.unitIndex+'.png'];
+      const layers=[{atlas:'buildings',name:'hpbar_'+color+'.png'},{atlas:profile.mapMarkerAtlas||'buildings',name:profile.mapMarker||'mark_unit_'+profile.unitIndex+'.png'}];
       let left=-12,top=-12,right=12,bottom=12;
-      for(const name of names){const hd=this.api.manifest.atlases.buildings_hd?.[name],atlas=hd?'buildings_hd':'buildings',sprite=hd||this.api.manifest.atlases.buildings?.[name],ratio=spritePixelRatio(sprite,hd?2:1);
+      for(const layer of layers){const {name}=layer,hd=this.api.manifest.atlases[layer.atlas+'_hd']?.[name],atlas=hd?layer.atlas+'_hd':layer.atlas,sprite=hd||this.api.manifest.atlases[layer.atlas]?.[name],ratio=spritePixelRatio(sprite,hd?2:1);
         const texture=this.api.image('images/'+atlas+'.png');if(!sprite||!texture?.complete||!texture.naturalWidth)return null;
         left=Math.min(left,-sprite.refx/ratio);top=Math.min(top,-sprite.refy/ratio);right=Math.max(right,(sprite.w-sprite.refx)/ratio);bottom=Math.max(bottom,(sprite.h-sprite.refy)/ratio);
       }
@@ -733,9 +784,9 @@
       this.farBadgeBuilds++;this.farBadgeBuildPixels+=width*height*16;
       const canvas=document.createElement('canvas');canvas.width=width*4;canvas.height=height*4;
       const draw=canvas.getContext('2d');draw.scale(4,4);draw.translate(-left,-top);draw.globalAlpha=alpha;
-      this.api.sprite('buildings',names[0],0,0,1,draw);
+      this.api.sprite(layers[0].atlas,layers[0].name,0,0,1,draw);
       const arc=this.healthArc(unit.health,unit.maxHealth);if(arc)draw.drawImage(arc,-12,-12,24,24);
-      this.api.sprite('buildings',names[1],0,0,1,draw);
+      this.api.sprite(layers[1].atlas,layers[1].name,0,0,1,draw);
       // One texture per complete badge prevents thousands of atlas/ring batch switches.
       while(this.farBadges.size&&(this.farBadges.size>=128||this.farBadgePixels+canvas.width*canvas.height>2*1024*1024)){
         const oldest=this.farBadges.keys().next().value,entry=this.farBadges.get(oldest);this.draw.release?.(entry.canvas);this.farBadgePixels-=entry.canvas.width*entry.canvas.height;this.farBadges.delete(oldest);}
@@ -833,7 +884,7 @@
           this.draw.save();this.draw.translate(p.x,p.y);this.draw.scale(this.markerScale,this.markerScale);
           if(unit.commanderImage){
             this.api.sprite('commandermark','board_smallgenerals.png',0,-14);
-            this.api.sprite('commandermark',unit.commanderImage+'.png',0,-38);
+            this.commanderPortrait(unit.commanderImage+'.png',0,-38);
           }
           this.draw.restore();
         }
@@ -860,9 +911,26 @@
           // Portrait and pointer use different atlas anchors; the portrait sits inside
           // the white board, with the pointer tip on the unit (native board refy=74).
           this.api.sprite('commandermark','board_smallgenerals.png',p.x,p.y-8);
-          this.api.sprite('commandermark',unit.commanderImage+'.png',p.x,p.y-32);
+          this.commanderPortrait(unit.commanderImage+'.png',p.x,p.y-32);
         }
       }
+    }
+    commanderPortrait(name,x,y){
+      const revision=this.api.imageRevision||0;
+      if(this.portraitRevision!==revision||this.portraitManifest!==this.api.manifest){
+        for(const canvas of this.portraits?.values()||[])this.draw.release?.(canvas);
+        this.portraits=new Map();this.portraitRevision=revision;this.portraitManifest=this.api.manifest;
+      }
+      const rect=this.api.manifest.atlases.commanders2_hd?.[name],texture=rect?this.api.image('images/commanders2_hd.png'):null;
+      const sharp=texture?.complete&&texture.naturalWidth,key=name+(sharp?'@hd':'@small');
+      if(!this.portraits.has(key)){
+        const canvas=document.createElement('canvas');canvas.width=144;canvas.height=144;
+        const draw=canvas.getContext('2d');draw.scale(6,6);draw.beginPath();draw.arc(12,12,11,0,Math.PI*2);draw.clip();
+        if(sharp)draw.drawImage(texture,rect.x,rect.y,rect.w,rect.h,1,1,22,22);
+        else this.api.sprite('commandermark',name,12,12,1,draw);
+        this.portraits.set(key,canvas);
+      }
+      this.draw.drawImage(this.portraits.get(key),x-12,y-12,24,24);
     }
     unitAnimation(lib,item,tick){
       if(!item)return;
@@ -950,10 +1018,24 @@
     highlights() {
       const range=new Set(this.selection?.range),targets=new Set(this.selection?.targets);
       for(const {site:c,cell:i,p} of this.visibleCells){if(!c.active)continue;
-        if(range.has(i)&&i!==this.selection.cell&&(this.state.unitLayers||!this.stationed.has(i)))this.api.sprite('buildings','move.png',p.x,p.y);
-        if(targets.has(i))this.api.sprite('buildings','attack.png',p.x,p.y);
+        if(range.has(i)&&i!==this.selection.cell&&(this.state.unitLayers||!this.stationed.has(i))){
+          const q=movementPoint(this.state,this.selected,i);
+          if(this.state.unitLayers&&this.selected?.layer==='air'){
+            const d=this.draw;d.save();d.lineCap='round';d.lineJoin='round';
+            // Both endpoints describe one destination: elevated aircraft cue
+            // and the centre of the actual logical ground hex.
+            d.beginPath();d.moveTo(q.x,q.y+5);d.lineTo(p.x,p.y-5);
+            d.strokeStyle='rgba(29,43,40,.75)';d.lineWidth=3/this.zoom;d.stroke();
+            d.strokeStyle='rgba(246,246,224,.9)';d.lineWidth=1.3/this.zoom;d.stroke();
+            d.beginPath();d.moveTo(p.x,p.y-5);d.lineTo(p.x+7,p.y);d.lineTo(p.x,p.y+5);d.lineTo(p.x-7,p.y);d.closePath();
+            d.fillStyle='rgba(29,43,40,.12)';d.fill();d.strokeStyle='rgba(244,243,215,.45)';d.lineWidth=1.5/this.zoom;d.stroke();d.restore();
+          }
+          this.api.sprite('buildings','move.png',q.x,q.y);
+        }
+        if(targets.has(i)&&!this.state.unitLayers)this.api.sprite('buildings','attack.png',p.x,p.y);
       }
-      if(this.selection){const p=this.state.unitLayers&&this.selected?unitPoint(this.state,this.selected):point(this.selection.cell,this.state.width);let lib=this.api.libraries.get('choose');
+      if(this.state.unitLayers)for(const id of this.selection?.targetUnits||[]){const unit=this.unitById.get(id);if(unit){const p=interactionPoint(this.state,unit);this.api.sprite('buildings','attack.png',p.x,p.y);}}
+      if(this.selection){const p=this.state.unitLayers&&this.selected?interactionPoint(this.state,this.selected):point(this.selection.cell,this.state.width);let lib=this.api.libraries.get('choose');
         if(lib&&selectionHostile(this.state,this.selection.cell,this.state.unitLayers?this.selected?.id:null)){
           if(this.redChoose?.source!==lib.texture){
             const texture=document.createElement('canvas');texture.width=lib.texture.naturalWidth;texture.height=lib.texture.naturalHeight;
@@ -978,5 +1060,5 @@
     }
     visible(p,padding=120) {const r=this.visibleRect;return p.x>=r.left-padding&&p.x<=r.left+r.width+padding&&p.y>=r.top-padding&&p.y<=r.top+r.height+padding;}
   }
-  root.Ew4Battlefield=Object.freeze({point,unitPoint,spritePixelRatio,spriteSample,neighbor,cameraBounds,hex,textPath,pathLettering,mapLabelBounds,pose,badgeAlpha,badgeColor,selectionHostile,recruitSpeed,recruitDuration,recruitOffset,advanceTutorialArrow,flagFrame,flagAnimated,facilityFlagAnimated,healthColor,flagPosition,moraleSprite,objectiveMarker,terrainRows,animationBounds,SpatialIndex,Renderer});
+  root.Ew4Battlefield=Object.freeze({point,unitPoint,interactionPoint,movementPoint,hitAirUnit,spritePixelRatio,spriteSample,neighbor,cameraBounds,hex,textPath,pathLettering,mapLabelBounds,pose,badgeAlpha,badgeColor,selectionHostile,recruitSpeed,recruitDuration,recruitOffset,advanceTutorialArrow,flagFrame,flagAnimated,facilityFlagAnimated,healthColor,flagPosition,moraleSprite,objectiveMarker,terrainRows,animationBounds,SpatialIndex,Renderer});
 })(globalThis);

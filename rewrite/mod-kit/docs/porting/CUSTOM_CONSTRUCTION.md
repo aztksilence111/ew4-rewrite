@@ -32,6 +32,8 @@ API 3 源码接口，2026-11-02。现有 0.2.30 发行包不含新功能。R 本
 
 在建筑 `recruitment` 登记的 profile 只能通过相应自定义招募项及建筑招募；不能继续借旧城市/马厩卡绕过机场资格。实际兵种模板仍须在 legacy/catalog 与 client/manifest 中存在，并配套图像/数值。机场不自动创建兵种、航空星级或维修飞机能力。
 
+招募界面按client/manifest中profile的`kind`分格，缺省时回退到`unitIndex`；同一`kind`的不同`grade`才作为编制在同格切换。`unitIndex`可供多个自定义兵种复用原图标，不代表它们是同一个兵种。需要建筑等级限制编制时，为各编制登记独立profile与招募项，分别设置`minimumLevel`，不要只修改客户端显示。
+
 AI 遵守相同工兵限制；当己方未拥有相应生产建筑、有当前工兵合法落点和该建筑招募权限时，会优先建一处，然后使用原生产/升级流程。尚无专门选址运输、调工兵建设全国机场网或主动训练工兵的策略。
 
 `/api/action` 使用 `op:"building", unit:<工兵实例ID>, offer:<建筑种类>, revision`；选择结果的 `buildingOffers` 提供名称、图像、费用、`constructionTurns`、`available`及`unavailableReason`，和原工事共用建造菜单。工兵在合法工位但已行动时卡片仍显示，确认禁用并说明原因；执行仍按完整行动资格校验。地格的 `buildingConstructionTurns` 与 `buildingRecruitsThisTurn` 随存档保存。更改配置会改变 Mod 逻辑版本，不直接改旧档。未使用的新字段省略默认值，保持旧存档校验兼容。

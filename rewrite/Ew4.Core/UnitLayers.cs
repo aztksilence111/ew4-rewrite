@@ -7,6 +7,7 @@ namespace Ew4.Core;
 public sealed record UnitLayerProfile
 {
     public string Layer { get; init; } = "surface";
+    public int MovementCost { get; init; } = 1;
     public IReadOnlyList<string>? Occupies { get; init; }
     public IReadOnlyList<string> AttackLayers { get; init; } = new[] { "surface" };
     public IReadOnlyList<string>? CounterattackLayers { get; init; }
@@ -25,7 +26,7 @@ public sealed record UnitLayerRules
         static bool Layers(IReadOnlyList<string>? layers) => layers != null && layers.Count <= 2
             && layers.All(l => l is "surface" or "air") && layers.Distinct(StringComparer.Ordinal).Count() == layers.Count;
         if (SurfaceCapacity is < 1 or > 32 || AirCapacity is < 1 or > 32 || Profiles == null
-            || Profiles.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Value == null || p.Value.Layer is not ("surface" or "air")
+            || Profiles.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Value == null || p.Value.Layer is not ("surface" or "air") || p.Value.MovementCost is < 1 or > 32
                 || !Layers(p.Value.AttackLayers) || p.Value.CounterattackLayers != null && !Layers(p.Value.CounterattackLayers)))
             throw new RuleViolation("layers.configuration", "Invalid unit layers, capacities or target layers");
         if (Profiles.Values.Any(p => p.Occupies != null && (!Layers(p.Occupies) || !p.Occupies.Contains(p.Layer))))
@@ -52,7 +53,9 @@ public static class WorldUnitLayers
         && world.UnitLayers!.Profiles.TryGetValue(profile.Id, out var policy) && policy.Occupies != null ? policy.Occupies : new[] { Layer(world, profile) };
     public static bool Composite(WorldState world, UnitProfile profile) => Occupies(world, profile).Count > 1;
     public static bool Same(WorldState world, UnitState first, UnitState second) => Occupies(world, first.Combatant.Profile).Intersect(Occupies(world, second.Combatant.Profile)).Any();
-    public static IEnumerable<UnitState> Surface(WorldState world) => world.Units.Where(u => !Air(world, u));
+    public static bool GroundAt(WorldState world, UnitProfile profile, int cell) => Occupies(world, profile).Contains("surface")
+        && (!Air(world, profile) || !world.Cells[cell].Terrain.Sea && world.Cells[cell].Terrain.CanTraverse());
+    public static IEnumerable<UnitState> Surface(WorldState world) => world.Units.Where(u => GroundAt(world, u.Combatant.Profile, u.Cell));
     public static bool ValidTerrain(WorldState world, UnitProfile profile, int cell) => cell >= 0 && cell < world.Cells.Count
         && (Air(world, profile) ? world.Cells[cell].Terrain.Active : world.Cells[cell].Terrain.CanTraverse());
     public static int Capacity(WorldState world, UnitProfile profile) => !Enabled(world) ? world.Limits.UnitsPerCell

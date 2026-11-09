@@ -129,6 +129,25 @@ internal static class AdvancedUnitChecks
         Check(WorldActions.Reachable(hybrid, heli.Id).ContainsKey(6), "composite uses airborne movement");
         var blocked = hybrid with { Cells = hybrid.Cells.Select((c, i) => i == 6 ? c with { Owner = null, Terrain = c.Terrain with { Barrier = TerrainBarrier.Mountain } } : c).ToArray() };
         Check(WorldActions.Reachable(blocked, heli.Id).ContainsKey(6), "composite ignores mountain barrier");
+        foreach (string building in new[] { "city", "factory", "farmland", "airfield" })
+        {
+            var target = hybrid with { Cells = hybrid.Cells.Select((c, i) => i == 4 ? c with { Owner = "loser", BuildingKind = building, BuildingLevel = 1 } : c).ToArray() };
+            var landing = WorldActions.Move(target, target.Revision, heli.Id, 4);
+            Check(landing.State.Cells[4].Owner == heli.Owner && landing.State.Units.Single(u => u.Id == heli.Id).Combatant.BuildingKind == building,
+                "composite landing captures " + building);
+            Check(landing.State.Cells.Where((c, i) => i != 4).Select(c => c.Owner).SequenceEqual(target.Cells.Where((c, i) => i != 4).Select(c => c.Owner)),
+                "airborne route does not paint territory for " + building);
+            Check(WorldUnitLayers.Surface(landing.State).Any(u => u.Id == heli.Id), "landed composite is a surface garrison");
+            var persisted = WorldSave.Decode(WorldSave.Encode(landing.State), landing.State.ContentRevision);
+            Check(persisted.Cells[4].Owner == heli.Owner && persisted.Units.Single(u => u.Id == heli.Id).Combatant.BuildingKind == building,
+                "composite captured building survives reload");
+        }
+        var seaLanding = hybrid with { Cells = hybrid.Cells.Select((c, i) => i == 6 ? c with { Owner = null, Terrain = c.Terrain with { Sea = true } } : c).ToArray() };
+        var crossedSea = WorldActions.Move(seaLanding, seaLanding.Revision, heli.Id, 6).State;
+        Check(crossedSea.Cells[6].Owner == null && !crossedSea.Units.Single(u => u.Id == heli.Id).Combatant.AtSea
+            && WorldUnitLayers.Surface(crossedSea).All(u => u.Id != heli.Id), "composite over sea remains airborne and cannot occupy water");
+        var mountainLanding = WorldActions.Move(blocked, blocked.Revision, heli.Id, 6).State;
+        Check(mountainLanding.Cells[6].Owner == null, "airborne composite cannot occupy impassable mountain");
         Reject((layers with { Profiles = new Dictionary<string, UnitLayerProfile> { ["bad"] = new() { Layer = "air", Occupies = ["surface"] } } }).Validate, "layers.configuration");
         Check(WorldSave.Decode(WorldSave.Encode(hybrid), hybrid.ContentRevision).UnitLayers!.Profiles["fixture.heli"].Occupies!.Count == 2, "dual footprint persists");
         var overlap = hybrid with { Units = [heli, ordinary with { Id = "ally", Cell = 6 }, plane with { Cell = 6, Owner = "loser" }] };

@@ -75,6 +75,19 @@ internal static class SingleActionChecks
             Check(Call(host, "action", new { op, cell = target.Cell, unit = target.Id, revision = initial.Revision }, false).GetString() == "client.stale", op + " duplicate confirmation rejected");
         }
         var poor = initial with { World = world with { Factions = world.Factions.Select(f => f.Id == player ? f with { Resources = new(0, 0, 0) } : f).ToArray() } };
+        string ally = world.Factions.First(f => f.Id != player && WorldDiplomacy.Allied(world, player, f.Id)).Id;
+        var alliedWorld = world with { Cells = world.Cells.Select((c, i) => i == target.Cell ? c with { Owner = ally } : c).ToArray() };
+        var alliedSession = initial with { World = alliedWorld };
+        var alliedHost = Host("allied-transport", alliedSession);
+        var alliedSelection = Call(alliedHost, "action", new { op = "select", cell = target.Cell, revision = alliedSession.Revision });
+        Check(alliedSelection.GetProperty("transport").GetBoolean()
+            && alliedSelection.GetProperty("actionQuotes").GetProperty("transport").GetProperty("cost").Deserialize<Resources>(ClientGame.Json) == coreQuotes["transport"],
+            "allied territory shows transport button and exact quote");
+        var alliedResult = Call(alliedHost, "action", new { op = "transport", unit = target.Id, cell = target.Cell, revision = alliedSession.Revision });
+        var boughtSelection = Call(alliedHost, "action", new { op = "select", cell = target.Cell, revision = alliedResult.GetProperty("revision").GetInt64() });
+        Check(!boughtSelection.GetProperty("transport").GetBoolean()
+            && boughtSelection.GetProperty("actionQuotes").GetProperty("transport").ValueKind == JsonValueKind.Null,
+            "completed allied transport removes duplicate purchase offer");
         var poorHost = Host("poor", poor);
         var poorSelection = Call(poorHost, "action", new { op = "select", cell = target.Cell, revision = poor.Revision });
         foreach (var op in coreQuotes.Keys)

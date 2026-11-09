@@ -42,6 +42,14 @@ internal static class ScenarioArmyChecks
         Check(unit.Cell == 7 && unit.Combatant.Health == 60 && unit.Combatant.Profile.MaxHealth == 150, "fallback site and post-command health");
         Check(unit.Combatant.Stars == 7 && unit.CommanderId == "new.general", "actual non-capped commander ability attached");
         Check(unit.Acted && unit.RemainingMovement == 0, "reinforcement cannot act immediately");
+        var immediate = Execute(basis, "exercise", spawn with { Ready = true, Commander = null, CommanderTemplate = null,
+            UnitTemplate = new(actor, new() { FoodConsumption = 1 }, 9) });
+        var readyUnit = immediate.Units.Single(u => u.Id == "reinforcement");
+        Check(!readyUnit.Acted && readyUnit.RemainingMovement == 9, "explicit ready spawn uses resolved movement budget");
+        var readySave = WorldSave.Decode(WorldSave.Encode(immediate), immediate.ContentRevision);
+        Check(!readySave.Units.Single(u => u.Id == readyUnit.Id).Acted && readySave.ScenarioEvents.Last().Effects.Single().Ready,
+            "ready spawn and remaining action survive save without replay");
+        Reject(() => ScenarioArmies.ValidateEffect(new() { Type = "money", Ready = true }), "scenario.army_effect");
         Check(reinforced.Factions[1].Resources == new Resources(90, 97, 98), "cost paid once");
         Check(basis.Units.Count == 2 && basis.Factions[1].Resources.Money == 100, "input snapshot unchanged");
         var saved = WorldSave.Decode(WorldSave.Encode(reinforced), reinforced.ContentRevision);

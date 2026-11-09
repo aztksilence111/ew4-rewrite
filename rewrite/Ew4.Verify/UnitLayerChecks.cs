@@ -58,6 +58,27 @@ internal static class UnitLayerChecks
             Sea = i == 7, Barrier = i == 4 ? TerrainBarrier.Mountain : TerrainBarrier.None, Active = i != 2,
             TerrainCost = 9, RiverEdges = 63, BlockedSeaEdges = 63 } }).ToArray() };
         var range = WorldActions.Reachable(terrain, plane.Id);
+        var costed = terrain with { UnitLayers = layers with { Profiles = new Dictionary<string, UnitLayerProfile> {
+            ["fixture.air"] = policies["fixture.air"] with { MovementCost = 3 }
+        } } };
+        var costedRange = WorldActions.Reachable(costed, plane.Id);
+        var shortBudget = costed with { Units = costed.Units.Select(u => u.Id == plane.Id ? u with { RemainingMovement = 2 } : u).ToArray() };
+        Check(WorldActions.Reachable(shortBudget, plane.Id).Keys.All(c => c == plane.Cell), "air cannot overdraw an unaffordable first step after repeated clicks");
+        Check(costedRange.Values.All(r => r.Path.Count <= 3 && r.Remaining == 6-(r.Path.Count-1)*3), "air budget charges each hex and caps distance");
+        var budgetedFlight = costedRange.Values.First(r => r.Path.Count == 3);
+        var firstFlight = costedRange.Values.First(r => r.Path.Count == 2);
+        var partial = WorldActions.Move(costed, costed.Revision, plane.Id, firstFlight.Cell, new() { SpendAllMovement = false }).State;
+        Check(partial.Units.Single(u => u.Id == plane.Id).RemainingMovement == 3
+            && WorldActions.Reachable(partial, plane.Id).Values.All(r => r.Path.Count <= 2), "optional partial movement spends cost without replenishing budget");
+        var spent = WorldActions.Move(costed, costed.Revision, plane.Id, budgetedFlight.Cell).State;
+        Check(spent.Units.Single(u => u.Id == plane.Id).RemainingMovement == 0 && WorldActions.Reachable(spent, plane.Id).Count == 0,
+            "multiple flight steps cannot refresh the turn budget");
+        var costSaved = WorldSave.Decode(WorldSave.Encode(spent), spent.ContentRevision);
+        Check(costSaved.UnitLayers!.Profiles["fixture.air"].MovementCost == 3 && costSaved.Units.Single(u => u.Id == plane.Id).RemainingMovement == 0,
+            "flight cost and spent budget survive save reload");
+        foreach (int invalidCost in new[] { 0, 33 }) Reject(() => (layers with { Profiles = new Dictionary<string, UnitLayerProfile> {
+            ["fixture.air"] = policies["fixture.air"] with { MovementCost = invalidCost }
+        } }).Validate(), "layers.configuration");
         Check(range.ContainsKey(7) && range.ContainsKey(4) && !range.ContainsKey(2), "air crosses sea, mountains and rivers but not inactive cells");
         var flown = WorldActions.Move(terrain, terrain.Revision, plane.Id, 4).State;
         Check(flown.Cells.Select(c => c.Owner).SequenceEqual(terrain.Cells.Select(c => c.Owner)), "flight never captures territory");
@@ -77,6 +98,15 @@ internal static class UnitLayerChecks
         var flight = WorldActions.Move(world, world.Revision, plane.Id, 7);
         airUndo.Record(world, flight.State, plane.Id, flight.Movements[0].Path.ToArray());
         Check(airUndo.Undo(flight.State, plane.Id).Change.State.Units.Count(u => u.Cell == 8) == 2, "air undo returns over occupied surface");
+        var compositeWorld = world with { Units = [basis.Units[0], plane], UnitLayers = layers with {
+            Profiles = new Dictionary<string, UnitLayerProfile> { ["fixture.air"] = policies["fixture.air"] with { Occupies = ["air", "surface"] } } },
+            Cells = world.Cells.Select((c, i) => i is 4 or 8 ? c with { BuildingKind = "city", BuildingLevel = 1 } : c).ToArray() };
+        var compositeMove = WorldActions.Move(compositeWorld, compositeWorld.Revision, plane.Id, 4);
+        var compositeUndo = new MovementHistory();
+        compositeUndo.Record(compositeWorld, compositeMove.State, plane.Id, compositeMove.Movements[0].Path.ToArray());
+        var unlanded = compositeUndo.Undo(compositeMove.State, plane.Id).Change.State;
+        Check(unlanded.Cells[4].Owner == compositeWorld.Cells[4].Owner && unlanded.Units.Single(u => u.Id == plane.Id).Cell == 8
+            && unlanded.Units.Single(u => u.Id == plane.Id).Combatant.BuildingKind == "city", "composite undo restores ownership and origin building");
 
         var offer = new RecruitmentOffer { Id = "test.air", Template = plane.Combatant, Building = BuildingRequirement.Any };
         var recruit = world with { Units = [basis.Units[0], ground], Factions = world.Factions.Select(f => f with {

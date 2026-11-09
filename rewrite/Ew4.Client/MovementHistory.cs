@@ -76,7 +76,7 @@ public sealed class MovementHistory
                 Cell = entry.Origin, RemainingMovement = entry.Remaining,
                 PlayerControl = PlayerAi.Order(u) with { ActionRound = entry.PlayerActionRound },
                 Combatant = u.Combatant with { AtSea = !WorldUnitLayers.Air(world, u) && world.Cells[entry.Origin].Terrain.Sea,
-                    BuildingKind = WorldUnitLayers.Air(world, u) ? null : world.Cells[entry.Origin].BuildingKind }
+                    BuildingKind = WorldUnitLayers.GroundAt(world, u.Combatant.Profile, entry.Origin) ? world.Cells[entry.Origin].BuildingKind : null }
             }).Concat(entry.Removed).ToArray(),
             Cells = world.Cells.Select((c,i) => owners.TryGetValue(i,out var owner) ? c with { Owner = owner.Before } : c).ToArray(),
             Factions = world.Factions.Select(f => entry.Defeated.Contains(f.Id) ? f with { Defeated = false } : f).ToArray(),
