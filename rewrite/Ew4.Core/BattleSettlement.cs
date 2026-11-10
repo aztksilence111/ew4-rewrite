@@ -5,7 +5,7 @@ using System.Linq;
 namespace Ew4.Core;
 
 public sealed record BattleResult(string Id, string Scenario, string Outcome, int Round, int Stars,
-    int MinimumRatingRound, int HighestRatingRound, long AwardMedals, long CollectedMedals);
+    int MinimumRatingRound, int HighestRatingRound, long AwardMedals, long CollectedMedals, string? Country = null);
 
 public static class BattleSettlement
 {
@@ -41,18 +41,30 @@ public static class BattleSettlement
         return index < 0 ? 0 : 1000 - 50 * index;
     }
 
-    public static GameSession Settle(GameSession session, int mode, string campaignKey, int minimumRound, int highestRound)
+    public static GameSession Settle(GameSession session, int mode, string campaignKey, int minimumRound, int highestRound, string? conquestCountry = null)
     {
         var world = session.World;
         if (world.Phase != TurnPhase.Finished || world.Outcome == BattleOutcome.Continue || world.PendingDialogue != null
             || StoryPlayback.BlocksSettlement(world)) return session;
         if (string.IsNullOrWhiteSpace(session.BattleId)) throw new RuleViolation("settlement.identity", "Battle identity is missing");
         bool won = world.Outcome == BattleOutcome.Victory;
+        string? country = mode == 2 && won ? conquestCountry : null;
         int stars = won && mode != 4 ? Stars(world.Round, minimumRound, highestRound) : 0;
         if (session.Account.BattleResults.TryGetValue(session.BattleId, out var receipt))
+        {
+            // A finished old save can recover its country without paying the reward again.
+            if (receipt.Country == null && receipt.Outcome == "Victory" && country != null)
+            {
+                receipt = receipt with { Country = country };
+                var updated = session.Account.BattleResults.ToDictionary(p => p.Key, p => p.Value);
+                updated[receipt.Id] = receipt;
+                session = session with { Account = session.Account with {
+                    Revision = checked(session.Account.Revision + 1), BattleResults = updated } };
+            }
             return session with { BattleResult = receipt.Round == world.Round && receipt.Outcome == world.Outcome.ToString()
                 ? receipt : new(session.BattleId, world.ScenarioId, world.Outcome.ToString(), world.Round, stars,
-                    minimumRound, highestRound, 0, session.CollectedMedals) };
+                    minimumRound, highestRound, 0, session.CollectedMedals, country) };
+        }
         ProgressionState Latest(ProgressionState current, ProgressionState battle) => battle.Level > current.Level
             || battle.Level == current.Level && battle.Experience > current.Experience ? battle : current;
         var participating = session.World.Commanders.ToDictionary(c => c.Id);
@@ -62,7 +74,7 @@ public static class BattleSettlement
         int best = session.Account.CampaignStars.GetValueOrDefault(campaignKey);
         long award = mode == 1 && won ? CampaignAward(stars, best) : mode == 2 ? ConquestAward(session) : 0;
         var result = new BattleResult(session.BattleId, world.ScenarioId, world.Outcome.ToString(), world.Round,
-            stars, minimumRound, highestRound, award, session.CollectedMedals);
+            stars, minimumRound, highestRound, award, session.CollectedMedals, country);
         var scores = session.Account.CampaignStars.ToDictionary(p => p.Key, p => p.Value);
         if (mode == 1 && won) scores[campaignKey] = Math.Max(best, stars);
         var receipts = session.Account.BattleResults.ToDictionary(p => p.Key, p => p.Value);

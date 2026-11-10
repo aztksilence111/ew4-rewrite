@@ -325,6 +325,15 @@ function scenarioList() {
     }
     if(!label.childElementCount)label.append(originalTextRenderer.element(scenario.name,'font_text_2_cn_hd','#ebe6e1'));
     const line = document.createElement('span'); line.className = 'conquest-line'; row.append(label,line);
+    const victories=catalog.conquestVictories?.[scenario.id]||[];
+    if(victories.length){
+      const flags=document.createElement('span');flags.className='conquest-victories';flags.setAttribute('aria-label','已通关国家');
+      for(const id of victories){
+        const flag=countryImage(id,26,16),name=catalog.countries[id]?.name||id;
+        flag.alt=name+' 已通关';flag.title=flag.alt;flag.dataset.country=id;flags.append(flag);
+      }
+      row.append(flags);
+    }
   }
   const animations=list.getAnimations?.({subtree:true})||[];conquestEntering=animations.length>0;updateConquestPagination();
   Promise.all(animations.map(a=>a.finished.catch(()=>{}))).then(()=>{
@@ -1463,7 +1472,7 @@ canvas.addEventListener('wheel',e=>{e.preventDefault();if(!followingAi())zoom(Ma
 }
 bindMapInput();
 function zoom(factor,x=viewport.w/2,y=viewport.h/2){cameraInputUntil=performance.now()+120;const before=screenToWorld(x,y);view.zoom*=factor;clampView();const after=screenToWorld(x,y);view.x+=before.x-after.x;view.y+=before.y-after.y;clampView();}
-document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=async()=>{if(!startupReady)return;mode=Number(b.dataset.mode);if(mode===4){menus.tutorialMenu();return;}await menus.transitionPage(async()=>{$('main-menu').hidden=true;$('scenario-menu').hidden=false;$('countries').hidden=true;$('conquest-pagination').hidden=mode!==2;$('scenario-menu').classList.toggle('campaign-mode',mode===1);menuArt.apply(mode);$('mode-title').replaceChildren(labelImage(b.dataset.label,b.getAttribute('aria-label'),$('mode-title')));if(!await menus.open(mode))scenarioList();});});
+document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=async()=>{if(!startupReady)return;mode=Number(b.dataset.mode);if(mode===4){menus.tutorialMenu();return;}await menus.transitionPage(async()=>{if(mode===2)catalog=await rpc('catalog');$('main-menu').hidden=true;$('scenario-menu').hidden=false;$('countries').hidden=true;$('conquest-pagination').hidden=mode!==2;$('scenario-menu').classList.toggle('campaign-mode',mode===1);menuArt.apply(mode);$('mode-title').replaceChildren(labelImage(b.dataset.label,b.getAttribute('aria-label'),$('mode-title')));if(!await menus.open(mode))scenarioList();});});
 $('conquest-prev').onclick=()=>turnConquestPage(-1);
 $('conquest-next').onclick=()=>turnConquestPage(1);
 $('cancel-country').onclick=()=>menus.transitionPage(()=>{cancelBattlePreload();$('countries').hidden=true;});

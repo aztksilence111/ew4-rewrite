@@ -40,7 +40,8 @@ public sealed partial class ClientGame
         var source = RequestBattle(session.World.ScenarioId);
         var campaignAccount = CampaignProgress.Settle(content, session);
         if (!ReferenceEquals(campaignAccount, session.Account)) session = session with { Account = campaignAccount };
-        session = BattleSettlement.Settle(session, mode, presentation?.Id ?? session.World.ScenarioId, source.Header[12], source.Header[13]);
+        session = BattleSettlement.Settle(session, mode, presentation?.Id ?? session.World.ScenarioId, source.Header[12], source.Header[13],
+            mode == 2 ? FactionCountries(session.World).GetValueOrDefault(session.PlayerFaction) : null);
         if (content.Extensions.Metagame.Objectives.Count == 0) return session;
         var account = MetagameObjectives.Observe(session.Account, content.Extensions.Metagame.Objectives, ObjectiveContext(session, previous));
         return ReferenceEquals(account, session.Account) ? session : session with { Account = account };

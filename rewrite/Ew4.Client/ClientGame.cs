@@ -67,6 +67,10 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                         presentations = content.Presentations.ToDictionary(p => p.Key, p => p.Value with {
                             Countries = p.Value.Countries.Select(content.Countries.Canonical).ToArray() }),
                         unlockedCampaigns = Account().UnlockedCampaigns, campaignStars = Account().CampaignStars,
+                        conquestVictories = Account().BattleResults.Values.Where(r => r.Outcome == "Victory" && r.Country != null
+                            && content.Scenarios.Any(s => s.Id == r.Scenario && s.Mode == 2))
+                            .GroupBy(r => r.Scenario).ToDictionary(g => g.Key,
+                                g => g.Select(r => content.Countries.Canonical(r.Country!)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray()),
                         hasSave = File.Exists(Slot), extensionLayouts = content.Extensions.Layouts,
                         headquartersPresentation = content.Extensions.HeadquartersPresentation,
                         diplomacyPresentation = content.Diplomacy.Presentation,

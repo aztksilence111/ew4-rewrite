@@ -159,6 +159,8 @@ input,select,textarea{font-family:inherit;font-synthesis:none}
 .unit-effect-region .unit-skill-list.extension-skills{left:2px!important;top:19px!important;width:auto!important;height:auto!important;max-height:none}
 #scenario-menu:not(.campaign-mode) #scenarios{position:absolute;inset:29px 54px auto 52px;height:257px;display:grid;grid-template-columns:222px 222px;grid-template-rows:repeat(3,83px);gap:4px 18px;pointer-events:auto;overflow:visible}
 #scenario-menu:not(.campaign-mode) .scenario-entry{width:222px;height:83px;animation:conquest-entry .4s ease-out var(--entry-delay,0ms) backwards}
+.conquest-victories{position:absolute;left:15px;bottom:5px;width:180px;height:16px;display:flex;align-items:center;gap:2px;pointer-events:none}
+.conquest-victories img{flex:0 1 26px;min-width:0;height:16px;object-fit:contain}
 @keyframes conquest-entry{from{transform:translateX(var(--entry-offset));}to{transform:translateX(0)}}
 #conquest-pagination{position:absolute;right:54px;bottom:4px;height:26px;display:grid;grid-template-columns:26px 50px 26px;align-items:center;background:#3f3f3f;border:1px solid #737373}
 #conquest-pagination button{width:24px;height:24px;background:url('/content/ui/image_ui_hd/button_back.png') center/100% 100% no-repeat}

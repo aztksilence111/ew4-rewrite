@@ -263,7 +263,7 @@ if (args.ElementAtOrDefault(1) == "--headquarters-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { headquartersChecks = HeadquartersChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
 }
-if (args.Length is not (1 or 2) || args.Length == 2 && args[1] is not ("--startup-only" or "--client-only" or "--mechanics-only" or "--jurisdiction-only" or "--extension-only" or "--scenario-only" or "--settlement-only" or "--equipment-only" or "--local-only" or "--provocations-only" or "--consumables-only" or "--single-actions-only" or "--legacy-skills-only" or "--dialogues-only"))
+if (args.Length is not (1 or 2) || args.Length == 2 && args[1] is not ("--startup-only" or "--client-only" or "--mechanics-only" or "--jurisdiction-only" or "--extension-only" or "--scenario-only" or "--settlement-only" or "--conquest-victories-only" or "--equipment-only" or "--local-only" or "--provocations-only" or "--consumables-only" or "--single-actions-only" or "--legacy-skills-only" or "--dialogues-only"))
     throw new ArgumentException("Usage: Ew4.Verify <project root> [--startup-only|--client-only|--mechanics-only|--jurisdiction-only]");
 string root = Path.GetFullPath(args[0]);
 if (args.Length == 2 && args[1] == "--dialogues-only")
@@ -296,9 +296,13 @@ if (args.Length == 2 && args[1] == "--equipment-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { equipmentChecks = EquipmentDescriptionChecks.Run(root), errors = 0 })); return;
 }
+if (args.Length == 2 && args[1] == "--conquest-victories-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { conquestVictoryChecks = ConquestVictoryChecks.Run(root), errors = 0 })); return;
+}
 if (args.Length == 2 && args[1] == "--settlement-only")
 {
-    Console.WriteLine(JsonSerializer.Serialize(new { settlementChecks = BattleSettlementChecks.Run(root), victoryModChecks = VictoryModChecks.Run(root),
+    Console.WriteLine(JsonSerializer.Serialize(new { conquestVictoryChecks = ConquestVictoryChecks.Run(root), settlementChecks = BattleSettlementChecks.Run(root), victoryModChecks = VictoryModChecks.Run(root),
         saveCompatibilityChecks = SaveCompatibilityChecks.Run(root), errors = 0 })); return;
 }
 if (args.Length == 2 && args[1] == "--scenario-only")
