@@ -11,4 +11,4 @@
 
 回归入口：`Ew4.Verify <项目根> --conquest-victories-only`，`node tools/verify_conquest_victories.cjs <独立测试URL> <临时输出目录>`。浏览器用合成目录响应验证画面，未向玩家账户写入假通关；原生用独立合成账户检验实际结算及持久化。
 
-本次交付源码，未打新APK／正式发行，未替换玩家服务或做Android设备验收。独立56230测试宿主及全部配套编译、合成账户、缓存、截图和日志在验收后清理；简短结果及清理收据保留于 `build/maintenance-20261110/conquest-victories-cleanup.json`。
+初轮源码验收未打包，独立56230及全部配套临时产物已清，简短清理结果位于 `build/maintenance-20261110/conquest-victories-cleanup.json`。用户随后授权打包发布，功能已纳入正式[0.2.36双端及作者包](../rewrite/RELEASE_PROGRESS_0.2.36_20261110.md)，两个APK ABI实际程序集各通过国旗28项；最终源码／兼容前端四视口28项也已复测通过。未替换玩家服务或进行Android设备验收，发行清理见该版本记录。
