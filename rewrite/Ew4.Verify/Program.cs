@@ -294,7 +294,7 @@ if (args.Length == 2 && args[1] == "--provocations-only")
 }
 if (args.Length == 2 && args[1] == "--equipment-only")
 {
-    Console.WriteLine(JsonSerializer.Serialize(new { equipmentChecks = EquipmentDescriptionChecks.Run(root), errors = 0 })); return;
+    Console.WriteLine(JsonSerializer.Serialize(new { equipmentChecks = EquipmentDescriptionChecks.Run(root), battleEquipmentChecks = BattleEquipmentChecks.Run(root), errors = 0 })); return;
 }
 if (args.Length == 2 && args[1] == "--conquest-victories-only")
 {
@@ -390,6 +390,7 @@ foreach (var fixture in vectors.RootElement.GetProperty("fixtures").EnumerateArr
 int contracts = Contracts.Run(root);
 int commanderChecks = CommanderChecks.Run(root);
 commanderChecks += EquipmentDescriptionChecks.Run(root);
+commanderChecks += BattleEquipmentChecks.Run(root);
 commanderChecks += ConsumableChecks.Run(root);
 int animationChecks = AnimationChecks.Run(root);
 int catalogChecks = CatalogChecks.Run(root);

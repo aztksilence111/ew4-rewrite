@@ -573,7 +573,7 @@
       const abilityDefinitions=this.abilityDefinitions(),abilityRows=Math.ceil(abilityDefinitions.length/2);
       const body=this.api.detail('title_unitinfo',440,217+(abilityRows-4)*27,null,onClose||(()=>{this.drawRoster();}));body.className='commander-detail';
       const card=document.createElement('div');card.className='commander-detail-card';const portrait=this.card(definition,held,()=>{});portrait.querySelector('.commander-info').remove();portrait.querySelector('.commander-tag')?.remove();delete portrait.dataset.locked;card.append(portrait);body.append(card);
-      const equipment=document.createElement('div');equipment.className='commander-equipment';const title=document.createElement('div');title.className='commander-equipment-title';title.append(this.lettering(this.text('text_equipitem')));equipment.append(title);
+      const equipment=document.createElement('div');equipment.className='commander-equipment'+(held?.battle?' battle-equipment':'');const title=document.createElement('div');title.className='commander-equipment-title';title.append(this.lettering(this.text('text_equipitem')));equipment.append(title);
       const items=document.createElement('div');items.className='commander-equipment-slots';for(let i=0;i<(this.data.equipmentCapacity??2);i++){const marker=this.data.items.find(m=>m.id===held?.items[i]);items.append(this.api.uiImage(marker?.image||'item_blank.png',45));}equipment.append(items);body.append(equipment);
       const skills=document.createElement('div');skills.className='commander-skills';
       for(let i=0;i<Math.max(this.data.skillLayout?0:4,definition.skills.length);i++){

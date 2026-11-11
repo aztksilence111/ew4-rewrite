@@ -92,6 +92,7 @@
   };
   proto.itemButton=function(item,quantity,select){
     const b=this.api.button('',select,document.createElement('div'));b.className='native-item';b.setAttribute('aria-label',item?.name||'空物品位');
+    if(item)b.dataset.itemId=item.id;
     b.append(this.api.uiImage(item?.image||'item_blank.png',45));
     if(item&&Number.isFinite(quantity)&&(item.consumable||quantity>1)){const n=document.createElement('span');n.className='item-quantity';n.append(this.lettering(quantity,'font_char_2_hd','#ebe6e1'));b.append(n);}
     return b;
@@ -118,15 +119,39 @@
     }
     l.action('btn_equip',this.text('btn_equip'),()=>{},false);l.text('intitle_desc','');
   };
-  proto.battleEquipment=function(held,onClose){
+  proto.battleEquipment=async function(held,onClose){
     const l=this.native('form_deployitem',onClose),definition=this.definition(held);
     const portrait=this.card(definition,held,()=>{});delete portrait.dataset.locked;portrait.querySelector('.commander-info').remove();l.fill('tcmder',portrait);
     for(const [key,track] of [['rank_military','rank'],['rank_nobility','title']])l.fill(key,this.progressionBadge(track,held.learning[track]));
     l.text('text_life',held.healthBonus);l.text('text_apply',held.healing);
-    for(const key of ['btn_prev','btn_next','btn_equip'])l.hide(key);
-    l.hide('grid_items');l.text('intitle_desc','');
+    for(const key of ['btn_prev','btn_next'])l.action(key,key==='btn_prev'?'上一位将领':'下一位将领',()=>{},false);
+    const editable=!!held.editableEquipment,description=l.get('group_desc'),equip=l.get('btn_equip');
+    description.append(equip);
+    Object.assign(equip.style,{left:'50%',transform:'translateX(-50%)',top:'auto',bottom:'4px',width:'83px',height:'30px'});
+    Object.assign(l.get('text_desc').style,{height:(parseFloat(description.style.height)-(editable?60:30))+'px',overflowY:'auto'});
+    l.hide('btn_equip',!editable);l.text('intitle_desc','');
+    l.action('btn_equip',this.text('btn_equip'),()=>{},false);
+    const choose=(item,remove,b)=>{
+      for(const n of l.body.querySelectorAll('.native-item'))n.setAttribute('aria-pressed',String(n===b));
+      l.text('intitle_desc',item.name);l.text('text_desc',item.description);
+      const consume=item.consumable&&!remove,verb=remove?'卸下':consume?'使用':this.text('btn_equip');
+      const available=remove||consume?remove||item.available:item.available>0&&held.items.length<(this.data.equipmentCapacity??Infinity)&&!held.items.includes(item.id);
+      l.text('btn_equip',verb);
+      l.action('btn_equip',verb+' '+item.name,async()=>{
+        await this.api.act(remove?'unequip':consume?'use_item':'equip',{unit:held.unit,commander:held.id,item:item.id});
+        this.data=await this.api.rpc('headquarters');
+        const info=await this.api.rpc('unit-info',{unit:held.unit,revision:this.api.state().revision});
+        if(!info.commander)return onClose();
+        Object.assign(held,info.commander);await this.battleEquipment(held,onClose);
+      },editable&&available);
+    };
     for(let i=0;i<Math.max(this.data.equipmentCapacity??2,held.items.length);i++){
-      const item=this.data.items.find(d=>d.id===held.items[i]);let b=this.itemButton(item,0,()=>{l.text('intitle_desc',item.name);l.text('text_desc',item.description);});b.disabled=!item;l.get('lbox_equipitem').append(b);
+      const item=this.data.items.find(d=>d.id===held.items[i]);let b=this.itemButton(item,0,()=>choose(item,true,b));b.disabled=!item;l.get('lbox_equipitem').append(b);
+    }
+    const consumables=editable?await this.api.rpc('items',{unit:held.unit}):null;
+    if(!l.current())return;
+    for(const item of this.data.items.filter(i=>editable&&(i.consumable||i.available>0)).map(i=>i.consumable?{...i,...consumables.items.find(c=>c.id===i.id)}:i)){
+      let b=this.itemButton(item,item.available,()=>choose(item,false,b));l.get('grid_items').append(b);
     }
   };
   proto.promotion=function(id,onClose){

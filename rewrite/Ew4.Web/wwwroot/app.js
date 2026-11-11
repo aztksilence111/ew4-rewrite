@@ -88,7 +88,7 @@ async function prepareMapFonts(next,preferences=settings){
     ...geography.map(label=>Ew4OriginalUI.prepareMapText(label.textZh||'',!label.sea))]);
 }
 const menus = new Ew4Menus.Menus({rpc,button,uiImage,countryImage,labels:labelImage,text:(value,font,color,width,align,options)=>originalTextRenderer?.element(value,font,color,width,align,options)||document.createTextNode(value),prose:(...args)=>originalTextRenderer.prose(...args),detail:detailWindow,start,loadLibrary,image,animation,libraries,notice,main:showMain,
-  get manifest(){return manifest;},get catalog(){return catalog;},refreshCatalog:async()=>{catalog=await rpc('catalog');},tutorialUi,popup:popupOpen,load:(slot,mode)=>load(slot,mode),deploy:(unit,commander)=>act('deploy',{unit,commander}),act,
+  get manifest(){return manifest;},get catalog(){return catalog;},state:()=>state,refreshCatalog:async()=>{catalog=await rpc('catalog');},tutorialUi,popup:popupOpen,load:(slot,mode)=>load(slot,mode),deploy:(unit,commander)=>act('deploy',{unit,commander}),act,
   updateResources:resources=>{const player=state?.factions.find(f=>f.id===state.playerFaction);if(player){player.resources=resources;refreshResources();}},
   refresh:async()=>{if(state&&!$('play').hidden){await installState(await rpc('action',{op:'state',revision:state.revision}));}},get menuArt(){return menuArt;},closeDetail});
 let chosenScenario, chosenCountry, countryChoices = [], showGrid = false, selectedAt = 0;

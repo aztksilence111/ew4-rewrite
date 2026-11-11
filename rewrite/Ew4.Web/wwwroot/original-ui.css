@@ -95,6 +95,7 @@ input,select,textarea{font-family:inherit;font-synthesis:none}
 .commander-equipment-slots img{width:45px;height:45px}
 .commander-equipment button{position:absolute;left:107px;width:83px;height:33px}
 .commander-equipment .regroup{top:3px}.commander-equipment .equip{top:38px}
+.commander-equipment.battle-equipment .equip{top:20px}
 .commander-skills{left:278px;top:3px;width:160px;height:74px;right:auto;overflow:hidden}
 .commander-skills .skill-row{position:relative;width:160px;height:18.5px;border-bottom:1px solid #aaa;display:flex;align-items:center;padding-left:20px}
 .skill-row>img{position:absolute;left:1px;top:1px;width:19px;height:17px}
@@ -117,7 +118,8 @@ input,select,textarea{font-family:inherit;font-synthesis:none}
 .rank-gauge>canvas{display:block;width:28.5px;height:28.5px}
 .commander-ranks .rank-gauge{position:absolute;left:6px;top:6px}
 .commander-ranks .rank-image{position:absolute;left:8px;top:8px;width:21px;height:24px;object-fit:contain}
-.commander-ranks .rank-effect{position:absolute;left:49px;top:8px;width:17px;height:17px;object-fit:contain}
+.commander-ranks .rank-effect{position:absolute;left:49px;top:10px;width:15px;height:13.5px;object-fit:contain}
+.commander-ranks .rank-effect[src$="marker_recover_dark.png"]{top:7px;width:17.5px;height:17.5px}
 .commander-ranks .original-text{position:absolute;left:36px;top:23px;width:40px;justify-content:center}
 .commander-detail .commander-card{filter:none}
 .commander-equipment-title::before,.commander-equipment-title::after{content:"";position:absolute;left:0;top:3px;width:11px;height:12px;background:url('/content/ui/image_ui_hd/common_pattern.png') center/100% 100%;filter:brightness(.3)}

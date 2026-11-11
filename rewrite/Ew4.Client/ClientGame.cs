@@ -190,7 +190,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         if (recovered) state = SessionActions.CommitWorld(state, state.Revision, recovery).State;
         var profile = Account();
         var unlocks = profile.UnlockedCampaigns.Union(state.Account.UnlockedCampaigns, StringComparer.Ordinal).ToArray();
-        if (profile.Revision > state.Account.Revision) state = state with { Account = profile };
+        if (profile.Revision > state.Account.Revision) state = BattleEquipment.SynchronizeAccount(state, profile, start.Rules.Roster);
         if (!state.Account.UnlockedCampaigns.SequenceEqual(unlocks))
             state = state with { Account = state.Account with { Revision = checked(Math.Max(profile.Revision, state.Account.Revision) + 1), UnlockedCampaigns = unlocks } };
         state = SettleBattle(state);
@@ -283,6 +283,13 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         if (active.Id != session.PlayerFaction || !active.Human) throw new RuleViolation("client.player_turn", "Player does not own the active turn");
         if (PlayerAi.Pending(world)) throw new RuleViolation("player_ai.ending", "请先停止执行再操作单位");
         if (command.Op is "declare_war" or "demand_surrender" or "purchase_surrender") return DiplomacyAction(command);
+        if (command.Op is "equip" or "unequip")
+        {
+            CommitSession(BattleEquipment.Change(session, session.Revision, command.Unit!, command.Commander!, command.Item!, command.Op == "equip", rules.Roster));
+            movementHistory.Reset(game!.Session.World);
+            AutoSave();
+            return View();
+        }
         if (command.Op == "use_item")
         {
             var itemRules = content.Catalogs.Items.Rules();

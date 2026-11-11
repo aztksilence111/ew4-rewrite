@@ -67,15 +67,17 @@ public static class WorldCommanders
         return AssignForOwner(state, unitId, commanderId, faction.Id, rules);
     }
 
-    internal static WorldChange AssignForOwner(WorldState state, string unitId, string commanderId, string owner, WorldCommanderRules rules)
+    internal static WorldChange AssignForOwner(WorldState state, string unitId, string commanderId, string owner, WorldCommanderRules rules, bool refreshEquipment = false)
     {
         rules.Validate();
         var unit = state.Units.SingleOrDefault(u => u.Id == unitId);
         var commander = state.Commanders.SingleOrDefault(c => c.Id == commanderId);
         if (unit == null || unit.Owner != owner || commander == null || commander.Owner != owner || commander.Withdrawn
-            || state.Units.Any(u => u.CommanderId == commanderId))
+            || state.Units.Any(u => u.CommanderId == commanderId && (!refreshEquipment || u.Id != unitId)))
             throw new RuleViolation("commander.unavailable", "Commander or receiving unit is unavailable");
-        if (unit.CommanderId != null && !rules.AllowReplacement)
+        if (refreshEquipment && unit.CommanderId != commanderId)
+            throw new RuleViolation("commander.unavailable", "Equipment refresh requires the attached commander");
+        if (unit.CommanderId != null && !rules.AllowReplacement && !refreshEquipment)
             throw new RuleViolation("commander.occupied", "Commander replacement is disabled");
         if (!rules.Definitions.TryGetValue(commanderId, out var definition)) throw new RuleViolation("commander.definition", "Missing commander definition");
         var original = Unassigned(unit);

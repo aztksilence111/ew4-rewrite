@@ -47,7 +47,11 @@ public sealed partial class ClientGame
             if (owned != null) foreach (var value in owned.Learning.Abilities) abilities[value.Key] = value.Value;
             foreach (var value in resolved.Stars) abilities[value.Key] = value.Value;
             abilities["movement"] = resolved.Movement;
-            return new { id, definitionId = source.Definition.Id, locked = true, battle = true,
+            var unit = world.Units.FirstOrDefault(u => u.CommanderId == id);
+            bool editableEquipment = owned != null && unit?.Owner == session.PlayerFaction && runtime.Owner == session.PlayerFaction
+                && !runtime.Withdrawn && world.ActiveFaction == session.PlayerFaction && world.Phase == TurnPhase.Active
+                && world.Outcome == BattleOutcome.Continue && world.PendingDialogue == null;
+            return new { id, definitionId = source.Definition.Id, locked = true, battle = true, editableEquipment, unit = unit?.Id,
                 learning = new CommanderLearningState(runtime.Rank, runtime.Title, abilities),
                 training = runtime.MaximumTrainingLevel, items = resolved.Items.Select(i => i.Id).ToArray(),
                 healthBonus = runtime.RankHealthBonus, healing = current.Rules.Commanders.TitleHealing.GetValueOrDefault(runtime.Title.Level) };

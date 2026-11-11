@@ -12,7 +12,7 @@ public sealed partial class ClientGame
         long quantity = account.Inventory.GetValueOrDefault(key);
         long assigned = account.Roster.Sum(c => c.Items.LongCount(item => item == key));
         return (object)new { id = key, name = content.Label("name_" + name), image = name + ".png",
-            description = content.Label("desc_" + name), definition.Price, definition.Unique,
+            description = ItemDescription(definition.Equipment, name), definition.Price, definition.Unique,
             definition.Equipment.Consumable, quantity, available = quantity - assigned };
     }).ToArray();
 
