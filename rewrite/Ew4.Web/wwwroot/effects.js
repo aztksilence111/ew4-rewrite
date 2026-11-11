@@ -23,19 +23,29 @@
       this.parameters=definition.parameters;this.event=event;this.seed=seed>>>0;this.time=0;this.credit=0;this.particles=[];
       this.until=options.continuous?Infinity:Math.max(0,Math.min(Number(definition.life),options.emissionLife??Infinity));
       this.enabled=true;this.emitted=0;this.peak=0;this.previous={x:0,y:0,time:0};this.position={...this.previous};
+      this.positions=[this.position];
       this.maximumLife=Math.max(Number(this.parameters.life?.min||0),Number(this.parameters.life?.max||0),1/60);
     }
     random(){this.seed=(Math.imul(this.seed,1664525)+1013904223)>>>0;return this.seed/4294967296;}
     value(key,fallback=0){const p=this.parameters[key];return p?Number(p.min??fallback)+(Number(p.max??p.min??fallback)-Number(p.min??fallback))*this.random():fallback;}
-    move(x,y,time){this.previous=this.position;this.position={x,y,time};}
+    move(x,y,time){
+      this.previous=this.position;this.position={x,y,time};
+      if(this.positions[this.positions.length-1].time===time)this.positions[this.positions.length-1]=this.position;
+      else this.positions.push(this.position);
+      // Keep the segment that brackets the next simulation birth, including
+      // render samples that arrived before a full simulation step elapsed.
+      while(this.positions.length>2&&this.positions[1].time<=this.time)this.positions.shift();
+    }
     stop(time=this.time){this.until=Math.min(this.until,Math.max(0,time));}
     get alive(){return this.time<this.until||this.particles.length>0;}
     spawn(at){
       const p=this.parameters,angle=Number(this.event.rot||0)*Math.PI/180,direction=this.value('angle')*Math.PI/180+angle;
       const life=Math.max(1/60,this.value('life',.5)),speed=this.value('speed'),area=p.settings?.type==='area';
       const dx=area?(this.random()-.5)*Number(p.settings?.width||0):0,dy=area?(this.random()-.5)*Number(p.settings?.height||0):0;
-      const span=this.position.time-this.previous.time,f=span>0?Math.max(0,Math.min(1,(at-this.previous.time)/span)):1;
-      const x=this.previous.x+(this.position.x-this.previous.x)*f,y=this.previous.y+(this.position.y-this.previous.y)*f;
+      let a=this.positions[0],b=a;
+      for(const position of this.positions){b=position;if(position.time>=at)break;a=position;}
+      const span=b.time-a.time,f=span>0?Math.max(0,Math.min(1,(at-a.time)/span)):1;
+      const x=a.x+(b.x-a.x)*f,y=a.y+(b.y-a.y)*f;
       this.particles.push({image:p.image,tracks:p.lifetrack,born:at,age:0,life,
         x:x+Number(this.event.x||0)+dx*Math.cos(angle)-dy*Math.sin(angle),y:y+Number(this.event.y||0)+dx*Math.sin(angle)+dy*Math.cos(angle),
         vx:Math.cos(direction)*speed,vy:Math.sin(direction)*speed,gravity:this.value('gravity'),scale:this.value('scale',1),rotation:this.value('rotangle')*Math.PI/180+angle,spin:this.value('rotspeed'),
@@ -50,17 +60,28 @@
       // Invisible continuous trails keep their clock, without replaying discarded births.
       if(!this.enabled&&!this.particles.length){this.credit=0;this.time=end;return;}
       while(this.time+step<=end+1e-9){
-        for(let i=this.particles.length-1;i>=0;i--){
-          const p=this.particles[i],life=p.age/p.life;
+        let live=0;
+        for(const p of this.particles){
+          const life=p.age/p.life;
           p.x+=p.vx*track(p.tracks,life,'speed')*step;p.y+=p.vy*track(p.tracks,life,'speed')*step;
           p.vy+=p.gravity*track(p.tracks,life,'gravity')*step;p.rotation+=p.spin*track(p.tracks,life,'rotspeed')*step;p.age+=step;
-          if(p.age>=p.life){this.particles[i]=this.particles[this.particles.length-1];this.particles.pop();}
+          if(p.age<p.life)this.particles[live++]=p;
         }
+        this.particles.length=live;
         const emissionStep=Math.max(0,Math.min(step,this.until-this.time));
         if(this.enabled&&emissionStep>0){
-          this.credit+=Math.max(0,track(this.parameters.timetrack,this.time,'quantity','time',0))*emissionStep;
+          const rate=Math.max(0,track(this.parameters.timetrack,this.time,'quantity','time',0)),credit=this.credit;
+          this.credit+=rate*emissionStep;
           const count=Math.floor(this.credit+1e-9);this.credit=Math.max(0,this.credit-count);
-          for(let n=0;n<Math.min(count,100-this.particles.length);n++)this.spawn(this.time+emissionStep);
+          // Spread births along the travelled segment instead of stacking a
+          // whole simulation step at its endpoint. Keep the native rate/cap.
+          const births=Math.min(count,100-this.particles.length);
+          for(let n=0;n<births;n++){
+            const at=this.time+Math.min(emissionStep,(n+1-credit)/rate);this.spawn(at);
+            const p=this.particles[this.particles.length-1],age=this.time+step-at;
+            p.x+=p.vx*track(p.tracks,0,'speed')*age;p.y+=p.vy*track(p.tracks,0,'speed')*age;
+            p.vy+=p.gravity*track(p.tracks,0,'gravity')*age;p.rotation+=p.spin*track(p.tracks,0,'rotspeed')*age;p.age=age;
+          }
         }
         this.time+=step;
       }
@@ -313,15 +334,21 @@
             draw.save();draw.translate(x,y);draw.scale(Number(event.scale||1)*instance.scale,Number(event.scale||1)*instance.scale);this.api.sprite('eff',event.name,0,0,1,draw);draw.restore();
           }
         }
-        for(const emitter of instance.emitters)for(const p of emitter.particles){const life=p.age/p.life,scale=p.scale*track(p.tracks,life,'scale'),s=instance.scale;
+        for(const emitter of instance.emitters)for(const p of emitter.particles){
+          // Predict only the fractional remainder for drawing; fixed-step
+          // simulation and random births stay independent of refresh rate.
+          const remainder=Math.max(0,Math.min(1/60,elapsed-Number(emitter.event.at||0)-emitter.time));
+          const age=p.age+remainder;if(age>=p.life)continue;
+          const life=age/p.life,scale=p.scale*track(p.tracks,life,'scale'),s=instance.scale;
           const alpha=Math.max(0,Math.min(1,p.color[3]*track(p.tracks,life,'a')/255));if(alpha<=1/255)continue;
           const width=Number(p.image.width)*scale*s,height=Number(p.image.height)*scale*s;
-          const x=instance.x+p.x*s,y=instance.y+p.y*s,sprite=this.api.manifest.atlases.eff?.[p.image.file];
+          const velocity=track(p.tracks,p.age/p.life,'speed');
+          const x=instance.x+(p.x+p.vx*velocity*remainder)*s,y=instance.y+(p.y+p.vy*velocity*remainder)*s,sprite=this.api.manifest.atlases.eff?.[p.image.file];
           const anchorX=sprite?Number(sprite.refx||0)/sprite.w:.5,anchorY=sprite?Number(sprite.refy||0)/sprite.h:.5;
           const radius=Math.hypot(width,height)*Math.max(anchorX,1-anchorX,anchorY,1-anchorY);
           if(!inView(visibleRect,x,y,radius))continue;
           const color=p.color.map((v,i)=>v*track(p.tracks,life,['r','g','b','a'][i])),texture=draw.gpu?this.particleAtlas():this.texture(p.image?.file,color);if(!texture||!sprite)continue;
-          draw.save();draw.translate(x,y);draw.rotate(p.rotation);draw.globalAlpha=alpha;draw.globalCompositeOperation=p.image.blend==='add'?'lighter':'source-over';
+          draw.save();draw.translate(x,y);draw.rotate(p.rotation+p.spin*track(p.tracks,p.age/p.life,'rotspeed')*remainder);draw.globalAlpha=alpha;draw.globalCompositeOperation=p.image.blend==='add'?'lighter':'source-over';
           if(draw.gpu){const rgb=color.slice(0,3).map(v=>Math.max(0,Math.min(255,Math.round(v/16)*16)));draw.tint=(rgb[0]<<16)|(rgb[1]<<8)|rgb[2];draw.drawImage(texture,sprite.x,sprite.y,sprite.w,sprite.h,-width*anchorX,-height*anchorY,width,height);}
           else draw.drawImage(texture,-width*anchorX,-height*anchorY,width,height);
           draw.restore();

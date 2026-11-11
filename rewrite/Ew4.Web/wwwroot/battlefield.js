@@ -110,8 +110,17 @@
       return bounds;}
     return paddedBounds(Number(label.tx),Number(label.ty),Math.max(Number(label.width),Number(label.height)));
   }
+  function advanceMotions(motions,time){
+    for(const motion of motions.values()){
+      if(motion.pending){motion.started=time;motion.pending=false;}
+      // Original JNI updates cap dt at 50 ms. Preserve the path through a
+      // long frame instead of skipping its beginning or teleporting ahead.
+      else if(motion.frameTime!=null)motion.started+=Math.max(0,time-motion.frameTime-50);
+      motion.frameTime=time;
+    }
+  }
   function pose(motion,width,time) {
-    const progress=Math.max(0,Math.min(motion.path.length-1,(time-motion.started)/motion.stepMs));
+    const progress=motion.pending?0:Math.max(0,Math.min(motion.path.length-1,(time-motion.started)/motion.stepMs));
     const step=Math.min(motion.path.length-2,Math.floor(progress));
     const from=point(motion.path[Math.max(0,step)],width),to=point(motion.path[Math.max(0,step)+1],width),fraction=progress-step;
     return {x:from.x+(to.x-from.x)*fraction,y:from.y+(to.y-from.y)*fraction,
@@ -258,7 +267,11 @@
       let native=this.api.effects?.motion(profile,pose.action,facing),item=lib.byName.get(native?.name||profile.motions[pose.action]||profile.motions.ready);
       if(pose.action==='undoready'&&!native&&!profile.motions.undoready){pose={action:'ready',playing:false};this.unitMotions.set(unit.id,pose);native=this.api.effects?.motion(profile,'ready',facing);item=lib.byName.get(native?.name||profile.motions.ready);}
       if(native?.static===true){this.unitMotions.set(unit.id,{action:pose.action,playing:false});return {native,item,tick:0};}
-      if(native?.loop===true&&item?.duration>0)return {native,item,tick:(time/1000*lib.fps*Number(native.speed||1))%item.duration};
+      if(native?.loop===true&&item?.duration>0){
+        const movement=moving&&this.motions?.get(unit.id);
+        const elapsed=movement?Math.max(0,time-movement.started)*(this.arrivalSpeed||1):time;
+        return {native,item,tick:(elapsed/1000*lib.fps*Number(native.speed||1))%item.duration};
+      }
       let tick=pose.playing?(time-pose.started)/1000*lib.fps*Number(native?.speed||1):0;
       if(pose.playing&&(!item||tick>=item.duration)){
         const action=pose.action,started=pose.started;
@@ -1060,5 +1073,5 @@
     }
     visible(p,padding=120) {const r=this.visibleRect;return p.x>=r.left-padding&&p.x<=r.left+r.width+padding&&p.y>=r.top-padding&&p.y<=r.top+r.height+padding;}
   }
-  root.Ew4Battlefield=Object.freeze({point,unitPoint,interactionPoint,movementPoint,hitAirUnit,spritePixelRatio,spriteSample,neighbor,cameraBounds,hex,textPath,pathLettering,mapLabelBounds,pose,badgeAlpha,badgeColor,selectionHostile,recruitSpeed,recruitDuration,recruitOffset,advanceTutorialArrow,flagFrame,flagAnimated,facilityFlagAnimated,healthColor,flagPosition,moraleSprite,objectiveMarker,terrainRows,animationBounds,SpatialIndex,Renderer});
+  root.Ew4Battlefield=Object.freeze({point,unitPoint,interactionPoint,movementPoint,hitAirUnit,spritePixelRatio,spriteSample,neighbor,cameraBounds,hex,textPath,pathLettering,mapLabelBounds,advanceMotions,pose,badgeAlpha,badgeColor,selectionHostile,recruitSpeed,recruitDuration,recruitOffset,advanceTutorialArrow,flagFrame,flagAnimated,facilityFlagAnimated,healthColor,flagPosition,moraleSprite,objectiveMarker,terrainRows,animationBounds,SpatialIndex,Renderer});
 })(globalThis);

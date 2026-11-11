@@ -497,7 +497,7 @@ async function installState(next, center = false) {
   const now=performance.now(), stepMs=movementStepMs(), recruitSpeed=Ew4Battlefield.recruitSpeed(settings.speed,aiRunning);
   if (!center && !fastSkipping()) {
     const moves=skipAi&&next.combat?.movements?.length?next.combat.movements:next.movements||[];
-    if(!next.combat||skipAi)for(const move of moves)if(!move.instant&&move.path.length>1){combatMotions.delete(move.unit);motions.set(move.unit,{path:move.path,started:now,stepMs});const a=point(move.path.at(-2)),b=point(move.path.at(-1));facings.set(move.unit,b.x<a.x?-1:1);if(!skipAi)playMovementSound(move);}
+    if(!next.combat||skipAi)for(const move of moves)if(!move.instant&&move.path.length>1){combatMotions.delete(move.unit);motions.set(move.unit,{path:move.path,started:now,stepMs,pending:true});const a=point(move.path.at(-2)),b=point(move.path.at(-1));facings.set(move.unit,b.x<a.x?-1:1);if(!skipAi)playMovementSound(move);}
     if(!skipAi)for(const id of next.recruited || []){const unit=state.units.find(u=>u.id===id);if(!unit||unit.category==='fort'||!next.notices?.some(n=>n.kind==='unit.recruited'&&n.subject===id))continue;arrivals.set(id,now);const p=point(unit.cell);effects?.sound('sfx_draft.wav');effects?.effect('effect_recruit.xml',p.x,p.y,{speed:recruitSpeed});}
     const duration=Math.max(...[...motions.values()].map(m=>(m.path.length-1)*stepMs),arrivals.size?Ew4Battlefield.recruitDuration(recruitSpeed):0);
     updateAiCamera(now);
@@ -577,7 +577,17 @@ function updateAiCamera(time){
   const p=motion?Ew4Battlefield.pose(motion,state.width,time):point(unit?.cell??aiFocus.cell);
   view.x=p.x;view.y=p.y;clampView();
 }
-function presentationDelay(duration){requestRender();return new Promise(resolve=>{const timer=setTimeout(done,duration);function done(){clearTimeout(timer);presentationWaiters.delete(done);if(!presentationWaiters.size)finishPresentation=null;requestRender();resolve();}presentationWaiters.add(done);finishPresentation=()=>{for(const finish of [...presentationWaiters])finish();};});}
+function presentationDelay(duration){
+  requestRender();return new Promise(resolve=>{
+    let timer=setTimeout(checkTime,duration);
+    function checkTime(){
+      const remaining=appVisible&&!document.hidden?Math.max(0,...[...motions.values()].map(m=>m.started+(m.path.length-1)*m.stepMs-performance.now())):0;
+      if(remaining>1){timer=setTimeout(checkTime,remaining);return;}done();
+    }
+    function done(){clearTimeout(timer);presentationWaiters.delete(done);if(!presentationWaiters.size)finishPresentation=null;requestRender();resolve();}
+    presentationWaiters.add(done);finishPresentation=()=>{for(const finish of [...presentationWaiters])finish();};
+  });
+}
 function beginDeath(id){if(!deaths.has(id))deaths.set(id,{started:performance.now(),duration:500/Math.sqrt(settings.speed)});}
 function playMovementSound(move){const unit=state.units.find(u=>u.id===move.unit);if(unit)effects?.moveSound(visualProfile(unit),unit.category,state.cells[move.path.at(-1)]?.sea);}
 function playOccupationSound(next,moves){
@@ -586,7 +596,7 @@ function playOccupationSound(next,moves){
 }
 async function playMovements(moves){
   const started=performance.now(),stepMs=movementStepMs();
-  for(const move of moves)if(!move.instant&&move.path.length>1){combatMotions.delete(move.unit);motions.set(move.unit,{path:move.path,started,stepMs});playMovementSound(move);}
+  for(const move of moves)if(!move.instant&&move.path.length>1){combatMotions.delete(move.unit);motions.set(move.unit,{path:move.path,started,stepMs,pending:true});playMovementSound(move);}
   await presentationDelay(Math.max(0,...moves.filter(m=>!m.instant).map(m=>(m.path.length-1)*stepMs)));motions.clear();
 }
 async function playCombat(combat,destroyed=new Set()){
@@ -1358,7 +1368,11 @@ function render(time,forceBattlefield=false) {
   const active=pointers.size||time<cameraInputUntil||aiRunning||motions.size||arrivals.size||deaths.size||combatMotions.size||effects?.instances.length||damageNumbers?.instances.length;
   const interval=touch?1000/(active?60:30):0;
   if(!forceBattlefield&&!renderDirty&&time-lastRenderTime<interval-.75){renderRequest=requestAnimationFrame(render);return;}
-  renderDirty=false;lastRenderTime=time;
+  // Retain the fractional budget: resetting to each accepted RAF timestamp
+  // turns 60 Hz into 45 Hz on 90 Hz screens (48 Hz on 144 Hz screens).
+  lastRenderTime=interval>0&&Number.isFinite(lastRenderTime)&&!renderDirty&&!forceBattlefield
+    ?lastRenderTime+Math.max(1,Math.floor((time-lastRenderTime+.75)/interval))*interval:time;
+  renderDirty=false;
   const playVisible=state&&!$('play').hidden;
   const menuVisible=!$('menu').hidden;
   if(playVisible)turnUi.tick();
@@ -1379,6 +1393,7 @@ function render(time,forceBattlefield=false) {
   if(covered&&!stageIntroOpen&&!resized&&!forceBattlefield&&!battlefieldNeedsFrame)return;
   if(!ctx){try{ctx=Ew4Pixi.createContext(canvas,()=>{battlefield.invalidateGround();battlefieldNeedsFrame=true;requestRender();});if(canvas!==ctx.canvas){canvas=ctx.canvas;bindMapInput();}}catch(error){notice('绘图初始化失败：'+error.message);suspendRendering();return;}}
   if(!ctx.begin(Math.round(w*dpr),Math.round(h*dpr)))return;
+  Ew4Battlefield.advanceMotions(motions,time);
   viewport={w,h,dpr};updateAiCamera(time);clampView();ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#688e91';ctx.fillRect(0,0,w,h);
   ctx.translate(w/2,h/2);ctx.scale(view.zoom,view.zoom);ctx.translate(-view.x,-view.y);
   const min=screenToWorld(0,0),max=screenToWorld(w,h);
