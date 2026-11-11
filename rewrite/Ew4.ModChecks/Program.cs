@@ -4,6 +4,10 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Xml.Linq;
 using Ew4.Mods;
+if (args.ElementAtOrDefault(1) == "--independent-units-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { independentUnitModChecks = IndependentUnitModChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
 if (args.ElementAtOrDefault(1) == "--commander-abilities-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { commanderAbilityChecks = CommanderAbilityModChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;

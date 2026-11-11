@@ -8,7 +8,8 @@ public sealed partial class ClientContent
     private LegacyScenarioStart ConfigureConstruction(LegacyScenarioStart start, IReadOnlyDictionary<string, string> countries)
     {
         var config = Extensions.Construction;
-        if (config?.Enabled != true) return start;
+        if (config?.Enabled != true && Extensions.UnitRecruitment == null) return start;
+        config ??= new ModConstructionRules();
         var world = start.Session.World; var rules = start.Rules;
         var buildings = config.Buildings.Where(p => WorldConstruction.Available(world, p.Value)).ToArray();
         var ai = rules.Ai with { Tactics = rules.Ai.Tactics with { Buildings = rules.Ai.Tactics.Buildings.Concat(buildings
@@ -26,7 +27,8 @@ public sealed partial class ClientContent
         {
             var extra = new Dictionary<string, RecruitmentOffer>(StringComparer.Ordinal);
             var siteOffers = buildings.SelectMany(b => b.Value.Recruitment.Select(r => (Offer: r, Kinds: (IReadOnlyList<string>)new[] { b.Key })))
-                .Concat((config.Recruitment ?? Array.Empty<ModBuildingRecruit>()).Select(r => (Offer: r, Kinds: r.BuildingKinds!)));
+                .Concat((config.Recruitment ?? Array.Empty<ModBuildingRecruit>()).Concat(Extensions.UnitRecruitment?.Offers ?? [])
+                    .Select(r => (Offer: r, Kinds: r.BuildingKinds!)));
             foreach (var entry in siteOffers)
             {
                 var r = entry.Offer;
@@ -34,7 +36,8 @@ public sealed partial class ClientContent
                     || r.Countries.Count > 0 && (!countries.TryGetValue(faction, out string? country) || !r.Countries.Contains(country))) continue;
                 var definition = Catalogs.Runtime.Profiles[r.Profile];
                 extra.Add(r.Id, new RecruitmentOffer { Id = r.Id, Template = new Combatant { Profile = definition.Profile, Health = definition.Profile.MaxHealth },
-                    Cost = r.Cost, BuildingKinds = entry.Kinds, MinimumBuildingLevel = r.MinimumLevel, AllowSea = false,
+                    Cost = r.Cost, BuildingKinds = entry.Kinds, MinimumBuildingLevel = r.MinimumLevel,
+                    AllowSea = definition.Profile.Category == "naval",
                     Support = new UnitSupport { FoodConsumption = definition.FoodConsumption } });
             }
             if (extra.Keys.Any(recruitment[faction].ContainsKey)) throw new RuleViolation("construction.recruitment", "Custom recruitment IDs collide with existing cards");
@@ -43,7 +46,8 @@ public sealed partial class ClientContent
             production[faction] = policy with { BuildingUpgrades = upgrades, Offers = policy.Offers.Concat(extra).ToDictionary(p => p.Key, p => p.Value),
                 Upgrade = policy.Upgrade with { BuildingWeights = policy.Upgrade.BuildingWeights.Concat(buildings
                     .Select(p => new KeyValuePair<string, long>(p.Key, p.Value.AiUpgradeWeight))).ToDictionary(p => p.Key, p => p.Value) },
-                Groups = policy.Groups.Concat(extra.Keys.Select(id => new ProductionOfferGroup(id, new[] { id }))).ToArray() };
+                Groups = policy.Groups.Concat(extra.Keys.Select(id => new ProductionOfferGroup(id, new[] { id },
+                    extra[id].Template!.Profile.Category == "naval"))).ToArray() };
             additions[faction] = extra.ToDictionary(p => p.Key, _ => new RecruitmentGrant(), StringComparer.Ordinal);
         }
         IReadOnlyDictionary<string, RecruitmentGrant> Grants(string id, IReadOnlyDictionary<string, RecruitmentGrant>? old) =>

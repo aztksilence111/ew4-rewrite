@@ -30,6 +30,7 @@ public sealed partial class ExtensionLoader
     public AiControlPresentation AiControl { get; private init; } = new();
     public UnitLayerRules? UnitLayers { get; private init; }
     public ModConstructionRules? Construction { get; private init; }
+    public UnitRecruitmentConfiguration? UnitRecruitment { get; private init; }
     public IReadOnlyDictionary<string, BuildingIncomePatch[]> Economy { get; private init; } = new Dictionary<string, BuildingIncomePatch[]>();
     public CommanderAbilityConfiguration? CommanderAbilities { get; private init; }
     public LegacySkillParameters? LegacySkills { get; private init; }
@@ -52,7 +53,7 @@ public sealed partial class ExtensionLoader
         string? StageIntroPresentation = null, string? FormationCounts = null, string? CampaignVisibility = null,
         string? Geography = null, string? PauseObjectivesPresentation = null, string? MapColors = null, string? AiControl = null,
         string? StoryPresentation = null, string? HeadquartersPresentation = null, string? UnitLayers = null, string? Construction = null,
-        string? Economy = null, string? CommanderAbilities = null);
+        string? Economy = null, string? CommanderAbilities = null, string? UnitRecruitment = null);
     private sealed record EconomyFile(int Schema, Dictionary<string, BuildingIncomePatch[]> Scenarios);
     private sealed record CampaignVisibilityFile(int Schema, Dictionary<string, string>? Visibility);
     private sealed record LegacySkillFile(int Schema, Dictionary<string, Dictionary<string, double>> Skills);
@@ -104,6 +105,13 @@ public sealed partial class ExtensionLoader
         }
         UnitLayerRules? unitLayers = null;
         ModConstructionRules? construction = null;
+        UnitRecruitmentConfiguration? unitRecruitment = null;
+        if (m.UnitRecruitment != null)
+        {
+            if (m.ApiVersion < 3) throw new RuleViolation("extension.version", "Independent unit recruitment requires API 3");
+            unitRecruitment = Read<UnitRecruitmentConfiguration>(m.UnitRecruitment);
+            unitRecruitment.Validate();
+        }
         var economy = new Dictionary<string, BuildingIncomePatch[]>();
         if (m.Economy != null)
         {
@@ -346,7 +354,8 @@ public sealed partial class ExtensionLoader
                 ItemBindings = items, DeploymentLimits = deploymentLimits, FormationCounts = formationCounts, CampaignVisibility = campaignVisibility,
                 Metagame = metagame, StageIntroPresentations = introScreens, PauseObjectivesPresentations = pauseScreens, Geography = geography,
                 MapColors = mapColors, AiControl = aiControl, Stories = stories, HeadquartersPresentation = headquartersPresentation,
-                UnitLayers = unitLayers, Construction = construction, Economy = economy, CommanderAbilities = commanderAbilities };
+                UnitLayers = unitLayers, Construction = construction, Economy = economy, CommanderAbilities = commanderAbilities,
+                UnitRecruitment = unitRecruitment };
         bool Known(string id) => skills.ContainsKey(id) || id.StartsWith("ew4.skill.", StringComparison.Ordinal)
             && int.TryParse(id[10..], out int value) && value is >= 0 and < 40 || BuiltinTraits.Contains(id);
     }

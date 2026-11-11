@@ -1207,7 +1207,7 @@ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&pendingActi
 function openRecruitment(cell){
   const offers=selection.offers;let chosen=offers[0];
   if(!chosen)return;
-  const groups=new Map();for(const offer of offers){const p=manifest.profiles[offer.profile],key=p.kind??p.unitIndex;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(offer);}
+  const groups=new Map();for(const offer of offers){const p=manifest.profiles[offer.profile],key=p.recruitGroup??p.kind??p.unitIndex;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(offer);}
   const body=detailWindow('recruit_label',Math.max(441,groups.size*73+3),185,()=>act('recruit',{cell,offer:chosen.id}));
   const row=document.createElement('div');row.className='recruit-cards';body.append(row);const details=document.createElement('div');details.className='recruit-description';body.append(details);
   function choose(offer,b){chosen=offer;const profile=visualProfile({profile:offer.profile,owner:state.playerFaction}),library=profile?.library;if(library)void loadLibrary(library).catch(()=>{});for(const c of row.children)c.setAttribute('aria-pressed',String(c===b));details.replaceChildren(abilityGrid(offer.profile));descriptionBox(details,profile.name,profile.description);const funds=state.factions.find(f=>f.id===state.playerFaction).resources;$('detail-confirm').disabled=['money','industry','food'].some(key=>(offer.cost[key]||0)>funds[key]);}

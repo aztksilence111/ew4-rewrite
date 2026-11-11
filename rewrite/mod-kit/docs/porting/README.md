@@ -15,6 +15,7 @@
 地理名称可按单字或字母沿地形曲线排列，地图字段与示例见[曲线地理文字](MAP_TEXT_PATHS.md)。
 
 将领、技能文字、兵种、装备、建筑及成长等可直接编辑独立 JSON，见[文件与字段](SPLIT_CATALOG.md)。
+新增独立 ID 的兵种、单独招募报价、兵模分组和开局部署见[独立兵种接口](INDEPENDENT_UNITS.md)及[最小示例](../../examples/independent-units/README.md)。
 旧 APK/XML 导入会生成同一组文件。
 
 商店、刷新次数恢复条件、初始资源，以及战役说明窗口UI和任务目标的入口见[局外配置与战役说明](METAGAME_AND_BRIEFING.md)。

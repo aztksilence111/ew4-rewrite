@@ -150,6 +150,18 @@ public sealed partial class ClientContent
             throw new RuleViolation("extension.deployment_limit", "Deployment limits reference an unknown scenario");
         if (Extensions.UnitLayers?.Profiles.Keys.Any(id => !Catalogs.Runtime.Profiles.ContainsKey(id)) == true)
             throw new RuleViolation("layers.profile", "Unit layers reference an unknown unit profile");
+        if (Extensions.UnitRecruitment is { } independentRecruitment)
+        {
+            foreach (var offer in independentRecruitment.Offers)
+            {
+                if (!Catalogs.Runtime.Profiles.ContainsKey(offer.Profile)
+                    || offer.Scenarios.Any(id => !Scenarios.Any(s => s.Id == id))
+                    || offer.Countries.Any(id => Countries.Get(id) == null)
+                    || offer.BuildingKinds!.Any(kind => !Catalogs.Buildings.Definitions.Values.Any(b => b.Kind == kind)
+                        && Extensions.Construction?.Buildings.ContainsKey(kind) != true))
+                    throw new RuleViolation("unit_recruitment.reference", "Unknown profile, country, scenario or building: " + offer.Id);
+            }
+        }
         if (Extensions.Construction is { } construction && construction.BuilderProfiles
             .Concat((construction.Recruitment ?? Array.Empty<ModBuildingRecruit>()).Select(r => r.Profile))
             .Concat(construction.Buildings.Values.SelectMany(b => b.Recruitment.Select(r => r.Profile)))

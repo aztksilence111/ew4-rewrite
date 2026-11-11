@@ -50,6 +50,9 @@ internal static class ResourceValidation
         var loaded = new Dictionary<string, HashSet<string>>();
         foreach (var (_, profile) in manifest["profiles"]!.AsObject())
         {
+            if (profile!["recruitGroup"] is { } group && (group is not JsonValue groupValue
+                || !groupValue.TryGetValue<string>(out string? groupId) || string.IsNullOrWhiteSpace(groupId) || groupId.Length > 128))
+                throw new InvalidDataException("Invalid independent recruitment group");
             string lib = (string)profile!["library"]!;
             if (!loaded.TryGetValue(lib, out var names))
             {
