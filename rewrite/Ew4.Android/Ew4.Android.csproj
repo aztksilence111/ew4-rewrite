@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
     <ApplicationId>org.ew4.reconstruction</ApplicationId>
     <ApplicationTitle>欧陆战争4 重构</ApplicationTitle>
-    <ApplicationVersion>42</ApplicationVersion>
-    <ApplicationDisplayVersion>0.2.39</ApplicationDisplayVersion>
+    <ApplicationVersion>43</ApplicationVersion>
+    <ApplicationDisplayVersion>0.2.40</ApplicationDisplayVersion>
     <SupportedOSPlatformVersion>26</SupportedOSPlatformVersion>
     <RuntimeIdentifiers>android-arm64;android-x64</RuntimeIdentifiers>
     <AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>

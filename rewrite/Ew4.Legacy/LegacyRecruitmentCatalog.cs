@@ -81,7 +81,7 @@ public sealed class LegacyRecruitmentCatalog
         foreach (var kind in InstallationKinds)
         {
             var card = RequiredCard(41 + kind.Key, "installation");
-            result.Add(card.Id, new() { Kind = kind.Value, Purchase = new() { Cost = card.Cost, DiscountSkill = Ew4Combat.Skill(skills[kind.Key]),
+            result.Add(card.Id, new() { Kind = kind.Value, Purchase = new() { AllowSea = false, Cost = card.Cost, DiscountSkill = Ew4Combat.Skill(skills[kind.Key]),
                 MoneyPercentWithSkill = (skillParameters ?? LegacySkillParameters.Default).Percent(skills[kind.Key]) } });
         }
         return new ReadOnlyDictionary<string, InstallationBuildRules>(result);

@@ -185,6 +185,9 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                 InitialObjectiveOwner = local.InitialObjectiveOwner == null ? null : start.Session.World.LocalMultiplayer.InitialObjectiveOwner } } };
             state = state with { World = LocalMultiplayerGame.Resolve(state.World, start.Rules.Turns.Victory) };
         }
+        var installationRepair = WorldSupportActions.RemoveIllegalSeaInstallations(state.World, start.Rules.Installations.Values);
+        bool repairedInstallations = !ReferenceEquals(installationRepair.State, state.World);
+        if (repairedInstallations) state = SessionActions.CommitWorld(state, state.Revision, installationRepair).State;
         var recovery = WorldTurns.RecoverDefeatedFaction(state.World, start.Rules.Turns);
         bool recovered = !ReferenceEquals(recovery.State, state.World);
         if (recovered) state = SessionActions.CommitWorld(state, state.Revision, recovery).State;
@@ -196,10 +199,10 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         state = SettleBattle(state);
         state.Validate();
         StoreAccount(state.Account);
-        game = start with { Session = state, Notices = recovered ? recovery.Notices : start.Notices }; country = slot.Country;
+        game = start with { Session = state, Notices = (recovered ? recovery.Notices : start.Notices).Concat(installationRepair.Notices).ToArray() }; country = slot.Country;
         storyRestored = StoryPlayback.Current(state.World) != null;
         tutorialCheckpoint = slot.Tutorial;
-        if (migratedContent || recovered || upgradedCapacity) movementHistory.Reset(state.World);
+        if (migratedContent || recovered || upgradedCapacity || repairedInstallations) movementHistory.Reset(state.World);
         else movementHistory.Load(slot.MovementHistory, state.World);
         AutoSave();
         return View();

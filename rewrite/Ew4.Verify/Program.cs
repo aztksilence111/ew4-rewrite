@@ -1,5 +1,11 @@
 using System.Text.Json;
 using Ew4.Core;
+if (args.ElementAtOrDefault(1) == "--sea-installation-only")
+{
+    string project = Path.GetFullPath(args[0]);
+    Console.WriteLine(JsonSerializer.Serialize(new { seaInstallationChecks = SeaInstallationChecks.Run(project),
+        saveCompatibilityChecks = SaveCompatibilityChecks.Run(project), errors = 0 })); return;
+}
 if (args.ElementAtOrDefault(1) == "--strategic-focus-only")
 {
     string project = Path.GetFullPath(args[0]);
@@ -402,6 +408,7 @@ int lifecycleChecks = LifecycleChecks.Run(root);
 int actionChecks = ActionChecks.Run(root);
 int movementCommitChecks = MovementCommitChecks.Run(root);
 movementCommitChecks += MountainInstallationChecks.Run(root);
+movementCommitChecks += SeaInstallationChecks.Run(root);
 movementCommitChecks += MovementMoraleChecks.Run(root);
 movementCommitChecks += RFeedbackChecks.Run(root);
 int turnSettlementChecks = TurnSettlementChecks.Run(root);

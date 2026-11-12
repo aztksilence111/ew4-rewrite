@@ -31,6 +31,23 @@ public sealed record TransportPurchaseRules
 
 public static class WorldSupportActions
 {
+    public static WorldChange RemoveIllegalSeaInstallations(WorldState state, IEnumerable<InstallationBuildRules> rules)
+    {
+        var landOnly = rules.GroupBy(r => r.Kind, StringComparer.Ordinal)
+            .Where(g => g.All(r => !r.Purchase.AllowSea)).Select(g => g.Key).ToHashSet(StringComparer.Ordinal);
+        var invalid = state.Cells.Select((cell, i) => (cell, i))
+            .Where(p => p.cell.Terrain.Sea && p.cell.InstallationKind != null && landOnly.Contains(p.cell.InstallationKind))
+            .Select(p => p.i).ToHashSet();
+        if (invalid.Count == 0) return new(state, Array.Empty<WorldNotice>());
+        var next = state with
+        {
+            Cells = state.Cells.Select((cell, i) => invalid.Contains(i) ? cell with { InstallationKind = null } : cell).ToArray(),
+            Revision = checked(state.Revision + 1)
+        };
+        next.Validate();
+        return new(next, invalid.OrderBy(i => i).Select(i => new WorldNotice("installation.removed_invalid", state.Cells[i].InstallationKind!, i)).ToArray());
+    }
+
     private static (FactionState faction, UnitState unit, CellState cell) Ready(WorldState state, long expectedRevision,
         string unitId, UnitPurchaseRules rules, bool allowAlliedTerritory = false)
     {

@@ -57,6 +57,38 @@ internal static class SaveCompatibilityChecks
                 .Single(u => u.GetProperty("id").GetString() == mover.Id).GetProperty("cell").GetInt32() == destination,
                 "reused save remains playable through the real movement API: " + (moved.RootElement.GetProperty("ok").GetBoolean() ? "unexpected destination" : moved.RootElement.ToString()));
 
+            var seaCells = basis.World.Cells.Select((c, i) => (c, i)).Where(p => p.c.Terrain.Sea).Take(3).Select(p => p.i).ToArray();
+            var landCells = basis.World.Cells.Select((c, i) => (c, i)).Where(p => !p.c.Terrain.Sea).Take(3).Select(p => p.i).ToArray();
+            Check(seaCells.Length == 3 && landCells.Length == 3, "real scenario includes land and sea repair sites");
+            string[] fieldworks = ["trench", "fence", "bunker"];
+            var brokenCells = basis.World.Cells.ToArray();
+            for (int i = 0; i < 3; i++)
+            {
+                brokenCells[seaCells[i]] = brokenCells[seaCells[i]] with { InstallationKind = fieldworks[i] };
+                brokenCells[landCells[i]] = brokenCells[landCells[i]] with { InstallationKind = fieldworks[i] };
+            }
+            var broken = basis with { World = basis.World with { Cells = brokenCells } };
+            var repairCase = Prepare("sea-installations", broken);
+            string repairPath = Path.Combine(repairCase.Profile, "saves/mode-1/slot-0.json");
+            byte[] rawSlot = File.ReadAllBytes(repairPath);
+            var repairLoad = Load(repairCase.Host);
+            Check(repairLoad.GetProperty("ok").GetBoolean(), "old save with illegal sea installations loads");
+            var repairedSlot = JsonSerializer.Deserialize<ClientSlot>(File.ReadAllBytes(repairPath), ClientGame.Json)!;
+            var repaired = SessionSave.Decode(repairedSlot.Session, binding);
+            Check(seaCells.All(i => repaired.World.Cells[i].InstallationKind == null), "load persists removal of illegal sea installations");
+            Check(landCells.Select(i => repaired.World.Cells[i].InstallationKind).SequenceEqual(fieldworks), "load retains all land installations");
+            Check(JsonSerializer.Serialize(repaired.World with { Cells = broken.World.Cells, Revision = broken.World.Revision,
+                ContentRevision = broken.World.ContentRevision }, ClientGame.Json) == JsonSerializer.Serialize(broken.World, ClientGame.Json),
+                "repair preserves units, terrain, resources, turn and random states");
+            Check(repaired.Revision == broken.Revision + 1 && repaired.World.Revision == broken.World.Revision + 1,
+                "repair commits exactly one session and world revision");
+            Check(rawSlot.SequenceEqual(File.ReadAllBytes(repairPath + ".bak")), "load preserves raw prior slot backup");
+            Check(Load(new(content, repairCase.Profile)).GetProperty("ok").GetBoolean(), "repaired autosave reloads");
+            var reloadedSlot = JsonSerializer.Deserialize<ClientSlot>(File.ReadAllBytes(repairPath), ClientGame.Json)!;
+            var reloaded = SessionSave.Decode(reloadedSlot.Session, binding);
+            Check(reloaded.Revision == repaired.Revision && reloaded.World.Revision == repaired.World.Revision,
+                "reloading a repaired save does not repeat the migration");
+
             var missingUnit = basis with { World = basis.World with { Units = basis.World.Units.Select((u, i) => i == 0
                 ? u with { Combatant = u.Combatant with { Profile = u.Combatant.Profile with { Id = "missing-unit-definition" } } } : u).ToArray() } };
             var badUnit = Load(Prepare("missing-unit", missingUnit).Host);
