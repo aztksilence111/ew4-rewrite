@@ -228,6 +228,9 @@ def main():
     buildings = {e.attrib["type"]: [dict(level.attrib) for level in e] for e in building_defs}
     capitals = {int(e.attrib["id"]): dict(e.attrib) for e in ET.parse(SOURCE / "def_capital.xml").getroot()}
     layouts = ET.parse(SOURCE / "layout-568h.xml").getroot()
+    # Keep device-specific stock references for transferring legacy Mod layout deltas.
+    import_layouts = {p.name: p.read_text(encoding="utf-8-sig") for p in sorted(SOURCE.glob("layout*.xml"))}
+    (OUTPUT / "import-layouts.json").write_text(json.dumps(import_layouts, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
     def layout_record(e):
         return {"attributes": dict(e.attrib), "children": [layout_record(c) for c in e]}
     strategic = {e.attrib["file"].removesuffix(".btl"): dict(e.attrib) for e in ET.parse(SOURCE / "def_battlelist.xml").getroot()}

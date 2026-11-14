@@ -42,7 +42,7 @@
         el.style.justifyContent='center';el.style.alignItems='center';
         if(type==='tmp_button'){el.classList.add('native-command');if(/blue/.test(a.frm1))el.classList.add('blue');if(/red/.test(a.frm1))el.classList.add('red');}
         else if(art){el.style.backgroundImage=`url("${art.file}")`;el.style.backgroundSize='100% 100%';}
-        if(type==='tmp_button'&&this.options.body&&art)el.style.borderImageSource=`url("${art.file}")`;
+        if(type==='tmp_button'&&art){el.style.borderImageSource=`url("${art.file}")`;el.style.setProperty('--normal-art',`url("${art.file}")`);}
         if(a.frm2){const pressed=resource(this.api.manifest,a.frm2);if(pressed)el.style.setProperty('--pressed-art',`url("${pressed.file}")`);}
         el.disabled=true;
       }

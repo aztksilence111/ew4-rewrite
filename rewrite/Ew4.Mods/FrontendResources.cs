@@ -51,6 +51,8 @@ public sealed partial class ModStore
     {
         if (path != "client/manifest.json") return bytes;
         var manifest = ModFiles.Object(bytes);
+        if (selected?.Files.ContainsKey(UiPresentation.Path) == true || baseline.Files.Contains(UiPresentation.Path))
+            UiPresentation.Apply(manifest, UiPresentation.Read(ReadFrom(key, selected, UiPresentation.Path)));
         // The catalog may contain initial-only tiers above the upgrade ceiling.
         var catalog = ModFiles.Object(ReadFrom(key, selected, "legacy/catalog.json"));
         manifest["buildingUpgradeLimits"] = (int?)catalog["schema_version"] == 3

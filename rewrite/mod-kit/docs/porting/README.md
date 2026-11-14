@@ -1,5 +1,7 @@
 # 原版 Mod 移植到 rewrite
 
+既有控件贴图、位置与六套设备布局差量导入见[通用 UI 换肤](UI_PRESENTATION.md)及[最小源码](../../examples/ui-skin/README.md)。
+
 新增将领能力栏、初值、图标、教学及兵种星级绑定见[自定义能力接口](COMMANDER_ABILITIES.md)与[最小示例](../../examples/commander-abilities/README.md)。
 
 周围友军光环、最大生命/射程/免粮/地形移动、士气和战斗距离/地形/城市条件见[技能接口 API 3](RULE_EXTENSIONS.md)及[最小示例](../../examples/passive-auras/README.md)。

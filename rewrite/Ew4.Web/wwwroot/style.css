@@ -32,7 +32,7 @@ html,body{touch-action:pan-x pan-y;overscroll-behavior:none}
 #skip-ai{background-image:url("content/ui/image_recruit_hd/button_skip.png")}
 #next-unit{left:calc(41px * var(--battle-scale));background-image:url("unit-search.png")}
 #ai-action{position:absolute;bottom:0;right:0;width:137px;height:22px;background:url("content/ui/image_ui_hd/board_aiaction.png") center/100% 100% no-repeat;transform:scale(var(--battle-scale));transform-origin:right bottom;color:#eee;font:13px var(--ew4-font-family);pointer-events:none}
-#ai-action img{position:absolute;left:13px;top:5px;width:25.5px;height:15px}#ai-action span{position:absolute;left:44px;top:5px}
+#ai-action img{position:absolute;left:13px;top:5px;width:25.5px;height:15px}#ai-action>span{position:absolute;left:44px;top:5px}
 .unit-card{background:#646464}.unit-card>.card-marker{position:absolute;left:1px;top:34px;object-fit:contain}.cost-strip{background:#414141}
 .defense-cards button{position:relative;flex:none;height:64px;overflow:hidden}.defense-cards button>img{display:block}.defense-cards .cost-strip{position:absolute;left:0;right:0;bottom:0;height:12px}.defense-cards+.unit-description{top:76px}
 .recruit-cards{left:2px;right:0;top:10px;padding:0;gap:1px;height:65px}.recruit-cards>button{outline:1px solid #888;outline-offset:-1px}

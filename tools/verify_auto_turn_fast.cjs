@@ -20,8 +20,9 @@ const deferred=()=>{let resolve;const promise=new Promise(r=>{resolve=r;});retur
     if(op==='ai'||op==='ai_batch')calls.push(op);
     if(armed?.ops.includes(op)){
       const gate=armed;armed=null;held=gate;
-      const response=await route.fetch();gate.seen.resolve();
-      await gate.release.promise;held=null;await route.fulfill({response});
+      // Hold before the server advances, so pause/load fixtures cannot finish the turn early.
+      gate.seen.resolve();await gate.release.promise;
+      const response=await route.fetch();held=null;await route.fulfill({response});
     }else await route.continue();
   });
   const ready=()=>page.waitForFunction(()=>startupReady,null,{timeout:60000});
@@ -30,7 +31,10 @@ const deferred=()=>{let resolve;const promise=new Promise(r=>{resolve=r;});retur
   const end=()=>page.evaluate(()=>{if(turnUi.open)closeDetail();window.autoTurnDone=false;window.autoTurn=act('end').finally(()=>{autoTurnDone=true;});});
   const saveSession=async slot=>{
     await page.evaluate(slot=>rpc('save',{slot,mode:2}),slot);
-    return JSON.parse(await fs.readFile(path.join(profile,'saves/mode-2/slot-'+slot+'.json'),'utf8')).session;
+    const encoded=JSON.parse(await fs.readFile(path.join(profile,'saves/mode-2/slot-'+slot+'.json'),'utf8')).session;
+    const {account,...session}=JSON.parse(Buffer.from(encoded,'base64').toString('utf8')).payload;
+    // Loading an old slot merges earned account receipts; compare the complete battle session.
+    return session;
   };
   try{
     await page.goto(base);await ready();
@@ -81,6 +85,7 @@ const deferred=()=>{let resolve;const promise=new Promise(r=>{resolve=r;});retur
         const colors=new Set();for(let i=0;i<pixels.length;i+=4*397)colors.add(pixels[i]+','+pixels[i+1]+','+pixels[i+2]);
         return colors.size>20&&$('skip-ai').hidden;
       }),'human battlefield renders with skip button hidden '+size.width);
+      check(await page.locator('#end-turn').isVisible(),'end turn returns during human turn '+size.width);
       const name='battlefield-'+size.width+'.png';await page.screenshot({path:path.join(folder,name)});report.screenshots.push(name);
     }
     await page.setViewportSize({width:1280,height:720});
@@ -89,18 +94,29 @@ const deferred=()=>{let resolve;const promise=new Promise(r=>{resolve=r;});retur
     check(await page.evaluate(()=>!skipAi&&!fastSkipping()),'opt out starts ordinary AI');
     for(const size of [{width:1280,height:720},{width:844,height:390},{width:390,height:844}]){
       await page.setViewportSize(size);
-      check(await page.locator('#skip-ai').evaluate(el=>{
-        const r=el.getBoundingClientRect();return !el.hidden&&!el.disabled&&r.x>=0&&r.y>=0&&r.right<=innerWidth&&r.bottom<=innerHeight&&document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)===el;
-      }),'manual skip is visible and clickable '+size.width);
-      const name='manual-skip-'+size.width+'.png';await page.screenshot({path:path.join(folder,name)});report.screenshots.push(name);
+      await page.waitForFunction(size=>screenLayout.width===size.width&&screenLayout.height===size.height,size);
+      check(await page.locator('#skip-ai').evaluate(el=>!el.hidden&&!el.disabled&&getComputedStyle(el).display!=='none'),'manual fast forward is visible and enabled during ordinary AI playback '+size.width);
+      check(await page.locator('#end-turn').isHidden(),'end turn does not show through the translucent country board '+size.width);
+      const country=await page.evaluate(()=>{
+        const board=$('ai-action'),flag=$('ai-flag'),b=board.getBoundingClientRect(),f=flag.getBoundingClientRect(),text=board.querySelector(':scope>span').getBoundingClientRect(),css=getComputedStyle(board);
+        return{visible:!board.hidden,scale:Number(getComputedStyle(document.documentElement).getPropertyValue('--ai-country-scale')),x:b.x,y:b.y,width:b.width,height:b.height,right:b.right,bottom:b.bottom,
+          flagX:f.x-b.x,flagWidth:f.width,flagHeight:f.height,textX:text.x-b.x,textWidth:text.width,textHeight:text.height,backgroundImage:css.backgroundImage,backgroundSize:css.backgroundSize,opacity:css.opacity,clipped:css.overflow,viewport:[innerWidth,innerHeight]};
+      });
+      check(country.visible&&Math.abs(country.width-62*country.scale)<.1&&Math.abs(country.height-22.5*country.scale)<.1,'native country board visible portion and ratio '+size.width);
+      check(Math.abs(country.right-size.width)<.1&&Math.abs(country.bottom-size.height)<.1,'country board reaches original screen corner '+size.width);
+      check(Math.abs(country.flagX-13*country.scale)<.1&&Math.abs(country.flagWidth/country.flagHeight-25.5/15)<.01,'native country flag position and aspect '+size.width);
+      check(country.backgroundSize==='137px 22.5px'&&country.opacity==='1'&&country.clipped==='hidden','native board crops original translucent art without stretching '+size.width);
+      check(country.backgroundImage.includes('board_aiaction.png')&&country.textWidth>0&&country.textHeight>0&&Math.abs(country.textX-44*country.scale)<.1,'country board retains its art and visible arrow text '+size.width);
+      report.countryBoards??=[];report.countryBoards.push(country);
+      const name='ordinary-turn-'+size.width+'.png';await page.screenshot({path:path.join(folder,name)});report.screenshots.push(name);
     }
     await page.setViewportSize({width:1280,height:720});
     await page.evaluate(()=>{window.skipWait= presentationDelay(30000);});
     await page.locator('#skip-ai').click();
-    check(await page.evaluate(()=>fastSkipping()&&!settings.autoTurnFast&&$('skip-ai').disabled&&presentationWaiters.size===0),'manual skip always enables full fast skip and cancels animation waits');
+    check(await page.evaluate(()=>fastSkipping()&&!settings.autoTurnFast&&!$('skip-ai').hidden&&$('skip-ai').disabled&&presentationWaiters.size===0),'manual fast forward activates batches and cancels animation waits');
     gate.release.resolve();await finish();
-    check(calls.at(-1)==='ai_batch','manual skip switches to batches with automatic mode off');
-    assert.deepEqual(await saveSession(2),firstAuto);report.checks++;
+    check(calls.at(-1)==='ai_batch','enabling fast playback switches to batches');
+    check(JSON.stringify(await saveSession(2))===JSON.stringify(firstAuto),'ordinary and fast playback save the same complete battle session');
 
     await page.evaluate(async()=>{settings.autoTurnFast=true;await installState(await rpc('load',{slot:6,mode:2}),true);});
     gate=hold(['ai_batch']);await end();await waitHeld(gate);

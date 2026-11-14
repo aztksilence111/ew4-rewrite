@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "screens": {
+    "main": {
+      "controls": {
+        "entries": { "right": 24, "y": 110 },
+        "campaign": { "image": "btn_common_blue.png", "pressedImage": "btn_common_red.png" },
+        "conquest": { "image": "btn_common_blue.png", "pressedImage": "btn_common_red.png" }
+      }
+    },
+    "pause": {
+      "controls": {
+        "save": { "image": "btn_common_blue.png" },
+        "exit": { "image": "btn_common_red.png" }
+      }
+    },
+    "settings": { "panel": { "background": "#ddd8ce" } }
+  }
+}

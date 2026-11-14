@@ -148,7 +148,7 @@ function sizeUi() {
   root.dataset.screenProfile=screenLayout.profile;root.dataset.screenOrientation=screenLayout.orientation;
   root.style.setProperty('--startup-reserve',reserve+'px');
   for(const [name,value] of Object.entries({'ui-scale':scale,'menu-scale':screenLayout.menuScale,'battle-scale':screenLayout.battleScale,
-    'battle-compact-scale':screenLayout.compactScale,'battle-hud-scale':screenLayout.hudScale,
+    'battle-compact-scale':screenLayout.compactScale,'battle-hud-scale':screenLayout.hudScale,'ai-country-scale':screenLayout.aiCountryScale,
     'pause-scale':screenLayout.pauseScale,'talk-scale':screenLayout.talkScale}))root.style.setProperty('--'+name,value);
   for(const [name,value] of Object.entries({'screen-width':width,'screen-height':height,'screen-safe-width':safeWidth,'screen-safe-height':safeHeight,
     'screen-corner-inset':screenLayout.cornerInset,'screen-action-width':screenLayout.actionWidth,
@@ -780,6 +780,7 @@ function refreshHud() {
   }
   capacity.title=capacity.ariaLabel=player.name+'部队 '+capacityText+(capacityStatus==='over'?'，超过上限，资源产出减半，粮食消耗翻倍':capacityStatus==='full'?'，已达上限':'')+'，回合 '+state.round;
   placeArmyCapacityHud();
+  $('end-turn').hidden = !active.human;
   $('end-turn').disabled = busy || !!state.playerAi?.endingTurn || !active.human || state.phase !== 'Active' || !!state.dialogue;
   $('undo-move').hidden = !active.human;
   $('undo-move').disabled = busy || !selected || !selection?.undo;
@@ -1616,7 +1617,9 @@ async function initializeClient(){
     const text=new Ew4OriginalUI.TextRenderer(m);await text.prepare();
     Ew4Startup.pending('菜单图像');
     const art=new Ew4MenuArt.MenuArt({manifest:m,image});await art.prepare();
+    window.ew4UiSkin?.dispose();
     catalog=c;manifest=m;cityNames=names;conquestPages=pages;menuArt=art;
+    window.ew4UiSkin=new Ew4UiPresentation.Skin(m);window.ew4UiSkin.apply();
     const buildInfo=await startupJson('/build-info.json');
     performanceLog.build=buildInfo.source.slice(0,12)+'/'+(c.build||'unknown').slice(0,8)+'/'+(c.buildVariant||'unknown');
     fx.elements??=presentation.elements;fx.sounds=[...new Set([...fx.sounds,...presentation.sounds])];

@@ -44,7 +44,7 @@ internal sealed class LegacyModImporter
     private XElement Atlas(string name) => ModFiles.Xml(Encoding.UTF8.GetBytes("<atlas>" + ModFiles.Text(Read(name + ".xml")) + "</atlas>")).Root!;
     internal (string[] Scenarios, string[] Warnings) Convert()
     {
-        if (!names.Any(n => n.StartsWith("def_", StringComparison.Ordinal) || new[] { ".btl", ".png", ".pkm", ".pvr", ".bin", ".fnt", ".ini", ".mp3", ".wav", ".ogg" }.Contains(Path.GetExtension(n))))
+        if (!names.Any(n => n.StartsWith("def_", StringComparison.Ordinal) || n.StartsWith("layout", StringComparison.Ordinal) && n.EndsWith(".xml", StringComparison.Ordinal) || new[] { ".btl", ".png", ".pkm", ".pvr", ".bin", ".fnt", ".ini", ".mp3", ".wav", ".ogg" }.Contains(Path.GetExtension(n))))
             throw new InvalidDataException("未找到原版资源。请选择APK、assets目录ZIP或带mod.json的内容包。");
         report(new("working", "迁移剧本与将领数据"));
         var extensionPaths = new HashSet<string>(StringComparer.Ordinal);
@@ -80,7 +80,7 @@ internal sealed class LegacyModImporter
         manifest["buildings"] = new JsonObject(Xml("def_construction.xml").Elements().Select(e => KeyValuePair.Create<string, JsonNode?>((string)e.Attribute("type")!, new JsonArray(e.Elements().Select(x => (JsonNode)LegacyCatalogConverter.Attr(x)).ToArray()))));
         manifest["capitals"] = new JsonObject(Xml("def_capital.xml").Elements().Select(e => KeyValuePair.Create<string, JsonNode?>((string)e.Attribute("id")!, LegacyCatalogConverter.Attr(e))));
         manifest["strategic"] = new JsonObject(Xml("def_battlelist.xml").Elements().Select(e => KeyValuePair.Create<string, JsonNode?>(Path.GetFileNameWithoutExtension((string)e.Attribute("file")!), LegacyCatalogConverter.Attr(e))));
-        if (names.Contains("layout-568h.xml")) manifest["layouts"] = new JsonObject(Xml("layout-568h.xml").Elements().GroupBy(e => (string)e.Attribute("id")!).Select(g => KeyValuePair.Create<string, JsonNode?>(g.Key, LegacyCatalogConverter.Layout(g.Last()))));
+        LegacyLayouts.Import(manifest, baseline, resources, warnings);
         foreach (string name in names.Where(n => n.StartsWith("tutorials_script", StringComparison.Ordinal) && n.EndsWith(".xml", StringComparison.Ordinal)))
             manifest["tutorials"]![Path.GetFileNameWithoutExtension(name).Replace("_script", "")] = new JsonObject { ["sha256"] = ModFiles.Hash(Read(name)), ["commands"] = new JsonArray(Xml(name).Elements().Select(e => (JsonNode)LegacyCatalogConverter.Attr(e)).ToArray()) };
         var textureNames = names.Where(n => !n.Contains('/') && (n.EndsWith(".png", StringComparison.Ordinal) || n.EndsWith(".pkm", StringComparison.Ordinal)))

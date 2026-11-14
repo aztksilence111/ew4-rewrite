@@ -20,21 +20,22 @@
     const menuScale=Math.min(stageFit,stageFit*preference*factor('menu'));
     // Corner size depends on the viewport, never on the space removed by safe insets.
     const legacyScale=Math.min(Math.max(Math.min(width/568,height/320)*preference,48/27,height/300),width/420,height/180);
-    const baseCornerSize=clamp(16*legacyScale,tablet?48:40,tablet?68:60);
+    const baseCornerSize=clamp(16*legacyScale,tablet?48:40,tablet?68:60)*1.06;
     const cornerSize=Math.min(baseCornerSize*factor('buttons'),safeWidth/5,safeHeight/3);
     const battleScale=cornerSize/20;
     const baseActionSize=clamp(baseCornerSize*1.15,tablet?48:40,tablet?60:56);
     const actionSize=baseActionSize*factor('actions');
     const compactScale=actionSize/33;
-    const cornerInset=2;
+    const cornerInset=touch?6:4;
     const gutter=cornerInset+cornerSize+8;
     const actionWidth=Math.max(actionSize,width-gutter*2)/compactScale;
     const hudScale=Math.min(baseActionSize/33*factor('info'),Math.max(1,(width-cornerSize-32)/164));
     // Insets constrain floating content, not the viewport used by the map and edge HUD.
     return {profile,orientation:height>=width?'portrait':'landscape',width,height:viewportHeight,safeWidth,safeHeight,
       uiScale,settingsScale:baseUiScale,menuScale,menuWidth:width/menuScale,menuHeight:viewportHeight/menuScale,
-      menuSafeLeft:0,menuSafeRight:0,menuSafeTop:0,menuSafeBottom:0,
-      battleScale,compactScale,hudScale,cornerSize,cornerInset,actionWidth,
+      menuSafeLeft:safe.left/menuScale,menuSafeRight:safe.right/menuScale,
+      menuSafeTop:safe.top/menuScale,menuSafeBottom:safe.bottom/menuScale,
+      battleScale,compactScale,hudScale,aiCountryScale:baseUiScale*1.06,cornerSize,cornerInset,actionWidth,
       pauseScale:fit(168,274,uiScale,safeWidth,safeHeight),
       talkScale:fit(339,96,Math.max(1,baseUiScale)*factor('dialogue'),safeWidth,safeHeight,10)};
   }

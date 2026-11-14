@@ -1,0 +1,4 @@
+.ui-skin-art{background-image:var(--skin-image)!important;background-size:100% 100%!important;background-repeat:no-repeat!important;border-image:none!important}
+button.ui-skin-art:active{background-image:var(--skin-pressed-image,var(--skin-image))!important}
+.ui-skin-decoration{position:absolute;pointer-events:none;user-select:none;z-index:0}
+.native-layout button.native-command:active{border-image-source:var(--pressed-art,var(--normal-art,url("/content/ui/image_ui_hd/btn_common_green.png")))!important}

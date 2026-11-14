@@ -1,5 +1,7 @@
 # Mod制作与排查导航
 
+[通用 UI 换肤](porting/UI_PRESENTATION.md)：既有界面控件图片、按下态和布局，以及旧设备布局差量迁移；附[最小源码](../examples/ui-skin/README.md)。
+
 [自定义将领能力栏](porting/COMMANDER_ABILITIES.md)：API3增加独立能力、图标与数值，支持整编教学、兵种攻击星级绑定和存档，附[最小示例](../examples/commander-abilities/README.md)。
 
 [被动光环与技能属性](porting/RULE_EXTENSIONS.md)：API 3 开放回合施加状态、生命上限/射程/免粮/地形移动、士气及 Lua 距离/地形/建筑条件，附[最小示例](../examples/passive-auras/README.md)。

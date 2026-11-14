@@ -13586,6 +13586,11 @@
       "path": "client/sounds/sfx_lvup2.wav",
       "bytes": 16872,
       "sha256": "363ef1d485addd60b2f02c02522684f8bc70b03877c06e7312c3c9a2aff11780"
+    },
+    {
+      "path": "client/import-layouts.json",
+      "bytes": 880084,
+      "sha256": "11f25c7aaf6c69043f42a97f1d193ae204595493502d6cedc832332324ff03b9"
     }
   ]
 }

@@ -9,6 +9,7 @@ internal static class ResourceValidation
     {
         void Need(string path) { ModFiles.PathName(path); if (!files.Contains(path)) throw new InvalidDataException("缺少依赖资源: " + path); }
         var manifest = ModFiles.Object(read("client/manifest.json"));
+        if (files.Contains(UiPresentation.Path)) UiPresentation.Check(UiPresentation.Read(read(UiPresentation.Path)), manifest, files, read);
         foreach (var type in content.Extensions.Geography.Maps.SelectMany(m => m.TerrainOverrides).Select(o => o.Type).Distinct())
         {
             var visual = content.Extensions.Geography.Visual(type);
