@@ -18,7 +18,7 @@ public sealed partial class ClientGame
             objectives = content.Label(screen?.Objectives ?? rules?.DescriptionKey ?? ""),
             minimumRatingRound = source.Header[12], highestRatingRound = source.Header[13], presentation = screen };
     }
-    private GameSession SettleBattle(GameSession session, WorldState? previous = null)
+    private GameSession SettleBattle(GameSession session, WorldState? previous = null, WorldTurnRules? turnRules = null)
     {
         if (session.World.Story != null)
         {
@@ -40,8 +40,12 @@ public sealed partial class ClientGame
         var source = RequestBattle(session.World.ScenarioId);
         var campaignAccount = CampaignProgress.Settle(content, session);
         if (!ReferenceEquals(campaignAccount, session.Account)) session = session with { Account = campaignAccount };
+        var turns = turnRules ?? Require().Rules.Turns;
+        int? victoryStars = mode == 1 && session.World.Outcome == BattleOutcome.Victory
+            ? ExtensionVictory.RatingStars(session.World, session.World.Factions.Single(f => f.Id == session.PlayerFaction).Camp,
+                turns.NeutralCamps, session.World.ScenarioVictory ?? turns.Victory.Custom, turns.Victory.Scripts) : null;
         session = BattleSettlement.Settle(session, mode, presentation?.Id ?? session.World.ScenarioId, source.Header[12], source.Header[13],
-            mode == 2 ? FactionCountries(session.World).GetValueOrDefault(session.PlayerFaction) : null);
+            mode == 2 ? FactionCountries(session.World).GetValueOrDefault(session.PlayerFaction) : null, victoryStars);
         if (content.Extensions.Metagame.Objectives.Count == 0) return session;
         var account = MetagameObjectives.Observe(session.Account, content.Extensions.Metagame.Objectives, ObjectiveContext(session, previous));
         return ReferenceEquals(account, session.Account) ? session : session with { Account = account };

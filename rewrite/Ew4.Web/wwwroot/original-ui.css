@@ -360,6 +360,11 @@ body:has(#play:not([hidden])>#pause:not([hidden])) :is(#pause,#settings,#detail-
 .chapter-preview-flags>img{flex:none;width:26px;height:15px}
 .chapter-preview-confirm{position:absolute;right:-1px;bottom:-1px;width:31px;height:31.5px;z-index:2}
 .chapter-preview-confirm>img{display:block;width:31px;height:31.5px}
+.atlas-chapter{border:0!important;background:none!important;padding:0;z-index:2}
+.atlas-chapter:hover,.atlas-chapter:focus-visible{z-index:3}
+.atlas-chapter>img{width:100%;height:100%}
+.atlas-chapter:focus-visible{outline:1px solid #e8dcb9;outline-offset:2px;border-radius:50%}
+.chapter-preview-confirm:disabled>img{filter:grayscale(1);opacity:.5}
 .promotion-row{position:absolute;left:88px;width:228px;height:56px;display:flex;align-items:center;gap:8px;border:1px solid #999}
 .promotion-row .native-command{position:absolute;right:3px;width:83px;height:35px;gap:2px}
 .regroup-confirm{display:flex;align-items:center;flex-direction:column;gap:3px;padding-top:3px}

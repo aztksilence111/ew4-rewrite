@@ -121,14 +121,32 @@
       if(mode!==1)return false;
       const list=document.getElementById('scenarios');list.replaceChildren();list.className='chapter-list';
       const layout=this.manifest.layouts.form_selcampaign;
+      const selection=this.manifest.campaignSelection;
+      if(Array.isArray(selection?.chapters)&&selection.chapters.length){
+        await Ew4OriginalUI.prepareText(selection.title+selection.subtitle+selection.chapters.map(c=>c.name+c.start+c.end+(c.location||'')).join('')+'亮徽可进入淡徽筹备中规划关已开放');
+        list.classList.add('atlas-chapters');
+        const markerWidth=Math.max(32,Math.min(54,Number(selection.markerWidth)||54)),markerHeight=markerWidth*62/54;
+        for(const entry of selection.chapters){
+          const catalogChapter=this.catalog.chapters.find(c=>c.id===entry.catalogId);
+          const playable=!!catalogChapter&&Object.values(this.catalog.presentations).some(p=>p.chapter===catalogChapter.id&&this.catalog.scenarios.some(s=>s.id===p.id));
+          const chapter={...entry,...catalogChapter,countries:catalogChapter?.countries||entry.countries||['c15by'],plannedCount:entry.plannedCount,playable};
+          const b=this.api.button('',()=>this.previewChapter(chapter,b),list);
+          b.className='chapter-entry atlas-chapter'+(playable?' is-playable':' is-planned');b.setAttribute('aria-label',entry.name);b.setAttribute('aria-pressed','false');
+          b.dataset.tipX=25/54*markerWidth;b.dataset.tipY=markerWidth;
+          Object.assign(b.style,{left:'calc('+entry.x/568*100+'% - '+25/54*markerWidth+'px)',top:'calc('+entry.y/320*100+'% - '+markerWidth+'px)',width:markerWidth+'px',height:markerHeight+'px'});
+          const image=this.api.image(entry.image).cloneNode();image.alt='';image.width=markerWidth;image.height=markerHeight;b.append(image);
+          b.title=entry.name+' · '+(entry.location||'')+' '+entry.start+'–'+entry.end+(playable?' · 可试玩':' · 筹备中');
+        }
+      }else{
       const custom=this.catalog.chapters.filter(chapter=>!layout.children.some(e=>e.attributes.id==='btn_selcamp_'+chapter.id));
       if(custom.length)list.classList.add('extended-chapters');
       for(const chapter of this.catalog.chapters){const placement=layout.children.find(e=>e.attributes.id==='btn_selcamp_'+chapter.id)?.attributes;
         const b=this.api.button('',()=>this.previewChapter(chapter,b),list);b.className='chapter-entry';b.setAttribute('aria-label',chapter.name);
         // Project the marker tip with the map; keep its artwork at the original size.
         if(placement){Object.assign(b.style,{left:'calc('+((Number(placement.x)+25)/568*100)+'% - 25px)',top:'calc('+((Number(placement.y)+54)/320*100)+'% - 54px)',width:placement.w+'px',height:placement.h+'px'});b.append(this.api.uiImage(placement.frm1,Number(placement.w),Number(placement.h)));}
-        else{b.classList.add('custom-chapter');Object.assign(b.style,{left:'356px',top:(14+custom.indexOf(chapter)*48)+'px',width:'185px',height:'40px'});b.append(this.lettering(chapter.name,'font_text_2_cn_hd','#404040',170,'center'));}
+        else{const index=custom.indexOf(chapter);b.classList.add('custom-chapter');Object.assign(b.style,{left:(28+index%5*106)+'px',top:(190+Math.floor(index/5)*88)+'px',width:'54px',height:'62px'});b.append(this.api.uiImage('button_choosebattlezone_locked.png',54,62));}
         b.title=chapter.name+' '+chapter.start+'–'+chapter.end;
+      }
       }
       document.getElementById('scenario-menu').onclick=e=>{if(!e.target.closest('.chapter-entry,.chapter-preview'))document.querySelector('.chapter-preview')?.remove();};
       return true;
@@ -138,13 +156,19 @@
       const popup=document.createElement('section');popup.className='chapter-preview';popup.setAttribute('aria-label',chapter.name+' '+chapter.start+'-'+chapter.end);
       const title=document.createElement('div');title.className='chapter-preview-title';title.append(this.lettering(chapter.name,'font_text_2_cn_hd','#ebe6e1',139,'center',{singleLine:true}));
       const years=document.createElement('div');years.className='chapter-preview-years';years.append(this.lettering(chapter.start+'-'+chapter.end,'font_char_2_hd','#404040'));
-      const flags=document.createElement('div');flags.className='chapter-preview-flags';for(const country of chapter.countries)flags.append(this.countryFlag(country,26,15));
+      const flags=document.createElement('div');flags.className='chapter-preview-flags';
+      if(chapter.flagImages?.length){for(const file of chapter.flagImages){const flag=this.api.image(file).cloneNode();flag.alt='';flag.width=26;flag.height=15;flags.append(flag);}}
+      else for(const country of chapter.countries)flags.append(this.countryFlag(country,26,15));
       popup.append(title,years,flags);const confirm=this.api.button('',()=>{popup.remove();return this.openChapter(chapter);},popup);confirm.className='chapter-preview-confirm';confirm.setAttribute('aria-label','进入 '+chapter.name);confirm.title='进入 '+chapter.name;confirm.append(this.api.uiImage('button_confrim.png',31,31.5));
+      if(chapter.playable===false){confirm.disabled=true;confirm.title='筹备中';confirm.setAttribute('aria-label',chapter.name+' 筹备中');}
+      popup.title=(chapter.location||'')+(chapter.plannedCount?' · 规划'+chapter.plannedCount+'关':'')+(chapter.playable===false?' · 筹备中':'');
       // The visible marker tip is (25, 54); its texture includes transparent shadow margins.
-      const targetX=anchor.offsetLeft+25,targetY=anchor.offsetTop+54;
+      const targetX=anchor.offsetLeft+Number(anchor.dataset.tipX||25),targetY=anchor.offsetTop+Number(anchor.dataset.tipY||54);
       const left=Math.max(4,Math.min(document.getElementById('scenarios').clientWidth-143,targetX-69.5));
       popup.style.left=left+'px';popup.style.top=Math.max(24,targetY-69.5)+'px';popup.style.setProperty('--chapter-arrow-left',(targetX-left-16.5)+'px');
       document.getElementById('scenarios').append(popup);confirm.focus({preventScroll:true});
+      popup.tabIndex=-1;if(confirm.disabled)popup.focus({preventScroll:true});
+      popup.onkeydown=e=>{if(e.key==='Escape'){popup.remove();anchor.focus({preventScroll:true});}};
     }
     async openChapter(chapter){
       await this.api.refreshCatalog();
@@ -200,7 +224,7 @@
     }
     fitCampaignDescription(){
       if(!this.battle||document.getElementById('campaign-screen').hidden)return;
-      const description=document.getElementById('campaign-description'),width=Math.floor(parseFloat(getComputedStyle(description).width));
+      const description=document.getElementById('campaign-description'),style=getComputedStyle(description),width=Math.floor(description.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight));
       if(!width)return;
       const text=this.battle.description.startsWith('desc_')?'':this.battle.description,key=JSON.stringify([text,width]);
       if(this.descriptionKey===key)return;
@@ -262,7 +286,8 @@
         if(!screen.layout){const heading=document.createElement('div');heading.className='stage-condition-title';heading.append(this.lettering(this.text(key),'font_text_2_cn_hd','#ebe6e1',176,'center',{singleLine:true}));l.get(group).append(heading);
           if(bindings[binding])l.get(bindings[binding]).style.height='32px';
           if(override!=null)l.hide(group+'/text_round');}
-        if(bindings[binding])l.text(bindings[binding],override==null?value:this.text(override));
+        if(bindings[binding])l.text(bindings[binding],override==null?value:this.text(override),
+          override!=null&&!screen.layout?{font:'font_text_1_cn_hd',size:12,align:'center',breakwords:'true'}:undefined);
       }
       if(bindings.victoryLabel)l.text(bindings.victoryLabel,this.text('text_victory'));
       if(bindings.bestVictoryLabel)l.text(bindings.bestVictoryLabel,this.text('text_bestvic'));
@@ -280,10 +305,15 @@
       if(surface.width!==w||surface.height!==h){surface.width=w;surface.height=h;}
       const logicalWidth=surface.clientWidth,logicalHeight=surface.clientHeight;
       draw.setTransform(w/logicalWidth,0,0,h/logicalHeight,0,0);draw.clearRect(0,0,logicalWidth,logicalHeight);
-      const definition=this.manifest.strategic[this.battle.id]||{},textureScale=this.manifest.uiOverrides?.strategic?1:.8,texture=this.api.menuArt.strategic;
-      const scale=Math.max(Number(definition.scale||1),this.manifest.uiOverrides?.strategic?0:Math.max((logicalWidth-130)/(texture.image.naturalWidth/texture.ratio*textureScale),logicalHeight/((texture.height||texture.image.naturalHeight/texture.ratio)*textureScale)));
+      const definition=this.manifest.strategic[this.battle.id]||{},textureScale=this.manifest.uiOverrides?.strategic||definition.background?1:.8,texture=this.api.menuArt.strategicTexture(definition);
+      const scale=Math.max(Number(definition.scale||1),(logicalWidth-130)/(texture.image.naturalWidth/texture.ratio*textureScale),definition.fitHeight===false?0:logicalHeight/((texture.height||texture.image.naturalHeight/texture.ratio)*textureScale));
       const target=this.api.menuArt.strategicCamera(definition,scale,textureScale,logicalWidth-130,logicalHeight);
-      const camera=this.strategicPose(this.battle.id,{x:target.x-Number(definition.centerx||410)*scale,y:target.y-Number(definition.centery||288)*scale,scale},time);
+      const camera=this.strategicPose(this.battle.id,{x:target.x-Number(definition.centerx||410)*scale,y:definition.fitHeight===false?0:target.y-Number(definition.centery||288)*scale,scale},time);
+      if(definition.fitHeight===false&&definition.paperMargin>0){
+        if(!texture.paperTile){const tile=document.createElement('canvas');tile.width=texture.image.naturalWidth/texture.ratio;tile.height=definition.paperMargin/texture.ratio;
+          tile.getContext('2d').drawImage(texture.image,0,0,texture.image.naturalWidth,definition.paperMargin,0,0,tile.width,tile.height);texture.paperTile=tile;}
+        draw.fillStyle=draw.createPattern(texture.paperTile,'repeat');draw.fillRect(0,0,logicalWidth,logicalHeight);
+      }
       draw.save();
       const projected={...definition,centerx:0,centery:0};
       this.api.menuArt.drawStrategic(draw,projected,camera.scale,camera.x,camera.y,textureScale);
@@ -525,9 +555,9 @@
         const panel=document.createElement('section');panel.className='save-slot';
         Object.assign(panel.style,{left:attrs.x+'px',top:(Number(attrs.y)-27)+'px',width:attrs.w+'px',height:attrs.h+'px'});
         const title=document.createElement('div');title.className='save-name';title.append(this.lettering(slot.corrupt?'存档损坏':slot.exists?slot.name:this.text('text_empty'),'font_text_2_cn_hd','#ebe6e1',110,'center'));panel.append(title);
-        const mod=document.createElement('div');mod.className='save-mod-name';mod.textContent=slot.modName||'原版';mod.title=mod.textContent;panel.append(mod);
+        if(slot.exists||slot.corrupt){const mod=document.createElement('div');mod.className='save-mod-name';mod.textContent=slot.modName||'原版';mod.title=mod.textContent;mod.setAttribute('aria-label','所属Mod或存档标注：'+mod.textContent);panel.append(mod);}
         const date=document.createElement('div');date.className='save-date';
-        if(slot.savedAt){const d=new Date(slot.savedAt),pad=n=>String(n).padStart(2,'0');date.append(this.lettering(d.getFullYear()+'/'+pad(d.getMonth()+1)+'/'+pad(d.getDate())+'\n'+pad(d.getHours())+':'+pad(d.getMinutes()),'font_char_1_hd','#404040',110,'center'));}panel.append(date);
+        if(slot.savedAt){const d=new Date(slot.savedAt),pad=n=>String(n).padStart(2,'0');date.append(this.lettering(d.getFullYear()+'/'+pad(d.getMonth()+1)+'/'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes()),'font_char_1_hd','#404040',110,'center'));}panel.append(date);
         if(slot.country){const flag=this.countryFlag(slot.country,25.5,15);flag.className='save-country';panel.append(flag);}
         const titleText=(saving?'保存到':'载入')+(slot.slot===0?'自动存档':'存档 '+slot.slot)+(slot.exists?' '+slot.name+' 回合 '+slot.round:' 空');
         const command=this.api.button('',async()=>{

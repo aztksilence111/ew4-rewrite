@@ -39,8 +39,8 @@
 #countries .country-entry,#campaign-battles .country-entry{transition:transform 160ms ease-out,margin-left 160ms ease-out;filter:none}
 /* Scale the complete original rows; keep flags, labels, and art in their original alignment. */
 #campaign-intro{left:calc(72px + var(--menu-safe-left,0px));right:calc(var(--campaign-row-width,164px) + var(--menu-safe-right,0px) + 8px);width:auto;max-width:none;height:88px}
-#campaign-intro::before{right:0;width:auto}
-#campaign-description{left:70px;right:0;top:0;width:auto;max-width:none;height:88px;background:#ebe6e1}
+#campaign-intro::before{left:70px;right:0;top:0;width:auto;height:88px;box-sizing:border-box;border-width:0;background:#ebe6e1;border-image:none}
+#campaign-description{left:70px;right:0;top:0;width:auto;max-width:none;height:88px;box-sizing:border-box;padding:3px 5px;background:none}
 .menu-transition-curtain{position:fixed;inset:0;z-index:10000;background:#000;pointer-events:auto;touch-action:none}
 .round-commanders{overflow-x:auto;overflow-y:hidden;align-items:center;scrollbar-width:none}
 .round-commander{position:relative;flex:0 0 46.5px;height:58px;background:#858580;overflow:hidden}

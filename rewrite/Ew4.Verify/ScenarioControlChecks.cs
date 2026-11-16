@@ -56,6 +56,30 @@ internal static class ScenarioControlChecks
         Reject(() => ScenarioRules.Validate(basis with { ScenarioEvents = [new() { Id = "bad", Effects = [ruleEffect with {
             VictoryRules = delayedWin with { Win = new() { Type = "cells_owned", Cells = [999] } } }] }] }, true), "extension.victory_reference");
         var upcoming = new ScenarioEffect { Type = "faction_create", Faction = "rebels", Name = "叛军", Camp = "rebels", TemplateFaction = "winner" };
+        var filteredLand = ScenarioRules.Evaluate(basis with { ScenarioEvents = [new() { Id = "filtered.land", Effects = [
+            new() { Type = "cells_owner", Faction = "winner", ExpectedOwner = "loser", Cells = [0, 1, 8] }] }] }).State;
+        Check(filteredLand.Cells[0].Owner == "loser" && filteredLand.Cells[1].Owner == "winner" && filteredLand.Cells[8].Owner == "winner",
+            "source-filtered land transfer preserves hostile occupied land and third-party ownership");
+        var opening = new ScriptedScenarioEvent { Id = "opening.handoff", Effects = [upcoming,
+            new() { Type = "unit_owner", Unit = "unit.1", Faction = "rebels" },
+            new() { Type = "cells_owner", Cells = [0], Faction = "rebels" },
+            new() { Type = "player_control", Faction = "rebels", OpeningTurn = true }] };
+        var openingWorld = ScenarioRules.Evaluate(basis with { ScenarioEvents = [opening] }).State;
+        Check(openingWorld.ActiveFaction == "winner" && openingWorld.ScenarioPlayerFaction == "rebels", "opening handoff waits for pending presentation");
+        openingWorld = WorldSave.Decode(WorldSave.Encode(openingWorld), openingWorld.ContentRevision);
+        var turnRules = new WorldTurnRules();
+        var handed = WorldTurns.CompleteOpeningHandoff(openingWorld, turnRules).State;
+        Check(handed.ActiveFaction == "rebels" && handed.Round == 1 && handed.Phase == TurnPhase.Active, "opening handoff starts the new army without intervening AI turns");
+        Check(handed.Units.Single(u => u.Owner == "winner").Acted && !handed.Units.Single(u => u.Owner == "rebels").Acted,
+            "outgoing army settles once and incoming army receives its first movement budget");
+        Check(ReferenceEquals(handed, WorldTurns.CompleteOpeningHandoff(handed, turnRules).State), "opening handoff is consumed exactly once");
+        var laterOpening = ScenarioRules.Evaluate(basis with { Round = 4, ScenarioEvents = [opening] }).State;
+        laterOpening = WorldSave.Decode(WorldSave.Encode(laterOpening), laterOpening.ContentRevision);
+        var laterHanded = WorldTurns.CompleteOpeningHandoff(laterOpening, turnRules).State;
+        Check(laterHanded.ActiveFaction == "rebels" && laterHanded.Round == 4, "new provincial army can receive its first turn after a later response");
+        Reject(() => ScenarioRules.Evaluate(basis with { ScenarioEvents = [opening with { Effects = opening.Effects.Select(e => e.Type == "player_control"
+            ? e with { Faction = "loser" } : e).ToArray() }] }), "scenario.opening_turn");
+        Reject(() => ScenarioRules.ValidateDefinitions([new() { Id = "bad", Effects = [new() { Type = "money", OpeningTurn = true }] }]), "scenario.effect");
         var reserved = basis with { ScenarioEvents = [new() { Id = "objectives", Effects = [ruleEffect with {
             VictoryRules = delayedWin with { Win = new() { Type = "factions_defeated", Factions = ["rebels"] } } }] },
             new() { Id = "later", Condition = new() { Type = "round", Value = 9 }, Effects = [upcoming] }] };

@@ -16,7 +16,7 @@
       this.speed=this.tool(right,null,'播放倍速',()=>{const speeds=[1,2,4,8];this.preferences.speed=speeds[(speeds.indexOf(this.preferences.speed)+1)%4];this.persist();this.controls();this.schedule();});
       this.auto=this.tool(right,'play','自动播放',()=>{if(this.resumePaused){this.resumePaused=false;this.preferences.auto=true;}else this.preferences.auto=!this.preferences.auto;this.persist();this.controls();this.schedule();});
       this.auto.className='story-auto';this.auto.append(document.createTextNode('自动'));
-      this.skip=this.tool(right,'skip-forward','跳过剧情',()=>this.command('story_skip'));
+      this.skip=this.tool(right,'skip-forward','跳过剧情',()=>this.confirmSkip());
       this.dialogue=document.createElement('div');this.dialogue.className='story-dialogue';
       this.speaker=document.createElement('div');this.speaker.className='story-speaker';
       this.text=document.createElement('p');this.text.className='story-text';this.text.setAttribute('aria-live','polite');
@@ -168,7 +168,19 @@
       const sheet=document.createElement('section');sheet.className='story-sheet'+(history?' story-history':'');const header=document.createElement('header');
       const h=document.createElement('h2');h.textContent=title;h.style.fontSize='22px';header.append(h);this.tool(header,'x','关闭',()=>this.closeOverlay()).className='story-close';
       sheet.append(header);this.overlay.append(sheet);this.host.append(this.overlay);this.schedule();return sheet;}
-    closeOverlay(){if(this.overlay)this.overlay.remove();this.overlay=null;this.schedule();}
+    closeOverlay(){const focus=this.overlay?.classList.contains('story-skip-overlay');if(this.overlay)this.overlay.remove();this.overlay=null;if(focus&&!this.host.hidden)this.skip.focus();this.schedule();}
+    confirmSkip(){
+      if(!this.story||this.busy||this.commandPending||this.preparing)return;
+      const key=this.key,sheet=this.sheet('跳过剧情？');
+      this.overlay.classList.add('story-skip-overlay');sheet.classList.add('story-skip-confirm');
+      sheet.setAttribute('role','dialog');sheet.setAttribute('aria-modal','true');sheet.setAttribute('aria-label','确认跳过剧情');
+      const message=document.createElement('p');message.textContent='是否跳过当前剧情？遇到需要选择的选项时仍会停下。';sheet.append(message);
+      const actions=document.createElement('div');actions.className='story-skip-actions';sheet.append(actions);
+      const cancel=this.tool(actions,null,'继续阅读',()=>this.closeOverlay());cancel.textContent='继续阅读';
+      const confirm=this.tool(actions,null,'确认跳过',()=>{this.closeOverlay();if(this.key===key)void this.command('story_skip');});confirm.textContent='确认跳过';
+      sheet.addEventListener('keydown',event=>{if(event.key!=='Tab')return;const buttons=Array.from(sheet.querySelectorAll('button:not(:disabled)'));const first=buttons[0],last=buttons[buttons.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}});
+      cancel.focus();
+    }
     settings(){const sheet=this.sheet('剧情设置');
       const label=document.createElement('label');label.textContent='字号';const select=document.createElement('select');select.setAttribute('aria-label','剧情字号');
       for(const [value,text] of [['small','小'],['medium','中'],['large','大']]){const option=document.createElement('option');option.value=value;option.textContent=text;select.append(option);}

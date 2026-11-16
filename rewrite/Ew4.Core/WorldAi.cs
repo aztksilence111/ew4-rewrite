@@ -8,8 +8,10 @@ public abstract record WorldAiCommand(long ExpectedRevision, string UnitId);
 public sealed record AiStrikeCommand(long ExpectedRevision, string UnitId, string TargetId) : WorldAiCommand(ExpectedRevision, UnitId);
 public sealed record AiMoveCommand(long ExpectedRevision, string UnitId, int Destination, string? TargetId = null) : WorldAiCommand(ExpectedRevision, UnitId);
 public sealed record AiHoldCommand(long ExpectedRevision, string UnitId) : WorldAiCommand(ExpectedRevision, UnitId);
+public sealed record AiDefendOrder(int Center, int Radius);
 public sealed record WorldAiRules
 {
+    public IReadOnlyDictionary<string, AiDefendOrder> DefendOrders { get; init; } = new Dictionary<string, AiDefendOrder>();
     public AiTacticalRules Tactics { get; init; } = new();
     public IReadOnlyDictionary<string, int> ExperienceLevels { get; init; } = new Dictionary<string, int>();
     public IReadOnlyDictionary<string, IReadOnlyCollection<string>> ProfileTraits { get; init; } = new Dictionary<string, IReadOnlyCollection<string>>();
@@ -31,7 +33,8 @@ public sealed record WorldAiRules
     private void ValidateCore()
     {
         Tactics.Validate(); MoveScoring.Validate(); Strategy.Validate();
-        if (ExperienceLevels.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Value < 0)
+        if (DefendOrders.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Value == null || p.Value.Center < 0 || p.Value.Radius is < 0 or > 6)
+            || ExperienceLevels.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Value < 0)
             || ProfileTraits.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Value.Any(string.IsNullOrWhiteSpace))
             || SitePriorities.Any(p => p.Key < 0 || p.Value < 0) || PriorityBehaviors.Concat(NeutralCamps).Any(string.IsNullOrWhiteSpace)
             || string.IsNullOrWhiteSpace(HoldInfantryCategory) || Behaviors.Any(p => string.IsNullOrWhiteSpace(p.Key))
@@ -136,8 +139,13 @@ public static partial class WorldAi
         AiCandidate<AiMoveCommand>? move = null, combo = null;
         var range = WorldActions.MovementRange(state, unit, rules.Movement);
         var occupied = PlanningScope.Queries(state)?.Occupants;
+        rules.DefendOrders.TryGetValue(unit.Id, out var defend);
+        var map = defend == null ? null : new HexMap(state.Width, state.Height);
+        if (defend != null && defend.Center >= map!.Count)
+            throw new RuleViolation("ai.defend_center", "AI defense center is outside the map");
         foreach (int cellId in range.Keys.OrderBy(i => i))
         {
+            if (defend != null && map!.Distance(cellId, defend.Center) > defend.Radius) continue;
             if (cellId == unit.Cell || (WorldUnitLayers.Enabled(state)
                 ? !WorldUnitLayers.HasSpace(state, unit.Combatant.Profile, unit.Owner, cellId, unit.Id)
                 : (occupied != null ? occupied.ContainsKey(cellId) : state.Units.Any(u => u.Cell == cellId)))) continue;

@@ -9,7 +9,7 @@
       this.scenarioName=node('span','');this.country=node('span','pause-objectives-country');this.scenario.append(this.scenarioName,this.country);
       this.scroll=node('div','pause-objectives-scroll');this.scroll.tabIndex=0;this.scroll.setAttribute('aria-label','战局目标列表');
       this.description=node('p','pause-objectives-description');this.scroll.append(this.description);
-      this.sections={};for(const key of ['win','limits','ratings']){const section=node('section','pause-objectives-section'),title=node('h3',''),body=node('div','');section.append(title,body);this.sections[key]={section,title,body};this.scroll.append(section);}
+      this.sections={};for(const key of ['stages','win','limits','ratings']){const section=node('section','pause-objectives-section'),title=node('h3',''),body=node('div','');section.dataset.section=key;section.append(title,body);this.sections[key]={section,title,body};this.scroll.append(section);}
       this.note=node('p','pause-objectives-foot');this.element.replaceChildren(this.header,this.scenario,this.scroll,this.note);
       addEventListener('resize',()=>this.fit());addEventListener('ew4uiscale',()=>this.fit());
     }
@@ -43,9 +43,9 @@
       this.element.style.backgroundImage=p.backgroundImage?'url("'+this.api.imagePath(p.backgroundImage)+'")':'';
       this.write(this.header,snapshot.title);this.write(this.scenarioName,snapshot.scenario);this.write(this.country,snapshot.country);
       this.write(this.description,model.description);this.description.hidden=!model.description;this.write(this.note,model.note);
-      const titles={win:p.winTitle,limits:p.limitsTitle,ratings:p.ratingsTitle};
-      if(this.sectionOrder!==p.sections.join(',')){for(const key of p.sections)this.scroll.append(this.sections[key].section);this.sectionOrder=p.sections.join(',');}
-      for(const key of p.sections)this.write(this.sections[key].title,this.api.label(titles[key]));
+      const titles={stages:p.stagesTitle||'阶段目标',win:p.winTitle,limits:p.limitsTitle,ratings:p.ratingsTitle},order=['stages',...p.sections];
+      if(this.sectionOrder!==order.join(',')){for(const key of order)this.scroll.append(this.sections[key].section);this.sectionOrder=order.join(',');}
+      for(const key of order)this.write(this.sections[key].title,this.api.label(titles[key]));
       const used=new Set();
       const mount=(row,parent,failure=false)=>{
         used.add(row.id);let entry=this.rows.get(row.id);
@@ -57,8 +57,10 @@
         for(const child of row.children||[])mount(child,entry.children,failure||row.relation==='failure');
       };
       mount(model.win,this.sections.win.body);for(const limit of model.limits)mount(limit,this.sections.limits.body);
+      for(const goal of model.stages||[])mount(goal,this.sections.stages.body);
       for(const [id,entry] of this.rows)if(!used.has(id)){entry.el.remove();this.rows.delete(id);}
       this.sections.limits.section.hidden=model.limits.length===0;this.sections.ratings.section.hidden=model.ratings.length===0;
+      this.sections.stages.section.hidden=!model.stages?.length;
       const ratingUsed=new Set();
       for(const rating of model.ratings){
         ratingUsed.add(rating.stars);let entry=this.ratings.get(rating.stars);

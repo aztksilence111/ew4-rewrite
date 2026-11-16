@@ -55,6 +55,24 @@ public sealed record WorldTurnRules
 
 public static class WorldTurns
 {
+    public const string OpeningHandoffKey = "scenario/player_control.opening_handoff";
+
+    public static WorldChange CompleteOpeningHandoff(WorldState state, WorldTurnRules rules)
+    {
+        if (state.ExtensionState.GetValueOrDefault(OpeningHandoffKey) != 1 || state.PendingDialogue != null
+            || state.Phase != TurnPhase.Active) return new(state, Array.Empty<WorldNotice>());
+        string target = state.ScenarioPlayerFaction!;
+        if (state.Factions.Single(f => f.Id == target).TurnSummary != null || target == state.ActiveFaction)
+            throw new RuleViolation("scenario.opening_turn", "Opening handoff is no longer valid");
+        // Settle the old turn normally, then give the new army its first turn.
+        // Other countries keep their relative order; no intervening AI actions run.
+        var ordered = state.Factions.Where(f => f.Id != target).ToList();
+        ordered.Insert(ordered.FindIndex(f => f.Id == state.ActiveFaction) + 1, state.Factions.Single(f => f.Id == target));
+        var counters = state.ExtensionState.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal);
+        counters[OpeningHandoffKey] = 0;
+        var prepared = state with { Factions = ordered.ToArray(), ExtensionState = counters };
+        return EndTurn(prepared, prepared.Revision, rules);
+    }
     private static void CheckRevision(WorldState state, long expectedRevision)
     {
         state.Validate();

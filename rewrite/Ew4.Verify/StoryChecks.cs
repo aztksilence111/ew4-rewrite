@@ -23,6 +23,18 @@ internal static class StoryChecks
         var basis = new WorldState { ScenarioId = "fixture", ContentRevision = "fixture", Width = 2, Height = 1,
             ActiveFaction = "player", ScenarioPlayerFaction = "player", Factions = [new() { Id = "player", Camp = "a", Human = true, Resources = new(100, 0, 0) },
                 new() { Id = "enemy", Camp = "b" }], Cells = [new() { Owner = "player" }, new() { Owner = "enemy" }], Story = new() { Library = library } };
+        var terminalLibrary = library with { Scenes = library.Scenes.Concat(new[] { new KeyValuePair<string, StoryScene>("terminal",
+            new("terminal", [new() { Id = "order", Text = "出征！", Choices = [new() { Id = "march", Text = "黔军听令！", End = true,
+                Effects = [new() { Type = "state", Key = "scenario/march", Value = 1 }] }] }])) }).ToDictionary(p => p.Key, p => p.Value) };
+        StoryValidation.Library(terminalLibrary);
+        var singleChoice = StoryPlayback.Enqueue(basis with { Story = new() { Library = terminalLibrary } }, "order", "terminal");
+        singleChoice = WorldSave.Decode(WorldSave.Encode(singleChoice), singleChoice.ContentRevision);
+        Reject(() => StoryPlayback.Advance(singleChoice, StoryPlayback.Current(singleChoice)!.Id, "order", null, false), "story.choice_required");
+        singleChoice = StoryPlayback.Advance(singleChoice, StoryPlayback.Current(singleChoice)!.Id, "order", "march", false).State;
+        Check(singleChoice.PendingDialogue == null && singleChoice.ExtensionState["scenario/march"] == 1, "terminal single choice returns directly without an extra dialogue node");
+        Check(WorldSave.Decode(WorldSave.Encode(singleChoice), singleChoice.ContentRevision).Story!.Runs.Single().Completed, "terminal choice completion survives save");
+        Reject(() => StoryValidation.Library(terminalLibrary with { Scenes = new Dictionary<string, StoryScene> {
+            ["invalid"] = new("invalid", [new() { Id = "a", Choices = [new() { Id = "bad", Text = "bad", End = true, Next = "b" }] }, new() { Id = "b", End = true }]) } }), "story.definition");
         var ev = new ScriptedScenarioEvent { Id = "council", Effects = [new() { Type = "money", Value = -10 },
             new() { Type = "play_story", Key = "call", Scene = "scene" }, new() { Type = "food", Value = 15 }] };
         var w = ScenarioRules.Evaluate(basis with { ScenarioEvents = [ev] }).State;

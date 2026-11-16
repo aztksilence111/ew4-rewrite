@@ -6,6 +6,10 @@
 
 ## 分阶段更新条件
 
+当前源码另支持可选的条件评级：在 `victoryRules` 中设置 `majorVictory` 条件树、`victoryStars`（默认3）和 `majorVictoryStars`（默认5）。战役实际获胜后才检查 `majorVictory`，满足则使用重大胜利星数，否则使用普通胜利星数；两值均为1至5且重大胜利高于普通胜利。谓词、引用及Lua处理与胜负条件相同，随当前规则和存档保留，正常结算、奖励差额与重复领取保护共用原流程。没有 `majorVictory` 时仍按原版回合阈值评级，征服及本地多人不使用这项覆盖。需要包含此接口的新宿主，尚未进入正式发行包。
+
+例如同在第10回合结算：`win` 为第10回合且控制接应点，`majorVictory` 为同时控制接应点与主城，`lose` 为司令部队被消灭或期限到仍未控制接应点。主城失守只降评级，不能同时列为即时失败。界面可用 `victoryText`、`bestVictoryText` 分别写简短条件，日期和失败条件留在任务说明中。
+
 沿用 `scenarioEvents`，每个阶段执行一次 `victory_rules`，完整替换当前条件。`victory_default` 恢复剧本原规则。条件树字段见[RULE_EXTENSIONS](RULE_EXTENSIONS.md)，事件和选择语义见[SCENARIO_CONTROL](SCENARIO_CONTROL.md)。
 
 阶段使用 `event_completed` 或 `state` 记录先后顺序；事件在同一判定点可以连锁执行。一次性阶段不填 `repeat`。若需要循环修改，可使用已有 `repeat`。阶段条件、已执行事件、当前规则、待选弹窗均随存档保存。

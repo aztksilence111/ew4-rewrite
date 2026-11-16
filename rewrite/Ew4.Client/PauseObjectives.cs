@@ -9,10 +9,18 @@ public sealed record PauseObjectiveRow(string Id, string Text, bool? Met = null,
     string Relation = "", IReadOnlyList<PauseObjectiveRow>? Children = null);
 public sealed record PauseRating(int Stars, int Start, int? End, bool Available);
 public sealed record PauseObjectiveModel(PauseObjectiveRow Win, IReadOnlyList<PauseObjectiveRow> Limits,
-    IReadOnlyList<PauseRating> Ratings, string Description, string Note);
+    IReadOnlyList<PauseRating> Ratings, string Description, string Note)
+{
+    public IReadOnlyList<PauseObjectiveRow> Stages { get; init; } = [];
+}
 
 public static class PauseObjectiveProjection
 {
+    public static IReadOnlyList<PauseObjectiveRow> Stages(WorldState world, IEnumerable<Ew4.Legacy.StageObjectiveDefinition> goals,
+        Func<string, string> label) => goals.Where(g => g.VisibleWhen == null || ScenarioRules.Match(world, g.VisibleWhen))
+        .Select(g => new PauseObjectiveRow("stages." + g.Id, label(g.Text),
+            g.CompleteWhen == null ? null : ScenarioRules.Match(world, g.CompleteWhen), label(g.Detail))).ToArray();
+
     public static IReadOnlyList<PauseRating> Ratings(int round, int minimum, int highest, int? limit)
     {
         if (minimum < 1 || highest < 0) return [];
@@ -180,6 +188,7 @@ public sealed partial class ClientGame
                 id => world.Factions.SingleOrDefault(f => f.Id == id)?.Name is string name ? content.Label(name) : id);
             var screen = content.Extensions.PauseObjectivesPresentations.GetValueOrDefault(world.ScenarioId)
                 ?? content.Extensions.PauseObjectivesPresentations.GetValueOrDefault("*") ?? new();
+            model = model with { Stages = PauseObjectiveProjection.Stages(world, screen.StageObjectives, content.Label) };
             var view = new { context, visible = scenario.Mode is 1 or 2, title = content.Label(screen.Title),
                 scenario = content.Label(scenario.Name), country = content.Label(world.Factions.Single(f => f.Id == session.PlayerFaction).Name),
                 model, presentation = screen };

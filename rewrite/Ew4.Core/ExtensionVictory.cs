@@ -21,6 +21,9 @@ public sealed record ExtensionVictoryRules
 {
     public VictoryCondition Win { get; init; } = new();
     public VictoryCondition? Lose { get; init; }
+    public VictoryCondition? MajorVictory { get; init; }
+    public int VictoryStars { get; init; } = 3;
+    public int MajorVictoryStars { get; init; } = 5;
     public string Priority { get; init; } = "defeat";
     public string DescriptionKey { get; init; } = "";
     public int? RoundLimit { get; init; }
@@ -28,6 +31,10 @@ public sealed record ExtensionVictoryRules
 }
 public static class ExtensionVictory
 {
+    public static IEnumerable<VictoryCondition> AllConditions(ExtensionVictoryRules rules)
+        => Conditions(rules.Win).Concat(rules.Lose == null ? [] : Conditions(rules.Lose))
+            .Concat(rules.MajorVictory == null ? [] : Conditions(rules.MajorVictory));
+
     public static IEnumerable<VictoryCondition> Conditions(VictoryCondition root)
     {
         var pending = new Stack<(VictoryCondition Condition, int Depth)>();
@@ -46,9 +53,11 @@ public static class ExtensionVictory
 
     public static void Validate(ExtensionVictoryRules rules)
     {
-        if (rules == null || rules.Priority is not ("victory" or "defeat") || rules.RoundLimit < 1 || rules.DescriptionKey == null)
+        if (rules == null || rules.Priority is not ("victory" or "defeat") || rules.RoundLimit < 1 || rules.DescriptionKey == null
+            || rules.VictoryStars is < 1 or > 5 || rules.MajorVictoryStars is < 1 or > 5
+            || rules.MajorVictory != null && rules.MajorVictoryStars <= rules.VictoryStars)
             throw new RuleViolation("extension.victory", "Invalid outcome priority/round limit");
-        var conditions = Conditions(rules.Win).Concat(rules.Lose == null ? Array.Empty<VictoryCondition>() : Conditions(rules.Lose)).ToArray();
+        var conditions = AllConditions(rules).ToArray();
         if (conditions.Length > 1024) throw new RuleViolation("extension.victory", "Too many victory conditions");
         foreach (var c in conditions)
         {
@@ -71,7 +80,7 @@ public static class ExtensionVictory
 
     public static void ValidateTargets(ExtensionVictoryRules rules, WorldState world, bool initial, Func<string, bool>? knownFaction = null)
     {
-        foreach (var c in Conditions(rules.Win).Concat(rules.Lose == null ? Array.Empty<VictoryCondition>() : Conditions(rules.Lose)))
+        foreach (var c in AllConditions(rules))
             if (c.Cells.Any(i => i < 0 || i >= world.Cells.Count || !world.Cells[i].Terrain.CanTraverse())
                 || c.Factions.Any(id => !(knownFaction?.Invoke(id) ?? world.Factions.Any(f => f.Id == id)))
                 || initial && c.Units.Any(id => !ScenarioArmies.KnownUnit(world, id)))
@@ -82,8 +91,14 @@ public static class ExtensionVictory
     {
         VictoryCondition Clone(VictoryCondition c) => c with { Conditions = c.Conditions.Select(Clone).ToArray(),
             Cells = c.Cells.ToArray(), Units = c.Units.ToArray(), Factions = c.Factions.ToArray() };
-        return rules with { Win = Clone(rules.Win), Lose = rules.Lose == null ? null : Clone(rules.Lose) };
+        return rules with { Win = Clone(rules.Win), Lose = rules.Lose == null ? null : Clone(rules.Lose),
+            MajorVictory = rules.MajorVictory == null ? null : Clone(rules.MajorVictory) };
     }
+
+    public static int? RatingStars(WorldState state, string camp, IReadOnlyCollection<string> neutral,
+        ExtensionVictoryRules? rules, IRuleScriptRuntime? scripts)
+        => rules?.MajorVictory == null ? null : Match(state, camp, neutral, rules.MajorVictory, scripts)
+            ? rules.MajorVictoryStars : rules.VictoryStars;
 
     public static BattleOutcome Evaluate(WorldState state, string camp, IReadOnlyCollection<string> neutral, ExtensionVictoryRules rules, IRuleScriptRuntime? scripts)
     {

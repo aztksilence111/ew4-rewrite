@@ -75,7 +75,8 @@ public static class StoryValidation
                         && Math.Abs(a.Amplitude) <= 200 && Math.Abs(a.X) <= 2000 && Math.Abs(a.Y) <= 2000, step.Id + " animation");
                 Check(step.Choices.Select(c => c.Id).Distinct().Count() == step.Choices.Count, step.Id + " choice IDs");
                 foreach (var c in step.Choices)
-                    Check(c != null && Id(c.Id) && !string.IsNullOrWhiteSpace(c.Text) && c.Text.Length <= 2000 && c.Next != null && byId.ContainsKey(c.Next)
+                    Check(c != null && Id(c.Id) && !string.IsNullOrWhiteSpace(c.Text) && c.Text.Length <= 2000
+                        && (c.End ? c.Next == null : c.Next != null && byId.ContainsKey(c.Next))
                         && c.Effects != null && c.Effects.Count <= 64 && c.Effects.Select((e, i) => e.Type != "play_story" || i == c.Effects.Count - 1).All(v => v), step.Id + " choice");
             }
             var visiting = new HashSet<string>(); var visited = new HashSet<string>();
@@ -85,7 +86,7 @@ public static class StoryValidation
                 if (!visited.Add(id)) return;
                 visiting.Add(id);
                 var s = byId[id];
-                if (s.Choices.Count > 0) foreach (var c in s.Choices) Visit(c.Next!);
+                if (s.Choices.Count > 0) foreach (var c in s.Choices.Where(c => !c.End)) Visit(c.Next!);
                 else if (!s.End)
                 {
                     string? next = s.Next ?? scene.Steps.ElementAtOrDefault(scene.Steps.ToList().FindIndex(x => x.Id == id) + 1)?.Id;

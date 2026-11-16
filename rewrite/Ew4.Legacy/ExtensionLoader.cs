@@ -32,6 +32,7 @@ public sealed partial class ExtensionLoader
     public ModConstructionRules? Construction { get; private init; }
     public UnitRecruitmentConfiguration? UnitRecruitment { get; private init; }
     public IReadOnlyDictionary<string, BuildingIncomePatch[]> Economy { get; private init; } = new Dictionary<string, BuildingIncomePatch[]>();
+    public IReadOnlyDictionary<string, Dictionary<string, AiDefendOrder>> AiOrders { get; private init; } = new Dictionary<string, Dictionary<string, AiDefendOrder>>();
     public CommanderAbilityConfiguration? CommanderAbilities { get; private init; }
     public LegacySkillParameters? LegacySkills { get; private init; }
     public IReadOnlyDictionary<string, int?> DeploymentLimits { get; private init; } = new Dictionary<string, int?>();
@@ -53,7 +54,8 @@ public sealed partial class ExtensionLoader
         string? StageIntroPresentation = null, string? FormationCounts = null, string? CampaignVisibility = null,
         string? Geography = null, string? PauseObjectivesPresentation = null, string? MapColors = null, string? AiControl = null,
         string? StoryPresentation = null, string? HeadquartersPresentation = null, string? UnitLayers = null, string? Construction = null,
-        string? Economy = null, string? CommanderAbilities = null, string? UnitRecruitment = null);
+        string? Economy = null, string? CommanderAbilities = null, string? UnitRecruitment = null, string? AiOrders = null);
+    private sealed record AiOrdersFile(int Schema, Dictionary<string, Dictionary<string, AiDefendOrder>> Scenarios);
     private sealed record EconomyFile(int Schema, Dictionary<string, BuildingIncomePatch[]> Scenarios);
     private sealed record CampaignVisibilityFile(int Schema, Dictionary<string, string>? Visibility);
     private sealed record LegacySkillFile(int Schema, Dictionary<string, Dictionary<string, double>> Skills);
@@ -121,6 +123,16 @@ public sealed partial class ExtensionLoader
                 string.IsNullOrWhiteSpace(p.Key) || p.Key == "*" || p.Value == null || p.Value.Any(v => v == null)))
                 throw new RuleViolation("extension.economy", "Invalid scenario economy configuration");
             economy = configured.Scenarios;
+        }
+        var aiOrders = new Dictionary<string, Dictionary<string, AiDefendOrder>>();
+        if (m.AiOrders != null)
+        {
+            if (m.ApiVersion < 3) throw new RuleViolation("extension.version", "AI defense orders require API 3");
+            var configured = Read<AiOrdersFile>(m.AiOrders);
+            if (configured.Schema != 1 || configured.Scenarios == null || configured.Scenarios.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Value == null))
+                throw new RuleViolation("extension.ai_orders", "Invalid AI orders configuration");
+            foreach (var orders in configured.Scenarios.Values) new WorldAiRules { DefendOrders = orders }.Validate();
+            aiOrders = configured.Scenarios;
         }
         if (m.Construction != null)
         {
@@ -308,7 +320,7 @@ public sealed partial class ExtensionLoader
         var scenarioHandlers = scenarioEvents.Values.SelectMany(v => v).SelectMany(e =>
             Core.ScenarioRules.Conditions(e).Where(c => c.Script != null).Select(c => (Script: c.Script!, Function: c.Function!))
                 .Concat(Core.ScenarioRules.Effects(e).Where(a => a.Script != null).Select(a => (Script: a.Script!, Function: a.Function!))))
-            .Concat(eventVictories.SelectMany(v => Conditions(v.Win).Concat(v.Lose == null ? [] : Conditions(v.Lose)))
+            .Concat(eventVictories.SelectMany(ExtensionVictory.AllConditions)
                 .Where(c => c.Type == "script").Select(c => (Script: c.Script!, Function: c.Function!))).ToArray();
         var layouts = m.Presentation == null ? new Dictionary<string, ExtensionLayout>() : Read<Dictionary<string, ExtensionLayout>>(m.Presentation);
         var victoryScreens = m.VictoryPresentation == null ? new Dictionary<string, VictoryPresentation>() : Read<Dictionary<string, VictoryPresentation>>(m.VictoryPresentation);
@@ -330,7 +342,7 @@ public sealed partial class ExtensionLoader
                 || layout.Value.Width is < 40 or > 560 || layout.Value.Height is < 20 or > 300) throw new RuleViolation("extension.layout", layout.Key);
         var scripts = new Dictionary<string, string>(StringComparer.Ordinal);
         foreach (string path in effects.Select(e => e.Script)
-            .Concat(victories.Values.SelectMany(v => Conditions(v.Win).Concat(v.Lose == null ? [] : Conditions(v.Lose))).Select(c => c.Script))
+            .Concat(victories.Values.SelectMany(ExtensionVictory.AllConditions).Select(c => c.Script))
             .Where(s => s != null).Select(s => s!).Concat(scenarioHandlers.Select(h => h.Script)).Concat(m.Scripts ?? []).Distinct())
         {
             if (!PathValid(path) || !path.EndsWith(".lua", StringComparison.Ordinal)) throw new RuleViolation("extension.path", path);
@@ -341,7 +353,7 @@ public sealed partial class ExtensionLoader
         var runtime = scripts.Count == 0 ? null : new ExtensionScriptRuntime(scripts);
         foreach (var handler in scenarioHandlers) runtime!.ValidateHandler(handler.Script, handler.Function);
         foreach (var effect in effects.Where(e => e.Script != null)) runtime!.ValidateHandler(effect.Script!, effect.Function!);
-        foreach (var condition in victories.Values.SelectMany(v => Conditions(v.Win).Concat(v.Lose == null ? [] : Conditions(v.Lose))).Where(c => c.Type == "script"))
+        foreach (var condition in victories.Values.SelectMany(ExtensionVictory.AllConditions).Where(c => c.Type == "script"))
             runtime!.ValidateHandler(condition.Script!, condition.Function!);
         foreach (var icon in skills.Values.Select(s => s.Icon).Concat(statuses.Values.Select(s => s.Icon)).OfType<string>().Distinct())
         {
@@ -354,7 +366,7 @@ public sealed partial class ExtensionLoader
                 ItemBindings = items, DeploymentLimits = deploymentLimits, FormationCounts = formationCounts, CampaignVisibility = campaignVisibility,
                 Metagame = metagame, StageIntroPresentations = introScreens, PauseObjectivesPresentations = pauseScreens, Geography = geography,
                 MapColors = mapColors, AiControl = aiControl, Stories = stories, HeadquartersPresentation = headquartersPresentation,
-                UnitLayers = unitLayers, Construction = construction, Economy = economy, CommanderAbilities = commanderAbilities,
+                UnitLayers = unitLayers, Construction = construction, Economy = economy, AiOrders = aiOrders, CommanderAbilities = commanderAbilities,
                 UnitRecruitment = unitRecruitment };
         bool Known(string id) => skills.ContainsKey(id) || id.StartsWith("ew4.skill.", StringComparison.Ordinal)
             && int.TryParse(id[10..], out int value) && value is >= 0 and < 40 || BuiltinTraits.Contains(id);
@@ -436,7 +448,7 @@ public sealed partial class ExtensionLoader
         => ExtensionVictory.Conditions(c);
     public void ValidateVictoryScripts(ExtensionVictoryRules rules)
     {
-        foreach (var condition in Conditions(rules.Win).Concat(rules.Lose == null ? [] : Conditions(rules.Lose)).Where(c => c.Type == "script"))
+        foreach (var condition in ExtensionVictory.AllConditions(rules).Where(c => c.Type == "script"))
         {
             if (Bus.Scripts is not ExtensionScriptRuntime runtime)
                 throw new RuleViolation("extension.lua_missing", "VICT scripts require rewrite/extension.json and its scripts list");

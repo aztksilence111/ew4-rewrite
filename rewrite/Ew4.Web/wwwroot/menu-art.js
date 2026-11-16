@@ -40,6 +40,10 @@
       // The legacy power-of-two texture has white padding below its 1024 x 720 map.
       this.strategic.height=Math.min(720,this.strategic.image.naturalHeight/this.strategic.ratio);
       if(this.api.manifest.uiOverrides?.strategic){const image=this.api.image(this.api.manifest.uiOverrides.strategic);await image.decode();this.strategic={image,ratio:2};}
+      this.strategicBackgrounds=new Map();
+      for(const file of new Set(Object.values(this.api.manifest.strategic||{}).map(d=>d.background).filter(Boolean))){
+        const image=this.api.image(file);await image.decode();this.strategicBackgrounds.set(file,{image,ratio:2});
+      }
       this.apply(2);
     }
     apply(mode){
@@ -47,15 +51,16 @@
       target.style.setProperty('background-image','url("'+this.backgrounds[mode===1?'form_selcampaign':'form_selconquest']+'")','important');
       target.style.backgroundSize=mode===1?'100% 100%':'cover';
     }
+    strategicTexture(definition){return this.strategicBackgrounds?.get(definition.background)||this.strategic;}
     drawStrategic(draw,definition,scale,centerX=205,centerY=128,textureScale=1){
-      const {image,ratio}=this.strategic,cx=Number(definition.centerx??410),cy=Number(definition.centery??288);
-      const sourceHeight=this.strategic.height||image.naturalHeight/ratio;
+      const texture=this.strategicTexture(definition),{image,ratio}=texture,cx=Number(definition.centerx??410),cy=Number(definition.centery??288);
+      const sourceHeight=texture.height||image.naturalHeight/ratio;
       const width=image.naturalWidth/ratio*textureScale,height=sourceHeight*textureScale;
       draw.drawImage(image,0,0,image.naturalWidth,sourceHeight*ratio,centerX-cx*scale,centerY-cy*scale,width*scale,height*scale);
     }
     strategicCamera(definition,scale,textureScale,viewportWidth=438,viewportHeight=320){
-      const {image,ratio}=this.strategic,cx=Number(definition.centerx||410),cy=Number(definition.centery||288);
-      const width=image.naturalWidth/ratio*textureScale*scale,height=(this.strategic.height||image.naturalHeight/ratio)*textureScale*scale;
+      const texture=this.strategicTexture(definition),{image,ratio}=texture,cx=Number(definition.centerx||410),cy=Number(definition.centery||288);
+      const width=image.naturalWidth/ratio*textureScale*scale,height=(texture.height||image.naturalHeight/ratio)*textureScale*scale;
       // Native 8e4c0: reserve the 130px sidebar, center on the full-height map, clamp its edges.
       const clamp=(offset,total,viewport)=>total<=viewport?(total-viewport)/2:Math.max(0,Math.min(total-viewport,offset));
       return {x:cx*scale-clamp(cx*scale-viewportWidth/2,width,viewportWidth),y:cy*scale-clamp(cy*scale-viewportHeight/2,height,viewportHeight)};

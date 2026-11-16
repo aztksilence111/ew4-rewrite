@@ -62,6 +62,7 @@ public sealed record StoryChoice
     public string Id { get; init; } = "";
     public string Text { get; init; } = "";
     public string? Next { get; init; }
+    public bool End { get; init; }
     public ScenarioCondition? Condition { get; init; }
     public IReadOnlyList<ScenarioEffect> Effects { get; init; } = Array.Empty<ScenarioEffect>();
 }
@@ -184,6 +185,7 @@ public static class StoryPlayback
             var scene = w.Story!.Library.Scenes[run.Scene];
             var step = Step(w.Story, run);
             string? next = step.Next;
+            bool choiceEnd = false;
             if (step.Choices.Count > 0)
             {
                 if (choice == null)
@@ -203,16 +205,17 @@ public static class StoryPlayback
                 // Validate against an isolated projection; the battle remains unchanged until the scene ends.
                 _ = DecisionWorld(w, run, scripts);
                 next = option.Next;
+                choiceEnd = option.End;
                 choice = null;
                 notices.Add(new("story.choice", run.Key + "/" + step.Id + "/" + option.Id));
             }
             else if (choice != null) throw new RuleViolation("story.choice", "No choice is waiting");
-            if (next == null && !step.End)
+            if (next == null && !step.End && !choiceEnd)
             {
                 int index = scene.Steps!.ToList().FindIndex(s => s.Id == step.Id);
                 next = scene.Steps.ElementAtOrDefault(index + 1)?.Id;
             }
-            if (step.End || next == null)
+            if (step.End || choiceEnd || next == null)
             {
                 var effects = run.PendingEffects;
                 var remaining = run.Continuation;

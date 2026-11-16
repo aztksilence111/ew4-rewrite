@@ -58,7 +58,7 @@ const profile=process.argv[4]&&path.resolve(process.argv[4]);
     for(let i=0;i<12;i++){
       await web.waitForFunction(()=>!busy&&!sessionTransition);
       const pending=await web.evaluate(()=>({story:!!state.story,dialogue:!!state.dialogue}));if(!pending.story&&!pending.dialogue)break;
-      if(pending.story){await web.waitForFunction(()=>!storyPlayer.preparing&&!storyPlayer.commandPending);await web.locator('#story-player button[aria-label="跳过剧情"]').click();}
+      if(pending.story){await web.waitForFunction(()=>!storyPlayer.preparing&&!storyPlayer.commandPending);await web.locator('#story-player button[aria-label="跳过剧情"]').click();await web.getByRole('button',{name:'确认跳过',exact:true}).click();}
       else await web.evaluate(()=>act('dialogue'));
     }
     await web.evaluate(()=>rpc('save',{mode:2,slot:1}));

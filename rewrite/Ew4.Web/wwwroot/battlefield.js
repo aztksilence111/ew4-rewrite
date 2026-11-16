@@ -253,23 +253,45 @@
       const token=eligible?unit.id+':'+this.selectedAt:null;
       if(token===this.motionSelection?.token)return;
       const previous=this.motionSelection?.id;
-      if(previous&&!this.combatMotions?.has(previous))this.unitMotions.set(previous,{action:'undoready',started:this.time,playing:true});
+      if(previous===unit?.id&&eligible){this.motionSelection={id:unit.id,token};return;}
+      if(previous&&!this.combatMotions?.has(previous))this.changeSelectionMotion(previous,false);
       this.motionSelection=eligible?{id:unit.id,token}:null;
-      if(eligible&&!(this.unitMotions.get(unit.id)?.until>this.time))this.unitMotions.set(unit.id,{action:'ready',started:this.selectedAt??this.time,playing:true});
+      if(eligible&&!(this.unitMotions.get(unit.id)?.until>this.time))this.changeSelectionMotion(unit.id,true);
+    }
+    changeSelectionMotion(id,forward){
+      const unit=this.unitById.get(id);if(!unit)return;
+      const whole=this.api.effects?.profile(unit.profile,this.factions.get(unit.owner))||this.api.manifest.profiles[unit.profile];
+      if(!whole)return;
+      const parts=this.api.effects?.parts?.(whole,!!this.state.cells[unit.cell]?.sea)||[whole];
+      const facing=this.facings?.get(id)??(unit.facing===0?-1:1);
+      const duration=Math.max(0,...parts.map(part=>{
+        const motion=this.api.effects?.motion(part,'select',facing),lib=this.api.libraries.get(part.library);
+        return (lib?.byName.get(motion?.name||part.motions.select)?.duration||0)/((lib?.fps||24)*Number(motion?.speed||1))*1000;
+      }));
+      const prior=this.unitMotions.get(id);let progress=prior?.action==='selected'?1:0;
+      if(prior?.selectionDuration>0)progress=Math.max(0,Math.min(1,prior.selectionFrom+(this.time-prior.started)/prior.selectionDuration*(prior.selectionReverse?-1:1)));
+      else if(prior?.playing&&duration>0){const elapsed=Math.max(0,(this.time-prior.started)/duration);progress=prior.action==='undoready'?1-Math.min(1,elapsed):Math.min(1,elapsed);}
+      this.unitMotions.set(id,duration>0?{action:'select',playing:true,started:this.time,selectionFrom:progress,selectionReverse:!forward,selectionDuration:duration}:{action:forward?'ready':'undoready',playing:true,started:this.time});
     }
     stationedHasUnit(id){return this.unitIds.has(id);}
     motionPose(unit,profile,lib,facing,time,moving=false){
       let pose=this.unitMotions.get(unit.id)||{action:'ready',playing:false};
+      if(pose.selectionDuration>0&&!moving&&!unit.constructionTurns){
+        const progress=Math.max(0,Math.min(1,pose.selectionFrom+(time-pose.started)/pose.selectionDuration*(pose.selectionReverse?-1:1)));
+        const native=this.api.effects?.motion(profile,'select',facing),item=lib.byName.get(native?.name||profile.motions.select||profile.motions.ready);
+        if(pose.selectionReverse?progress>0:progress<1)return {native,item,tick:progress*Math.max(0,(item?.duration||1)-1)};
+        pose={action:pose.selectionReverse?'ready':native?.rest||'selected',playing:false};this.unitMotions.set(unit.id,pose);
+      }
       if(pose.until!=null&&time>=pose.until){pose={action:'ready',playing:false};this.unitMotions.set(unit.id,pose);}
-      if(!moving&&pose.action==='move'){pose={action:'ready',playing:false};this.unitMotions.set(unit.id,pose);}
-      if(moving||unit.constructionTurns>0){pose={action:unit.constructionTurns>0?'build':profile.motions.move?'move':'ready',playing:false};this.unitMotions.set(unit.id,pose);}
+      if(!moving&&pose.action==='move'||!unit.constructionTurns&&pose.action==='build'){pose={action:'ready',playing:false};this.unitMotions.set(unit.id,pose);}
+      if(moving||unit.constructionTurns>0){const action=unit.constructionTurns>0?'build':profile.motions.move?'move':'ready';if(pose.action!==action||pose.started==null)pose={action,started:time,playing:false};this.unitMotions.set(unit.id,pose);}
       if(pose.action==='ready'&&pose.playing&&profile.motions.select)pose={...pose,action:'select'};
       let native=this.api.effects?.motion(profile,pose.action,facing),item=lib.byName.get(native?.name||profile.motions[pose.action]||profile.motions.ready);
       if(pose.action==='undoready'&&!native&&!profile.motions.undoready){pose={action:'ready',playing:false};this.unitMotions.set(unit.id,pose);native=this.api.effects?.motion(profile,'ready',facing);item=lib.byName.get(native?.name||profile.motions.ready);}
       if(native?.static===true){this.unitMotions.set(unit.id,{action:pose.action,playing:false});return {native,item,tick:0};}
       if(native?.loop===true&&item?.duration>0){
         const movement=moving&&this.motions?.get(unit.id);
-        const elapsed=movement?Math.max(0,time-movement.started)*(this.arrivalSpeed||1):time;
+        const elapsed=movement?Math.max(0,time-movement.started)*(this.arrivalSpeed||1):pose.action==='build'?Math.max(0,time-pose.started):time;
         return {native,item,tick:(elapsed/1000*lib.fps*Number(native.speed||1))%item.duration};
       }
       let tick=pose.playing?(time-pose.started)/1000*lib.fps*Number(native?.speed||1):0;
@@ -467,6 +489,20 @@
           }
         }
         else if(!preview){const neighbors=this.neighbors(i);if(neighbors.some(n=>n?.active&&!n.sea&&n.color))draw.drawImage(this.surface.coast(neighbors),p.x-32,p.y-36,64,72);}
+        // A smooth custom shoreline can expose land in the outside half of a
+        // border water hex. Extend its nearest land colour beneath the opaque
+        // water tile too, so a clipped coast never reveals the neutral ground.
+        if(!preview&&c.sea&&this.map.territoryEdgeExtension?.includes(this.state.scenario)){
+          const row=Math.floor(i/this.state.width),col=i%this.state.width;
+          if(col!==0&&col!==this.state.width-1&&row!==0&&row!==this.state.height-1)continue;
+          const nearby=this.neighbors(i).find(n=>n?.active&&!n.sea&&n.color);
+          if(!nearby)continue;
+          const color=Ew4MapSurface.rgba(nearby.color??this.factions.get(nearby.owner)?.color??0),bounds=this.map.cameraBounds||{left:0,top:0,width:this.map.width,height:this.map.height};
+          draw.fillStyle=`rgba(${color[0]},${color[1]},${color[2]},${color[3]/255})`;
+          const left=col===0?bounds.left:p.x-32,right=col===this.state.width-1?bounds.left+bounds.width:p.x+32;
+          const top=row===0?bounds.top:p.y-27,bottom=row===this.state.height-1?bounds.top+bounds.height:p.y+27;
+          draw.fillRect(left,top,right-left,bottom-top);
+        }
       }
     }
     neighbors(index){return Array.from({length:6},(_,d)=>{const i=neighbor(index,d,this.state.width,this.state.height),site=this.state.cells[i],cell=this.projection?.display(site,i)??site;
@@ -536,8 +572,30 @@
         this.draw.save();this.draw.translate(overlay.x,overlay.y);
         this.draw.scale((overlay.scaleX??1)*scale,(overlay.scaleY??1)*scale);
         this.draw.globalAlpha=overlay.opacity??1;
-        this.api.sprite('tiles',overlay.image,0,0,1,this.draw);this.draw.restore();
+        if(this.map.terrainOwnershipTint&&reliefForeground)this.ownedTerrainSprite(overlay);
+        else this.api.sprite('tiles',overlay.image,0,0,1,this.draw);
+        this.draw.restore();
       }
+    }
+    ownedTerrainSprite(overlay){
+      const site=this.state.cells[overlay.cell],cell=this.projection?.display(site,overlay.cell)??site;
+      const color=this.projection?.color(cell,this.mapMode)??this.factions.get(cell.owner)?.color??0;
+      let atlas='tiles',ratio=1;
+      if(this.api.manifest.atlases.tiles_hd?.[overlay.image]){atlas='tiles_hd';ratio=2;}
+      const s=this.api.manifest.atlases[atlas]?.[overlay.image],texture=this.api.image('images/'+atlas+'.png');
+      if(!s||!texture.complete||!texture.naturalWidth)return;
+      ratio=spritePixelRatio(s,ratio);
+      this.ownedTerrainSprites??=new Map();
+      const key=[atlas,overlay.image,color].join(':');
+      if(!this.ownedTerrainSprites.has(key)){
+        const canvas=document.createElement('canvas');canvas.width=s.w;canvas.height=s.h;
+        const draw=canvas.getContext('2d');draw.drawImage(texture,s.x,s.y,s.w,s.h,0,0,s.w,s.h);
+        const rgba=Ew4MapSurface.rgba(color);
+        draw.globalCompositeOperation='source-atop';draw.fillStyle=`rgba(${rgba[0]},${rgba[1]},${rgba[2]},${rgba[3]/255})`;draw.fillRect(0,0,s.w,s.h);
+        if(this.ownedTerrainSprites.size>=256)this.ownedTerrainSprites.clear();
+        this.ownedTerrainSprites.set(key,canvas);
+      }
+      this.draw.drawImage(this.ownedTerrainSprites.get(key),-s.refx/ratio,-s.refy/ratio,s.w/ratio,s.h/ratio);
     }
     geography(){
       for(const {site,p,cell} of this.visibleCells)if(site.active&&site.geographySprite){

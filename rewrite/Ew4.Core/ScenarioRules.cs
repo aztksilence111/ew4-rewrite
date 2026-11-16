@@ -58,6 +58,7 @@ public sealed record ScenarioEffect
     public int? Health { get; init; }
     public long Experience { get; init; }
     public bool Ready { get; init; }
+    public bool Objective { get; init; }
     public string? Disposition { get; init; }
     public string? ExpectedOwner { get; init; }
     public Resources? Cost { get; init; }
@@ -66,6 +67,7 @@ public sealed record ScenarioEffect
     public string? Script { get; init; }
     public string? Function { get; init; }
     public string? Scene { get; init; }
+    public bool OpeningTurn { get; init; }
 }
 
 public sealed record ScenarioEventChoice
@@ -325,7 +327,7 @@ public static class ScenarioRules
                     var surrender = WorldEvents.Surrender(next, owner, Faction(next, e.OtherFaction!));
                     next = surrender.State; notices.AddRange(surrender.Notices); break;
                 case "player_control":
-                    next = ScenarioFactions.Control(next, owner); notices.Add(new("scenario.player_changed", owner)); break;
+                    next = ScenarioFactions.Control(next, owner, e.OpeningTurn); notices.Add(new("scenario.player_changed", owner)); break;
                 case "victory_rules": next = next with { ScenarioVictory = ExtensionVictory.Copy(e.VictoryRules!) }; break;
                 case "victory_default": next = next with { ScenarioVictory = null }; break;
                 case "ending":
@@ -353,9 +355,12 @@ public static class ScenarioRules
                 case "camp":
                     next = next with { Factions = next.Factions.Select(f => f.Id == owner ? f with { Camp = e.Camp! } : f).ToArray() }; break;
                 case "cells_owner":
-                    if (WorldUnitLayers.Surface(next).Any(u => e.Cells.Contains(u.Cell) && !WorldDiplomacy.Allied(next, u.Owner, owner)))
+                    var transferCells = e.Cells.Where(i => e.ExpectedOwner == null || next.Cells[i].Owner == e.ExpectedOwner).ToHashSet();
+                    if (e.ExpectedOwner != null)
+                        transferCells.ExceptWith(WorldUnitLayers.Surface(next).Where(u => !WorldDiplomacy.Allied(next, u.Owner, owner)).Select(u => u.Cell));
+                    if (WorldUnitLayers.Surface(next).Any(u => transferCells.Contains(u.Cell) && !WorldDiplomacy.Allied(next, u.Owner, owner)))
                         throw new RuleViolation("scenario.occupants", "Transfer occupants first before changing hostile territory");
-                    next = next with { Cells = next.Cells.Select((c, i) => e.Cells.Contains(i) ? c with { Owner = owner } : c).ToArray() }; break;
+                    next = next with { Cells = next.Cells.Select((c, i) => transferCells.Contains(i) ? c with { Owner = owner } : c).ToArray() }; break;
                 case "unit_owner":
                     var unit = next.Units.Single(u => u.Id == e.Unit);
                     if (e.ExpectedOwner != null && unit.Owner != e.ExpectedOwner)
@@ -469,6 +474,7 @@ public static class ScenarioRules
                     || e.Type is "site_income" or "site_income_default" && (e.Cells.Count == 0 || e.Cells.Distinct().Count() != e.Cells.Count)
                     || e.Type == "play_story" && (!StoryValidation.Id(e.Key) || !StoryValidation.Id(e.Scene) || e.Script != null)
                     || e.Type != "play_story" && e.Scene != null
+                    || e.OpeningTurn && e.Type != "player_control"
                     || (e.Type == "victory_rules") != (e.VictoryRules != null)
                     || e.Type is "player_control" or "victory_rules" or "victory_default" or "ending" && e.Script != null
                     || e.Type == "ending" && (string.IsNullOrWhiteSpace(e.Key) || e.Key.Length > 128 || e.Key.Any(char.IsControl)

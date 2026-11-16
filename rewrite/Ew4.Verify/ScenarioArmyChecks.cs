@@ -42,6 +42,18 @@ internal static class ScenarioArmyChecks
         Check(unit.Cell == 7 && unit.Combatant.Health == 60 && unit.Combatant.Profile.MaxHealth == 150, "fallback site and post-command health");
         Check(unit.Combatant.Stars == 7 && unit.CommanderId == "new.general", "actual non-capped commander ability attached");
         Check(unit.Acted && unit.RemainingMovement == 0, "reinforcement cannot act immediately");
+        Check(!unit.Objective, "ordinary reinforcement remains unmarked by default");
+        var marked = Execute(basis, "marked", spawn with { Objective = true });
+        Check(marked.Units.Single(u => u.Id == "reinforcement").Objective, "event reinforcement receives objective marker");
+        var markedSave = WorldSave.Decode(WorldSave.Encode(marked), marked.ContentRevision);
+        Check(markedSave.Units.Single(u => u.Id == "reinforcement").Objective && markedSave.ScenarioEvents.Last().Effects.Single().Objective,
+            "objective unit and event declaration survive save reload");
+        Check(WorldVictory.Facts(markedSave, []).Single(f => f.Id == "winner").Objectives == WorldVictory.Facts(basis, []).Single(f => f.Id == "winner").Objectives + 1,
+            "spawned objective contributes to native objective accounting");
+        const string unmarkedJson = """{"type":"unit_spawn","unit":"ordinary","profile":"infantry","cells":[7]}""";
+        Check(!JsonSerializer.Deserialize<ScenarioEffect>(unmarkedJson, new JsonSerializerOptions(JsonSerializerDefaults.Web))!.Objective,
+            "ordinary JSON event keeps false objective default");
+        Reject(() => ScenarioArmies.ValidateEffect(new() { Type = "money", Objective = true }), "scenario.army_effect");
         var immediate = Execute(basis, "exercise", spawn with { Ready = true, Commander = null, CommanderTemplate = null,
             UnitTemplate = new(actor, new() { FoodConsumption = 1 }, 9) });
         var readyUnit = immediate.Units.Single(u => u.Id == "reinforcement");

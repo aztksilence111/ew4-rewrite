@@ -295,7 +295,10 @@ public sealed partial class ClientContent
                 Tavern = rules.Tavern with { Assignment = rules.Tavern.Assignment with { Extensions = Extensions.Bus } },
                 Production = rules.Production.ToDictionary(p => p.Key, p => p.Value with {
                     Commanders = p.Value.Commanders == null ? null : p.Value.Commanders with { Extensions = Extensions.Bus } }),
-                Ai = rules.Ai with { Movement = movement } } };
+                Ai = rules.Ai with { Movement = movement,
+                    DefendOrders = Extensions.AiOrders.TryGetValue(id, out var orders) ? orders : new Dictionary<string, AiDefendOrder>() } } };
+            if (started.Rules.Ai.DefendOrders.Values.Any(o => o.Center >= baseMap.Cells.Count))
+                throw new RuleViolation("extension.ai_orders", "AI defense center is outside the scenario map");
             if (Extensions.Enabled)
             {
                 var world = started.Session.World;
@@ -312,6 +315,14 @@ public sealed partial class ClientContent
                 }).ToArray() };
                 world = ScenarioArmyContent.Prepare(this, world, started.Rules.Commanders);
                 ScenarioRules.Validate(world, initial: true);
+                var pauseScreen = Extensions.PauseObjectivesPresentations.GetValueOrDefault(id)
+                    ?? Extensions.PauseObjectivesPresentations.GetValueOrDefault("*");
+                if (pauseScreen != null)
+                    foreach (var condition in pauseScreen.StageObjectives.SelectMany(PauseObjectivesPresentation.StageConditions))
+                        if (condition.Type is "player_faction" or "faction_exists" && condition.Faction is not ("@player" or "@active")
+                            && !world.Factions.Any(f => f.Id == condition.Faction)
+                            && !ScenarioFactions.Creations(world.ScenarioEvents).Any(e => e.Faction == condition.Faction))
+                            throw new RuleViolation("extension.pause_objectives", "Unknown stage objective faction: " + condition.Faction);
                 var production = started.Rules.Production.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal);
                 var recruitment = started.Rules.Recruitment.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal);
                 var grants = new Dictionary<string, IReadOnlyDictionary<string, RecruitmentGrant>>();

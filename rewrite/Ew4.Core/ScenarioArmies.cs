@@ -38,11 +38,11 @@ public static class ScenarioArmies
             || e.Type is "commander_assign" or "commander_detach" && string.IsNullOrWhiteSpace(e.Commander)
             || e.Type is "unit_spawn" or "commander_assign" && (e.CommanderDefinition != null && e.Commander == null || e.CommanderDefinition < 0)
             || e.Type is not ("unit_spawn" or "commander_assign" or "commander_detach") && (e.Commander != null || e.CommanderDefinition != null || e.CommanderTemplate != null)
-            || e.Type != "unit_spawn" && (e.Profile != null || e.UnitTemplate != null || e.Health != null || e.Experience != 0 || e.Ready || e.Cost != null)
+            || e.Type != "unit_spawn" && (e.Profile != null || e.UnitTemplate != null || e.Health != null || e.Experience != 0 || e.Ready || e.Objective || e.Cost != null)
             || e.Type is not ("unit_remove" or "commander_detach") && e.Disposition != null
             || e.Disposition != null && e.Disposition is not ("available" or "withdrawn")
             || e.Health < 1 || e.Experience < 0 || e.ExpectedOwner != null && (string.IsNullOrWhiteSpace(e.ExpectedOwner)
-                || e.Type is not ("unit_owner" or "unit_remove" or "commander_assign" or "commander_detach")))
+                || e.Type is not ("cells_owner" or "unit_owner" or "unit_remove" or "commander_assign" or "commander_detach")))
             throw new RuleViolation("scenario.army_effect", "Invalid army effect fields");
         e.Cost?.Validate();
         e.UnitTemplate?.Combatant.Validate();
@@ -207,7 +207,7 @@ public static class ScenarioArmies
             Id = effect.Unit!, Owner = owner, Cell = cell, Combatant = template.Combatant with
             { Health = template.Combatant.MaximumHealth, AtSea = !WorldUnitLayers.Air(world, template.Combatant.Profile) && world.Cells[cell].Terrain.Sea,
                 BuildingKind = WorldUnitLayers.Air(world, template.Combatant.Profile) ? null : world.Cells[cell].BuildingKind },
-            Support = template.Support, Experience = effect.Experience, Acted = !effect.Ready,
+            Support = template.Support, Experience = effect.Experience, Acted = !effect.Ready, Objective = effect.Objective,
             RemainingMovement = effect.Ready ? template.MovementBudget ?? template.Combatant.Profile.Movement : 0,
             ExtensionMovementLimit = template.MovementBudget
         };

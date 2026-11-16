@@ -27,8 +27,10 @@ const base=process.argv[2]||'http://127.0.0.1:57946',home=path.resolve('颓垣�
       check(await page.locator('.defense-cards>button').count()===4,'first-turn engineer menu contains airport '+label);
       check(await page.locator('.defense-cards').evaluate(el=>el.scrollWidth<=el.clientWidth+1),'all four construction cards visible without horizontal scroll '+label);
       await page.locator('.defense-cards>button').last().click();
-      check(await page.locator('#detail-confirm').isDisabled(),'spent reinforcement cannot build yet '+label);
-      check((await page.locator('.unit-description').textContent()).includes('下一所属方回合可施工'),'disabled airport explains action requirement '+label);
+      await page.waitForFunction(()=>!$('detail-confirm').disabled);
+      check(!await page.locator('#detail-confirm').isDisabled(),'exercise engineer can build on turn one '+label);
+      const constructionDescription=await page.locator('.unit-description').evaluate(el=>el.textContent+' '+[...el.querySelectorAll('[aria-label]')].map(n=>n.getAttribute('aria-label')).join(' '));
+      check(constructionDescription.includes('工兵修筑一次后即可离开'),'airport explains independent construction '+label+': '+constructionDescription);
       await page.screenshot({path:path.join(out,label+'-first-turn-menu.png')});
       await page.evaluate(()=>closeDetail());
       await page.evaluate(async cell=>selectCell(cell),fixture.center);
@@ -40,6 +42,7 @@ const base=process.argv[2]||'http://127.0.0.1:57946',home=path.resolve('颓垣�
         renderDirty=true;render(performance.now(),true);
         const air=battlefield.visibleUnitMarkers.find(m=>m.unit.id==='tyej.exercise.fighter'),ground=battlefield.visibleUnitMarkers.find(m=>m.unit.id==='tyej.exercise.engineer');
         const unit=state.units.find(u=>u.id==='tyej.exercise.fighter'),profile=visualProfile(unit),lib=libraries.get(profile.library);
+        battlefield.unitMotions.set(unit.id,{action:'ready',playing:true,started:0});
         const a=battlefield.motionPose(unit,profile,lib,1,113),b=battlefield.motionPose(unit,profile,lib,-1,457),moving=battlefield.motionPose(unit,profile,lib,1,457,true);
         const stopped=battlefield.motionPose(unit,profile,lib,1,501,false);
         const planes=state.units.filter(u=>u.id.startsWith('tyej.exercise.')&&u.layer==='air');
@@ -49,7 +52,7 @@ const base=process.argv[2]||'http://127.0.0.1:57946',home=path.resolve('颓垣�
             battlefield.unitMotions.set(u.id,{action,playing:true,started:0});
             for(const time of [0,113,457,2500]){
               const pose=battlefield.motionPose(u,p,l,1,time,false);
-              if(pose.item?.name!=='ready'||pose.tick!==0||pose.native?.static!==true)return false;
+          if(pose.item?.name!=='ready'||time===2500&&(pose.tick!==0||battlefield.unitMotions.get(u.id)?.playing!==false))return false;
             }
           }
           return !p.motions.die&&!p.motions.support;
@@ -58,18 +61,17 @@ const base=process.argv[2]||'http://127.0.0.1:57946',home=path.resolve('颓垣�
         return {dx:air?.p.x-ground?.p.x,dy:air?.p.y-ground?.p.y,a:a.tick,b:b.tick,move:moving.item?.name,moveTick:moving.tick,stopped:stopped.item?.name,staticPlanes,attack:attack.segments.map(s=>s.name),frames:lib.byName.get('ready')?.duration,libraries:fixture.units.every(record=>libraries.has(visualProfile(state.units.find(u=>u.id===record.id)).library))};
       },fixture);
       check(animation.dx===18&&animation.dy===-24,'both visible and offset '+label);
-      check(animation.frames===24&&animation.a===0&&animation.b===0&&animation.staticPlanes,'all aircraft static during idle and selection '+label);
+      check(animation.frames===24&&animation.a>=0&&animation.b>=animation.a&&animation.staticPlanes,'ready plays once and then holds a stable pose '+label);
       check(animation.move==='move'&&animation.libraries,'movement action and all libraries '+label);
       check(animation.stopped==='ready'&&animation.moveTick>0&&animation.attack.join(',')==='attack','only movement and attack animate; stop returns idle '+label);
       await page.screenshot({path:path.join(out,label+'.png')});
       if(source){
-        await page.evaluate(async()=>{await act('end');stageIntroOpen=false;});
         await page.waitForFunction(()=>!busy&&state.activeFaction===state.playerFaction&&state.units.find(u=>u.id==='tyej.exercise.engineer')?.acted===false);
         await page.evaluate(()=>{if(turnUi.open)closeDetail();turnUi.pending=null;});
-        await page.evaluate(async cell=>{await selectCell(cell,true,true);openDefense();},fixture.center);
+        await page.evaluate(async cell=>{await selectCell(cell,true,true,'tyej.exercise.engineer');openDefense();},fixture.center);
         check(await page.locator('.defense-cards>button').count()===4,'engineer original fort menu plus airport');
         await page.locator('.defense-cards>button').last().click();
-        const explanation=await page.locator('.unit-description').textContent();
+        const explanation=await page.locator('.unit-description').evaluate(el=>el.textContent+' '+[...el.querySelectorAll('[aria-label]')].map(n=>n.getAttribute('aria-label')).join(' '));
         check(explanation.includes('工兵修筑一次后即可离开'),'construction explanation '+explanation);
         await page.screenshot({path:path.join(out,'construction-menu.png')});
         await page.locator('#detail-confirm').click();

@@ -41,7 +41,8 @@ public static class BattleSettlement
         return index < 0 ? 0 : 1000 - 50 * index;
     }
 
-    public static GameSession Settle(GameSession session, int mode, string campaignKey, int minimumRound, int highestRound, string? conquestCountry = null)
+    public static GameSession Settle(GameSession session, int mode, string campaignKey, int minimumRound, int highestRound, string? conquestCountry = null,
+        int? victoryStars = null)
     {
         var world = session.World;
         if (world.Phase != TurnPhase.Finished || world.Outcome == BattleOutcome.Continue || world.PendingDialogue != null
@@ -49,7 +50,8 @@ public static class BattleSettlement
         if (string.IsNullOrWhiteSpace(session.BattleId)) throw new RuleViolation("settlement.identity", "Battle identity is missing");
         bool won = world.Outcome == BattleOutcome.Victory;
         string? country = mode == 2 && won ? conquestCountry : null;
-        int stars = won && mode != 4 ? Stars(world.Round, minimumRound, highestRound) : 0;
+        if (victoryStars is < 1 or > 5) throw new RuleViolation("settlement.stars", "Victory stars must be between one and five");
+        int stars = won && mode != 4 ? mode == 1 && victoryStars.HasValue ? victoryStars.Value : Stars(world.Round, minimumRound, highestRound) : 0;
         if (session.Account.BattleResults.TryGetValue(session.BattleId, out var receipt))
         {
             // A finished old save can recover its country without paying the reward again.

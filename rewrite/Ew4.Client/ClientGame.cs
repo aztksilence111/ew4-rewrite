@@ -131,7 +131,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         if (!CampaignProgress.Accessible(content, Account(), command.Scenario!))
             throw new RuleViolation("campaign.locked", "请先完成对应黄圈目标并赢得战役，解锁此隐藏关卡");
         var next = content.Start(command.Scenario!, command.Country, Account(), command.LocalPlayers);
-        next = next with { Session = SettleBattle(next.Session with { BattleId = Guid.NewGuid().ToString("N") }) };
+        next = next with { Session = SettleBattle(next.Session with { BattleId = Guid.NewGuid().ToString("N") }, turnRules: next.Rules.Turns) };
         StoreAccount(next.Session.Account);
         game = next; country = command.Country;
         storyRestored = false;
@@ -196,7 +196,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         if (profile.Revision > state.Account.Revision) state = BattleEquipment.SynchronizeAccount(state, profile, start.Rules.Roster);
         if (!state.Account.UnlockedCampaigns.SequenceEqual(unlocks))
             state = state with { Account = state.Account with { Revision = checked(Math.Max(profile.Revision, state.Account.Revision) + 1), UnlockedCampaigns = unlocks } };
-        state = SettleBattle(state);
+        state = SettleBattle(state, turnRules: start.Rules.Turns);
         state.Validate();
         StoreAccount(state.Account);
         game = start with { Session = state, Notices = (recovered ? recovery.Notices : start.Notices).Concat(installationRepair.Notices).ToArray() }; country = slot.Country;
@@ -386,6 +386,9 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             }
             change = change with { State = world };
         }
+        var handoff = WorldTurns.CompleteOpeningHandoff(change.State, current.Rules.Turns);
+        if (!ReferenceEquals(handoff.State, change.State))
+            change = change with { State = handoff.State, Notices = change.Notices.Concat(handoff.Notices).ToArray() };
         var recovery = WorldTurns.RecoverDefeatedFaction(change.State, current.Rules.Turns);
         if (!ReferenceEquals(recovery.State, change.State))
             change = change with { State = recovery.State, Notices = change.Notices.Concat(recovery.Notices).ToArray() };
@@ -622,6 +625,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                 .Select(id => SkillView(new SkillSlot(id, "trait." + id))).ToArray(),
             attack = AttackView(u.Combatant),
             health = u.Combatant.Health, maxHealth = u.Combatant.MaximumHealth, maximumRange = u.Combatant.MaximumRange,
+            movement = u.ExtensionMovementLimit ?? u.Combatant.Profile.Movement,
             u.Combatant.ConstructionTurns, u.RemainingMovement, u.Acted, u.CommanderId, u.Transport, u.Burning, u.Objective,
             aiControlled = PlayerAi.Managed(world, u), aiPolicy = PlayerAi.Order(u).Policy, aiGoal = PlayerAi.Order(u).Goal, aiGoals = PlayerAi.Targets(PlayerAi.Order(u)), aiTask = PlayerAi.Order(u).TaskId,
             objectiveMarker = u.Objective ? 1 : originalUnits.TryGetValue(u.Id, out var markedUnit) && markedUnit.Objective == 2 ? 2 : 0,

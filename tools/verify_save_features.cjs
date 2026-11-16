@@ -33,7 +33,8 @@ const base=process.argv[2]||'http://127.0.0.1:56183',folder=path.resolve(process
       await page.waitForFunction(()=>document.getElementById('save-manager-modal').hidden);
       await page.locator('#close-settings').click();
       await page.evaluate(()=>menus.saveMenu(false,2));
-      check(await page.locator('.save-mod-name').count()===7,'every battle slot names its Mod');
+      const populatedSlots=await page.evaluate(async()=>(await rpc('saves',{mode:2})).filter(slot=>slot.exists||slot.corrupt).length);
+      check(populatedSlots>0&&await page.locator('.save-mod-name').count()===populatedSlots,'every populated battle slot names its Mod');
       check(await page.locator('.save-mod-name').evaluateAll(es=>es.every(e=>e.title==='原版')),'base saves labelled');
       await page.locator('#close-detail').click();
       await page.close();
@@ -44,7 +45,7 @@ const base=process.argv[2]||'http://127.0.0.1:56183',folder=path.resolve(process
     if(await page.evaluate(()=>stageIntroOpen))await page.locator('#detail-confirm').click();
     for(let i=0;i<16;i++){
       const pending=await page.evaluate(()=>({story:!!state.story,dialogue:!!state.dialogue}));if(!pending.story&&!pending.dialogue)break;
-      if(pending.story){await page.waitForFunction(()=>!storyPlayer.preparing&&!storyPlayer.commandPending);await page.locator('#story-player button[aria-label="跳过剧情"]').click();}
+      if(pending.story){await page.waitForFunction(()=>!storyPlayer.preparing&&!storyPlayer.commandPending);await page.locator('#story-player button[aria-label="跳过剧情"]').click();await page.getByRole('button',{name:'确认跳过',exact:true}).click();}
       else await page.evaluate(()=>act('dialogue'));
       await page.waitForFunction(()=>!busy&&!aiRunning&&!sessionTransition,null,{timeout:90000});
     }

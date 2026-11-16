@@ -1,5 +1,7 @@
 # 配置索引：从目标定位到文件
 
+剧本部队协防：API3 `aiOrders`按部队ID配置目标格及半径，适用于初始部队和事件增援；见[协防区域](porting/AI_DEFEND_ORDERS.md)。
+
 将领能力栏：API3 `commanderAbilities`，支持新增能力、原/新增栏位混排、名称/图标覆盖、将领初值、兵种星级绑定及教学；见[自定义将领能力](porting/COMMANDER_ABILITIES.md)。
 
 指挥部完整布局、增删按钮、数据/命令绑定及自定义子页使用 API 3 `headquartersPresentation`，见[指挥部界面指南](porting/HEADQUARTERS_LAYOUT.md)及[最小示例](../examples/headquarters-layout/README.md)。

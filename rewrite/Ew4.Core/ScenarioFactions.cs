@@ -83,11 +83,21 @@ public static class ScenarioFactions
             ? f with { Defeated = false, Shortage = 0, TurnUses = new Dictionary<string, int>() } : f).ToArray() };
     }
 
-    internal static WorldState Control(WorldState world, string owner)
+    internal static WorldState Control(WorldState world, string owner, bool openingTurn = false)
     {
         if (world.LocalMultiplayer != null) return world;
         if (world.Phase == TurnPhase.Finished || world.Factions.Single(f => f.Id == owner).Defeated)
             throw new RuleViolation("scenario.player_control", "Player control requires a live faction in an unfinished battle");
+        if (openingTurn)
+        {
+            if (world.Phase != TurnPhase.Active || world.ActiveFaction != world.ScenarioPlayerFaction
+                || owner == world.ActiveFaction || world.Factions.Single(f => f.Id == owner).TurnSummary != null
+                || !Creations(world.ScenarioEvents).Any(e => e.Faction == owner))
+                throw new RuleViolation("scenario.opening_turn", "Opening handoff requires a new faction before its first turn during the outgoing player's active turn");
+            var counters = world.ExtensionState.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal);
+            counters[WorldTurns.OpeningHandoffKey] = 1;
+            world = world with { ExtensionState = counters };
+        }
         return world with { ScenarioPlayerFaction = owner,
             Factions = world.Factions.Select(f => f with { Human = f.Id == owner }).ToArray() };
     }

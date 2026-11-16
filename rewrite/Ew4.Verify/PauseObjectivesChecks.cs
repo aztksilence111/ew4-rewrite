@@ -119,6 +119,29 @@ internal static class PauseObjectivesChecks
         var configured = new ClientContent(ModRead, Directory.EnumerateFiles(Path.Combine(data, "original"), "*.btl"));
         Check(configured.Extensions.PauseObjectivesPresentations["*"].Width == 340, "registered presentation loads through real extension entry");
         Check(configured.Extensions.Revision != content.Extensions.Revision, "presentation participates in extension fingerprint");
+        var goals = new StageObjectiveDefinition[] {
+            new() { Id = "bridge", Text = "夺取桥头触发援军", Detail = "攻占桥头后由事件写入状态。",
+                CompleteWhen = new() { Type = "state", Key = "scenario/test.bridge", Value = 1 } },
+            new() { Id = "next", Text = "援军抵达后继续",
+                VisibleWhen = new() { Type = "state", Key = "scenario/test.bridge", Value = 1 } }
+        };
+        var pendingGoals = PauseObjectiveProjection.Stages(source, goals, s => s);
+        Check(pendingGoals.Count == 1 && pendingGoals[0].Met == false, "unmet stage shown, later stage hidden");
+        var stageState = source.ExtensionState.ToDictionary(p => p.Key, p => p.Value);
+        stageState["scenario/test.bridge"] = 1;
+        var completedWorld = source with { ExtensionState = stageState };
+        string beforeProjection = JsonSerializer.Serialize(completedWorld);
+        var completedGoals = PauseObjectiveProjection.Stages(completedWorld, goals, s => s);
+        Check(completedGoals.Count == 2 && completedGoals[0].Met == true && completedGoals[1].Met == null, "event state completes stage and unlocks next description");
+        Check(JsonSerializer.Serialize(completedWorld) == beforeProjection, "stage projection leaves battle, random and events unchanged");
+        Check(PauseObjectiveProjection.Stages(WorldSave.Decode(WorldSave.Encode(completedWorld), completedWorld.ContentRevision), goals, s => s)[0].Met == true,
+            "stage completion survives existing world save state");
+        PauseObjectivesPresentation.Validate(new Dictionary<string, PauseObjectivesPresentation> { ["*"] = new() { StageObjectives = goals } }, manifest, Read);
+        Check(true, "stage definitions accepted through generic presentation interface");
+        Reject(new() { StageObjectives = [goals[0], goals[0]] });
+        Reject(new() { StageObjectives = [goals[0] with { CompleteWhen = new() { Type = "script", Script = "rewrite/test.lua", Function = "random" } }] });
+        Reject(new() { StageObjectives = [goals[0] with { VisibleWhen = new() { Type = "state", Key = "outside.namespace" } }] });
+        Reject(new() { StageObjectives = [goals[0] with { VisibleWhen = new() { Type = "not", Conditions = [] } }] });
         return checks;
     }
 }

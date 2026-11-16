@@ -44,6 +44,8 @@ public static partial class WorldAi
             if (!rules.Behaviors.TryGetValue(unit.Behavior, out var behavior)) throw new RuleViolation("ai.behavior", "Unmapped unit AI behavior");
             var requests = AiPlanning.Requests(behavior, new(unit.RemainingMovement, unit.Morale.Effective, unit.Combatant.ConstructionTurns, unit.Acted));
             kinds = requests.Kinds.ToArray(); eligible = requests.Eligible;
+            if (eligible && rules.DefendOrders.ContainsKey(unitId))
+                kinds = kinds.Append(AiCandidateKind.Hold).Distinct().ToArray();
         }
         internal bool Advance()
         {

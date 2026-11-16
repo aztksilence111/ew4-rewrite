@@ -661,7 +661,7 @@ async function start(scenario, country, localPlayers) {
     performanceLog.beginEntry(scenario);
     try{
       await withLoading(async()=>{
-        tutorial=null;stageIntroOpen=false;
+        tutorial=null;stageIntroOpen=false;stageIntroPending=false;
         const next=await performanceLog.stage('backend',()=>rpc('start', {scenario, country,localPlayers}));
         await installState(next, true);
         showStageIntro();await beginTutorial();
@@ -798,6 +798,7 @@ function refreshHud() {
   diplomacyUi.sync();
   refreshAiProgress();
   refreshDialogue();
+  if(stageIntroPending&&!state.story)showStageIntro();
   storyPlayer.sync(state.story,stageIntroOpen,busy).catch(error=>notice(error.message));
   $('scenario-event').hidden = !state.scenarioPopup || stageIntroOpen;
   if(state.scenarioPopup){
@@ -1029,9 +1030,14 @@ function toolButton(icon,title,action){const b=button('',action,$('actions'));b.
   if(icon==='disband'){const img=new Image(33,33);img.alt='';img.src='/disband.png';b.append(img);}
   else b.append(uiImage('button_'+(icon==='general'?'generals':icon)+'.png',33));
   b.dataset.tutorialId=({general:'btn_general',items:'btn_item',city:'btn_city',factory:'btn_factory',stable:'btn_stable',dock:'btn_dock',buildfortress:'btn_fortress',builddefense:'btn_defense',buyship:'btn_ship',training:'btn_training',buildupgrade:'btn_upgrade',trade:'btn_trading'})[icon]||'';return b;}
-let detailReturn,detailRevision=0,stageIntroOpen=false;
+let detailReturn,detailRevision=0,stageIntroOpen=false,stageIntroPending=false;
 function showStageIntro(){
   if(!state?.stageIntro||state.phase==='Finished')return;
+  // A Mod can use the native in-battle dialogue after its opening story.
+  // Keep the mission sheet available without automatically covering the speaker.
+  if(manifest.campaignPresentation?.[state.scenario]?.autoStageIntro===false){stageIntroPending=false;return;}
+  if(state.story){stageIntroPending=true;return;}
+  stageIntroPending=false;
   stageIntroOpen=true;
   menus.stageIntro(state.stageIntro,()=>{stageIntroOpen=false;refreshHud();void runAi();});
   refreshHud();
@@ -1074,8 +1080,8 @@ function abilityGrid(profile,unit){
   const p=manifest.profiles[profile],s=p.stats,grid=document.createElement('div');grid.className='ability-grid';
   const health=Number(s.strength)===-999?'一次性':unit?.health??s.strength;
   const attack=unit?.attack,attackText=(attack?.minimum??s.minatk)+'-'+(attack?.maximum??s.maxatk);
-  for(const [icon,value] of [['attack',attackText],['soldiernumber',catalog.formationCounts?.[profile]??Number(p.grade)+1],['hp',health],['food',s.consumption],['range',s.maxatkrange],['move',unit?.remainingMovement??s.movement]]){
-    const marker=document.createElement('span');marker.className='ability-icon';marker.append(uiImage('infomarker_'+icon+'.png',21));const number=document.createElement('span');number.textContent=value;grid.append(marker,number);
+  for(const [icon,value] of [['attack',attackText],['soldiernumber',catalog.formationCounts?.[profile]??Number(p.grade)+1],['hp',health],['food',s.consumption],['range',s.maxatkrange],['move',unit?.movement??s.movement]]){
+    const marker=document.createElement('span');marker.className='ability-icon';marker.append(uiImage('infomarker_'+icon+'.png',21));const number=document.createElement('span');number.textContent=value;number.dataset.ability=icon;if(icon==='move')number.setAttribute('aria-label','行动力 '+value);grid.append(marker,number);
     if(icon==='soldiernumber'){
       number.replaceChildren();number.className='formation-count';number.dataset.count=String(value);number.setAttribute('aria-label',value+'编');
       if(value>3){number.append(tintedUi('infomarker_soldiernumber.png','#404040',14,18),originalTextRenderer.element('\u00d7'+value,'font_char_2_hd','#404040',32,'center',{size:13,singleLine:true,maxHeight:22}));}
@@ -1343,11 +1349,11 @@ function drawStrategicMap(time=performance.now()) {
       const w=preview.naturalWidth*scale,h=preview.naturalHeight*scale;draw.drawImage(preview,(width-w)/2,(rect.height-h)/2,w,h);}
     return;
   }
-  const textureScale=manifest.uiOverrides?.strategic?1:.8;
+  const textureScale=manifest.uiOverrides?.strategic||definition.background?1:.8;
   const logicalWidth=surface.clientWidth,logicalHeight=surface.clientHeight;
-  const mapWidth=logicalWidth-158,texture=menuArt.strategic;
+  const mapWidth=logicalWidth-158,texture=menuArt.strategicTexture(definition);
   const scale=Math.max(Number(definition.scale||1)*.92,
-    manifest.uiOverrides?.strategic?0:Math.max(mapWidth/(texture.image.naturalWidth/texture.ratio*textureScale),logicalHeight/((texture.height||texture.image.naturalHeight/texture.ratio)*textureScale)));
+    manifest.uiOverrides?.strategic||definition.background?0:Math.max(mapWidth/(texture.image.naturalWidth/texture.ratio*textureScale),logicalHeight/((texture.height||texture.image.naturalHeight/texture.ratio)*textureScale)));
   const camera=menuArt.strategicCamera(definition,scale,textureScale,mapWidth,logicalHeight);
   const rect=surface.getBoundingClientRect(),ratio=settings.hd?Math.min(devicePixelRatio||1,3):1;
   const width=Math.max(1,Math.round(rect.width*ratio)),height=Math.max(1,Math.round(rect.height*ratio));
@@ -1555,7 +1561,7 @@ $('save').onclick=()=>{
   if(busy||aiRunning||sessionTransition){notice('请等待当前行动完成后再保存');return;}
   if(state)return menus.saveMenu(true,catalog.scenarios.find(s=>s.id===state.scenario).mode,tutorial?.checkpoint()).catch(e=>notice(e.message));
 };
-async function load(slot=0,saveMode=mode){if(busy)return;busy=true;try{await withLoading(async()=>{tutorial=null;stageIntroOpen=false;await installState(await rpc('load',{slot,mode:saveMode}),true);$('detail-modal').hidden=true;showStageIntro();await beginTutorial(state.tutorialCheckpoint);});}catch(e){notice(e.message);}finally{busy=false;if(state){refreshHud();await runAi();}}}
+async function load(slot=0,saveMode=mode){if(busy)return;busy=true;try{await withLoading(async()=>{tutorial=null;stageIntroOpen=false;stageIntroPending=false;await installState(await rpc('load',{slot,mode:saveMode}),true);$('detail-modal').hidden=true;showStageIntro();await beginTutorial(state.tutorialCheckpoint);});}catch(e){notice(e.message);}finally{busy=false;if(state){refreshHud();await runAi();}}}
 $('continue').onclick=()=>menus.saveMenu(false,mode).catch(e=>notice(e.message));
 $('restart').onclick=async()=>{
   if(!state||sessionTransition)return;
@@ -1616,6 +1622,7 @@ async function initializeClient(){
     Ew4Startup.pending('内置字库');
     const text=new Ew4OriginalUI.TextRenderer(m);await text.prepare();
     Ew4Startup.pending('菜单图像');
+    window.ew4UiSkin?.dispose();
     const art=new Ew4MenuArt.MenuArt({manifest:m,image});await art.prepare();
     window.ew4UiSkin?.dispose();
     catalog=c;manifest=m;cityNames=names;conquestPages=pages;menuArt=art;

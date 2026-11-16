@@ -16,7 +16,7 @@ const base=process.argv[2]||'http://127.0.0.1:5592',folder=path.resolve(process.
     if(await page.evaluate(()=>stageIntroOpen)){await page.locator('#detail-confirm').click();await idle();}
     for(let i=0;i<12;i++){
       const pending=await page.evaluate(()=>({story:!!state.story,dialogue:!!state.dialogue}));if(!pending.story&&!pending.dialogue)break;
-      if(pending.story){await page.waitForFunction(()=>!storyPlayer.preparing&&!storyPlayer.commandPending);await page.locator('#story-player button[aria-label="跳过剧情"]').click();}
+      if(pending.story){await page.waitForFunction(()=>!storyPlayer.preparing&&!storyPlayer.commandPending);await page.locator('#story-player button[aria-label="跳过剧情"]').click();await page.getByRole('button',{name:'确认跳过',exact:true}).click();}
       else await page.evaluate(()=>act('dialogue'));
       await idle();
     }

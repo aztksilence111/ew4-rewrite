@@ -36,6 +36,12 @@
 .story-sheet label{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:22px 0;font-size:17px}
 .story-sheet input[type=checkbox]{width:21px;height:21px;accent-color:var(--story-accent)}
 .story-sheet select{background:#252b2e;color:#fff;font:inherit;border:1px solid #797b78;padding:7px;border-radius:3px}
+.story-skip-overlay{align-items:center;justify-content:center;padding:20px}
+.story-sheet.story-skip-confirm{width:440px;max-height:100%;border:1px solid var(--story-accent);box-shadow:0 8px 32px #0009}
+.story-skip-confirm p{font-size:18px;line-height:1.6;margin:0 0 24px}
+.story-skip-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:12px}
+.story-skip-actions button{min-height:44px;padding:8px 16px;border:1px solid #a6a99e;background:#273439;color:#fff;font-size:17px}
+.story-skip-actions button:last-child{background:#e4d3a3;color:#172126;border-color:#e4d3a3}
 .story-history{width:100%;max-width:none;background:#0b1013e8}
 .story-history-list{max-width:1100px;margin:0 auto}
 .story-history-row{display:grid;grid-template-columns:160px minmax(0,1fr);gap:24px;padding:14px 0;font-size:20px;line-height:1.6;border-bottom:1px solid #ffffff18}

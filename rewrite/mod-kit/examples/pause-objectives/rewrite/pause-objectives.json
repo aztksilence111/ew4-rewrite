@@ -9,6 +9,12 @@
     "headerBackground":"#414442",
     "textColor":"#393b39",
     "accentColor":"#58735e",
-    "sections":["win","limits","ratings"]
+    "sections":["win","limits","ratings"],
+    "stagesTitle":"阶段目标",
+    "stageObjectives":[
+      {"id":"bridge","text":"夺取桥头，接应援军",
+       "detail":"将此说明替换为本剧本真实目标；在对应夺城事件中设置scenario/bridge.secured=1。",
+       "completeWhen":{"type":"state","key":"scenario/bridge.secured","value":1}}
+    ]
   }
 }

@@ -40,6 +40,7 @@ public static partial class WorldAi
         var unit = PlanningScope.Queries(state) is { } prepared ? prepared.Units.GetValueOrDefault(unitId)
             : state.Units.SingleOrDefault(u => u.Id == unitId);
         if (unit == null || unit.Owner != faction.Id) throw new RuleViolation("ai.unit", "Unknown active faction unit");
+        if (rules.DefendOrders.TryGetValue(unit.Id, out var defend)) return DefendCandidates(state, unit, defend, rules);
         if (!rules.Strategy.Behaviors.TryGetValue(unit.Behavior, out var behavior))
             throw new RuleViolation("ai.strategy_behavior", "Unmapped strategic behavior");
         var random = new AiRandom(state.AiRandomState);
@@ -201,6 +202,32 @@ public static partial class WorldAi
             }
         }
         return new(state.Revision, unitId, state.AiRandomState, random.State, result.ToArray());
+    }
+
+    private static AiStrategyPlan DefendCandidates(WorldState state, UnitState unit, AiDefendOrder order, WorldAiRules rules)
+    {
+        var result = new List<AiCandidate<AiStrategicCommand>>();
+        var map = new HexMap(state.Width, state.Height);
+        if (order.Center >= map.Count) throw new RuleViolation("ai.defend_center", "AI defense center is outside the map");
+        if (map.Distance(unit.Cell, order.Center) <= order.Radius || unit.RemainingMovement < 1
+            || unit.Morale.Effective == -3 || unit.Acted) return new(state.Revision, unit.Id, state.AiRandomState, state.AiRandomState, result);
+        var context = WorldActions.MovementContext(state, unit, rules.Movement);
+        var reachable = WorldActions.MovementRange(state, unit, rules.Movement);
+        bool air = WorldUnitLayers.Air(state, unit), naval = unit.Combatant.Profile.Category == rules.Tactics.NavalCategory;
+        var goals = map.Within(order.Center, order.Radius, true).Where(i => (air ? state.Cells[i].Terrain.Active : state.Cells[i].Terrain.CanTraverse())
+            && (air || (naval ? state.Cells[i].Terrain.Sea : !state.Cells[i].Terrain.Sea || unit.Transport))
+            && WorldUnitLayers.ValidTerrain(state, unit.Combatant.Profile, i)
+            && WorldUnitLayers.HasSpace(state, unit.Combatant.Profile, unit.Owner, i, unit.Id)).ToArray();
+        if (goals.Length == 0) return new(state.Revision, unit.Id, state.AiRandomState, state.AiRandomState, result);
+        var distances = Movement.DistancesForAdvance(map, context.Cells, goals, context.Actor, rules.Movement.Search, unit.Cell, reachable.Keys.ToArray());
+        if (distances.TryGetValue(unit.Cell, out long origin))
+        {
+            int destination = reachable.Keys.Where(i => i != unit.Cell && distances.TryGetValue(i, out long d) && d < origin
+                && WorldUnitLayers.HasSpace(state, unit.Combatant.Profile, unit.Owner, i, unit.Id))
+                .OrderBy(i => distances[i]).ThenBy(i => map.Distance(i, order.Center)).ThenBy(i => i).DefaultIfEmpty(-1).First();
+            if (destination >= 0) result.Add(new(new(state.Revision, unit.Id, destination, order.Center, false), 1_000_000));
+        }
+        return new(state.Revision, unit.Id, state.AiRandomState, state.AiRandomState, result);
     }
 
     public static WorldChange ExecuteStrategic(WorldState state, AiStrategyPlan plan, int selected, WorldAiRules rules)
