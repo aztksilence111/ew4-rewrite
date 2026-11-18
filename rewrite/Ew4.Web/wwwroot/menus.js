@@ -347,7 +347,9 @@
     portrait(name){
       const img=document.createElement('img');img.alt='';img.width=78;img.height=78;
       const atlas=['princesses_hd','commanders1_hd','commanders2_hd'].find(a=>this.manifest.atlases[a]?.[name]);
-      if(atlas)img.src='/content/ui/'+atlas+'/'+name;else{img.src='/content/ui/image_ui_hd/button_add_generals.png';img.title=name;}
+      const original=atlas?'/content/ui/'+atlas+'/'+name:'/content/ui/image_ui_hd/button_add_generals.png';
+      img.dataset.commanderPortrait=name;img.dataset.originalPortrait=original;img.src=this.api.portraits?.url(name)||original;
+      if(!atlas)img.title=name;
       return img;
     }
     async headquarters(deployment=null){
@@ -610,7 +612,7 @@
       definition=this.presentedCommander(definition);
       this.commanderReturn=onClose;
       const abilityDefinitions=this.abilityDefinitions(),abilityRows=Math.ceil(abilityDefinitions.length/2);
-      const body=this.api.detail('title_unitinfo',440,217+(abilityRows-4)*27,null,onClose||(()=>{this.drawRoster();}));body.className='commander-detail';
+      const body=this.api.detail('title_unitinfo',440,217+(abilityRows-4)*27+(this.api.portraits?32:0),null,onClose||(()=>{this.drawRoster();}));body.className='commander-detail';
       const card=document.createElement('div');card.className='commander-detail-card';const portrait=this.card(definition,held,()=>{});portrait.querySelector('.commander-info').remove();portrait.querySelector('.commander-tag')?.remove();delete portrait.dataset.locked;card.append(portrait);body.append(card);
       const equipment=document.createElement('div');equipment.className='commander-equipment'+(held?.battle?' battle-equipment':'');const title=document.createElement('div');title.className='commander-equipment-title';title.append(this.lettering(this.text('text_equipitem')));equipment.append(title);
       const items=document.createElement('div');items.className='commander-equipment-slots';for(let i=0;i<(this.data.equipmentCapacity??2);i++){const marker=this.data.items.find(m=>m.id===held?.items[i]);items.append(this.api.uiImage(marker?.image||'item_blank.png',45));}equipment.append(items);body.append(equipment);
@@ -649,6 +651,7 @@
       }body.append(abilities);
       if(held&&!this.deployment&&!held.battle){const regroup=this.api.button('',()=>this.regroup(held.id),equipment);regroup.className='native-command orange regroup';regroup.disabled=held.locked;regroup.setAttribute('aria-label',this.text('btn_regroup'));regroup.append(this.lettering(this.text('btn_regroup'),'font_text_3_cn_hd','#ebe6e1'));}
       const item=this.api.button('',()=>held?.battle?this.battleEquipment(held,()=>this.commanderInfo(definition,held,onClose)):this.equipment(held.id),equipment);item.className='native-command blue equip';item.disabled=!held||!!this.deployment||!!held.locked&&!held.battle;item.setAttribute('aria-label',this.text('btn_item'));item.append(this.lettering(this.text('btn_item'),'font_text_3_cn_hd','#ebe6e1'));
+      if(this.api.portraits){const skin=this.api.button('皮肤',()=>this.api.portraits.open(definition.id).catch(e=>this.api.notice(e.message)),card);skin.className='commander-skin-button';skin.setAttribute('aria-label','更换'+definition.name+'皮肤');}
     }
   }
   root.Ew4Menus={Menus};

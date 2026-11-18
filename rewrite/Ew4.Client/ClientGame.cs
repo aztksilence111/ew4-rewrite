@@ -9,7 +9,8 @@ public sealed record ClientCommand(string Op = "", long Revision = -1, string? S
     string? Unit = null, string? Target = null, int Cell = -1, string? Offer = null, string? Commander = null, string? Item = null, JsonElement? Tutorial = null, int Group = 0, int Slot = 0, int Mode = 0,
     IReadOnlyList<string>? LocalPlayers = null, string? Tag = null, IReadOnlyList<string>? TaggedCommanders = null, bool Delta = false,
     string? KnownVersion = null, string[]? Units = null, string? Policy = null, bool? AutoBattle = null, int[]? Goals = null,
-    int? TaskId = null, string? Kind = null, int? Radius = null, int[]? Line = null, bool? DeployFirst = null, bool Compact = false, string? SecondaryTarget = null);
+    int? TaskId = null, string? Kind = null, int? Radius = null, int[]? Line = null, bool? DeployFirst = null, bool Compact = false, string? SecondaryTarget = null,
+    string? Portrait = null, string? Marker = null);
 public sealed record ClientSlot(string Scenario, string? Country, byte[] Session, MovementHistoryState? MovementHistory = null, JsonElement? Tutorial = null,
     int Round = 0, DateTimeOffset? SavedAt = null, IReadOnlyList<string>? LocalPlayers = null, string? DisplayCountry = null,
     IReadOnlyList<int>? TechnologySnapshot = null, string? ModName = null, string? SaveIdentity = null);
@@ -80,6 +81,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                     "/api/countries" => Countries(Command(body)),
                     "/api/local-players" => LocalPlayers(Command(body)),
                     "/api/headquarters" => Headquarters(),
+                    "/api/portraits" => PortraitGallery(Command(body)),
                     "/api/technology" => Technology(Command(body)),
                     "/api/objectives" => Objectives(Command(body)),
                     "/api/pause-objectives" => PauseObjectives(Command(body)),

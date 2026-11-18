@@ -29,12 +29,19 @@ public sealed partial class ModStore
             {
                 int end = path.IndexOf('/');
                 if (end < 0) throw new FileNotFoundException("Invalid content revision");
-                string key = path[2..end], resource = ContentPath(path[(end + 1)..]);
+                string key = path[2..end], relative = path[(end + 1)..];
+                if (relative.StartsWith("portraits/", StringComparison.Ordinal))
+                {
+                    var portraitManifest = key == baseline.Revision ? null : key == activeKey ? activeManifest : Manifest(key);
+                    return Ew4.Client.ClientGame.ReadPortrait(SaveDirectory(portraitManifest), relative[10..]);
+                }
+                string resource = ContentPath(relative);
                 // In-flight requests from the closing document still resolve their own content set.
                 if (key == baseline.Revision) return Presentation(baseline.Read(resource), resource, null, null);
                 var selected = key == activeKey ? activeManifest : Manifest(key);
                 return Presentation(ReadFrom(key, selected, resource), resource, key, selected);
             }
+            if (path.StartsWith("portraits/", StringComparison.Ordinal)) return Ew4.Client.ClientGame.ReadPortrait(SaveDirectory(activeManifest),path[10..]);
             string logical = ContentPath(path);
             return Presentation(ReadFrom(activeKey, activeManifest, logical), logical, activeKey, activeManifest);
         }

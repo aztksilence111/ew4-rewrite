@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "skins": [{
+    "id": "demo.expedition",
+    "commander": "ew4.commander.1",
+    "name": "远征服",
+    "image": "rewrite/skins/expedition.png",
+    "marker": "rewrite/skins/expedition-marker.png",
+    "unlock": ["demo.first-commander"],
+    "unlockDescription": "获得任意一位将领后解锁",
+    "automatic": true,
+    "priority": 10
+  }]
+}

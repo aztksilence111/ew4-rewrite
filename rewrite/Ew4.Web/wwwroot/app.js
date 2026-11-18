@@ -71,7 +71,7 @@ const pauseObjectives=new Ew4PauseObjectives.Panel({rpc,state:()=>state,notice,
 const diplomacyUi=new Ew4Diplomacy.Panel({rpc,state:()=>state,presentation:()=>catalog?.diplomacyPresentation,notice,action:act,flag:flagSource,
   busy:()=>busy,aiRunning:()=>aiRunning,blocked:()=>stageIntroOpen||sessionTransition||!!aiControl.mode,
   prepare:text=>Ew4OriginalUI.prepareText(text),pause:stopAi,resume:()=>runAi().catch(e=>notice(e.message))});
-const battlefield = new Ew4Battlefield.Renderer({image,sprite,animation,libraries,loadLibrary,requestFrame:requestRender,get mapMode(){return mapViews.mode;},get cameraActive(){return pointers.size>0||performance.now()<cameraInputUntil;},get warmingPaused(){return aiRunning;},get visible(){return appVisible;},get imageRevision(){return imageRevision;},get effects(){return effects;},get manifest(){return manifest;},get cityLanguage(){return settings.cityLanguage;},get geographicLanguage(){return settings.geographicLanguage;},cityLabelSize:(name,cell)=>{
+const battlefield = new Ew4Battlefield.Renderer({portrait:name=>window.ew4Portraits?.marker(name),image,sprite,animation,libraries,loadLibrary,requestFrame:requestRender,get mapMode(){return mapViews.mode;},get cameraActive(){return pointers.size>0||performance.now()<cameraInputUntil;},get warmingPaused(){return aiRunning;},get visible(){return appVisible;},get imageRevision(){return imageRevision;},get effects(){return effects;},get manifest(){return manifest;},get cityLanguage(){return settings.cityLanguage;},get geographicLanguage(){return settings.geographicLanguage;},cityLabelSize:(name,cell)=>{
   const layout=originalTextRenderer.layout(cityLabelText(name,cell,state.map,settings.cityLanguage),'font_city_labels_hd');
   return {width:(layout.width+8)/2,height:(layout.height+10)/2};
 },cityLabel:(name,cell,rasterScale=1)=>{
@@ -88,9 +88,10 @@ async function prepareMapFonts(next,preferences=settings){
     ...geography.map(label=>Ew4OriginalUI.prepareMapText(label.textZh||'',!label.sea))]);
 }
 const menus = new Ew4Menus.Menus({rpc,button,uiImage,countryImage,labels:labelImage,text:(value,font,color,width,align,options)=>originalTextRenderer?.element(value,font,color,width,align,options)||document.createTextNode(value),prose:(...args)=>originalTextRenderer.prose(...args),detail:detailWindow,start,loadLibrary,image,animation,libraries,notice,main:showMain,
-  get manifest(){return manifest;},get catalog(){return catalog;},state:()=>state,refreshCatalog:async()=>{catalog=await rpc('catalog');},tutorialUi,popup:popupOpen,load:(slot,mode)=>load(slot,mode),deploy:(unit,commander)=>act('deploy',{unit,commander}),act,
+  get portraits(){return window.ew4Portraits;},get manifest(){return manifest;},get catalog(){return catalog;},state:()=>state,refreshCatalog:async()=>{catalog=await rpc('catalog');},tutorialUi,popup:popupOpen,load:(slot,mode)=>load(slot,mode),deploy:(unit,commander)=>act('deploy',{unit,commander}),act,
   updateResources:resources=>{const player=state?.factions.find(f=>f.id===state.playerFaction);if(player){player.resources=resources;refreshResources();}},
   refresh:async()=>{if(state&&!$('play').hidden){await installState(await rpc('action',{op:'state',revision:state.revision}));}},get menuArt(){return menuArt;},closeDetail,acquisitionEffect});
+window.ew4Portraits=new Ew4PortraitGallery.Library({notice,changed:()=>{imageRevision++;requestRender();},countryName:id=>catalog?.countries?.[id]?.name||manifest?.strings['name_'+id]||id,original:name=>{const atlas=['princesses_hd','commanders1_hd','commanders2_hd'].find(a=>manifest?.atlases[a]?.[name]);return '/content/ui/'+(atlas?atlas+'/'+name:'image_ui_hd/button_add_generals.png');},updated:()=>{if(menus.data&&!$('hq-screen').hidden)menus.drawRoster();}});
 let chosenScenario, chosenCountry, countryChoices = [], showGrid = false, selectedAt = 0;
 const turnUi=new Ew4TurnUI.Turns({
   state:()=>state,get manifest(){return manifest;},rpc,button,detail:detailWindow,close:closeDetail,notice,
@@ -251,6 +252,7 @@ async function rpc(route, args = {}) {
     if(!next.units){const units=new Map(state.units.map(u=>[u.id,u]));for(const id of next.removedUnits||[])units.delete(id);for(const unit of next.unitUpdates||[])units.set(unit.id,unit);next.units=next.unitOrder?next.unitOrder.map(id=>units.get(id)):[...units.values()];}
     delete next.cellUpdates;delete next.unitUpdates;delete next.removedUnits;delete next.unitOrder;
   }
+  if(route==='commander'||route==='objectives'||route==='action'&&args.op!=='select')window.ew4Portraits?.schedule();
   return data;
 }
 function failure(code, message) {
@@ -1033,7 +1035,7 @@ async function findNextUnit(){
 function uiImage(name,width,height=width){
   const atlas=['image_recruit_hd','image_recruit_hd2','image_recruit_hd3','image_ui_hd','image_menu_hd','image_item_hd','image_newgame_hd','princesses_hd','princesses_sketch_hd','commanders1_hd','commanders2_hd','image_ui'].find(a=>manifest.atlases[a]?.[name]);
   const img=document.createElement('img');img.alt='';img.width=width;img.height=height;
-  if(atlas)img.src='/content/ui/'+atlas+'/'+name;else console.warn('Missing original UI image',name);return img;
+  if(atlas){const original='/content/ui/'+atlas+'/'+name;img.dataset.commanderPortrait=name;img.dataset.originalPortrait=original;img.src=window.ew4Portraits?.url(name)||original;}else console.warn('Missing original UI image',name);return img;
 }
 function toolButton(icon,title,action){const b=button('',action,$('actions'));b.title=title;b.setAttribute('aria-label',title);
   if(icon==='disband'){const img=new Image(33,33);img.alt='';img.src='/disband.png';b.append(img);}
@@ -1608,6 +1610,7 @@ window.ew4Back=()=>{
   if(!storyPlayer.host.hidden){storyPlayer.back();return 'handled';}
   if(mapViews.close())return 'handled';
   if(pendingAction){closeSingleAction();return 'handled';}
+  if(!$('portrait-gallery').hidden){window.ew4Portraits.close();return 'handled';}
   const visible=id=>!$(id).hidden;
   const modal=document.querySelector('dialog[open]');
   if(modal){modal.close();return 'handled';}
@@ -1654,6 +1657,7 @@ async function initializeClient(){
     const art=new Ew4MenuArt.MenuArt({manifest:m,image});await art.prepare();
     window.ew4UiSkin?.dispose();
     catalog=c;manifest=m;cityNames=names;conquestPages=pages;menuArt=art;
+    await window.ew4Portraits.refresh().catch(error=>notice('头像图库暂不可用：'+error.message));
     window.ew4UiSkin=new Ew4UiPresentation.Skin(m);window.ew4UiSkin.apply();
     const buildInfo=await startupJson('/build-info.json');
     performanceLog.build=buildInfo.source.slice(0,12)+'/'+(c.build||'unknown').slice(0,8)+'/'+(c.buildVariant||'unknown');

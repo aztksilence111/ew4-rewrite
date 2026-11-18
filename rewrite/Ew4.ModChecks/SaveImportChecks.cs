@@ -46,9 +46,11 @@ internal static class SaveImportChecks
             var original = new Dictionary<string, byte[]> {
                 ["builtin/check/account.json"] = Encoding.UTF8.GetBytes("{\"medals\":9592,\"roster\":[]}"),
                 ["builtin/check/saves/mode-2/slot-1.json"] = [0,255,1,2],
-                ["mods/sample/logic/saves/mode-2/slot-1.json.bak"] = [3,4,5] };
+                ["mods/sample/logic/saves/mode-2/slot-1.json.bak"] = [3,4,5],
+                ["builtin/check/portraits/library.json"] = Encoding.UTF8.GetBytes("{\"schema\":1}"),
+                ["builtin/check/portraits/"+new string('a',64)+".png"] = [137,80,78,71,0,255] };
             var result = store.ImportSaves(new MemoryStream(Bundle(original)));
-            Check(result.Imported && result.Files == 3, "new archive imports without requiring readable save payloads");
+            Check(result.Imported && result.Files == original.Count, "new archive imports without requiring readable save payloads");
             foreach (var (name, bytes) in original) Check(File.ReadAllBytes(PathFor(name)).SequenceEqual(bytes), "raw " + name);
             var changed = new Dictionary<string, byte[]> { ["builtin/check/account.json"] = Encoding.UTF8.GetBytes("{\"medals\":2}") };
             result = store.ImportSaves(new MemoryStream(Bundle(changed)));

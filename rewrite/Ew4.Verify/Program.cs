@@ -1,5 +1,12 @@
 using System.Text.Json;
 using Ew4.Core;
+if (args.ElementAtOrDefault(1) == "--portrait-gallery-only")
+{
+    string project = Path.GetFullPath(args[0]);
+    Console.WriteLine(JsonSerializer.Serialize(new { portraitGalleryChecks = PortraitGalleryChecks.Run(project),
+        extensionChecks = ExtensionChecks.Run(project), objectiveChecks = ObjectiveChecks.Run(project),
+        saveCompatibilityChecks = SaveCompatibilityChecks.Run(project), errors = 0 })); return;
+}
 if (args.ElementAtOrDefault(1) == "--command-orders-only")
 {
     Console.WriteLine(JsonSerializer.Serialize(new { commandOrders = CommandOrderChecks.Run(), errors = 0 })); return;

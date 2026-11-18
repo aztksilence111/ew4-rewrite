@@ -1013,6 +1013,8 @@
     }
     commanderPortrait(name,x,y,target=this.draw){
       this.prepareCommanderPortraits();
+      const custom=this.api.portrait?.(name);
+      if(custom){target.save();target.beginPath();target.arc(x,y,11,0,Math.PI*2);target.clip();target.drawImage(custom,x-11,y-11,22,22);target.restore();return;}
       // Native 641bc draws the dedicated commandermark sprite, not the
       // square dialogue/academy bust from commanders2_hd. Keep its head crop.
       const atlas=this.api.manifest.atlases.commandermark_hd?.[name]?'commandermark_hd':'commandermark';

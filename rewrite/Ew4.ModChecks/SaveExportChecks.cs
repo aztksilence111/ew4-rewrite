@@ -23,6 +23,9 @@ internal static class SaveExportChecks
             using (var empty = new ZipArchive(new MemoryStream(Archive()))) Check(empty.Entries.Count == 1, "empty save directory still exports metadata");
             var fixtures = new Dictionary<string, byte[]> {
                 ["account.json"] = Encoding.UTF8.GetBytes("{\"medals\":17}"),
+                ["portraits/library.json"] = Encoding.UTF8.GetBytes("{\"schema\":1}"),
+                ["portraits/"+new string('a',64)+".png"] = [137,80,78,71,0,255],
+                ["mods/sample/logic/portraits/library.json"] = Encoding.UTF8.GetBytes("{\"schema\":1}"),
                 ["account.json.bak"] = Encoding.UTF8.GetBytes("{\"medals\":16}"),
                 ["session.json"] = Encoding.UTF8.GetBytes("legacy session"),
                 ["session.json.bak"] = Encoding.UTF8.GetBytes("legacy backup"),

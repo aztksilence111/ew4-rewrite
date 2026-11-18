@@ -93,7 +93,7 @@ public static class StartupAssets
             .ToDictionary(p => (string)p!["path"]!, p => (string)p!["sha256"]!, StringComparer.Ordinal);
         bool originalChanges = expectedOriginals == null || originals.Keys.Any(p => !expectedOriginals.TryGetValue(p, out string? hash) || hash != hashes[p])
             || expectedOriginals.Keys.Any(p => !originals.ContainsKey(p));
-        bool LogicPath(string path) => path != ArmyCapacityConfiguration.Path && path != DiplomacyConfiguration.Path && (path.StartsWith("original/", StringComparison.Ordinal) || path.StartsWith("legacy/", StringComparison.Ordinal)
+        bool LogicPath(string path) => path != CommanderSkinLibrary.Path && path != ArmyCapacityConfiguration.Path && path != DiplomacyConfiguration.Path && (path.StartsWith("original/", StringComparison.Ordinal) || path.StartsWith("legacy/", StringComparison.Ordinal)
             || path.StartsWith("rewrite/", StringComparison.Ordinal) && !path.EndsWith(".png", StringComparison.Ordinal));
         var expectedLogic = reference?["files"]?.AsArray().Where(p => (string?)p?["path"] is string path && LogicPath(path) && ModFiles.RuntimePath(path))
             .ToDictionary(p => (string)p!["path"]!, p => (string)p!["sha256"]!, StringComparer.Ordinal);

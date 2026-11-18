@@ -1,5 +1,7 @@
 # 原版 Mod 移植到 rewrite
 
+玩家上传头像、局内小头像同步、任务/成就解锁及指挥部皮肤切换见[将领皮肤](COMMANDER_SKINS.md)和[最小示例](../../examples/commander-skins/README.md)。
+
 0.2.43 的可选将领指令、AI 与存档支持及将领奖励资格见[将领指令](COMMAND_ORDERS.md)。
 
 0.2.42 新增的剧本 AI 区域协防见 [AI 协防命令](AI_DEFEND_ORDERS.md)；阶段目标、增援红圈及剧情配置分别见 [暂停目标](PAUSE_OBJECTIVES.md)、[军队事件](SCENARIO_ARMIES.md) 和 [剧情呈现](STORY_PRESENTATION.md)。

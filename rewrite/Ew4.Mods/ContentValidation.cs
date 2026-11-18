@@ -8,6 +8,11 @@ internal static class ContentValidation
         HashSet<string> files, List<object>? diagnostics = null, bool startScenarios = true)
     {
         var content = baseline.Content(read, scenarios);
+        foreach(var image in (content.Extensions.CommanderSkins?.Skins ?? []).SelectMany(s=>new[]{s.Image,s.Marker??s.Image}).Distinct())
+        {
+            try { _ = StbImageSharp.ImageResult.FromMemory(read(image),StbImageSharp.ColorComponents.RedGreenBlueAlpha); }
+            catch(Exception e) when(e is not OutOfMemoryException) { throw new InvalidDataException("皮肤图片无法解码："+image,e); }
+        }
         var errors = new List<string>();
         Exception? firstError = null;
         foreach (var scenario in content.Scenarios)

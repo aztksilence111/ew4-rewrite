@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "objectives": [{
+    "id": "demo.first-commander",
+    "kind": "task",
+    "name": "首位将领",
+    "description": "获得任意一位将领",
+    "conditions": [{"type": "commanderOwned", "count": 1}],
+    "reward": {},
+    "internal": true
+  }]
+}

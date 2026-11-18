@@ -330,6 +330,27 @@ public sealed partial class MainActivity : Activity
     protected override void OnActivityResult(int requestCode, Result resultCode, Intent? data)
     {
         base.OnActivityResult(requestCode, resultCode, data);
+        if (requestCode == 444)
+        {
+            if (resultCode != Result.Ok || data?.Data is not { } portraitUri) return;
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    using var input = ContentResolver!.OpenInputStream(portraitUri) ?? throw new IOException("无法读取图片");
+                    using var output = new MemoryStream(); byte[] buffer = new byte[65536]; int count;
+                    while ((count = input.Read(buffer)) > 0)
+                    {
+                        if (output.Length + count > 10 * 1024 * 1024) throw new IOException("图片超过 10 MiB，请压缩后重试。");
+                        output.Write(buffer,0,count);
+                    }
+                    string json = System.Text.Json.JsonSerializer.Serialize(new { name="portrait", type=ContentResolver.GetType(portraitUri), base64=Convert.ToBase64String(output.ToArray()) });
+                    RunOnUiThread(() => web?.EvaluateJavascript("window.ew4PortraitFileSelected?.("+json+")",null));
+                }
+                catch (Exception error) { RunOnUiThread(() => web?.EvaluateJavascript("window.ew4PortraitFileError?.("+System.Text.Json.JsonSerializer.Serialize(error.Message)+")",null)); }
+            });
+            return;
+        }
         if (requestCode == 443)
         {
             if (resultCode != Result.Ok || data?.Data is not { } source || store == null) { SaveImportFinished(new { cancelled = true }); return; }
@@ -390,6 +411,21 @@ public sealed partial class MainActivity : Activity
     {
         [JavascriptInterface, Java.Interop.Export("choose")]
         public void Choose(string id, string name) => activity.Pick(id, name);
+        [JavascriptInterface, Java.Interop.Export("choosePortrait")]
+        public void ChoosePortrait() => activity.RunOnUiThread(() =>
+        {
+            try
+            {
+                var intent = new Intent(Intent.ActionOpenDocument); intent.AddCategory(Intent.CategoryOpenable); intent.SetType("image/*");
+                intent.PutExtra(Intent.ExtraMimeTypes,new[]{"image/png","image/jpeg","image/webp"});
+                activity.StartActivityForResult(intent,444);
+            }
+            catch (Exception error) { activity.web?.EvaluateJavascript("window.ew4PortraitFileError?.("+System.Text.Json.JsonSerializer.Serialize(error.Message)+")",null); }
+        });
+        [JavascriptInterface, Java.Interop.Export("portraitCommand")]
+        public string PortraitCommand(string json) => json.Length > 3000000
+            ? "{\"ok\":false,\"message\":\"头像请求过大\"}"
+            : activity.store!.Value.Dispatch("/api/portraits",json);
         [JavascriptInterface, Java.Interop.Export("exportSaves")]
         public void ExportSaves() => activity.PickSaveExport();
         [JavascriptInterface, Java.Interop.Export("importSaves")]

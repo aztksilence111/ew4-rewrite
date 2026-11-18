@@ -1,5 +1,7 @@
 # 配置索引：从目标定位到文件
 
+将领头像/小头像皮肤：API 3固定文件`rewrite/commander-skins.json`，支持目标解锁、自动优先级和玩家手动覆盖；见[将领皮肤](porting/COMMANDER_SKINS.md)。
+
 自定义战役大章侧栏：`client/manifest.json` 的 `campaignSelection.chapters[]` 可配置 `sidebarImage`（`client/` 下相对PNG路径）、`sidebarWidth`／`sidebarHeight`（显示点数，默认164／45）。沿用对应章的 `key`／`catalogId` 关联；不配置时保留原版底图。图片应按显示点数的两倍导出，选中状态只改变横向位置，不应改宽高或拉伸纹理。项目实例见[章节侧栏样式](../../../颓垣饿鸠/source/campaigns/selection/SIDEBAR_STYLE.md)。
 
 剧本部队协防：API3 `aiOrders`按部队ID配置目标格及半径，适用于初始部队和事件增援；见[协防区域](porting/AI_DEFEND_ORDERS.md)。

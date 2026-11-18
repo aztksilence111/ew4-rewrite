@@ -14,7 +14,7 @@ public sealed partial class ModStore
     {
         try { ModFiles.PathName(path); }
         catch (InvalidDataException) { return false; }
-        return Regex.IsMatch(path, @"^(?:recovery/[a-f0-9]{32}/)?(?:(?:mods/[a-z0-9_.-]+/[a-zA-Z0-9_.-]+|builtin/[a-zA-Z0-9_.-]+)/)?(?:(?:saves/mode-[0124]/)?(?:account\.json|session\.json|slot-[0-6]\.json)(?:\.bak)?|retention-[1-8]\.json)$");
+        return Regex.IsMatch(path, @"^(?:recovery/[a-f0-9]{32}/)?(?:(?:mods/[a-z0-9_.-]+/[a-zA-Z0-9_.-]+|builtin/[a-zA-Z0-9_.-]+)/)?(?:(?:saves/mode-[0124]/)?(?:account\.json|session\.json|slot-[0-6]\.json)(?:\.bak)?|retention-[1-8]\.json|portraits/(?:library\.json|[a-f0-9]{64}\.png))$");
     }
 
     private string CheckedSavePath(string relative)

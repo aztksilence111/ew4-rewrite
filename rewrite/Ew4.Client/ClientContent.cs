@@ -59,6 +59,8 @@ public sealed partial class ClientContent
             correctItems, Extensions.LegacySkills, Extensions.ConfigureItem);
         CorrectOriginalEquipment = correctItems && LegacyEquipmentCorrections.IsOriginal(runtime.SourceHashes["def_item.xml"]);
         Extensions.ConfigureRuntime(runtime);
+        if (Extensions.CommanderSkins?.Skins.Any(s => !runtime.Commanders.Values.Any(c => c.Definition.Id == s.Commander)) == true)
+            throw new Ew4.Core.RuleViolation("skins.commander", "Skin references an unknown commander");
         Extensions.Bus.RegisterOrderProfiles(runtime.Profiles.ToDictionary(p=>p.Key,p=>p.Value.Profile),runtime.Profiles.ToDictionary(p=>p.Key,p=>p.Value.FoodConsumption));
         runtime.VerifySources(name => originalRead("original/" + name));
         Countries.ValidateRuntime(runtime);

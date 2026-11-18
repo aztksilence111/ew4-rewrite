@@ -42,6 +42,7 @@ public sealed partial class ExtensionLoader
     public IReadOnlyDictionary<string, StageIntroPresentation> StageIntroPresentations { get; private init; } = new Dictionary<string, StageIntroPresentation>();
     public IReadOnlyDictionary<string, PauseObjectivesPresentation> PauseObjectivesPresentations { get; private init; } = new Dictionary<string, PauseObjectivesPresentation>();
     public HeadquartersPresentation? HeadquartersPresentation { get; private init; }
+    public CommanderSkinLibrary? CommanderSkins { get; private init; }
     public IReadOnlyDictionary<string, CommanderDialogueLines> CommanderDialogues { get; private init; } = new Dictionary<string, CommanderDialogueLines>();
     private ExtensionLoader(RuleEventBus bus, string revision, ExtensionBinding[] units, ExtensionBinding[] commanders,
         Dictionary<string, ExtensionVictoryRules> victories, Dictionary<string, ExtensionLayout> layouts,
@@ -339,6 +340,17 @@ public sealed partial class ExtensionLoader
         if (m.HeadquartersPresentation != null && m.ApiVersion < 3) throw new RuleViolation("extension.version", "Headquarters presentation requires API 3");
         var headquartersPresentation = m.HeadquartersPresentation == null ? null : Read<HeadquartersPresentation>(m.HeadquartersPresentation);
         headquartersPresentation?.Validate(read("client/manifest.json"), read);
+        CommanderSkinLibrary? commanderSkins = null;
+        byte[]? skinBytes = null;
+        try { skinBytes = read(CommanderSkinLibrary.Path); }
+        catch (Exception e) when (e is FileNotFoundException or DirectoryNotFoundException or KeyNotFoundException) { }
+        if (skinBytes != null)
+        {
+            if (m.ApiVersion < 3) throw new RuleViolation("extension.version", "Commander skins require API 3");
+            // Appearance changes must not invalidate a battle's rule fingerprint.
+            commanderSkins = ParseJson<CommanderSkinLibrary>(skinBytes);
+        }
+        commanderSkins?.Validate(read, metagame);
         foreach (var layout in layouts)
             if (layout.Value == null || layout.Key is not ("commander" or "unit" or "headquarters" or "tasks" or "achievements") || layout.Value.Mode is not ("list" or "grid" or "positioned")
                 || layout.Value.Columns is < 1 or > 16 || layout.Value.Gap is < 0 or > 32 || layout.Value.IconSize is < 12 or > 64
@@ -371,7 +383,7 @@ public sealed partial class ExtensionLoader
                 Metagame = metagame, StageIntroPresentations = introScreens, PauseObjectivesPresentations = pauseScreens, Geography = geography,
                 MapColors = mapColors, AiControl = aiControl, Stories = stories, HeadquartersPresentation = headquartersPresentation,
                 UnitLayers = unitLayers, Construction = construction, Economy = economy, AiOrders = aiOrders, CommanderAbilities = commanderAbilities,
-                UnitRecruitment = unitRecruitment };
+                UnitRecruitment = unitRecruitment, CommanderSkins = commanderSkins };
         bool Known(string id) => skills.ContainsKey(id) || id.StartsWith("ew4.skill.", StringComparison.Ordinal)
             && int.TryParse(id[10..], out int value) && value is >= 0 and < 40 || BuiltinTraits.Contains(id);
     }
