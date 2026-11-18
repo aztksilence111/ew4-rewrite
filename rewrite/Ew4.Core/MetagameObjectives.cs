@@ -12,7 +12,7 @@ public sealed record ObjectiveReward(long Medals = 0, long Badges = 0)
 public sealed record ObjectiveCondition(string Type, long Count = 1, string? Id = null, int? Cell = null, string Scope = "battle");
 public sealed record MetagameObjective(string Id, string Kind, string Name, string Description,
     IReadOnlyList<ObjectiveCondition> Conditions, ObjectiveReward Reward, bool Any = false,
-    int? Mode = null, string? Scenario = null, string? Country = null, bool Hidden = false);
+    int? Mode = null, string? Scenario = null, string? Country = null, bool Hidden = false, string? Faction = null, bool Internal = false);
 public sealed record ObjectiveBattleProgress(string Scenario, int Mode, string Country, long UnitsDestroyed,
     IReadOnlyList<int> CapturedCities, string BattleId = "", string Faction = "", bool Won = false);
 public sealed record ObjectiveContext(GameSession Session, int Mode, string Country, WorldState? Previous = null);
@@ -34,7 +34,9 @@ public static class MetagameObjectives
                 || o.Hidden && o.Kind != "achievement"
                 || o.Description == null || o.Description.Length > 2000 || o.Conditions == null || o.Conditions.Count is < 1 or > 32
                 || o.Reward == null || o.Reward.Medals < 0 || o.Reward.Badges < 0 || o.Mode.HasValue && o.Mode is not (1 or 2)
-                || o.Scenario != null && string.IsNullOrWhiteSpace(o.Scenario) || o.Country != null && string.IsNullOrWhiteSpace(o.Country))
+                || o.Scenario != null && string.IsNullOrWhiteSpace(o.Scenario) || o.Country != null && string.IsNullOrWhiteSpace(o.Country)
+                || o.Faction != null && (string.IsNullOrWhiteSpace(o.Faction) || o.Scenario == null)
+                || o.Internal && (o.Reward.Medals != 0 || o.Reward.Badges != 0 || o.Reward.Items?.Count != 0 || o.Reward.Commanders?.Count != 0))
                 throw new RuleViolation("objectives.configuration", "Invalid objective: " + o.Id);
             if (o.Reward.Items == null || o.Reward.Items.Count > 256 || o.Reward.Items.Any(p => string.IsNullOrWhiteSpace(p.Key) || p.Value < 1)
                 || o.Reward.Commanders == null || o.Reward.Commanders.Count > 64 || o.Reward.Commanders.Any(string.IsNullOrWhiteSpace)
@@ -54,13 +56,14 @@ public static class MetagameObjectives
         }
     }
     private static bool Matches(MetagameObjective o, ObjectiveBattleProgress b) => (!o.Mode.HasValue || o.Mode == b.Mode)
-        && (o.Scenario == null || o.Scenario == b.Scenario) && (o.Country == null || o.Country == b.Country);
+        && (o.Scenario == null || o.Scenario == b.Scenario) && (o.Country == null || o.Country == b.Country)
+        && (o.Faction == null || o.Faction == b.Faction);
     private static string BattleKey(GameSession session) => session.BattleId + ":" + session.PlayerFaction;
     public static ObjectiveConditionProgress Progress(PlayerAccount account, MetagameObjective objective, ObjectiveCondition c, ObjectiveContext? context)
     {
         var session = context?.Session;
         bool live = context != null && context.Mode is 1 or 2 && session!.World.LocalMultiplayer == null
-            && Matches(objective, new(session.World.ScenarioId, context.Mode, context.Country, 0, []));
+            && Matches(objective, new(session.World.ScenarioId, context.Mode, context.Country, 0, [], Faction: session.PlayerFaction));
         var world = live ? session!.World : null;
         string? player = live ? session!.PlayerFaction : null;
         IEnumerable<KeyValuePair<string, ObjectiveBattleProgress>> battles = account.ObjectiveBattles.Where(p => Matches(objective, p.Value));
@@ -83,7 +86,7 @@ public static class MetagameObjectives
             _ => 0
         };
         bool requiresContext = c.Scope != "lifetime" && (BattleTypes.Contains(c.Type)
-            || objective.Mode.HasValue || objective.Scenario != null || objective.Country != null);
+            || objective.Mode.HasValue || objective.Scenario != null || objective.Country != null || objective.Faction != null);
         return new(c.Type, value, c.Count, value >= c.Count && (!requiresContext || live));
     }
     public static PlayerAccount Observe(PlayerAccount account, IReadOnlyList<MetagameObjective> objectives, ObjectiveContext? context = null)
@@ -125,6 +128,7 @@ public static class MetagameObjectives
         ItemTradingRules? itemRules = null, AccountCommanderRules? commanderRules = null, IReadOnlyList<OwnedCommander>? commanders = null)
     {
         account.Validate(); Validate(new[] { objective });
+        if (objective.Internal) throw new RuleViolation("objectives.internal", "该条件用于解锁奖励，无须单独领取");
         if (account.Revision != revision) throw new RuleViolation("account.revision", "Account changed; refresh this command");
         if (!account.CompletedObjectives.Contains(objective.Id)) throw new RuleViolation("objectives.incomplete", "条件尚未达成");
         string receipt = "objective." + objective.Id;

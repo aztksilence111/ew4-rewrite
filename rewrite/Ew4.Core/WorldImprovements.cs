@@ -7,6 +7,7 @@ namespace Ew4.Core;
 public sealed record TrainingStage(string Id, long? MoneyToNext, int HealingOnEntry = 0);
 public sealed record TrainingRules
 {
+    public RuleEventBus? Extensions { get; init; }
     public IReadOnlyList<TrainingStage> Stages { get; init; } = Array.Empty<TrainingStage>();
     public int FoodMultiplier { get; init; } = 3;
 
@@ -24,6 +25,7 @@ public sealed record TrainingRules
 public sealed record BuildingUpgradeStep(string Kind, int FromLevel, int ToLevel, Resources Cost);
 public sealed record BuildingUpgradeRules
 {
+    public RuleEventBus? Extensions { get; init; }
     public IReadOnlyList<BuildingUpgradeStep> Steps { get; init; } = Array.Empty<BuildingUpgradeStep>();
     public int? PerTurnLimit { get; init; } = 1;
     public string DiscountSkill { get; init; } = Ew4Combat.Skill(30);
@@ -51,7 +53,9 @@ public static class WorldImprovements
     {
         bool discount = WorldUnitLayers.Surface(state).Any(u => u.Cell == cellId && u.CommanderId != null && u.Combatant.Has(rules.DiscountSkill));
         long Discount(long value) => checked(value / 100 * rules.DiscountPercent + value % 100 * rules.DiscountPercent / 100);
-        return discount ? step.Cost with { Money = Discount(step.Cost.Money), Industry = Discount(step.Cost.Industry) } : step.Cost;
+        var cost = discount ? step.Cost with { Money = Discount(step.Cost.Money), Industry = Discount(step.Cost.Industry) } : step.Cost;
+        var target = WorldUnitLayers.Surface(state).FirstOrDefault(u => u.Cell == cellId && u.Owner == state.Cells[cellId].Owner);
+        return target == null ? cost : CommandOrders.Discount(state, target, "building_upgrade", step.Cost, cost, rules.Extensions);
     }
 
     public static bool CanUpgradeBuilding(WorldState state, int cellId, BuildingUpgradeRules rules)
@@ -91,7 +95,7 @@ public static class WorldImprovements
             throw new RuleViolation("training.limit", "Commander or training track limit reached");
         var cost = new Resources(rules.Stages[level].MoneyToNext!.Value, 0,
             checked(unit.Support.FoodConsumption * rules.FoodMultiplier));
-        return (unit, level, cost);
+        return (unit, level, CommandOrders.Discount(state, unit, "training", cost, cost, rules.Extensions));
     }
 
     public static WorldChange Train(WorldState state, long expectedRevision, string unitId, TrainingRules rules)
@@ -150,6 +154,6 @@ public static class WorldImprovements
             Revision = checked(state.Revision + 1)
         }).Copy();
         next.Validate();
-        return new(next, new[] { new WorldNotice("building.upgraded", cellId.ToString(), step.ToLevel) });
+        return new(CommandOrders.SitesChanged(state, next), new[] { new WorldNotice("building.upgraded", cellId.ToString(), step.ToLevel) });
     }
 }

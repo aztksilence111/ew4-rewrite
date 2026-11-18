@@ -6,6 +6,16 @@ public sealed record ClientSkillView(string Id, string InstanceId, int Level, in
     string Name, string Description, string? Icon, string Kind, string Target, int Cooldown, Resources Cost);
 public sealed partial class ClientGame
 {
+    private object? OrderReactionView(WorldState world)
+    {
+        var choice = world.PendingOrderAction?.Choices?.FirstOrDefault(c => c.Accept == null);
+        if (choice == null) return null;
+        var skill = content.Extensions.Bus.Skills[choice.Skill];
+        var source = world.Units.Single(u => u.Id == choice.Source);
+        var target = world.Units.SingleOrDefault(u => u.Id == choice.Target);
+        return new { choice.Source, choice.Target, name = content.Label(skill.NameKey), description = content.Label(skill.DescriptionKey),
+            owner = source.Owner, cell = target?.Cell ?? source.Cell };
+    }
     private ClientSkillView SkillView(SkillSlot slot)
     {
         if (content.Extensions.Bus.Skills.TryGetValue(slot.Id, out var skill))
@@ -30,7 +40,8 @@ public sealed partial class ClientGame
     private object[] ActiveSkills(WorldState world, UnitState unit)
     {
         var faction = world.Factions.Single(f => f.Id == unit.Owner);
-        return SkillViews(unit.Combatant).Where(s => s.Kind == "active").Select(s =>
+        return SkillViews(unit.Combatant).Where(s => s.Kind == "active" || content.Extensions.Bus.Skills.TryGetValue(s.Id, out var pending)
+            && pending.Order != null && CommandOrders.HasPending(world, unit, pending)).Select(s =>
         {
             var def = content.Extensions.Bus.Skills[s.Id];
             var cells = def.Target != "cell" ? [] : Enumerable.Range(0, world.Cells.Count)
@@ -41,12 +52,30 @@ public sealed partial class ClientGame
                     ? WorldDiplomacy.Allied(world, t.Owner, faction.Id)
                     : !WorldDiplomacy.Allied(world, t.Owner, faction.Id))).Select(t => t.Id).ToArray();
             if (def.Maneuver != null) targets = world.Units.Where(t => TacticalSkills.Eligible(world, unit, t, def)).Select(t => t.Id).ToArray();
+            if (def.Order != null) targets = CommandOrders.Candidates(world, unit, def, content.Extensions.Bus);
+            bool pendingOrder = def.Order != null && CommandOrders.HasPending(world, unit, def);
             bool available = !unit.Acted && unit.Morale.Effective != -3 && ready <= world.Round && (targets.Length > 0 || cells.Length > 0 || def.Maneuver != null)
                 && (def.Cost.Money == 0 || faction.Resources.Money >= def.Cost.Money)
                 && (def.Cost.Industry == 0 || faction.Resources.Industry >= def.Cost.Industry) && (def.Cost.Food == 0 || faction.Resources.Food >= def.Cost.Food);
             if (def.Maneuver != null) available &= TacticalSkills.CanActivate(world, unit);
-            return (object)new { skill = s, available, remainingCooldown = Math.Max(0, ready - world.Round), targets, cells,
-                multiple = def.Maneuver != null, maximumTargets = def.Maneuver?.MaximumOthers ?? 1, includesSelf = def.Maneuver != null };
+            if (def.Order != null) available = unit.Morale.Effective != -3 && (pendingOrder || ready <= world.Round)
+                && CommandOrders.CanActivate(world, unit, def, content.Extensions.Bus);
+            var enemies = CommandOrders.EnemyTargets(world, unit, def);
+            var legalSelections=CommandOrders.LegalSelections(world,unit,def)?.ToArray();
+            if (def.Order?.Enemy != null && !def.Order.EnemyOptional && enemies.Length == 0) available = false;
+            var secondaryEnemies = def.Order?.SecondaryEnemy == null ? Array.Empty<string>() : world.Units.Where(t =>
+                CommandOrders.Matches(world, unit, t, def.Order.SecondaryEnemy) && new HexMap(world.Width, world.Height).Distance(unit.Cell, t.Cell) <= def.Order.SecondaryEnemy.Radius).Select(t => t.Id).ToArray();
+            var secondaryByEnemy=enemies.ToDictionary(e=>e,e=>secondaryEnemies.Where(id=>
+                CommandOrders.SecondaryAvailable(world,unit,def,e,id)).ToArray());
+            int minimum = def.Order == null ? 0 : pendingOrder ? 1 : def.Order.Mode == "summon" ? def.Order.Profiles.Length
+                : def.Order.Mode == "swap" ? def.Order.IncludesSelf ? 1 : 2 : def.Order.SelectSelf || def.Order.IncludesSelf ? 0 : 1;
+            var shown = def.Order?.Mode == "summon" && CommandOrders.SummonCost(world, unit, def, content.Extensions.Bus) is { } price ? s with { Cost = price } : s;
+            return (object)new { skill = shown, available, remainingCooldown = Math.Max(0, ready - world.Round), targets, cells,
+                multiple = def.Maneuver != null || def.Order != null, maximumTargets = def.Maneuver?.MaximumOthers ?? (pendingOrder ? 1 : def.Order?.Recipients.Count ?? 1),
+                includesSelf = def.Maneuver != null || def.Order?.IncludesSelf == true || def.Order?.SelectSelf == true,
+                minimumTargets = minimum, enemyTargets = enemies, requiresEnemy = !pendingOrder && def.Order?.Enemy != null,
+                enemyOptional = def.Order?.EnemyOptional ?? false, secondaryEnemies,secondaryByEnemy,
+                secondaryOwn=def.Order?.SecondaryEnemy?.Own==true,siteTarget=def.Order?.Plan=="op_recruit", pendingOrder, legalSelections };
         }).ToArray();
     }
     private ClientSkillView[] ManeuverViews(WorldState world, UnitState unit) => unit.Maneuvers

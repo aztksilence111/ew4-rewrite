@@ -68,8 +68,17 @@ public static class WorldBattle
 {
     public static WorldChange Attack(WorldState state, long expectedRevision, string attackerId, string defenderId, WorldBattleRules rules)
     {
+        if (state.PendingOrderAction != null) throw new RuleViolation("orders.reaction", "Resolve the pending reaction first");
+        if (!state.OrderProbe && state.OrderChoices.Count == 0 && rules.Combat.Extensions is { } bus && CommandOrders.NeedsReactionProbe(bus, state))
+        {
+            var probe = Attack(state with { OrderProbe = true }, expectedRevision, attackerId, defenderId, rules).State;
+            var queued = CommandOrders.QueueProbedAction(state, probe, new("attack", attackerId, defenderId));
+            if (queued.PendingOrderAction != null) return new(queued, new[] { new WorldNotice("orders.reaction", attackerId) });
+        }
         var preview = Preview(state, expectedRevision, attackerId, defenderId, rules);
-        return CommitResolved(state, new(attackerId, defenderId, preview.Main.AttackerDamage, preview.Main.DefenderDamage,
+        return CommitResolved(state, new(attackerId, defenderId,
+            preview.Main.RawAttackerDamage < 0 ? preview.Main.AttackerDamage : preview.Main.RawAttackerDamage,
+            preview.Main.RawDefenderDamage < 0 ? preview.Main.DefenderDamage : preview.Main.RawDefenderDamage,
             preview.Main.Counterattack, preview.Main.RandomState, preview.SplashTarget, preview.SplashDamage), rules);
     }
 
@@ -87,9 +96,16 @@ public static class WorldBattle
             throw new RuleViolation("attack.target", "Attacker or hostile target is unavailable");
         var map = new HexMap(state.Width, state.Height);
         int distance = map.Distance(attacker.Cell, defender.Cell);
+        if(rules.Combat.Extensions?.OrdersEnabled==true && CommandOrders.AttackLocked(state,attacker))
+            throw new RuleViolation("attack.unavailable","Main attack is locked for this owner turn");
         if (AttackLegality.Check(true, true, attacker.Combatant.ConstructionTurns, attacker.Acted, attacker.Morale.Effective,
             distance, attacker.Combatant.Profile.MinimumRange, attacker.Combatant.MaximumRange) != AttackBlock.None)
             throw new RuleViolation("attack.unavailable", "Attacker cannot attack this target");
+        if (rules.Combat.Extensions is { OrdersEnabled: true } orders)
+        {
+            state = CommandOrders.BeforeBattle(state, attackerId, defenderId, orders);
+            attacker = state.Units.Single(u => u.Id == attackerId); defender = state.Units.Single(u => u.Id == defenderId);
+        }
         var a = CombatContext.Resolve(state, attacker, defender.Combatant.Profile.Category, rules.Context);
         var bus = rules.Combat.Extensions;
         if (bus?.TacticalEnabled == true) a = a with { Tactical = TacticalSkills.Resolve(state, attacker, bus), GroundMobile = TacticalSkills.Mobile(state, attacker) };
@@ -97,12 +113,18 @@ public static class WorldBattle
             a = a with { Profile = a.Profile with { Traits = a.Profile.Traits.Append("no_retaliation").Distinct().ToArray() } };
         var d = CombatContext.Resolve(state, defender, attacker.Combatant.Profile.Category, rules.Context);
         if (bus?.TacticalEnabled == true) d = d with { Tactical = TacticalSkills.Resolve(state, defender, bus), GroundMobile = TacticalSkills.Mobile(state, defender) };
+        if (bus != null && bus.Skills.Values.Any(s => s.Order != null))
+        {
+            a = a with { OrderCombat = CommandOrders.Resolve(state, attacker, defender, true, bus) };
+            d = d with { OrderCombat = CommandOrders.Resolve(state, defender, attacker, false, bus) };
+        }
         var splash = SplashCombat.Target(state, attacker, defender, rules.Splash);
         CombatExchange? secondary = splash == null ? null : new(
             CombatContext.Resolve(state, attacker, splash.Combatant.Profile.Category, rules.Context),
             CombatContext.Resolve(state, splash, attacker.Combatant.Profile.Category, rules.Context), map.Distance(attacker.Cell, splash.Cell));
         var damage = SplashCombat.Calculate(new(a, d, distance), secondary, new Ew4Random(state.RandomState), rules.Combat, rules.Splash);
-        return new(state.Revision, attackerId, defenderId, damage.Main, splash?.Id, damage.SplashDamage);
+        int splashDamage = splash != null && bus?.OrdersEnabled == true ? CommandOrders.SplashDamage(state, splash, damage.SplashDamage, bus) : damage.SplashDamage;
+        return new(state.Revision, attackerId, defenderId, damage.Main, splash?.Id, splashDamage);
     }
 
     internal static WorldChange CommitResolved(WorldState state, ResolvedBattle battle, WorldBattleRules rules)
@@ -141,6 +163,12 @@ public static class WorldBattle
         {
             var unit = Unit(id);
             if (unit == null) return;
+            if (rules.Combat.Extensions is { OrdersEnabled: true } orders)
+            {
+                state = CommandOrders.BattleMorale(state, id, value, additive, orders);
+                notices.Add(new(additive ? "battle.morale_added" : "battle.morale_set", id, value));
+                return;
+            }
             bool leader = unit.Combatant.Has(Ew4Combat.Skill(3));
             var morale = additive ? unit.Morale.Add(value, leader) : MoraleState.Set(value, leader);
             SetUnit(unit with { Morale = morale, Combatant = unit.Combatant with { Morale = morale.Effective } });
@@ -150,6 +178,8 @@ public static class WorldBattle
         internal WorldChange Resolve(ResolvedBattle battle)
         {
             state = state with { RandomState = battle.RandomState };
+            if (rules.Combat.Extensions is { OrdersEnabled: true } orders)
+                state = CommandOrders.BeforeBattle(state, battle.Attacker, battle.Defender, orders);
             if (rules.Combat.Extensions?.TacticalEnabled == true)
                 state = TacticalSkills.ConsumeAttack(state, battle.Attacker, rules.Combat.Extensions);
             var initiator = Unit(battle.Attacker)!;
@@ -165,6 +195,11 @@ public static class WorldBattle
                     state = WorldDiplomacy.Attacked(state, attacker.Owner, splash.Owner, rules.NeutralCamps);
             }
             if (battle.Counterattack) Ignite(attacker, defender.Combatant.Profile);
+            if (rules.Combat.Extensions is { OrdersEnabled: true } counterOrders && battle.Taken > 0)
+            {
+                var adjusted = CommandOrders.Incoming(state, attacker.Id, defender.Id, battle.Taken, counterOrders, mainAttack: false);
+                state = adjusted.State; battle = battle with { Taken = adjusted.Damage };
+            }
             bool attackerDead = Damage(attacker.Id, battle.Taken, defender);
             if (!attackerDead)
             {
@@ -173,6 +208,11 @@ public static class WorldBattle
             }
             else RecordKill(defender, attacker);
             Ignite(defender, attacker.Combatant.Profile);
+            if (rules.Combat.Extensions is { OrdersEnabled: true } incoming)
+            {
+                var adjusted = CommandOrders.Incoming(state, defender.Id, attacker.Id, battle.Dealt, incoming);
+                state = adjusted.State; battle = battle with { Dealt = adjusted.Damage };
+            }
             bool defenderDead = Damage(defender.Id, battle.Dealt, attacker);
             if (defenderDead) RecordKill(attacker, defender);
             else AwardUnit(defender.Id, battle.Taken);
@@ -196,6 +236,8 @@ public static class WorldBattle
             ConsumeWeapon(attacker.Id);
             if (battle.Counterattack) ConsumeWeapon(defender.Id);
             RefreshLocalMorale();
+            if (rules.Combat.Extensions is { } orderBus && orderBus.Skills.Values.Any(s => s.Order != null))
+                state = CommandOrders.AfterBattle(before, state, attacker.Id, defender.Id, orderBus, battle.Counterattack);
             var provocation = WorldProvocations.Attacked(state, attacker.Owner, defender.Owner, rules.NeutralCamps);
             state = provocation.State; notices.AddRange(provocation.Notices);
             if (splash != null && battle.SplashDamage > 0 && splash.Owner != defender.Owner

@@ -73,7 +73,9 @@
 
 每项`id`须唯一，由英数字、点、下划线或短横线组成，1～128字符；`text`非空且最多256字符，`detail`最多2048字符，两者可用字符串表键。最多64项。`visibleWhen`省略即显示，`completeWhen`省略即不判断完成；完成为绿点，未完成为空心点。需要完成后隐藏，可把相同状态的`eq:0`条件放在`visibleWhen`。
 
-两个谓词复用事件条件的字段，但只允许无副作用的`always`、`all`、`any`、`not`、`state`、`round`、`player_faction`和`faction_exists`。`state.key`须为`scenario/`命名空间，数字比较支持`eq/ne/gt/ge/lt/le`；最大深度16，每项最多256条件。国家可用实际初始／声明新建ID或`@player/@active`。Lua、资源效果、单位或地格查询不在此显示接口执行；复杂实际战果由事件层判断并写状态，避免暂停界面消耗随机数或再次触发事件。未知配置／非法谓词校验拒绝。
+两个谓词复用事件条件的字段，但只允许无副作用的`always`、`all`、`any`、`not`、`state`、`round`、`player_faction`、`faction_exists`和`cells_owned`。`state.key`须为`scenario/`命名空间，数字比较支持`eq/ne/gt/ge/lt/le`；最大深度16，每项最多256条件。国家可用实际初始／声明新建ID或`@player/@active`。`cells_owned`须指定`faction`及1～256个不重复的合法地图格索引，用于显示当前控制情况，失地后完成状态随之撤销；只有该谓词接受`cells`。Lua、资源效果及单位查询不在此显示接口执行；复杂实际战果由事件层判断并写状态，避免暂停界面消耗随机数或再次触发事件。未知配置／非法谓词校验拒绝。
+
+2026-11-16源码增补：需要区分政治转交与军事夺取时，结合[可选战果记录](SCENARIO_BATTLE_FACTS.md)的`capture/<cell>/from`、`to`状态与`cells_owned`，不能单凭当前归属声称打赢了仗。旧发行DLL需要更新后才支持此只读谓词。
 
 快照新增`model.stages`，行ID为`stages.<id>`，状态及说明参与原版本缓存。旧包省略字段行为不变；这是API2/3宿主的后续源码增补，旧发行DLL不识别这些字段，须升级宿主再使用。
 

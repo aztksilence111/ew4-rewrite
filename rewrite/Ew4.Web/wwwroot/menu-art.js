@@ -63,7 +63,8 @@
       const width=image.naturalWidth/ratio*textureScale*scale,height=(texture.height||image.naturalHeight/ratio)*textureScale*scale;
       // Native 8e4c0: reserve the 130px sidebar, center on the full-height map, clamp its edges.
       const clamp=(offset,total,viewport)=>total<=viewport?(total-viewport)/2:Math.max(0,Math.min(total-viewport,offset));
-      return {x:cx*scale-clamp(cx*scale-viewportWidth/2,width,viewportWidth),y:cy*scale-clamp(cy*scale-viewportHeight/2,height,viewportHeight)};
+      const x=definition.alignX==='sidebar'?cx*scale+Math.max(0,viewportWidth+Number(definition.sidebarOverlap||0)-width):cx*scale-clamp(cx*scale-viewportWidth/2,width,viewportWidth);
+      return {x,y:cy*scale-clamp(cy*scale-viewportHeight/2,height,viewportHeight)};
     }
   }
   function cityName(name,language,names){

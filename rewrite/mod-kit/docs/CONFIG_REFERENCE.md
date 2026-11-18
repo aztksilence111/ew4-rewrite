@@ -1,5 +1,7 @@
 # 配置索引：从目标定位到文件
 
+自定义战役大章侧栏：`client/manifest.json` 的 `campaignSelection.chapters[]` 可配置 `sidebarImage`（`client/` 下相对PNG路径）、`sidebarWidth`／`sidebarHeight`（显示点数，默认164／45）。沿用对应章的 `key`／`catalogId` 关联；不配置时保留原版底图。图片应按显示点数的两倍导出，选中状态只改变横向位置，不应改宽高或拉伸纹理。项目实例见[章节侧栏样式](../../../颓垣饿鸠/source/campaigns/selection/SIDEBAR_STYLE.md)。
+
 剧本部队协防：API3 `aiOrders`按部队ID配置目标格及半径，适用于初始部队和事件增援；见[协防区域](porting/AI_DEFEND_ORDERS.md)。
 
 将领能力栏：API3 `commanderAbilities`，支持新增能力、原/新增栏位混排、名称/图标覆盖、将领初值、兵种星级绑定及教学；见[自定义将领能力](porting/COMMANDER_ABILITIES.md)。
@@ -83,5 +85,7 @@ API 3 的 `geography` 引用 `rewrite/geography.json`，配置禁行山地/海�
 当前基础攻击正常区间有min钳位，但分布偏向下限；反向端点未完整拒绝。最终伤害还受攻击次数/修正/倍率影响。字段minatk/maxatk不能当最终伤害硬上下限使用。
 
 ## 清单是自动产物
+
+成就／任务定义支持可选 `faction`，与 `scenario` 一起限定实际操控势力ID，适用于改国号仍有效、转线无效的奖励。`internal: true` 只记录资格、不显示在任务成就列表，也不可单独领取，奖励必须为空。`metagame.commanderRewardUnlocks` 将原生奖励槽（例如 `princess.4`）映射到资格ID；null表示暂未开放，省略该键沿用原版开放行为。服务端同样校验，领取记录在将领离开名册后仍有效。Mod示例配置见 `颓垣饿鸠/source/staff-rewards/rewards.json`。
 
 `files`把覆盖相对路径映射为SHA256；`scenarios`是可加载剧本ID全集，`baseRevision`绑定当前基础资源，`logicRevision`由实际原定义/规则内容计算。仅修改version不替代资源校验；改内容后重新pack。手改哈希不会把无效XML或缺失动作变有效。

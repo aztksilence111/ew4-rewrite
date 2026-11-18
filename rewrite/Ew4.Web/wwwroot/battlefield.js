@@ -954,8 +954,7 @@
           if(!unit.commanderImage)continue;
           this.draw.save();this.draw.translate(p.x,p.y);this.draw.scale(this.markerScale,this.markerScale);
           if(unit.commanderImage){
-            this.api.sprite('commandermark','board_smallgenerals.png',0,-14);
-            this.commanderPortrait(unit.commanderImage+'.png',0,-38);
+            this.commanderMarker(unit.commanderImage+'.png',0,-13);
           }
           this.draw.restore();
         }
@@ -979,29 +978,54 @@
       }
       for(const {unit,p} of this.visibleUnitMarkers||[]){
         if(unit.commanderImage){
-          // Portrait and pointer use different atlas anchors; the portrait sits inside
-          // the white board, with the pointer tip on the unit (native board refy=74).
-          this.api.sprite('commandermark','board_smallgenerals.png',p.x,p.y-8);
-          this.commanderPortrait(unit.commanderImage+'.png',p.x,p.y-32);
+          this.commanderMarker(unit.commanderImage+'.png',p.x,p.y-13);
         }
       }
     }
-    commanderPortrait(name,x,y){
+    commanderMarker(name,x,y){
+      const atlas=this.api.manifest.atlases.commandermark_hd?.['board_smallgenerals.png']?'commandermark_hd':'commandermark';
+      const rect=this.api.manifest.atlases[atlas]?.['board_smallgenerals.png'];if(!rect)return;
+      const ratio=spritePixelRatio(rect,atlas.endsWith('_hd')?2:1),board=this.api.image('images/'+atlas+'.png');
+      if(!board?.complete||!board.naturalWidth)return;
+      this.prepareCommanderPortraits();
+      if(!this.commanderMarkers.has(name)){
+        const canvas=document.createElement('canvas'),density=6,width=rect.w/ratio,height=rect.h/ratio;
+        canvas.width=Math.ceil(width*density);canvas.height=Math.ceil(height*density);
+        const draw=canvas.getContext('2d');draw.scale(density,density);
+        draw.drawImage(board,rect.x,rect.y,rect.w,rect.h,0,0,width,height);
+        // The original white disk is centred at (14.5,13.25), not at the
+        // pointer's reference point. HD's refx differs by half a logical pixel.
+        // Compose the pointer first and the full 22px portrait over it once.
+        this.commanderPortrait(name,width/2,13.25,draw);
+        this.commanderMarkers.set(name,canvas);
+      }
+      const canvas=this.commanderMarkers.get(name);
+      this.draw.drawImage(canvas,0,0,canvas.width,canvas.height,x-rect.refx/ratio,y-rect.refy/ratio,rect.w/ratio,rect.h/ratio);
+    }
+    prepareCommanderPortraits(){
       const revision=this.api.imageRevision||0;
       if(this.portraitRevision!==revision||this.portraitManifest!==this.api.manifest){
         for(const canvas of this.portraits?.values()||[])this.draw.release?.(canvas);
+        for(const canvas of this.commanderMarkers?.values()||[])this.draw.release?.(canvas);
+        this.commanderMarkers=new Map();
         this.portraits=new Map();this.portraitRevision=revision;this.portraitManifest=this.api.manifest;
       }
-      const rect=this.api.manifest.atlases.commanders2_hd?.[name],texture=rect?this.api.image('images/commanders2_hd.png'):null;
+    }
+    commanderPortrait(name,x,y,target=this.draw){
+      this.prepareCommanderPortraits();
+      // Native 641bc draws the dedicated commandermark sprite, not the
+      // square dialogue/academy bust from commanders2_hd. Keep its head crop.
+      const atlas=this.api.manifest.atlases.commandermark_hd?.[name]?'commandermark_hd':'commandermark';
+      const rect=this.api.manifest.atlases[atlas]?.[name],texture=rect?this.api.image('images/'+atlas+'.png'):null;
       const sharp=texture?.complete&&texture.naturalWidth,key=name+(sharp?'@hd':'@small');
       if(!this.portraits.has(key)){
-        const canvas=document.createElement('canvas');canvas.width=144;canvas.height=144;
-        const draw=canvas.getContext('2d');draw.scale(6,6);draw.beginPath();draw.arc(12,12,11,0,Math.PI*2);draw.clip();
-        if(sharp)draw.drawImage(texture,rect.x,rect.y,rect.w,rect.h,1,1,22,22);
-        else this.api.sprite('commandermark',name,12,12,1,draw);
+        const canvas=document.createElement('canvas');canvas.width=132;canvas.height=132;
+        const draw=canvas.getContext('2d');draw.scale(6,6);draw.beginPath();draw.arc(11,11,11,0,Math.PI*2);draw.clip();
+        if(sharp)draw.drawImage(texture,rect.x,rect.y,rect.w,rect.h,0,0,22,22);
+        else this.api.sprite('commandermark',name,11,11,1,draw);
         this.portraits.set(key,canvas);
       }
-      this.draw.drawImage(this.portraits.get(key),x-12,y-12,24,24);
+      target.drawImage(this.portraits.get(key),x-11,y-11,22,22);
     }
     unitAnimation(lib,item,tick){
       if(!item)return;

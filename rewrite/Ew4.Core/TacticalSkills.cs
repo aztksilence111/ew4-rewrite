@@ -75,7 +75,7 @@ public static class TacticalSkills
         && u.Combatant.Profile.Movement > 0;
     private static bool Fresh(UnitState u) => !u.Acted && !u.MovedThisTurn && !u.AttackedThisTurn;
     public static string CooldownKey(UnitState u, ExtensionSkill skill, string instance) =>
-        (skill.Maneuver != null && u.CommanderId != null ? "commander." + u.CommanderId : u.Id) + "/" + instance + "/ready";
+        ((skill.Maneuver != null || skill.Order != null) && u.CommanderId != null ? "commander." + u.CommanderId : u.Id) + "/" + instance + "/ready";
     public static bool CanActivate(WorldState w, UnitState source) => Mobile(w, source) && Fresh(source)
         && source.Morale.Effective != -3 && source.Combatant.ConstructionTurns == 0;
     public static bool Eligible(WorldState w, UnitState source, UnitState target, ExtensionSkill skill) =>

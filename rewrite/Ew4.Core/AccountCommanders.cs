@@ -45,10 +45,10 @@ public static class AccountCommanders
         if (!rules.Definitions.TryGetValue(source.DefinitionId, out var definition)
             || source.Items.Any(id => !rules.Items.ContainsKey(id)) || source.Items.Count > rules.EquipmentCapacity
             || !source.Learning.Abilities.TryGetValue("movement", out int movement)
-            || definition.Stars.Keys.Any(id => !source.Learning.Abilities.ContainsKey(id)))
+            || definition.Stars.Keys.Any(id => !id.Contains('.') && !source.Learning.Abilities.ContainsKey(id)))
             throw new RuleViolation("account.definition", "Roster commander does not match its definition or equipment policy");
         var resolved = definition with { Id = source.Id, Movement = movement, Skills = definition.Skills.ToArray(),
-            Stars = definition.Stars.Keys.ToDictionary(id => id, id => source.Learning.Abilities[id], StringComparer.Ordinal), Items = Array.Empty<Equipment>() };
+            Stars = definition.Stars.Keys.ToDictionary(id => id, id => source.Learning.Abilities.GetValueOrDefault(id,definition.Stars[id]), StringComparer.Ordinal), Items = Array.Empty<Equipment>() };
         foreach (string item in source.Items) resolved = Ew4Commander.Equip(resolved, rules.Items[item], rules.EquipmentCapacity);
         return resolved;
     }

@@ -220,7 +220,11 @@ public sealed partial class ExtensionLoader
                     || skill.Icon != null && (!PathValid(skill.Icon) || !skill.Icon.EndsWith(".png", StringComparison.Ordinal)))
                     throw new RuleViolation("extension.skill", "Invalid/duplicate skill: " + skill?.Id);
                 skill.Cost.Validate();
+                if (skill.NativeSkills == null || skill.NativeSkills.Any(id => !id.StartsWith("ew4.skill.", StringComparison.Ordinal)
+                    || !int.TryParse(id[10..], out int native) || native is < 0 or > 39) || skill.NativeSkills.Distinct().Count() != skill.NativeSkills.Length)
+                    throw new RuleViolation("extension.native_skills", skill.Id);
                 TacticalSkills.Validate(skill, m.ApiVersion);
+                CommandOrders.Validate(skill, m.ApiVersion);
                 if (skill.Cost.Money < 0 || skill.Cost.Industry < 0 || skill.Cost.Food < 0) throw new RuleViolation("extension.cost", skill.Id);
                 foreach (var e in skill.Effects)
                 {
@@ -479,7 +483,9 @@ public sealed partial class ExtensionLoader
                     ?? (unit ? [] : entry["skills"]!.AsArray().Select((s, i) => new SkillSlot((string)s!, "legacy." + i)).ToArray());
                 var slots = Merge(oldSlots, binding.Skills ?? [], s => s.InstanceId, binding.Mode);
                 entry["skill_slots"] = JsonSerializer.SerializeToNode(slots, Json);
-                if (!unit) entry["skills"] = JsonSerializer.SerializeToNode(slots.Select(s => s.Id).ToArray());
+                if (!unit) entry["skills"] = JsonSerializer.SerializeToNode(slots.Select(s => s.Id).Concat(slots
+                    .Where(s => Bus.Skills.ContainsKey(s.Id)).SelectMany(s => Bus.Skills[s.Id].NativeSkills)
+                    .Distinct().Except(slots.Select(s => s.Id))).ToArray());
                 if (unit && binding.Traits != null) entry["traits"] = JsonSerializer.SerializeToNode(Merge(
                     entry["traits"]!.AsArray().Select(s => (string)s!).ToArray(), binding.Traits, s => s, binding.Mode));
             }

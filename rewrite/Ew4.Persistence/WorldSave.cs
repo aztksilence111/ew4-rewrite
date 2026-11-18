@@ -68,13 +68,18 @@ public static class WorldSave
                     info.Properties.Single(p => p.Name == "recruitment").ShouldSerialize = (_, value) => value != null;
                 if (info.Type == typeof(Combatant)) {
                     info.Properties.Single(p => p.Name == "attributeModifiers").ShouldSerialize = (_, value) => value != null;
-                    foreach (string name in new[] { "maximumHealth", "maximumRange", "foodExempt", "ignoreTerrain", "ruleLocation", "tactical", "groundMobile" })
+                    foreach (string name in new[] { "maximumHealth", "maximumRange", "foodExempt", "ignoreTerrain", "ruleLocation", "tactical", "groundMobile", "orderCombat", "terrainEvasion", "buildingEvasion" })
                         info.Properties.Remove(info.Properties.Single(p => p.Name == name));
                 }
+                if (info.Type == typeof(WorldState))
+                    info.Properties.Single(p => p.Name == "pendingOrderAction").ShouldSerialize = (_, value) => value != null;
                 if (info.Type == typeof(UnitState)) {
+                    info.Properties.Single(p => p.Name == "orderOrigin").ShouldSerialize = (_, value) => value != null;
                     info.Properties.Single(p => p.Name == "movedThisTurn").ShouldSerialize = (_, value) => (bool)value!;
                     info.Properties.Single(p => p.Name == "attackedThisTurn").ShouldSerialize = (_, value) => (bool)value!;
                     info.Properties.Single(p => p.Name == "maneuvers").ShouldSerialize = (_, value) => ((IReadOnlyList<ManeuverGrant>)value!).Count > 0;
+                    info.Properties.Single(p => p.Name == "orders").ShouldSerialize = (_, value) => ((IReadOnlyList<OrderGrant>)value!).Count > 0;
+                    info.Properties.Single(p => p.Name == "orderMorale").ShouldSerialize = (_, value) => ((IReadOnlyList<OrderMoraleContribution>)value!).Count > 0;
                 }
                 if (info.Type == typeof(UnitProfile))
                     info.Properties.Single(p => p.Name == "commanderAbility").ShouldSerialize = (_, value) => value != null;

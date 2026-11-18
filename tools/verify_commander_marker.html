@@ -1,0 +1,49 @@
+<!doctype html><meta charset="utf-8"><title>将领圆框渲染核对</title>
+<style>body{background:#56695e;color:white;font:18px sans-serif}main{display:flex;flex-wrap:wrap;gap:12px}section{background:#43564d;padding:8px}canvas{display:block}pre{white-space:pre-wrap}</style>
+<h1>将领头像、白框及指针</h1><pre id="result">正在检查</pre><main></main>
+<script src="/vendor/pixi-7.4.3.min.js"></script><script src="/vendor/pixi-csp-7.4.3.min.js"></script>
+<script src="/pixi-battle.js"></script><script src="/map-surface.js"></script><script src="/battlefield.js?v=20261116.commander-head"></script>
+<script>
+(async()=>{
+ const manifest=await(await fetch('/content/manifest.json')).json(),images=new Map();
+ for(const name of ['commandermark','commandermark_hd']){
+  const img=new Image();img.src='/content/images/'+name+'.png';await img.decode();images.set('images/'+name+'.png',img);
+ }
+ let checks=0;const assert=(ok,label)=>{if(!ok)throw Error(label);checks++;};
+ const portrait=document.createElement('canvas');portrait.width=portrait.height=156;
+ portrait.getContext('2d').fillStyle='#ed1537';portrait.getContext('2d').fillRect(0,0,156,156);
+ for(const hd of [false,true]){
+  const m=structuredClone(manifest);if(!hd)delete m.atlases.commandermark_hd;
+  const api={manifest:m,imageRevision:1,image:name=>images.get(name),sprite(){throw Error('HD portrait unexpectedly unavailable');}};
+  const r=new Ew4Battlefield.Renderer(api),target=document.createElement('canvas');target.width=200;target.height=200;r.draw=target.getContext('2d');
+  const atlas=hd?'commandermark_hd':'commandermark',source=images.get('images/'+atlas+'.png'),rect=m.atlases[atlas]['MG1037.png'];
+  const fake=document.createElement('canvas');fake.width=source.naturalWidth;fake.height=source.naturalHeight;
+  fake.getContext('2d').drawImage(portrait,rect.x,rect.y,rect.w,rect.h);
+  images.set('images/'+atlas+'.png',fake);fake.complete=true;fake.naturalWidth=fake.width;
+  r.commanderMarker('MG1037.png',100,100);
+  const marker=r.commanderMarkers.get('MG1037.png'),pixels=marker.getContext('2d').getImageData(0,0,marker.width,marker.height).data;
+  const cx=marker.width/2,cy=13.25*6,red=(x,y)=>{const i=(Math.floor(y)*marker.width+Math.floor(x))*4;return pixels[i]>200&&pixels[i+1]<50&&pixels[i+2]<80;};
+  // Test opaque portrait coverage where the pointer joins the disk, and all quadrants.
+  for(let y=-60;y<=60;y+=6)for(let x=-60;x<=60;x+=6)if(x*x+y*y<60*60)assert(red(cx+x,cy+y),'Pointer/background leaked into portrait');
+  let left=marker.width,right=0,top=marker.height,bottom=0;
+  for(let y=0;y<marker.height;y++)for(let x=0;x<marker.width;x++)if(red(x,y)){left=Math.min(left,x);right=Math.max(right,x);top=Math.min(top,y);bottom=Math.max(bottom,y);}
+  assert(Math.abs((left+right+1)/2-cx)<.2,'Horizontal portrait centre');
+  assert(Math.abs((top+bottom+1)/2-cy)<=.5,'Vertical portrait centre');
+  assert(Math.abs(right-left+1-132)<=1,'Full 22px portrait diameter');
+  images.set('images/'+atlas+'.png',source);
+  for(const gpu of [false,true])for(const far of [false,true]){
+   const section=document.createElement('section');section.textContent=`${hd?'高清':'普通'}白框 · ${gpu?'WebGL':'Canvas'} · ${far?'缩远标记':'正常兵模'}`;
+   const canvas=document.createElement('canvas');canvas.width=240;canvas.height=275;section.append(canvas);document.querySelector('main').append(section);
+   const draw=gpu?new Ew4Pixi.Context(canvas):Ew4Pixi.createContext(canvas);
+   // Force the requested Canvas path independently of the browser renderer preference.
+   if(!gpu&&draw.gpu){draw.renderer.destroy();canvas.remove();const c=document.createElement('canvas');section.append(c);c.width=240;c.height=275;r.draw=c.getContext('2d');}
+   else r.draw=draw;
+   r.portraitRevision=-1;r.state={};r.factions=new Map();r.moraleTransitions=new Map();r.time=0;r.flag=()=>{};r.markerScale=1.4;r.badgeOnly=far;
+   r.visibleUnitMarkers=[{unit:{commanderImage:'MG1037',morale:0},p:{x:0,y:0}}];
+   const d=r.draw;if(d.begin)d.begin(240,275);d.save();d.translate(120,225);d.scale(3,3);r.unitMarkers();d.restore();if(d.end)d.end();
+   assert(r.commanderMarkers.size===1,'Normal/far paths share a composed marker');
+  }
+ }
+ document.getElementById('result').textContent=JSON.stringify({checks,errors:0,portraitDiameter:22,centre:[14.5,13.25],pointer:'behind portrait'},null,2);
+})().catch(e=>document.getElementById('result').textContent='ERROR: '+e.stack);
+</script>

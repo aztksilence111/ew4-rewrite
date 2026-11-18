@@ -18,12 +18,13 @@ public sealed record RecruitmentOffer
     public string TurnGroup { get; init; } = "recruitment";
     public int? PerTurnLimit { get; init; }
     public int ConstructionTurns { get; init; }
+    public IReadOnlyList<string> UnlockAny { get; init; } = Array.Empty<string>();
     public UnitSupport Support { get; init; } = new();
     public void Validate()
     {
         Cost.Validate();
         if (string.IsNullOrWhiteSpace(Id) || string.IsNullOrWhiteSpace(TurnGroup) || PerTurnLimit < 1
-            || MinimumBuildingLevel < 0 || ConstructionTurns < 0 || !Enum.IsDefined(typeof(BuildingRequirement), Building)
+            || MinimumBuildingLevel < 0 || ConstructionTurns < 0 || UnlockAny == null || UnlockAny.Any(string.IsNullOrWhiteSpace) || !Enum.IsDefined(typeof(BuildingRequirement), Building)
             || BuildingKinds.Any(string.IsNullOrWhiteSpace)
             || AllowedBuildingLevels != null && AllowedBuildingLevels.Any(p => string.IsNullOrWhiteSpace(p.Key)
                 || p.Value == null || p.Value.Count == 0 || p.Value.Any(l => l < 0)))
@@ -64,6 +65,7 @@ public static class WorldActions
         if (expectedRevision != state.Revision) throw new RuleViolation("action.stale", "Command was planned against another state revision");
         if (state.Phase != TurnPhase.Active) throw new RuleViolation("action.phase", "Faction turn is not active");
         if (state.PendingDialogue != null) throw new RuleViolation("action.dialogue_pending", "A dialogue is waiting");
+        if (state.PendingOrderAction != null) throw new RuleViolation("orders.reaction", "A skill reaction is waiting");
         var faction = state.Factions.Single(f => f.Id == state.ActiveFaction);
         if (faction.Defeated) throw new RuleViolation("action.defeated", "Active faction has been defeated");
         return faction;
@@ -76,12 +78,21 @@ public static class WorldActions
         return CanRecruitValidated(state, faction, cell, offer);
     }
 
+    public static Resources RecruitmentCost(WorldState state,int cell,RecruitmentOffer offer,RuleEventBus? extensions=null)
+    {
+        var builder=offer.Template?.Profile.Category=="fort" && !WorldUnitLayers.Air(state,offer.Template.Profile)
+            ? WorldConstruction.FortBuilder(state,cell,state.ActiveFaction):null;
+        var native=builder==null?offer.Cost:CommandOrders.Discount(state,builder,"fort",offer.Cost,offer.Cost,extensions);
+        return extensions?.OrdersEnabled==true?CommandOrders.RecruitmentPrice(state,cell,offer,native,extensions):native;
+    }
+
     internal static bool CanRecruitValidated(WorldState state, FactionState faction, int cell, RecruitmentOffer offer,
         int? occupants = null)
     {
-        if (cell < 0 || cell >= state.Cells.Count || state.PendingDialogue != null || state.Phase != TurnPhase.Active) return false;
+        if (cell < 0 || cell >= state.Cells.Count || state.PendingDialogue != null || state.Phase != TurnPhase.Active
+            || offer.UnlockAny.Count > 0 && !offer.UnlockAny.Any(state.TriggeredScenarioEvents.Contains)) return false;
         var site = state.Cells[cell];
-        if (site.BuildingConstructionTurns > 0) return false;
+        if (site.BuildingConstructionTurns > 0 || CommandOrders.RecruitmentBlocked(state,cell)) return false;
         if (state.Construction?.Enabled == true && site.BuildingKind != null
             && state.Construction.Buildings.TryGetValue(site.BuildingKind, out var production)
             && production.RecruitmentPerTurn > 0 && site.BuildingRecruitsThisTurn >= production.RecruitmentPerTurn) return false;
@@ -119,6 +130,7 @@ public static class WorldActions
         if (string.IsNullOrWhiteSpace(unitId) || state.Units.Any(u => u.Id == unitId))
             throw new RuleViolation("recruit.identity", "Recruitment requires a new unit ID");
         if (!CanRecruit(state, cell, offer)) throw new RuleViolation("recruit.site", "Recruitment is not permitted at this site");
+        offer=offer with { Cost=RecruitmentCost(state,cell,offer,extensions) };
         if (faction.Resources.Money < offer.Cost.Money || faction.Resources.Industry < offer.Cost.Industry || faction.Resources.Food < offer.Cost.Food)
             throw new RuleViolation("recruit.resources", "Insufficient recruitment resources");
         if (offer.Template == null) throw new RuleViolation("recruit.profile", "Recruitment unit definition is missing");
@@ -150,12 +162,25 @@ public static class WorldActions
                 ? c with { BuildingRecruitsThisTurn = checked(c.BuildingRecruitsThisTurn + 1) } : c).ToArray(),
             Units = state.Units.Select(u => u.Id == builderId ? u with { Acted = true, RemainingMovement = 0 } : u).Append(unit).ToArray(), Revision = checked(state.Revision + 1)
         }).Copy();
+        if(extensions?.OrdersEnabled==true)next=CommandOrders.AfterRecruitment(next,cell,offer);
         next.Validate();
         return new(next, new[] { new WorldNotice("unit.recruited", unitId) });
     }
 
     public static WorldChange Move(WorldState state, long expectedRevision, string unitId, int destination, WorldMoveRules? configuration = null)
         => MoveCore(state, expectedRevision, unitId, destination, configuration);
+
+    internal static WorldState OrderMove(WorldState state, UnitState unit, int destination,
+        IReadOnlyDictionary<int, ReachableCell> range, WorldMoveRules rules)
+    {
+        var prepared = state with { Units = state.Units.Select(u => u.Id != unit.Id ? u : u with {
+            RemainingMovement = Math.Max(1, unit.RemainingMovement), ExtensionMovementLimit = Math.Max(1, unit.ExtensionMovementLimit ?? unit.Combatant.Profile.Movement) }).ToArray() };
+        var result = MoveCore(prepared, state.Revision, unit.Id, destination, rules, range).State;
+        result=CommandOrders.RestoreOrdinaryMovement(state,result,unit);
+        return result with { Revision = state.Revision, Units = result.Units.Select(u => u.Id != unit.Id ? u : u with {
+            Acted = unit.Acted, RemainingMovement = unit.RemainingMovement, ExtensionMovementLimit = unit.ExtensionMovementLimit,
+            MovedThisTurn = unit.MovedThisTurn, AttackedThisTurn = unit.AttackedThisTurn }).ToArray() };
+    }
 
     internal static WorldChange ProjectMove(WorldState state, string unitId, int destination, WorldMoveRules rules,
         IReadOnlyDictionary<int, ReachableCell> range)
@@ -195,6 +220,9 @@ public static class WorldActions
         var next = projection ? PlanningScope.ProjectMovement(state, unit, destination, moved.RemainingMovement, claimed, ownership)
             : state with { Cells = claimed, Units = state.Units.Select(u => u.Id == unitId ? moved : u).ToArray(),
                 Revision = checked(state.Revision + 1) };
+        next = CommandOrders.SitesChanged(state, next);
+        if (rules.Extensions?.OrdersEnabled == true) next = CommandOrders.AfterMovement(state, next, unit, reachable.Path, rules.Extensions);
+        next = ScenarioBattleFacts.Captured(state, next, faction.Id, ownership.Changed);
         next = DemandDiplomacy.Captured(state, next, faction.Id, ownership.Changed);
         var treasury = CapitalTreasury.Captured(state, next, faction.Id, ownership.Changed);
         next = treasury.State; notices.AddRange(treasury.Notices);
@@ -276,7 +304,8 @@ public static class WorldActions
     {
         var context = MovementContext(state, unit, rules);
         var search = WorldUnitLayers.Air(state, unit) ? rules.Search with { AllowFirstStepOverdraw = false, AllowOverdrawnEntry = false } : rules.Search;
-        return Movement.Reachable(new(state.Width, state.Height), context.Cells, unit.Cell, context.Actor, search);
+        var range = Movement.Reachable(new(state.Width, state.Height), context.Cells, unit.Cell, context.Actor, search);
+        return rules.Extensions?.OrdersEnabled == true ? CommandOrders.FilterMovement(state, unit, range, rules.Extensions) : range;
     }
 
     public static IReadOnlyCollection<string> MovableUnits(WorldState state, string owner, WorldMoveRules configuration)
@@ -299,7 +328,7 @@ public static class WorldActions
             var actor = MovementActorFor(unit, context.Actor.Camp);
             if (configuration.Extensions != null)
             {
-                int budget = configuration.Extensions.MovementBudget(unit.Combatant);
+                int budget = Math.Max(configuration.Extensions.MovementBudget(unit.Combatant),unit.ExtensionMovementLimit??0);
                 actor = actor with { FullBudget = budget, Remaining = Math.Min(unit.RemainingMovement, budget) };
             }
             actor = Movement.AtOrigin(actor, context.Cells[unit.Cell]);
@@ -336,10 +365,10 @@ public static class WorldActions
             var mover = MovementActorFor(unit, prepared.Camp);
             if (rules?.Extensions != null)
             {
-                int budget = rules.Extensions.MovementBudget(unit.Combatant);
+                int budget = Math.Max(rules.Extensions.MovementBudget(unit.Combatant),unit.ExtensionMovementLimit??0);
                 mover = mover with { FullBudget = budget, Remaining = Math.Min(unit.RemainingMovement, budget) };
             }
-            return (prepared.Cells, mover);
+            return CommandOrders.MovementContext(state, unit, (prepared.Cells, mover), rules?.Extensions);
         }
         var campIndex = state.Factions.ToDictionary(f => f.Id, f => f.Camp, StringComparer.Ordinal);
         if (state.DiplomaticRelations.Count > 0)
@@ -355,11 +384,11 @@ public static class WorldActions
         if (air) actor = actor with { Category = "layer.air", Transport = false, Geography = false };
         if (rules?.Extensions != null)
         {
-            int budget = rules.Extensions.MovementBudget(unit.Combatant);
+            int budget = Math.Max(rules.Extensions.MovementBudget(unit.Combatant),unit.ExtensionMovementLimit??0);
             actor = actor with { FullBudget = budget, Remaining = Math.Min(unit.RemainingMovement, budget) };
         }
         // Reachable applies the sea-origin cap for this turn. Keep the land budget
         // here so strategic routes can still include inland steps after landing.
-        return (cells, actor);
+        return CommandOrders.MovementContext(state, unit, (cells, actor), rules?.Extensions);
     }
 }

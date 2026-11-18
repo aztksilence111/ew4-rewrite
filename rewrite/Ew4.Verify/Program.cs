@@ -1,5 +1,9 @@
 using System.Text.Json;
 using Ew4.Core;
+if (args.ElementAtOrDefault(1) == "--command-orders-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { commandOrders = CommandOrderChecks.Run(), errors = 0 })); return;
+}
 if (args.ElementAtOrDefault(1) == "--sea-installation-only")
 {
     string project = Path.GetFullPath(args[0]);

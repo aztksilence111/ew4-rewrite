@@ -140,6 +140,7 @@ public static class WorldEvents
             Factions = state.Factions.Select(f => f.Id == loser ? f with { Defeated = true } : f).ToArray(),
             Revision = checked(state.Revision + 1)
         };
+        next = CommandOrders.SitesChanged(state, next);
         next.Validate();
         return new WorldChange(next, removed.Select(u => new WorldNotice("unit.removed", u.Id))
             .Concat(new[] { new WorldNotice("faction.defeated", loser) }).ToArray());

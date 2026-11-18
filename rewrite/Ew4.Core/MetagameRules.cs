@@ -27,11 +27,16 @@ public sealed record MetagameRules
     public IReadOnlyList<MetagameObjective> Objectives { get; init; } = Array.Empty<MetagameObjective>();
     public IReadOnlyDictionary<string, int> CommanderSectionCapacities { get; init; } = new Dictionary<string, int>();
     public IReadOnlyDictionary<string, RefreshPolicy> Refresh { get; init; } = new Dictionary<string, RefreshPolicy>();
+    public IReadOnlyDictionary<string, string?> CommanderRewardUnlocks { get; init; } = new Dictionary<string, string?>();
+    public bool CommanderRewardUnlocked(string id, PlayerAccount account) => !CommanderRewardUnlocks.TryGetValue(id, out string? objective)
+        || objective != null && account.CompletedObjectives.Contains(objective);
     public int CommanderSectionCapacity(int section) => CommanderSectionCapacities.GetValueOrDefault(
         section.ToString(System.Globalization.CultureInfo.InvariantCulture), DefaultCommanderSectionCapacity);
     public void Validate()
     {
-        if (Schema != 1 || InitialMedals < 0 || InitialBadges < 0 || Refresh == null
+        if (Schema != 1 || InitialMedals < 0 || InitialBadges < 0 || Refresh == null || CommanderRewardUnlocks == null || Objectives == null
+            || CommanderRewardUnlocks.Any(p => string.IsNullOrWhiteSpace(p.Key)
+                || p.Value != null && !Objectives.Any(o => o.Id == p.Value))
             || CommanderSectionCapacities == null || CommanderSectionCapacities.Any(p => p.Key is not ("0" or "1" or "2") || p.Value < 0)
             || Refresh.Any(p => p.Key is not ("shop" or "academy.0" or "academy.1" or "academy.2") || p.Value == null)
             || ShopSlots != null && (ShopSlots.Any(s => s == null || s.Slot is < 0 or > 13

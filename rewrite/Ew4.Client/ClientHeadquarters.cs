@@ -95,7 +95,11 @@ public sealed partial class ClientGame
             items = ItemViews(account), equipmentCapacity = content.Catalogs.Accounts.Rules().EquipmentCapacity,
             princesses = content.PrincessDefinitions.Select(p => new { id = "princess." + (string)p.Attribute("id")!,
                 definitionId = "ew4.commander." + (string)p.Attribute("commanderid")!, image = (string)p.Attribute("name")! + ".png",
-                unlocked = true, claimed = account.Roster.Any(c => c.DefinitionId == "ew4.commander." + (string)p.Attribute("commanderid")!) }) };
+                unlocked = content.Extensions.Metagame.CommanderRewardUnlocked("princess." + (string)p.Attribute("id")!, account),
+                unlockDescription = content.Extensions.Metagame.CommanderRewardUnlocks.TryGetValue("princess." + (string)p.Attribute("id")!, out string? objective)
+                    ? objective == null ? "暂未开放" : content.Label(content.Extensions.Metagame.Objectives.Single(o => o.Id == objective).Description) : "",
+                claimed = account.ClaimedRewards.Contains("princess." + (string)p.Attribute("id")!)
+                    || account.Roster.Any(c => c.DefinitionId == "ew4.commander." + (string)p.Attribute("commanderid")!) }) };
     }
     // Original 60030/195150: three offer pools, distinct from individual ability stars.
     private static readonly int[] BadgePrices = [0, 0, 0, 3, 3, 4, 6, 8];
@@ -152,8 +156,10 @@ public sealed partial class ClientGame
         {
             var reward = content.PrincessDefinitions.SingleOrDefault(p => "princess." + (string)p.Attribute("id")! == command.Offer)
                 ?? throw new RuleViolation("account.reward", "Unknown princess reward");
+            if (!content.Extensions.Metagame.CommanderRewardUnlocked(command.Offer!, account))
+                throw new RuleViolation("account.reward_locked", "尚未满足该参谋的获取条件");
             int id = (int)reward.Attribute("commanderid")!;
-            if (account.Roster.Any(c => c.DefinitionId == "ew4.commander." + id))
+            if (account.ClaimedRewards.Contains(command.Offer!) || account.Roster.Any(c => c.DefinitionId == "ew4.commander." + id))
                 throw new RuleViolation("account.reward_claimed", "Princess already claimed");
             if (account.Roster.Count >= rules.MaximumRoster) throw new RuleViolation("account.capacity", "Roster is full");
             var owned = content.Catalogs.Accounts.FromDefinition(id, "local.commander." + id + "." + Guid.NewGuid().ToString("N"));

@@ -67,6 +67,7 @@ public sealed record MovementCell
     public bool Sea { get; init; }
     public int TerrainCost { get; init; } = 3;
     public int MinimumEntryCost { get; init; }
+    public int? LandCostCap { get; init; }
     public byte BlockedSeaEdges { get; init; }
     public byte RiverEdges { get; init; }
     public byte BridgeEdges { get; init; }
@@ -79,6 +80,7 @@ public sealed record MovementActor
     public string Camp { get; init; } = "";
     public bool Transport { get; init; }
     public bool Geography { get; init; }
+    public int FreeRiverCrossings { get; init; }
     public int FullBudget { get; init; }
     public int Remaining { get; init; }
 }
@@ -338,6 +340,7 @@ public static class Movement
         {
             if (actor.Category == "naval") return null;
             cost = actor.Category == "infantry" || actor.Geography ? rules.BaseLandCost : to.TerrainCost;
+            if(to.LandCostCap is {} cap)cost=Math.Min(cost,Math.Max(1,cap));
         }
         if ((actor.Transport && from.Sea != to.Sea)
             || ((to.RiverEdges & (1 << enteringEdge)) != 0 && (to.BridgeEdges & (1 << enteringEdge)) == 0))
@@ -354,6 +357,7 @@ public static class Movement
         var rules = configuration ?? new MovementRules();
         if (!cells[origin].CanTraverse()) return new Dictionary<int, ReachableCell>();
         actor = AtOrigin(actor, cells[origin]);
+        if (actor.FreeRiverCrossings > 0) return ReachableWithRiver(map, cells, origin, actor, rules);
         var remaining = new Dictionary<int, int> { [origin] = actor.Remaining };
         var parents = new Dictionary<int, int>();
         var queue = new SortedSet<(int NegativeRemaining, int Cell)> { (-actor.Remaining, origin) };
@@ -378,6 +382,42 @@ public static class Movement
         }
         // Store predecessor links during search. Materialize paths only on request.
         return new Reachability(remaining, parents, origin);
+    }
+
+    private static IReadOnlyDictionary<int, ReachableCell> ReachableWithRiver(HexMap map, IReadOnlyList<MovementCell> cells,
+        int origin, MovementActor actor, MovementRules rules)
+    {
+        // Keep separate labels before/after the one waived edge. A cheaper path
+        // to a cell must not erase a more expensive path that still has its waiver.
+        var start = (Cell: origin, Free: actor.FreeRiverCrossings);
+        var budgets = new Dictionary<(int Cell, int Free), int> { [start] = actor.Remaining };
+        var parents = new Dictionary<(int Cell, int Free), (int Cell, int Free)>();
+        var queue = new SortedSet<(int Negative, int Cell, int Free)> { (-actor.Remaining, origin, actor.FreeRiverCrossings) };
+        while (queue.Count > 0)
+        {
+            var item = queue.Min; queue.Remove(item); var key = (item.Cell, item.Free); int budget = -item.Negative;
+            if (budgets[key] != budget || budget <= 0) continue;
+            for (int d = 0; d < 6; d++)
+            {
+                int cell = map.Neighbor(item.Cell, d); if (cell < 0) continue;
+                var to = cells[cell]; int edge = (d + 3) % 6;
+                bool cross = item.Free > 0 && !cells[item.Cell].Sea && !to.Sea && (to.RiverEdges & (1 << edge)) != 0 && (to.BridgeEdges & (1 << edge)) == 0;
+                int? cost = EntryCost(cells[item.Cell], cross ? to with { RiverEdges = (byte)(to.RiverEdges & ~(1 << edge)) } : to, edge, actor, rules);
+                if (!CanEnter(cost, budget, key == start, rules)) continue;
+                var next = (cell, item.Free - (cross ? 1 : 0)); int rest = budget - cost!.Value;
+                if (budgets.TryGetValue(next, out int old) && old >= rest) continue;
+                budgets[next] = rest; parents[next] = key; queue.Add((-rest, next.cell, next.Item2));
+            }
+        }
+        var result = new Dictionary<int, ReachableCell>();
+        foreach (var row in budgets.GroupBy(p => p.Key.Cell))
+        {
+            var best = row.OrderByDescending(p => p.Value).ThenByDescending(p => p.Key.Free).First();
+            var key = best.Key; var path = new List<int> { key.Cell };
+            while (key != start) { key = parents[key]; path.Add(key.Cell); } path.Reverse();
+            result.Add(row.Key, new(row.Key, best.Value, path));
+        }
+        return result;
     }
 
     private sealed class Reachability : IReadOnlyDictionary<int, ReachableCell>

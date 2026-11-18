@@ -71,6 +71,8 @@ public static class CombatContext
             RuleLocation = new(unit.Cell, cell.DefenseTerrain, cell.BuildingKind, cell.BuildingLevel, cell.InstallationKind),
             AtSea = !air && cell.Terrain.Sea, BuildingKind = air ? null : cell.BuildingKind, Morale = unit.Morale.Effective,
             Evasion = Math.Min(1f, basis + bonus), EvasionIgnoringBuilding = Math.Min(1f, withoutBuilding + bonus),
+            TerrainEvasion = !air && cell.BuildingKind == null ? basis : 0,
+            BuildingEvasion = !air && cell.BuildingKind != null ? Math.Max(0, basis - withoutBuilding) : 0,
             Armor = rules.VeterancyArmor.TryGetValue(unit.Veterancy, out int armor) ? armor : unit.Combatant.Armor,
             AttackBonus = checked(unit.Combatant.AttackBonus + aura.Attack), DefenseBonus = checked(unit.Combatant.DefenseBonus + aura.Defense)
         };

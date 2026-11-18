@@ -9,7 +9,7 @@ public sealed record ClientCommand(string Op = "", long Revision = -1, string? S
     string? Unit = null, string? Target = null, int Cell = -1, string? Offer = null, string? Commander = null, string? Item = null, JsonElement? Tutorial = null, int Group = 0, int Slot = 0, int Mode = 0,
     IReadOnlyList<string>? LocalPlayers = null, string? Tag = null, IReadOnlyList<string>? TaggedCommanders = null, bool Delta = false,
     string? KnownVersion = null, string[]? Units = null, string? Policy = null, bool? AutoBattle = null, int[]? Goals = null,
-    int? TaskId = null, string? Kind = null, int? Radius = null, int[]? Line = null, bool? DeployFirst = null, bool Compact = false);
+    int? TaskId = null, string? Kind = null, int? Radius = null, int[]? Line = null, bool? DeployFirst = null, bool Compact = false, string? SecondaryTarget = null);
 public sealed record ClientSlot(string Scenario, string? Country, byte[] Session, MovementHistoryState? MovementHistory = null, JsonElement? Tutorial = null,
     int Round = 0, DateTimeOffset? SavedAt = null, IReadOnlyList<string>? LocalPlayers = null, string? DisplayCountry = null,
     IReadOnlyList<int>? TechnologySnapshot = null, string? ModName = null, string? SaveIdentity = null);
@@ -248,6 +248,12 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             Commit(advanced, autoSave: false); storyRestored = false; AutoSave(); return View();
         }
         if (StoryPlayback.Current(world) != null) throw new RuleViolation("story.pending", "请先完成当前剧情");
+        if (command.Op == "order_response")
+        {
+            Commit(CommandOrders.Respond(world, command.Revision, command.Mode == 1, content.Extensions.Bus, rules.Movement, rules.Battle));
+            AutoSave(); return View();
+        }
+        if (world.PendingOrderAction != null && command.Op != "select") throw new RuleViolation("orders.reaction", "请先决定是否发动被动技能");
         if (command.Op == "ai_batch") return AiBatch(command.Compact);
         var active = world.Factions.Single(f => f.Id == world.ActiveFaction);
         if (command.Op.StartsWith("player_ai_", StringComparison.Ordinal)) return PlayerAiAction(command);
@@ -327,7 +333,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         WorldChange action = command.Op switch
         {
             "skill" => WorldSkillActions.Execute(world, world.Revision, command.Unit!, command.Offer!, command.Target, content.Extensions.Bus, rules.Movement,
-                command.Cell < 0 ? null : command.Cell, command.Units),
+                command.Cell < 0 ? null : command.Cell, command.Units, command.SecondaryTarget,rules.Battle),
             "move" => WorldActions.Move(world, world.Revision, command.Unit!, command.Cell, rules.Movement),
             "disband" => WorldDisband.Execute(world, world.Revision, command.Unit!, DisbandConfiguration()),
             "attack" => WorldBattle.Attack(world, world.Revision, command.Unit!, command.Target!, rules.Battle),
@@ -336,7 +342,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             "upgrade" => WorldImprovements.UpgradeBuilding(world, world.Revision, command.Cell, rules.Upgrades),
             "transport" => WorldSupportActions.BuyTransport(world, world.Revision, command.Unit!, rules.Transport),
             "installation" => WorldSupportActions.BuildInstallation(world, world.Revision, command.Unit!, rules.Installations[command.Offer!]),
-            "building" => WorldConstruction.Build(world, world.Revision, command.Unit!, command.Offer!),
+            "building" => WorldConstruction.Build(world, world.Revision, command.Unit!, command.Offer!, content.Extensions.Bus),
             "recruit" => WorldActions.Recruit(world, world.Revision, command.Cell, "client.unit." + world.Revision, rules.Recruitment[active.Id][command.Offer!], content.Extensions.Bus),
             _ => throw new RuleViolation("client.command", "Unknown action")
         };
@@ -349,7 +355,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
         if (command.Op == "attack") movementHistory.Attack(command.Unit!);
         if (command.Op == "skill") movementHistory.Reset(action.State);
         if (command.Op == "disband") { movementHistory.Forget(command.Unit!); AutoSave(); }
-        return View(world, combat: preview == null ? null : new { attacker = preview.Attacker, defender = preview.Defender, counterattack = preview.Main.Counterattack,
+        return View(world, combat: preview == null || action.State.PendingOrderAction != null ? null : new { attacker = preview.Attacker, defender = preview.Defender, counterattack = preview.Main.Counterattack,
             attackLayer = WorldUnitLayers.AttackLayer(world, world.Units.Single(u => u.Id == preview.Attacker), world.Units.Single(u => u.Id == preview.Defender)),
             counterLayer = WorldUnitLayers.AttackLayer(world, world.Units.Single(u => u.Id == preview.Defender), world.Units.Single(u => u.Id == preview.Attacker), true),
             damage = preview.Main.DefenderDamage, counterDamage = preview.Main.AttackerDamage,
@@ -437,7 +443,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             ?? throw new RuleViolation("selection.unit", "Selected unit is not at this cell")
             : WorldUnitLayers.Enabled(world) ? occupants.OrderBy(u => WorldUnitLayers.Air(world, u)).FirstOrDefault() : occupants.FirstOrDefault();
         var offers = ready ? current.Rules.Recruitment[world.ActiveFaction].Values.Where(o => WorldActions.CanRecruit(world, cell, o))
-            .Select(o => new { o.Id, profile = o.Template?.Profile.Id, o.Cost }).ToArray() : [];
+            .Select(o => new { o.Id, profile = o.Template?.Profile.Id, Cost=WorldActions.RecruitmentCost(world,cell,o,content.Extensions.Bus) }).ToArray() : [];
         var occupied = world.Units.Select(u => u.Cell).ToHashSet();
         var range = ready && unit?.Owner == world.ActiveFaction
             ? WorldActions.Reachable(world, unit.Id, current.Rules.Movement).Keys.Where(c => c != unit.Cell && (WorldUnitLayers.Enabled(world)
@@ -460,9 +466,9 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
             .Where(p => WorldConstruction.CanBuild(world, unit.Id, p.Key, false, checkAction: false))
             .Select(p => new { id = p.Key, kind = p.Key, name = p.Value.Name, image = p.Value.Levels[0].Image,
                 constructionTurns = p.Value.Levels[0].ConstructionTurns,
-                available = WorldConstruction.CanBuild(world, unit.Id, p.Key, false),
+                available = WorldConstruction.CanBuild(world, unit.Id, p.Key, extensions: content.Extensions.Bus),
                 unavailableReason = unit.Acted ? "本回合已行动，下一所属方回合可施工。" : null,
-                quote = ActionQuote(() => p.Value.Cost) }).ToArray() : [];
+                quote = ActionQuote(() => WorldConstruction.Cost(world, unit, p.Key, content.Extensions.Bus)) }).ToArray() : [];
         string? disbandWarning = refund != null && unit!.Combatant.Profile.Category == "fort"
             && current.Rules.Recruitment[world.ActiveFaction].Values.Any(o => o.Template?.Profile.Category == "fort"
                 && o.PerTurnLimit.HasValue && world.Factions.Single(f => f.Id == world.ActiveFaction)
@@ -663,6 +669,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                 ? content.Label($"desc_{diplomatic.Kind} {diplomatic.Variant}")
                 : current.Rules.Dialogues.TryGetValue(world.PendingDialogue, out var dialogue) ? dialogue.Text : world.PendingDialogue,
             dialoguePresentation = DialoguePresentation(),
+            orderReaction = OrderReactionView(world),
             scenarioPopup = ScenarioPopupView(world),
             mapColors = MapColorsPresentation.Resolve(content.Extensions.MapColors, world.ScenarioId),
             playerAi = world.Factions.Single(f => f.Id == session.PlayerFaction).PlayerAi ?? new PlayerAiControl(),

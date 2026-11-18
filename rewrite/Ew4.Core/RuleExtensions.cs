@@ -47,6 +47,8 @@ public sealed record ExtensionSkill
     public ManeuverRule? Maneuver { get; init; }
     public TerritoryAuraRule? TerritoryAura { get; init; }
     public RecoveryNetworkRule? RecoveryNetwork { get; init; }
+    public CommandOrder? Order { get; init; }
+    public string[] NativeSkills { get; init; } = Array.Empty<string>();
     public IReadOnlyList<ExtensionEffect> Effects { get; init; } = Array.Empty<ExtensionEffect>();
 }
 public sealed record RuleUnitLocation(int Cell, string Terrain, string? Building, int BuildingLevel, string? Installation);
@@ -66,10 +68,12 @@ public sealed partial class RuleEventBus
     public IRuleScriptRuntime? Scripts { get; }
     public IReadOnlyDictionary<string, ExtensionStatus> Statuses { get; }
     public bool TacticalEnabled { get; }
+    public bool OrdersEnabled { get; }
     public RuleEventBus(IReadOnlyDictionary<string, ExtensionSkill> skills, IRuleScriptRuntime? scripts = null,
         IReadOnlyDictionary<string, ExtensionStatus>? statuses = null)
     { Skills = skills; Scripts = scripts; Statuses = statuses ?? new Dictionary<string, ExtensionStatus>();
-        TacticalEnabled = skills.Values.Any(s => s.Maneuver != null || s.TerritoryAura != null || s.RecoveryNetwork != null); }
+        TacticalEnabled = skills.Values.Any(s => s.Maneuver != null || s.TerritoryAura != null || s.RecoveryNetwork != null);
+        OrdersEnabled = skills.Values.Any(s => s.Order != null); }
 
     public static IReadOnlyList<SkillSlot> Slots(Combatant unit) => unit.Profile.SkillSlots.Concat(unit.SkillSlots.Count > 0
         ? unit.SkillSlots : unit.Skills.Select((id, i) => new SkillSlot(id, "legacy." + i))).ToArray();
@@ -179,43 +183,55 @@ public sealed partial class RuleEventBus
 public static class WorldSkillActions
 {
     public static WorldChange Execute(WorldState state, long revision, string unitId, string instanceId, string? targetId,
-        RuleEventBus bus, WorldMoveRules movement, int? targetCell = null, IReadOnlyList<string>? targets = null)
+        RuleEventBus bus, WorldMoveRules movement, int? targetCell = null, IReadOnlyList<string>? targets = null, string? secondaryTarget = null, WorldBattleRules? battle = null)
     {
         state.Validate();
         var unit = state.Units.SingleOrDefault(u => u.Id == unitId);
         if (state.Revision != revision || state.Phase != TurnPhase.Active || state.PendingDialogue != null
-            || unit == null || unit.Owner != state.ActiveFaction || unit.Acted || unit.Morale.Effective == -3)
+            || unit == null || unit.Owner != state.ActiveFaction || unit.Morale.Effective == -3)
             throw new RuleViolation("skill.unavailable", "Unit cannot use a skill now");
         var binding = bus.Bound(unit.Combatant).SingleOrDefault(p => p.Slot.InstanceId == instanceId);
         var skill = binding.Skill ?? throw new RuleViolation("skill.unknown", "Unknown skill instance");
-        if (skill.Maneuver == null && targets != null) throw new RuleViolation("skill.target", "This skill does not accept multiple targets");
-        var target = targetId == null ? unit : state.Units.SingleOrDefault(u => u.Id == targetId);
+        bool pendingOrder = skill.Order != null && CommandOrders.HasPending(state, unit, skill);
+        if (unit.Acted && skill.Order == null) throw new RuleViolation("skill.unavailable", "Unit has already acted");
+        if (skill.Maneuver == null && skill.Order == null && targets != null) throw new RuleViolation("skill.target", "This skill does not accept multiple targets");
+        var target = targetId == null || skill.Order!=null && targetId.StartsWith("cell.",StringComparison.Ordinal)
+            ? unit : state.Units.SingleOrDefault(u => u.Id == targetId);
         string key = TacticalSkills.CooldownKey(unit, skill, instanceId);
-        if (skill.Kind != "active" || target == null || state.ExtensionState.TryGetValue(key, out long ready) && ready > state.Round)
+        if (skill.Kind != "active" && !pendingOrder || target == null || !pendingOrder && state.ExtensionState.TryGetValue(key, out long ready) && ready > state.Round)
             throw new RuleViolation("skill.unavailable", "Skill unavailable or cooling down");
         if (skill.Target == "cell" && (targetId != null || targetCell == null || !bus.ValidCellTarget(state, unit, skill, targetCell.Value))
             || skill.Target != "cell" && targetCell != null)
             throw new RuleViolation("skill.target", "Invalid skill cell target");
         bool allied = WorldDiplomacy.Allied(state, unit.Owner, target.Owner);
         bool hostile = !allied;
-        if (skill.Target == "self" && target.Id != unit.Id || skill.Target == "ally" && !allied || skill.Target == "enemy" && !hostile
-            || new HexMap(state.Width, state.Height).Distance(unit.Cell, targetCell ?? target.Cell) > skill.Range)
+        if (skill.Order == null && (skill.Target == "self" && target.Id != unit.Id || skill.Target == "ally" && !allied || skill.Target == "enemy" && !hostile
+            || new HexMap(state.Width, state.Height).Distance(unit.Cell, targetCell ?? target.Cell) > skill.Range))
             throw new RuleViolation("skill.target", "Invalid skill target");
         var faction = state.Factions.Single(f => f.Id == unit.Owner);
         if (skill.Cost.Money > 0 && faction.Resources.Money < skill.Cost.Money || skill.Cost.Industry > 0 && faction.Resources.Industry < skill.Cost.Industry
             || skill.Cost.Food > 0 && faction.Resources.Food < skill.Cost.Food)
             throw new RuleViolation("skill.resources", "Insufficient resources");
+        if (state.PendingOrderAction != null) throw new RuleViolation("orders.reaction", "Resolve the pending reaction first");
+        if (!state.OrderProbe && state.OrderChoices.Count == 0 && CommandOrders.NeedsReactionProbe(bus, state))
+        {
+            var probe = Execute(state with { OrderProbe = true }, revision, unitId, instanceId, targetId, bus, movement, targetCell, targets, secondaryTarget,battle).State;
+            var queued = CommandOrders.QueueProbedAction(state, probe, new("skill", unitId, targetId, instanceId, targets?.ToArray(), secondaryTarget, TargetCell: targetCell));
+            if (queued.PendingOrderAction != null) return new(queued, new[] { new WorldNotice("orders.reaction", unitId) });
+        }
         var next = state.Copy() with { Factions = state.Factions.Select(f => f.Id != unit.Owner ? f : f with { Resources = new(
             checked(f.Resources.Money - skill.Cost.Money), checked(f.Resources.Industry - skill.Cost.Industry), checked(f.Resources.Food - skill.Cost.Food)) }).ToArray() };
         if (skill.Effects.Any(e => e.Operation == "damage") && target.Owner != unit.Owner)
             next = WorldDiplomacy.Attacked(next, unit.Owner, target.Owner, movement.NeutralCamps);
-        next = skill.Maneuver != null ? TacticalSkills.Activate(next, unit, skill, binding.Slot, targets, bus)
+        next = skill.Order != null ? CommandOrders.Activate(next, unit, skill, binding.Slot, targets, targetId, bus, secondaryTarget)
+            : skill.Maneuver != null ? TacticalSkills.Activate(next, unit, skill, binding.Slot, targets, bus)
             : bus.Dispatch(next, "skill.activate", unitId, new Ew4Random(state.RandomState), instanceId,
                 skill.Target == "cell" ? null : target.Id, targetCell: targetCell, movement: movement);
+        next=CommandOrders.ExecuteStrike(next,unit,skill,targetId,battle);
         if (next.Units.SingleOrDefault(u => u.Id == unitId) is UnitState relocated && relocated.Cell != unit.Cell)
             next = bus.Dispatch(next, "unit.move_end", unitId, new Ew4Random(next.RandomState));
         var counters = next.ExtensionState.ToDictionary(p => p.Key, p => p.Value);
-        counters[key] = checked(state.Round + Math.Max(1, skill.Cooldown));
+        if (!pendingOrder) counters[key] = checked(state.Round + Math.Max(1, skill.Cooldown));
         next = next with { ExtensionState = counters, Revision = checked(revision + 1), Units = next.Units.Select(u => u.Id == unitId && skill.EndsAction
             ? u with { Acted = true, RemainingMovement = 0 } : u).ToArray() };
         var events = ScenarioRules.Evaluate(next, bus.Scripts);

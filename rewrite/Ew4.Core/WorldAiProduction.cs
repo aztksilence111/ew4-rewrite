@@ -96,7 +96,7 @@ public static partial class WorldAi
                 if (state.Cells.Any(c => c.Owner == faction.Id && c.BuildingKind == building.Key)
                     || !building.Value.Recruitment.Any(r => faction.Recruitment.ContainsKey(r.Id))) continue;
                 var builder = state.Units.Where(u => u.Owner == faction.Id && state.Cells[u.Cell].Environment == 0)
-                    .OrderBy(u => u.Cell).ThenBy(u => u.Id, StringComparer.Ordinal).FirstOrDefault(u => WorldConstruction.CanBuild(state, u.Id, building.Key));
+                    .OrderBy(u => u.Cell).ThenBy(u => u.Id, StringComparer.Ordinal).FirstOrDefault(u => WorldConstruction.CanBuild(state, u.Id, building.Key, extensions: ai.Movement.Extensions));
                 if (builder != null) return new(state.Revision, state.AiRandomState, state.AiRandomState, "building",
                     new AiBuildingCommand(state.Revision, builder.Id, building.Key));
             }
@@ -330,7 +330,7 @@ public static partial class WorldAi
                 change = WorldSupportActions.BuildInstallation(state, state.Revision, installation.UnitId, build);
                 break;
             case AiBuildingCommand building:
-                change = WorldConstruction.Build(state, state.Revision, building.UnitId, building.Kind);
+                change = WorldConstruction.Build(state, state.Revision, building.UnitId, building.Kind, ai.Movement.Extensions);
                 break;
             case AiUpgradeCommand upgrade:
                 change = WorldImprovements.UpgradeBuilding(state, state.Revision, upgrade.Cell,

@@ -315,6 +315,7 @@ public static class WorldTurns
             var before = state;
             state = rules.Extensions.DispatchFactionTurn(state, faction, "turn.end");
             state = TacticalSkills.EndTurn(state, faction, rules.Extensions);
+            state = CommandOrders.EndTurn(state, faction, rules.Extensions);
             state = rules.Extensions.ExpireStatuses(state, faction);
             notices.AddRange(RuleEventBus.ChangeNotices(before, state));
         }
@@ -341,7 +342,8 @@ public static class WorldTurns
     {
         var siteUnits = WorldUnitLayers.Surface(state).Where(u => u.CommanderId != null).GroupBy(u => u.Cell).ToDictionary(g => g.Key, g => g.First());
         var production = state.Cells.Select((c, i) => (c, i)).Where(p => p.c.Owner == faction.Id).Select(p =>
-            new ProductionSite(SiteIncome(p.c, p.i, rules, siteUnits.GetValueOrDefault(p.i)))).ToArray();
+            new ProductionSite(CommandOrders.Income(state, p.i, rules.Income(p.c, p.i),
+                SiteIncome(p.c, p.i, rules, siteUnits.GetValueOrDefault(p.i)), rules.Extensions))).ToArray();
         var income = EconomyProduction.Calculate(production, faction.IncomeMultiplier, faction.IncomeBonus);
         return WorldArmyCapacity.IsOverLimit(state, faction.Id)
             ? new(income.Money / 2, income.Industry / 2, income.Food / 2) : income;
@@ -408,6 +410,7 @@ public static class WorldTurns
             var before = state;
             state = rules.Extensions.DispatchFactionTurn(state, faction.Id, "turn.start");
             state = TacticalSkills.StartTurn(state, faction.Id, rules.Extensions);
+            state = CommandOrders.StartTurn(state, faction.Id, rules.Extensions);
             notices.AddRange(RuleEventBus.ChangeNotices(before, state));
         }
         return state;

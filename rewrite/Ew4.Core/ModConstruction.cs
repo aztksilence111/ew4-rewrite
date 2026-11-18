@@ -22,6 +22,7 @@ public sealed record ModBuildingRecruit
     public int MinimumLevel { get; init; } = 1;
     public IReadOnlyList<string> Scenarios { get; init; } = Array.Empty<string>();
     public IReadOnlyList<string> Countries { get; init; } = Array.Empty<string>();
+    public IReadOnlyList<string> UnlockAny { get; init; } = Array.Empty<string>();
 }
 public sealed record ModBuildingDefinition
 {
@@ -52,7 +53,7 @@ public sealed record ModConstructionRules
         {
             if (offer == null || string.IsNullOrWhiteSpace(offer.Id) || !ids.Add(offer.Id) || string.IsNullOrWhiteSpace(offer.Profile)
                 || offer.BuildingKinds == null || offer.BuildingKinds.Count == 0 || offer.BuildingKinds.Any(string.IsNullOrWhiteSpace)
-                || offer.Cost == null || offer.MinimumLevel < 1 || offer.Countries == null || offer.Scenarios == null
+                || offer.Cost == null || offer.MinimumLevel < 1 || offer.Countries == null || offer.Scenarios == null || offer.UnlockAny==null || offer.UnlockAny.Any(string.IsNullOrWhiteSpace)
                 || offer.Countries.Any(string.IsNullOrWhiteSpace) || offer.Scenarios.Any(string.IsNullOrWhiteSpace))
                 throw new RuleViolation("construction.configuration", "Invalid site recruitment");
             offer.Cost.Validate();
@@ -76,16 +77,16 @@ public sealed record ModConstructionRules
             foreach (var offer in b.Recruitment)
             {
                 if (offer == null || offer.Cost == null || string.IsNullOrWhiteSpace(offer.Id) || !ids.Add(offer.Id) || string.IsNullOrWhiteSpace(offer.Profile)
-                    || offer.MinimumLevel < 1 || offer.MinimumLevel > b.Levels.Count || offer.Countries == null || offer.Scenarios == null
+                    || offer.MinimumLevel < 1 || offer.MinimumLevel > b.Levels.Count || offer.Countries == null || offer.Scenarios == null || offer.UnlockAny==null || offer.UnlockAny.Any(string.IsNullOrWhiteSpace)
                     || offer.Countries.Any(string.IsNullOrWhiteSpace) || offer.Scenarios.Any(string.IsNullOrWhiteSpace))
                     throw new RuleViolation("construction.configuration", "Invalid custom recruitment");
                 offer.Cost.Validate();
             }
         }
     }
-    public ModConstructionRules Copy() => this with { Recruitment = Recruitment?.Select(r => r with { BuildingKinds = r.BuildingKinds?.ToArray(), Scenarios = r.Scenarios.ToArray(), Countries = r.Countries.ToArray() }).ToArray(), BuilderProfiles = BuilderProfiles.ToArray(), Buildings = Buildings.ToDictionary(p => p.Key,
+    public ModConstructionRules Copy() => this with { Recruitment = Recruitment?.Select(r => r with { BuildingKinds = r.BuildingKinds?.ToArray(), Scenarios = r.Scenarios.ToArray(), Countries = r.Countries.ToArray(),UnlockAny=r.UnlockAny.ToArray() }).ToArray(), BuilderProfiles = BuilderProfiles.ToArray(), Buildings = Buildings.ToDictionary(p => p.Key,
         p => p.Value with { Scenarios = p.Value.Scenarios.ToArray(), Levels = p.Value.Levels.Select(l => l with { }).ToArray(),
-            Recruitment = p.Value.Recruitment.Select(r => r with { BuildingKinds = r.BuildingKinds?.ToArray(), Scenarios = r.Scenarios.ToArray(), Countries = r.Countries.ToArray() }).ToArray() }, StringComparer.Ordinal) };
+            Recruitment = p.Value.Recruitment.Select(r => r with { BuildingKinds = r.BuildingKinds?.ToArray(), Scenarios = r.Scenarios.ToArray(), Countries = r.Countries.ToArray(),UnlockAny=r.UnlockAny.ToArray() }).ToArray() }, StringComparer.Ordinal) };
 }
 
 public static class WorldConstruction
@@ -97,7 +98,11 @@ public static class WorldConstruction
         .Where(u => u.Owner == owner && Builder(world, u) && !WorldUnitLayers.Air(world, u) && !u.Acted && u.Combatant.ConstructionTurns == 0
             && u.Morale.Effective != -3 && !world.Cells[u.Cell].Terrain.Sea && new HexMap(world.Width, world.Height).Distance(u.Cell, cell) == 1)
         .OrderBy(u => u.Id, StringComparer.Ordinal).FirstOrDefault();
-    public static bool CanBuild(WorldState world, string unitId, string kind, bool checkResources = true, bool checkAction = true)
+    public static Resources Cost(WorldState world, UnitState builder, string kind, RuleEventBus? extensions = null) =>
+        CommandOrders.Discount(world, builder, "construction", world.Construction!.Buildings[kind].Cost,
+            world.Construction!.Buildings[kind].Cost, extensions);
+
+    public static bool CanBuild(WorldState world, string unitId, string kind, bool checkResources = true, bool checkAction = true, RuleEventBus? extensions = null)
     {
         var unit = world.Units.SingleOrDefault(u => u.Id == unitId);
         if (world.Construction?.Enabled != true || !world.Construction.Buildings.TryGetValue(kind, out var building) || !Available(world, building)
@@ -106,16 +111,17 @@ public static class WorldConstruction
             || world.Phase != TurnPhase.Active || world.PendingDialogue != null) return false;
         var cell = world.Cells[unit.Cell];
         var faction = world.Factions.Single(f => f.Id == unit.Owner);
+        var cost = Cost(world, unit, kind, extensions);
         return !faction.Defeated && cell.Owner == unit.Owner && cell.Terrain.Active && cell.Terrain.CanTraverse() && !cell.Terrain.Sea
             && cell.BuildingKind == null && cell.InstallationKind == null
-            && (!checkResources || faction.Resources.Money >= building.Cost.Money && faction.Resources.Industry >= building.Cost.Industry && faction.Resources.Food >= building.Cost.Food);
+            && (!checkResources || faction.Resources.Money >= cost.Money && faction.Resources.Industry >= cost.Industry && faction.Resources.Food >= cost.Food);
     }
-    public static WorldChange Build(WorldState world, long revision, string unitId, string kind)
+    public static WorldChange Build(WorldState world, long revision, string unitId, string kind, RuleEventBus? extensions = null)
     {
         var faction = WorldActions.Ready(world, revision);
-        if (!CanBuild(world, unitId, kind)) throw new RuleViolation("construction.unavailable", "Only configured engineers can construct this building at the selected site");
+        if (!CanBuild(world, unitId, kind, extensions: extensions)) throw new RuleViolation("construction.unavailable", "Only configured engineers can construct this building at the selected site");
         var unit = world.Units.Single(u => u.Id == unitId);
-        var cost = world.Construction!.Buildings[kind].Cost;
+        var cost = Cost(world, unit, kind, extensions);
         var next = (world with {
             Factions = world.Factions.Select(f => f.Id == faction.Id ? f with { Resources = new(f.Resources.Money-cost.Money, f.Resources.Industry-cost.Industry, f.Resources.Food-cost.Food) } : f).ToArray(),
             Units = world.Units.Select(u => u.Id == unit.Id ? u with { Acted = true,

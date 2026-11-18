@@ -94,6 +94,25 @@ internal static class ObjectiveChecks
         Check(lostInventory.CompletedObjectives.Contains("owned"), "completed ownership achievement remains completed");
         var result = new BattleResult("test-run", "conquest1", "Victory", 10, 4, 100, 20, 0, 0);
         var won = context with { Session = context.Session with { BattleResult = result } };
+        var factionReward = new MetagameObjective("faction-end", "achievement", "Faction end", "No route transfer",
+            [new("battleWon")], new(), Mode: 2, Scenario: "conquest1", Faction: session.PlayerFaction);
+        MetagameObjectives.Validate([factionReward]);
+        Check(MetagameObjectives.Observe(claimed, [factionReward], won).CompletedObjectives.Contains(factionReward.Id), "original faction victory qualifies");
+        Check(MetagameObjectives.Observe(claimed, [factionReward], won with { Country = "renamed-country" }).CompletedObjectives.Contains(factionReward.Id), "identity change does not alter player faction eligibility");
+        Check(!MetagameObjectives.Observe(claimed, [factionReward], won with { Session = won.Session with { PlayerFaction = "transferred" } }).CompletedObjectives.Contains(factionReward.Id), "transferred victory rejected");
+        Check(!MetagameObjectives.Observe(claimed, [factionReward], won with { Session = won.Session with { BattleResult = result with { Outcome = "Defeat" } } }).CompletedObjectives.Contains(factionReward.Id), "defeat rejected");
+        var unlocks = new MetagameRules { Objectives = [factionReward], CommanderRewardUnlocks = new Dictionary<string, string?> { ["princess.0"] = null, ["princess.4"] = factionReward.Id } };
+        unlocks.Validate();
+        Check(!unlocks.CommanderRewardUnlocked("princess.0", claimed) && !unlocks.CommanderRewardUnlocked("princess.4", claimed), "closed and incomplete rewards remain locked");
+        var factionEligible = claimed with { CompletedObjectives = claimed.CompletedObjectives.Append(factionReward.Id).ToArray() };
+        Check(unlocks.CommanderRewardUnlocked("princess.4", factionEligible) && !unlocks.CommanderRewardUnlocked("princess.0", factionEligible), "only configured reward unlocks");
+        Check(new MetagameRules().CommanderRewardUnlocked("princess.0", claimed), "unconfigured original rewards retain behavior");
+        var internalObjective = factionReward with { Internal = true };
+        MetagameObjectives.Validate([internalObjective]);
+        Check(MetagameObjectives.Observe(claimed, [internalObjective], won).CompletedObjectives.Contains(internalObjective.Id), "internal qualification completes normally");
+        Reject(() => MetagameObjectives.Claim(factionEligible, factionEligible.Revision, internalObjective), "objectives.internal");
+        Reject(() => MetagameObjectives.Validate([internalObjective with { Reward = new(1) }]), "objectives.configuration");
+        Reject(() => (unlocks with { CommanderRewardUnlocks = new Dictionary<string, string?> { ["princess.4"] = "missing" } }).Validate(), "metagame.configuration");
         var victory = MetagameObjectives.Observe(lifetime with { BattleResults = new Dictionary<string, BattleResult> { ["test-run"] = result } }, objectives, won);
         Check(victory.CompletedObjectives.Contains("win") && !victory.CompletedObjectives.Contains("total-wins"), "victory, stars, round conditions together");
         var twoWins = MetagameObjectives.Observe(victory, objectives, second with { Session = second.Session with { BattleResult = result with { Id = "second-run" } } });

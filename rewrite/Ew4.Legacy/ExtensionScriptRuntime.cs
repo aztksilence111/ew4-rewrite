@@ -104,6 +104,7 @@ public sealed class ExtensionScriptRuntime : IRuleScriptRuntime
                 var commander = world.Commanders.SingleOrDefault(c => c.Id == args[args.Count - 1].String);
                 if (commander == null) return DynValue.Nil;
                 var t = new Table(script); t.Set("id", DynValue.NewString(commander.Id)); t.Set("owner", DynValue.NewString(commander.Owner));
+                t.Set("definition", commander.DefinitionId == null ? DynValue.Nil : DynValue.NewString(commander.DefinitionId));
                 t.Set("withdrawn", DynValue.NewBoolean(commander.Withdrawn)); t.Set("rank", DynValue.NewNumber(commander.Rank.Level));
                 t.Set("title", DynValue.NewNumber(commander.Title.Level)); return DynValue.NewTable(t);
             }));

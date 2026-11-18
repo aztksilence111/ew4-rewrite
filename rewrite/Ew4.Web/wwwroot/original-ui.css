@@ -309,6 +309,7 @@ body:has(#play:not([hidden])>#pause:not([hidden])) :is(#pause,#settings,#detail-
 .portrait-only.unavailable-candidate>img:first-child{filter:brightness(.5)}
 .reward-claimed>img:first-child{filter:brightness(.4)}
 .skill-tooltip{position:absolute;width:157px;box-sizing:border-box;min-height:28px;max-height:150px;padding:2px;z-index:10;border:4px solid transparent;border-image:url('/content/ui/image_ui_hd/box_skilldetail.png') 8 fill stretch;color:#ebe6e1;cursor:pointer}
+.skill-tooltip-content{max-height:138px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;touch-action:pan-y}
 .skill-tooltip::after{content:"";position:absolute;right:-18px;top:var(--tip-arrow-top,4px);width:18.5px;height:19.5px;background:url('/content/ui/image_ui_hd/box_skilldetail_arrow.png') center/100% 100%;transform:none}
 .skill-tooltip.tip-right::after{left:-18px;right:auto;transform:scaleX(-1)}
 .commander-skills .skill-info{padding:0;border:0;background:none}

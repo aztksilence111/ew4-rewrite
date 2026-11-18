@@ -36,7 +36,7 @@ public sealed partial class ClientContent
                     || r.Countries.Count > 0 && (!countries.TryGetValue(faction, out string? country) || !r.Countries.Contains(country))) continue;
                 var definition = Catalogs.Runtime.Profiles[r.Profile];
                 extra.Add(r.Id, new RecruitmentOffer { Id = r.Id, Template = new Combatant { Profile = definition.Profile, Health = definition.Profile.MaxHealth },
-                    Cost = r.Cost, BuildingKinds = entry.Kinds, MinimumBuildingLevel = r.MinimumLevel,
+                    Cost = r.Cost, BuildingKinds = entry.Kinds, MinimumBuildingLevel = r.MinimumLevel, UnlockAny = r.UnlockAny,
                     AllowSea = definition.Profile.Category == "naval",
                     Support = new UnitSupport { FoodConsumption = definition.FoodConsumption } });
             }

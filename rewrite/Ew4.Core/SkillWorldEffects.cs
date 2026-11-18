@@ -17,7 +17,7 @@ public sealed record ExtensionStatus
 
 public sealed record SkillStatus(string Id, int RemainingTurns, int Level = 1, int Stacks = 1,
     string? SourceId = null, string? SourceOwner = null);
-public sealed record SkillSummonTemplate(UnitProfile Profile, UnitSupport Support);
+public sealed record SkillSummonTemplate(UnitProfile Profile, UnitSupport Support, Resources? Cost = null);
 
 public sealed partial class RuleEventBus
 {

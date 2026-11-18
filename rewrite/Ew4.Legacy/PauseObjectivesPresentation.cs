@@ -46,10 +46,13 @@ public sealed record PauseObjectivesPresentation
     private static void ValidatePredicate(ScenarioCondition condition, int depth = 0)
     {
         if (depth > 16 || condition == null || condition.Conditions == null || condition.Conditions.Count > 64
-            || condition.Type is not ("always" or "all" or "any" or "not" or "state" or "round" or "player_faction" or "faction_exists")
-            || condition.Script != null || condition.Function != null || condition.Cells == null || condition.Cells.Count != 0 || condition.Unit != null || condition.Commander != null
+            || condition.Type is not ("always" or "all" or "any" or "not" or "state" or "round" or "player_faction" or "faction_exists" or "cells_owned")
+            || condition.Script != null || condition.Function != null || condition.Cells == null
+            || condition.Type == "cells_owned" && (condition.Cells.Count == 0 || condition.Cells.Count > 256
+                || condition.Cells.Any(c => c < 0) || condition.Cells.Distinct().Count() != condition.Cells.Count)
+            || condition.Type != "cells_owned" && condition.Cells.Count != 0 || condition.Unit != null || condition.Commander != null
             || condition.Type == "state" && (condition.Key == null || !condition.Key.StartsWith("scenario/", StringComparison.Ordinal) || condition.Key.Length > 512)
-            || condition.Type is "player_faction" or "faction_exists" && string.IsNullOrWhiteSpace(condition.Faction)
+            || condition.Type is "player_faction" or "faction_exists" or "cells_owned" && string.IsNullOrWhiteSpace(condition.Faction)
             || condition.Compare is not ("eq" or "ne" or "gt" or "ge" or "lt" or "le")
             || condition.Type is "all" or "any" && condition.Conditions.Count == 0
             || condition.Type == "not" && condition.Conditions.Count != 1

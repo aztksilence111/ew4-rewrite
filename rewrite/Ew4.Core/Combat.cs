@@ -71,6 +71,7 @@ public sealed record UnitProfile
 
 public sealed record Combatant
 {
+    public OrderCombatBonus? OrderCombat { get; init; }
     public TacticalCombatBonus? Tactical { get; init; }
     public bool GroundMobile { get; init; }
     public UnitAttributeModifiers? AttributeModifiers { get; init; }
@@ -98,6 +99,8 @@ public sealed record Combatant
     public string? BuildingKind { get; init; }
     public float Evasion { get; init; }
     public float EvasionIgnoringBuilding { get; init; }
+    public float TerrainEvasion { get; init; }
+    public float BuildingEvasion { get; init; }
     public bool Has(string skill) => !Profile.LegacySkillOverrides.Contains(skill)
         && (Skills.Contains(skill) || Profile.SkillSlots.Any(s => s.Id == skill));
     public void Validate()
@@ -122,7 +125,7 @@ public sealed record Combatant
 }
 
 public sealed record CombatResult(int DefenderDamage, int AttackerDamage, bool Counterattack,
-    bool OffensiveProc, bool DefensiveProc, ulong RandomState);
+    bool OffensiveProc, bool DefensiveProc, ulong RandomState, int RawDefenderDamage = -1, int RawAttackerDamage = -1);
 
 public sealed record CombatRules
 {
@@ -170,6 +173,7 @@ public static class Ew4Combat
             && distance >= d.Profile.MinimumRange && distance <= d.MaximumRange
             && d.Morale != -3 && !(d.Profile.Category == "fort" && d.ConstructionTurns > 0);
         if (rules.Extensions != null) counter = counter && rules.Extensions.Modify("combat.counterattack", "counterattack", 1, a, d, random, distance) > 0;
+        counter &= a.OrderCombat?.SuppressCounter != true;
         int am = MoraleModifier(a.Morale, ac), dm = MoraleModifier(d.Morale, dc);
         int aa = am + a.AttackBonus + Math.Min(ac, rules.StarRollCap) * a.Stars;
         int da = dm + d.AttackBonus + Math.Min(dc, rules.StarRollCap) * d.Stars;
@@ -179,10 +183,16 @@ public static class Ew4Combat
         int attack = Rolls(a, ac, offensive, random, skills);
         int dealt = Damage(a, d, aa + attack - Math.Min(0, dm) - d.DefenseBonus - d.Armor, false, rules, random, distance);
         if (defensive) dealt = rules.MinimumDamage;
+        int rawDealt = dealt;
+        dealt -= Math.Min(dealt / 2, d.OrderCombat?.RedirectCapacity ?? 0);
+        if (d.OrderCombat?.Survive == true) dealt = Math.Min(dealt, d.Health - 1);
         if (rules.LethalStrikePreventsCounterattack && dealt >= d.Health) counter = false;
         int retaliation = counter ? Rolls(d, dc, false, random, skills) : 0;
         int taken = counter ? Damage(d, a, da + retaliation - Math.Min(0, am) - a.DefenseBonus - a.Armor, true, rules, random, distance) : 0;
-        var result = new CombatResult(dealt, taken, counter, offensive, defensive, random.State);
+        int rawTaken = taken;
+        if (a.OrderCombat?.Survive == true) taken = Math.Min(taken, a.Health - 1);
+        var result = new CombatResult(dealt, taken, counter, offensive, defensive, random.State,
+            rawDealt == dealt ? -1 : rawDealt, rawTaken == taken ? -1 : rawTaken);
         callerRandom.Commit(random.State);
         return result;
     }
@@ -193,10 +203,12 @@ public static class Ew4Combat
     public static (int Minimum, int Maximum) AttackBounds(Combatant unit, LegacySkillParameters? skillParameters = null)
     {
         var skills = skillParameters ?? LegacySkillParameters.Default;
-        int? lowerSkill = unit.Profile.Category switch { "infantry" => 13, "cavalry" => 11, "artillery" => 7, _ => null };
-        int? upperSkill = unit.Profile.Category switch { "infantry" => 12, "cavalry" => 10, "artillery" => 8, _ => null };
+        int? lowerSkill = unit.Profile.Category switch { "infantry" => 13, "cavalry" when unit.Profile.CommanderAbility != "tyej.armor" => 11, "artillery" => 7, _ => null };
+        int? upperSkill = unit.Profile.Category switch { "infantry" => 12, "cavalry" when unit.Profile.CommanderAbility != "tyej.armor" => 10, "artillery" => 8, _ => null };
         int min = checked(unit.Profile.MinimumAttack + (lowerSkill.HasValue && unit.Has(Skill(lowerSkill.Value)) ? skills.Bonus(lowerSkill.Value) : 0));
         int max = checked(unit.Profile.MaximumAttack + (upperSkill.HasValue && unit.Has(Skill(upperSkill.Value)) ? skills.Bonus(upperSkill.Value) : 0));
+        min = checked(min + (unit.OrderCombat?.LowerAttack ?? 0));
+        max = checked(max + (unit.OrderCombat?.UpperAttack ?? 0));
         return (min, Math.Max(min, max));
     }
 
@@ -229,9 +241,14 @@ public static class Ew4Combat
             if (target.Profile.Category == "naval") factor += factor;
             else if (!target.AtSea) factor *= .5f;
         }
-        int? ignoreSkill = source.Profile.Category switch { "infantry" => 14, "cavalry" => 9, "artillery" => 5, _ => null };
-        bool ignore = ignoreSkill.HasValue && source.Has(Skill(ignoreSkill.Value));
+        int? ignoreSkill = source.Profile.Category switch { "infantry" => 14, "cavalry" when source.Profile.CommanderAbility != "tyej.armor" => 9, "artillery" => 5, _ => null };
+        bool ignore = ignoreSkill.HasValue && source.Has(Skill(ignoreSkill.Value)) || source.OrderCombat?.IgnoreEvasion == true;
         float evasion = ignore ? 0 : source.Has(Skill(29)) && target.BuildingKind != null ? target.EvasionIgnoringBuilding : target.Evasion;
+        if (!ignore && source.OrderCombat is { } order)
+        {
+            float terrain = target.TerrainEvasion, building = target.BuildingEvasion;
+            evasion = Math.Max(0, evasion - terrain * (float)order.IgnoreTerrain - building * (float)order.IgnoreBuilding);
+        }
         float combined = factor * (1f - evasion);
         double damage = Math.Max(rules.MinimumDamage, checked((int)(raw * combined)));
         double basisDamage = damage, outgoing = damage;
@@ -243,10 +260,11 @@ public static class Ew4Combat
             damage = rules.Extensions.Modify("combat.modify_incoming_damage", "damage_multiplier", damage, target, source, random, distance);
             damage = rules.Extensions.Modify("combat.modify_incoming_damage", "damage_add", damage, target, source, random, distance);
         }
-        if (source.Tactical != null || target.Tactical != null)
+        if (source.Tactical != null || target.Tactical != null || source.OrderCombat != null || target.OrderCombat != null)
         {
-            double attack = Math.Min(.35, (source.Tactical?.Attack ?? 0) + (retaliation ? 0 : source.Tactical?.FirstAttack ?? 0));
-            double defense = target.Tactical?.Defense ?? 0;
+            double attack = Math.Min(.35, (source.Tactical?.Attack ?? 0) + (retaliation ? source.OrderCombat?.CounterAttack ?? 0
+                : (source.Tactical?.FirstAttack ?? 0) + (source.OrderCombat?.Attack ?? 0)));
+            double defense = (target.Tactical?.Defense ?? 0) + (retaliation ? target.OrderCombat?.CounterDefense ?? 0 : target.OrderCombat?.Defense ?? 0);
             if (!retaliation && source.GroundMobile && target.Tactical is { Evasion: > 0 } shield)
             {
                 double extra = Math.Min(shield.Evasion, Math.Max(0, shield.EvasionCeiling - target.Evasion));
@@ -254,7 +272,8 @@ public static class Ew4Combat
                 defense = Math.Max(defense, evasion >= 1 ? 0 : extra / (1 - evasion));
             }
             defense = Math.Min(.25, defense);
-            double genericAttack = outgoing / basisDamage, genericDefense = outgoing > 0 ? damage / outgoing : 1;
+            double genericAttack = outgoing / basisDamage + (retaliation ? source.OrderCombat?.GenericCounterAttack ?? 0 : source.OrderCombat?.GenericAttack ?? 0);
+            double genericDefense = (outgoing > 0 ? damage / outgoing : 1) - (retaliation ? target.OrderCombat?.GenericCounterDefense ?? 0 : target.OrderCombat?.GenericDefense ?? 0);
             double gain = Math.Min(1, genericAttack) * (1 + Math.Min(.5, Math.Max(0, genericAttack - 1) + attack));
             double protection = Math.Max(1, genericDefense) * (1 - Math.Min(.4, Math.Max(0, 1 - genericDefense) + defense));
             damage = Math.Round(basisDamage * gain * protection * (retaliation ? 1 : 1 - (source.Tactical?.MainAttackPenalty ?? 0)), 9);

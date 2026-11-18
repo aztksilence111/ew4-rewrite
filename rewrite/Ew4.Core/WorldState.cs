@@ -91,6 +91,9 @@ public sealed record UnitState
     public bool MovedThisTurn { get; init; }
     public bool AttackedThisTurn { get; init; }
     public IReadOnlyList<ManeuverGrant> Maneuvers { get; init; } = Array.Empty<ManeuverGrant>();
+    public IReadOnlyList<OrderGrant> Orders { get; init; } = Array.Empty<OrderGrant>();
+    public OrderSummonOrigin? OrderOrigin { get; init; }
+    public IReadOnlyList<OrderMoraleContribution> OrderMorale { get; init; } = Array.Empty<OrderMoraleContribution>();
     public PlayerUnitControl? PlayerControl { get; init; }
     public bool Objective { get; init; }
     public long Experience { get; init; }
@@ -163,6 +166,10 @@ public sealed record ScenarioEvent
 
 public sealed record WorldState
 {
+    public OrderActionRequest? PendingOrderAction { get; init; }
+    internal bool OrderProbe { get; init; }
+    internal IReadOnlyList<OrderReactionChoice> OrderChoices { get; init; } = Array.Empty<OrderReactionChoice>();
+    internal IReadOnlyList<OrderReactionChoice> OrderProposals { get; init; } = Array.Empty<OrderReactionChoice>();
     public string ScenarioId { get; init; } = "";
     public string ContentRevision { get; init; } = "";
     public int Width { get; init; }
@@ -312,6 +319,18 @@ public sealed record WorldState
         var commanders = new HashSet<string>(StringComparer.Ordinal);
         foreach (var unit in Units)
         {
+            if (unit.OrderMorale == null || unit.OrderMorale.Count > 128 || unit.OrderMorale.Any(m => m == null
+                || string.IsNullOrWhiteSpace(m.Effect) || string.IsNullOrWhiteSpace(m.Source) || m.Change is < -4 or > 4 || m.Set is < -3 or > 1 || m.EndEpoch < 0))
+                throw new RuleViolation("world.order_morale", "Invalid saved morale contribution");
+            if (unit.Orders == null || unit.Orders.Count > 128 || unit.Orders.Any(g => g == null
+                || string.IsNullOrWhiteSpace(g.Skill) || string.IsNullOrWhiteSpace(g.Instance) || string.IsNullOrWhiteSpace(g.Source)
+                || !factionIds.Contains(g.Owner) || g.Round < 1 || g.Round > Round || g.Cell < 0 || g.Cell >= Cells.Count || g.Uses < 0
+                || g.Epoch<0 || g.Branch is < -1 or > 15 || g.Lifetime is < 1 or > 16 || g.EnemyCell < -1 || g.EnemyCell>=Cells.Count
+                || g.Participants is {Length:>32} || g.Participants?.Any(string.IsNullOrWhiteSpace)==true
+                || g.Positions is {Length:>128} || g.Positions?.Any(c=>c<0 || c>=Cells.Count)==true))
+                throw new RuleViolation("world.orders", "Invalid saved order grant");
+            if (unit.OrderOrigin is { } origin && (string.IsNullOrWhiteSpace(origin.Skill) || string.IsNullOrWhiteSpace(origin.Identity)))
+                throw new RuleViolation("world.order_origin","Invalid persistent summon origin");
             if (unit.Maneuvers == null || unit.Maneuvers.Count > 32 || unit.Maneuvers.Any(g => g == null
                 || string.IsNullOrWhiteSpace(g.Skill) || string.IsNullOrWhiteSpace(g.Instance) || string.IsNullOrWhiteSpace(g.Source)
                 || !factionIds.Contains(g.Owner) || g.StartRound < 1 || g.StartRound > Round
@@ -425,9 +444,9 @@ public sealed record WorldState
         }
         // All other UnitState fields are values or sealed immutable records.
         return ReferenceEquals(combatant, value.Combatant) && ReferenceEquals(control, value.PlayerControl)
-            && ReferenceEquals(commanderBase, value.CommanderBase) && value.Maneuvers.Count == 0 ? value
+            && ReferenceEquals(commanderBase, value.CommanderBase) && value.Maneuvers.Count == 0 && value.Orders.Count == 0 && value.OrderMorale.Count == 0 ? value
             : value with { Combatant = combatant, PlayerControl = control, CommanderBase = commanderBase,
-                Maneuvers = Array.AsReadOnly(value.Maneuvers.ToArray()) };
+                Maneuvers = Array.AsReadOnly(value.Maneuvers.ToArray()), Orders = Array.AsReadOnly(value.Orders.ToArray()), OrderMorale = Array.AsReadOnly(value.OrderMorale.ToArray()) };
     }
 
     internal static void ValidateCellValue(CellState cell)
@@ -445,6 +464,8 @@ public sealed record WorldState
     }
     public WorldState Copy() => PlanningScope.PreserveCopy(this, this with
     {
+        PendingOrderAction=PendingOrderAction==null?null:PendingOrderAction with { Recipients=PendingOrderAction.Recipients?.ToArray(), Choices=PendingOrderAction.Choices?.ToArray() },
+        OrderChoices=OrderChoices.ToArray(), OrderProposals=OrderProposals.ToArray(),
         ArmyCapacity = ArmyCapacity?.Copy(),
         UnitLayers = UnitLayers?.Copy(),
         Construction = Construction?.Copy(),

@@ -11,6 +11,7 @@ internal static class WorldDeaths
     internal static WorldDeathResult Remove(WorldState state, string unitId, string? successor = null, bool checkSurvival = true)
     {
         var unit = state.Units.Single(u => u.Id == unitId);
+        state = ScenarioBattleFacts.Destroyed(state, unit);
         var notices = new List<WorldNotice> { new("unit.destroyed", unitId) };
         var next = state with
         {
@@ -57,8 +58,10 @@ internal static class WorldDeaths
             var unit = state.Units[slot];
             if (affectedCells != null && !affectedCells.Contains(unit.Cell)) continue;
             int local = WorldUnitLayers.Air(state, unit) ? 0 : WorldTurns.LocalPenalty(state, map, unit.Cell, unit.Owner, neutralCamps, occupants);
-            int morale = TurnEconomy.Morale(unit.Morale.Baseline, unit.Morale.Duration, local, factions[unit.Owner].Shortage,
+            int effectiveLocal = CommandOrders.LocalPenalty(state, unit, local);
+            int morale = TurnEconomy.Morale(unit.Morale.Baseline, unit.Morale.Duration, effectiveLocal, factions[unit.Owner].Shortage,
                 unit.Support.Logistics || unit.Combatant.FoodExempt || unit.Combatant.Has(Ew4Combat.Skill(22)), unit.Combatant.Has(Ew4Combat.Skill(3)));
+            if (unit.OrderMorale.Count > 0) morale = CommandOrders.RefreshOrderMorale(state, unit with { LocalPenalty = local }).Morale.Effective;
             if (unit.LocalPenalty == local && unit.Morale.Effective == morale && unit.Combatant.Morale == morale) continue;
             units ??= state.Units.ToArray();
             units[slot] = unit with { LocalPenalty = local, Morale = unit.Morale with { Effective = morale }, Combatant = unit.Combatant with { Morale = morale } };

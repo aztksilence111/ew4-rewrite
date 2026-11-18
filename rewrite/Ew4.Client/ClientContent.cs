@@ -59,6 +59,7 @@ public sealed partial class ClientContent
             correctItems, Extensions.LegacySkills, Extensions.ConfigureItem);
         CorrectOriginalEquipment = correctItems && LegacyEquipmentCorrections.IsOriginal(runtime.SourceHashes["def_item.xml"]);
         Extensions.ConfigureRuntime(runtime);
+        Extensions.Bus.RegisterOrderProfiles(runtime.Profiles.ToDictionary(p=>p.Key,p=>p.Value.Profile),runtime.Profiles.ToDictionary(p=>p.Key,p=>p.Value.FoodConsumption));
         runtime.VerifySources(name => originalRead("original/" + name));
         Countries.ValidateRuntime(runtime);
         var buildings = LegacyBuildingCatalog.Read(Text("def_construction.xml"), Text("def_capital.xml"));
@@ -190,6 +191,8 @@ public sealed partial class ClientContent
                 || s.Pool == "consumable" && !Catalogs.Items.Rules().Definitions[id].Equipment.Consumable
                 || s.Pool == "equipment" && Catalogs.Items.Rules().Definitions[id].Equipment.Consumable) == true) == true)
             throw new RuleViolation("metagame.item", "Shop slot references an unknown item or mismatched pool");
+        if (Extensions.Metagame.CommanderRewardUnlocks.Keys.Any(id => !PrincessDefinitions.Any(p => id == "princess." + (string)p.Attribute("id")!)))
+            throw new RuleViolation("objectives.reference", "Unknown commander reward slot");
         foreach (var objective in Extensions.Metagame.Objectives)
         {
             if (objective.Reward.Items.Keys.Any(id => !Catalogs.Items.Rules().Definitions.ContainsKey(id))
@@ -290,6 +293,7 @@ public sealed partial class ClientContent
             if (Extensions.Economy.TryGetValue(id, out var economy)) turns = ScenarioEconomy.BuildingRules(turns, economy);
             var combat = rules.Battle with { Combat = rules.Battle.Combat with { Extensions = Extensions.Bus }, Victory = victory };
             started = started with { Rules = rules with { Movement = movement, Turns = turns, Battle = combat,
+                Training = rules.Training with { Extensions = Extensions.Bus }, Upgrades = rules.Upgrades with { Extensions = Extensions.Bus },
                 Commanders = rules.Commanders with { Extensions = Extensions.Bus },
                 Roster = rules.Roster with { Assignment = rules.Roster.Assignment with { Extensions = Extensions.Bus } },
                 Tavern = rules.Tavern with { Assignment = rules.Tavern.Assignment with { Extensions = Extensions.Bus } },
@@ -319,10 +323,14 @@ public sealed partial class ClientContent
                     ?? Extensions.PauseObjectivesPresentations.GetValueOrDefault("*");
                 if (pauseScreen != null)
                     foreach (var condition in pauseScreen.StageObjectives.SelectMany(PauseObjectivesPresentation.StageConditions))
-                        if (condition.Type is "player_faction" or "faction_exists" && condition.Faction is not ("@player" or "@active")
+                    {
+                        if (condition.Type == "cells_owned" && condition.Cells.Any(c => c >= world.Cells.Count))
+                            throw new RuleViolation("extension.pause_objectives", "Stage objective cell is outside the scenario map");
+                        if (condition.Type is "player_faction" or "faction_exists" or "cells_owned" && condition.Faction is not ("@player" or "@active")
                             && !world.Factions.Any(f => f.Id == condition.Faction)
                             && !ScenarioFactions.Creations(world.ScenarioEvents).Any(e => e.Faction == condition.Faction))
                             throw new RuleViolation("extension.pause_objectives", "Unknown stage objective faction: " + condition.Faction);
+                    }
                 var production = started.Rules.Production.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal);
                 var recruitment = started.Rules.Recruitment.ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal);
                 var grants = new Dictionary<string, IReadOnlyDictionary<string, RecruitmentGrant>>();
@@ -351,12 +359,15 @@ public sealed partial class ClientContent
                     Popup = ev.Popup == null ? null : ev.Popup with { Choices = ev.Popup.Choices.Select(c => c with { Effects = c.Effects.Select(Prepare).ToArray() }).ToArray() }
                 }).ToArray() };
                 started = started with { Rules = started.Rules with { Production = production, Recruitment = recruitment } };
+                Extensions.Bus.RegisterOrderRecruitment(id, started.Rules.Recruitment);
+                Extensions.Bus.RegisterOrderEconomy(id,started.Rules.Turns);
                 foreach (string unit in world.Units.Select(u => u.Id).ToArray())
                     world = Extensions.Bus.Dispatch(world, "scenario.start", unit, new Ew4Random(world.RandomState));
                 if (Extensions.ApiVersion >= 3 && world.Phase == TurnPhase.Active)
                 {
                     world = Extensions.Bus.DispatchFactionTurn(world, world.ActiveFaction, "turn.start");
                     world = TacticalSkills.StartTurn(world, world.ActiveFaction, Extensions.Bus);
+                    world = CommandOrders.StartTurn(world, world.ActiveFaction, Extensions.Bus);
                 }
                 world = world with { ArmyCapacity = ArmyCapacity.Resolve(id, CapacityCountries(world)) };
                 world.Validate();

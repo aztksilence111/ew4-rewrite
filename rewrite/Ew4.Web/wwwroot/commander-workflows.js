@@ -32,6 +32,20 @@
   };
   proto.reopenCommander=function(id){const held=this.held(id);if(held)this.commanderInfo(this.definition(held),held,this.commanderReturn);};
   proto.updateAccount=async function(args){this.data=await this.api.rpc('commander',{revision:this.data.revision,...args});this.drawRoster();};
+  proto.acquiredCommanders=function(previous,onClose){
+    const known=new Set(previous.map(c=>c.id)),added=this.data.roster.filter(c=>!known.has(c.id));
+    const show=index=>{
+      const held=added[index];if(!held){onClose?.();return;}
+      const next=()=>show(index+1),l=this.native('form_getgeneraltips',next);
+      l.fill('tcmder',this.card(this.definition(held),held,()=>{}));
+      this.api.acquisitionEffect?.(l.body,()=>l.current());
+      const confirm=document.getElementById('detail-confirm');
+      confirm.hidden=false;confirm.setAttribute('aria-label','确认获得将领');confirm.onclick=()=>this.api.closeDetail();
+      // Keep the acquisition notice open when viewing its commander's details.
+      l.get('tcmder').querySelector('.commander-info').onclick=e=>{e.stopPropagation();this.commanderInfo(this.definition(held),held,()=>show(index));};
+    };
+    show(0);
+  };
   proto.editCommanderTags=async function(){
     if(this.tagSaving)return;
     if(!this.tagDraft){this.tagDraft=new Set(this.data.roster.filter(c=>c.tag).map(c=>c.id));this.drawRoster();return;}
@@ -61,7 +75,8 @@
   proto.skillTip=function(anchor,skill,pin=false){
     if(this.skillAnchor===anchor&&this.skillPopup){if(pin){if(this.skillPinned)this.dismissSkillTip();else this.skillPinned=true;}return;}
     this.dismissSkillTip();this.skillAnchor=anchor;this.skillPinned=pin;
-    const tip=document.createElement('div');tip.id='commander-skill-tip';tip.className='skill-tooltip';tip.setAttribute('role','tooltip');tip.append(this.lettering(skill.description,'font_text_2_cn_hd','#ebe6e1',145));this.skillPopup=tip;
+    const tip=document.createElement('div');tip.id='commander-skill-tip';tip.className='skill-tooltip';tip.setAttribute('role','tooltip');
+    const content=document.createElement('div');content.className='skill-tooltip-content';content.tabIndex=0;content.setAttribute('aria-label','技能完整说明');content.append(this.lettering(skill.description,'font_text_2_cn_hd','#ebe6e1',140));tip.append(content);this.skillPopup=tip;
     const dialog=document.getElementById('detail-modal').firstElementChild;dialog.append(tip);
     const a=anchor.getBoundingClientRect(),d=dialog.getBoundingClientRect(),scale=d.width/dialog.offsetWidth;
     const left=a.left-d.left>170*scale;
@@ -83,10 +98,11 @@
   proto.princesses=function(){
     const l=this.native('form_princess',()=>this.drawRoster());
     for(const [index,p] of this.data.princesses.entries()){
-      const d=this.presentedCommander(this.data.definitions.find(d=>d.id===p.definitionId)),card=this.card({...d,image:p.unlocked?p.image:p.image.replace('.png','_sketch.png')},null,()=>this.commanderInfo(d,this.data.roster.find(c=>c.definitionId===d.id),()=>this.princesses()));
+      const d=this.presentedCommander(this.data.definitions.find(d=>d.id===p.definitionId)),card=this.card({...d,image:p.image},null,()=>this.commanderInfo(d,this.data.roster.find(c=>c.definitionId===d.id),()=>this.princesses()));
       card.querySelector('.commander-info').onclick=e=>{e.stopPropagation();this.commanderInfo(d,this.data.roster.find(c=>c.definitionId===d.id),()=>this.princesses());};
       card.classList.toggle('reward-claimed',p.claimed);l.get(index<4?'lbox_princess_up':'lbox_princess_dn').append(card);
-      l.action('btn_go_'+(index+1),p.claimed?'已领取':'领取 '+d.name,async()=>{await this.updateAccount({op:'claim',offer:p.id});this.princesses();},p.unlocked&&!p.claimed);
+      l.action('btn_go_'+(index+1),p.claimed?'已领取':'领取 '+d.name,async()=>{const previous=this.data.roster;await this.updateAccount({op:'claim',offer:p.id});this.acquiredCommanders(previous,()=>this.princesses());},p.unlocked&&!p.claimed);
+      if(!p.unlocked&&!p.claimed&&p.unlockDescription){const button=l.get('btn_go_'+(index+1));button.title=p.unlockDescription;button.setAttribute('aria-label',d.name+'：'+p.unlockDescription);}
       if(p.claimed)l.text('btn_go_'+(index+1),'已领取');
     }
   };
@@ -176,12 +192,20 @@
     const receiver=this.held(id),definition=this.definition(receiver),l=this.native('form_regroup',()=>this.reopenCommander(id));
     l.fill('tcmder_source',this.card(definition,receiver,()=>{}));
     l.text('text_notice',this.text('text_regroupnotice'));
+    for(const [group,key] of [['group_infos','text_preview'],['group_items','text_equipitem']])l.text(group+'/text_title',this.text(key),{color:'235,230,225,255'});
+    // XML contains example values (200/500); always initialize from this receiver.
+    for(const [key,track] of [['rank_military','rank'],['rank_nobility','title']])l.fill(key,this.progressionBadge(track,receiver.learning[track]));
+    l.text('text_life',receiver.healthBonus);l.text('text_apply',receiver.healing);
     const donors=this.data.roster.filter(c=>c.id!==id&&!c.locked);donorId=donors.some(c=>c.id===donorId)?donorId:donors[0]?.id;
     const list=l.get('lbox_general');this.bindHorizontalDrag(list);
     list.tabIndex=0;list.setAttribute('aria-label','整编将领列表');
     for(const held of donors){const b=this.card(this.definition(held),held,()=>this.regroup(id,held.id,list.scrollLeft));b.setAttribute('aria-pressed',String(held.id===donorId));list.append(b);}
     list.scrollLeft=scroll;
-    if(!donorId){l.action('btn_regroup',this.text('btn_regroup'),()=>{},false);return;}
+    if(!donorId){
+      l.text('text_notice','暂无可用于整编的将领（已派遣将领不可使用）',{size:12});
+      l.get('tcmder_target').append(this.lettering('无可用将领','font_text_2_cn_hd','#404040',78,'center',{size:12}));
+      l.action('btn_regroup',this.text('btn_regroup'),()=>{},false);return;
+    }
     const donor=this.held(donorId);l.fill('tcmder_target',this.card(this.definition(donor),donor,()=>{}));
     for(let i=0;i<(this.data.equipmentCapacity??2);i++)l.get('lbox_equipitem').append(this.api.uiImage(this.data.items.find(d=>d.id===donor.items[i])?.image||'item_blank.png',45));
     const preview=await this.api.rpc('commander',{op:'preview_inherit',revision:this.data.revision,commander:id,target:donorId});
@@ -363,7 +387,7 @@
       card.classList.add('portrait-only');card.classList.toggle('unavailable-candidate',!candidate.available);
       l.text(key+'/text_name',d.name);l.text(key+'/group/text_medal',candidate.medals);l.text(key+'/group/text_money',candidate.cost.money);l.text(key+'/group/text_indus',candidate.cost.industry);
       for(const [name,kind,level] of [['rank_military','rank',d.rank],['rank_nobility','class',d.title]])l.fill(key+'/'+name,...(level?[this.api.uiImage(kind+'_'+level+'.png',21,24)]:[]));
-      l.action(key+'/btn_rec_'+(index+1),this.text('btn_recruit')+' '+d.name,async()=>{await this.api.act('hire',{unit:data.unit,offer:candidate.id});await this.tavern(cell);},candidate.available);
+      l.action(key+'/btn_rec_'+(index+1),this.text('btn_recruit')+' '+d.name,async()=>{const previous=this.data.roster;await this.api.act('hire',{unit:data.unit,offer:candidate.id});this.data=await this.api.rpc('headquarters');this.acquiredCommanders(previous,()=>this.tavern(cell));},candidate.available);
       if(data.round<candidate.availableRound)l.text(key+'/btn_rec_'+(index+1),this.text('btn_round_word')+' '+data.round+'/'+candidate.availableRound);
     });
   };

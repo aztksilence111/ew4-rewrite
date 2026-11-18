@@ -9,6 +9,8 @@
       stage.addEventListener('scroll',()=>{stage.scrollTop=0;stage.scrollLeft=0;});
       const campaignList=document.getElementById('campaign-battles');
       campaignList.addEventListener('scroll',()=>{if(campaignList.scrollLeft)campaignList.scrollLeft=0;},{passive:true});
+      const countryList=document.getElementById('country-list');
+      countryList.addEventListener('scroll',()=>{if(countryList.scrollLeft)countryList.scrollLeft=0;},{passive:true});
       this.bindCampaignDrag(campaignList);
       document.getElementById('campaign-back').onclick=()=>this.transitionPage(()=>{document.getElementById('campaign-screen').hidden=true;});
       document.getElementById('hq-back').onclick=()=>{
@@ -134,7 +136,7 @@
           b.className='chapter-entry atlas-chapter'+(playable?' is-playable':' is-planned');b.setAttribute('aria-label',entry.name);b.setAttribute('aria-pressed','false');
           b.dataset.tipX=25/54*markerWidth;b.dataset.tipY=markerWidth;
           Object.assign(b.style,{left:'calc('+entry.x/568*100+'% - '+25/54*markerWidth+'px)',top:'calc('+entry.y/320*100+'% - '+markerWidth+'px)',width:markerWidth+'px',height:markerHeight+'px'});
-          const image=this.api.image(entry.image).cloneNode();image.alt='';image.width=markerWidth;image.height=markerHeight;b.append(image);
+          const image=playable?this.api.image(entry.image).cloneNode():this.api.uiImage('button_choosebattlezone_locked.png',markerWidth,markerHeight);image.alt='';image.width=markerWidth;image.height=markerHeight;b.append(image);
           b.title=entry.name+' · '+(entry.location||'')+' '+entry.start+'–'+entry.end+(playable?' · 可试玩':' · 筹备中');
         }
       }else{
@@ -178,9 +180,14 @@
       const chapterArt=['france','coalition','holyroman','east','usa','uk'][chapter.id-1]||'france';
       list.style.setProperty('--chapter-entry-image','url("/content/ui/image_menu_hd/button_choosestage_'+chapterArt+'.png")');
       const entryArt=this.manifest.atlases.image_menu_hd?.['button_choosestage_'+chapterArt+'.png'];
-      list.style.setProperty('--campaign-row-width',(entryArt?.w/2||164)+'px');
-      document.getElementById('campaign-screen').style.setProperty('--campaign-row-width',(entryArt?.w/2||164)+'px');
-      list.style.setProperty('--campaign-row-height',(entryArt?.h/2||45)+'px');
+      const chapterStyles=this.manifest.campaignSelection?.chapters;
+      const sidebar=chapter.key?chapterStyles?.find(c=>c.key===chapter.key):chapterStyles?.find(c=>c.catalogId===chapter.id);
+      if(sidebar?.sidebarImage){const image=this.api.image(sidebar.sidebarImage);await image.decode();list.style.setProperty('--chapter-entry-image','url("'+image.src+'")');}
+      const rowWidth=sidebar?.sidebarImage?Number(sidebar.sidebarWidth)||164:entryArt?.w/2||164;
+      const rowHeight=sidebar?.sidebarImage?Number(sidebar.sidebarHeight)||45:entryArt?.h/2||45;
+      list.style.setProperty('--campaign-row-width',rowWidth+'px');
+      document.getElementById('campaign-screen').style.setProperty('--campaign-row-width',rowWidth+'px');
+      list.style.setProperty('--campaign-row-height',rowHeight+'px');
       const commanders=new Map(),ready=[],text=[];
       for(const presentation of Object.values(this.catalog.presentations).filter(s=>s.chapter===chapter.id)){
         if(presentation.hidden&&!this.catalog.unlockedCampaigns?.includes(presentation.id))continue;
@@ -308,7 +315,7 @@
       const definition=this.manifest.strategic[this.battle.id]||{},textureScale=this.manifest.uiOverrides?.strategic||definition.background?1:.8,texture=this.api.menuArt.strategicTexture(definition);
       const scale=Math.max(Number(definition.scale||1),(logicalWidth-130)/(texture.image.naturalWidth/texture.ratio*textureScale),definition.fitHeight===false?0:logicalHeight/((texture.height||texture.image.naturalHeight/texture.ratio)*textureScale));
       const target=this.api.menuArt.strategicCamera(definition,scale,textureScale,logicalWidth-130,logicalHeight);
-      const camera=this.strategicPose(this.battle.id,{x:target.x-Number(definition.centerx||410)*scale,y:definition.fitHeight===false?0:target.y-Number(definition.centery||288)*scale,scale},time);
+      const camera=this.strategicPose(this.battle.id,{x:target.x-Number(definition.centerx||410)*scale,y:definition.fitHeight===false&&definition.verticalAlign!=='center'?0:target.y-Number(definition.centery||288)*scale,scale},time);
       if(definition.fitHeight===false&&definition.paperMargin>0){
         if(!texture.paperTile){const tile=document.createElement('canvas');tile.width=texture.image.naturalWidth/texture.ratio;tile.height=definition.paperMargin/texture.ratio;
           tile.getContext('2d').drawImage(texture.image,0,0,texture.image.naturalWidth,definition.paperMargin,0,0,tile.width,tile.height);texture.paperTile=tile;}
@@ -542,8 +549,10 @@
         }finally{this.refreshPending=false;this.syncRecruitmentBusy();}
         return;
       }
+      const previous=this.data.roster;
       this.data=await this.api.rpc('commander',{revision:this.data.revision,...args});
       if(!document.getElementById('hq-screen').hidden)this.drawRoster();
+      if(args.op==='recruit'||args.op==='recruit_badge')this.acquiredCommanders(previous);
     }
     async saveMenu(saving,mode,tutorial){
       const slots=await this.api.rpc('saves',{mode}),layout=this.manifest.layouts.form_save;

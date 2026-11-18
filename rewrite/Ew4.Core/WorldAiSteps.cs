@@ -81,6 +81,8 @@ public static partial class WorldAi
         if (state.AiRandomState != plan.Production.InitialRandomState)
             throw new RuleViolation("ai.step_stale_random", "AI random state changed after planning");
         var bus = battle.Combat.Extensions;
+        if (bus?.OrdersEnabled==true && !WorldDiplomacy.Dormant(state,state.ActiveFaction,ai.NeutralCamps)
+            && CommandOrders.AiAction(state,bus,ai.Movement,battle) is { } orderChange) return orderChange;
         if (bus?.TacticalEnabled == true && !WorldDiplomacy.Dormant(state, state.ActiveFaction, ai.NeutralCamps))
             foreach (var source in state.Units.Where(u => u.Owner == state.ActiveFaction && TacticalSkills.CanActivate(state, u)).OrderBy(u => u.Id, StringComparer.Ordinal))
                 foreach (var (skill, slot) in bus.Bound(source.Combatant).Where(p => p.Skill.Maneuver != null))

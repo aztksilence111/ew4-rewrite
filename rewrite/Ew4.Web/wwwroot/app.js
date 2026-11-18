@@ -90,7 +90,7 @@ async function prepareMapFonts(next,preferences=settings){
 const menus = new Ew4Menus.Menus({rpc,button,uiImage,countryImage,labels:labelImage,text:(value,font,color,width,align,options)=>originalTextRenderer?.element(value,font,color,width,align,options)||document.createTextNode(value),prose:(...args)=>originalTextRenderer.prose(...args),detail:detailWindow,start,loadLibrary,image,animation,libraries,notice,main:showMain,
   get manifest(){return manifest;},get catalog(){return catalog;},state:()=>state,refreshCatalog:async()=>{catalog=await rpc('catalog');},tutorialUi,popup:popupOpen,load:(slot,mode)=>load(slot,mode),deploy:(unit,commander)=>act('deploy',{unit,commander}),act,
   updateResources:resources=>{const player=state?.factions.find(f=>f.id===state.playerFaction);if(player){player.resources=resources;refreshResources();}},
-  refresh:async()=>{if(state&&!$('play').hidden){await installState(await rpc('action',{op:'state',revision:state.revision}));}},get menuArt(){return menuArt;},closeDetail});
+  refresh:async()=>{if(state&&!$('play').hidden){await installState(await rpc('action',{op:'state',revision:state.revision}));}},get menuArt(){return menuArt;},closeDetail,acquisitionEffect});
 let chosenScenario, chosenCountry, countryChoices = [], showGrid = false, selectedAt = 0;
 const turnUi=new Ew4TurnUI.Turns({
   state:()=>state,get manifest(){return manifest;},rpc,button,detail:detailWindow,close:closeDetail,notice,
@@ -798,6 +798,7 @@ function refreshHud() {
   diplomacyUi.sync();
   refreshAiProgress();
   refreshDialogue();
+  refreshOrderReaction();
   if(stageIntroPending&&!state.story)showStageIntro();
   storyPlayer.sync(state.story,stageIntroOpen,busy).catch(error=>notice(error.message));
   $('scenario-event').hidden = !state.scenarioPopup || stageIntroOpen;
@@ -834,6 +835,14 @@ function refreshHud() {
   victoryUi.sync(state.localMultiplayer?null:state);
   localMultiplayerUi.sync(state);
 }
+let orderReactionRevision=-1;
+function refreshOrderReaction(){
+  if(busy||!state?.orderReaction||orderReactionRevision===state.revision)return;
+  orderReactionRevision=state.revision;const reaction=state.orderReaction;
+  const body=detailWindow('info_label',300,220,()=>act('order_response',{mode:1}));
+  body.append(originalTextRenderer.element(reaction.name,'font_text_2_cn_hd','#404040'),originalTextRenderer.element(reaction.description,'font_text_2_cn_hd','#404040',270));
+  button('保留此次机会',()=>act('order_response',{mode:0}),body);
+}
 async function act(op, extra = {}) {
   if (busy || !state || stageIntroOpen || turnUi.open) return;
   const timedTurn=op==='end';
@@ -858,7 +867,7 @@ async function act(op, extra = {}) {
   } finally { busy = false;if(storyCommand&&presentationOnly)storyPlayer.sync(state.story,stageIntroOpen,false);else refreshHud(); }
   if(presentationOnly)return;
   if(!state?.story&&pendingStoryTutorial){const saved=pendingStoryTutorial;pendingStoryTutorial=null;await beginTutorial(saved.checkpoint);}
-  if (op === 'end' || op === 'dialogue' || op === 'event_choice' || op.startsWith('story_') || op === 'player_ai_start'&&state?.playerAi?.autoBattle) await runAi();
+  if (op === 'end' || op === 'dialogue' || op === 'order_response' || op === 'event_choice' || op.startsWith('story_') || op === 'player_ai_start'&&state?.playerAi?.autoBattle) await runAi();
   }catch(error){if(turnMeasurement)turnMeasurement.failed=true;throw error;}
   finally{
     if(timedTurn){
@@ -926,7 +935,7 @@ async function runAiLoop() {
     finally{busy = false; aiRunning = false; skipAi = false; aiStopRequested=false; aiFocus=null; if(state)refreshHud();requestRender();}
   }
 }
-function aiCanContinue(next){return !aiControl.mode&&!diplomacyUi.opened&&!stageIntroOpen&&next&&!turnUi.hasNewTurn(next)&&!next.dialogue&&!next.scenarioPopup&&next.phase!=='Finished'&&
+function aiCanContinue(next){return !aiControl.mode&&!diplomacyUi.opened&&!stageIntroOpen&&next&&!turnUi.hasNewTurn(next)&&!next.dialogue&&!next.orderReaction&&!next.scenarioPopup&&next.phase!=='Finished'&&
   (!next.factions.find(f=>f.id===next.activeFaction).human||next.activeFaction===next.playerFaction&&next.playerAi?.enabled&&(next.playerAi.endingTurn||next.playerAi.autoBattle));}
 function refreshTerrainInfo(site){
   const host=$('terrain-info'),rows=Ew4Battlefield.terrainRows(site),key=JSON.stringify(rows);
@@ -1045,6 +1054,19 @@ function showStageIntro(){
 function confirmDisband(unit,refund,anchor){openSingleAction('disband','解散部队',{cost:refund,affordable:true,warning:selection.disbandWarning},anchor,{unit:unit.id},true);}
 function popupOpen(element,sound='sfx_pop.wav'){if(sound)effects?.sound(sound);element.classList.remove('popup-opening');void element.offsetWidth;element.classList.add('popup-opening');}
 function closeDetail(){const back=detailReturn;detailReturn=null;menus.dismissSkillTip();$('detail-modal').hidden=true;if(back)back();}
+function acquisitionEffect(body,current){
+  if(!effects)return;
+  const canvas=document.createElement('canvas');canvas.width=152*2;canvas.height=184*2;
+  Object.assign(canvas.style,{position:'absolute',left:'0',top:'-27px',width:'152px',height:'184px',pointerEvents:'none',zIndex:'3'});body.append(canvas);
+  const particles=new Ew4Effects.Effects(effects.api,effects.data),draw=canvas.getContext('2d');
+  particles.effect('effect_getgeneral.xml',76,92);
+  const frame=time=>{
+    if(!current()){particles.dispose();canvas.remove();return;}
+    draw.setTransform(2,0,0,2,0,0);draw.clearRect(0,0,152,184);particles.frame(draw,time);
+    if(particles.instances.length)requestAnimationFrame(frame);else{particles.dispose();canvas.remove();}
+  };
+  requestAnimationFrame(frame);
+}
 function detailWindow(title,width,height,confirm,onClose,sound='sfx_pop.wav'){
   menus.closeHeadquartersFilter?.(true);
   closeSingleAction();
@@ -1128,22 +1150,28 @@ function openSkillDescription(skill,onClose){
   detailReturn=onClose||(()=>{if(selected)openUnitInfo(selected);});
 }
 function openSkillAction(unit,entry){
-  const skill=entry.skill,isCell=skill.target==='cell',choices=isCell?(entry.cells||[]):entry.targets,multiple=!!entry.multiple,chosen=new Set();let target=choices[0];
-  const body=detailWindow('info_label',300,multiple?280:220,()=>act('skill',{offer:skill.instanceId,...(multiple?{units:[...chosen]}:isCell?{cell:target}:{target})}));
+  const skill=entry.skill,isCell=skill.target==='cell',choices=isCell?(entry.cells||[]):entry.targets,multiple=!!entry.multiple,chosen=new Set(),enemies=entry.enemyTargets||[];let target=choices[0],enemy=enemies[0],secondaryTarget;
+  const body=detailWindow('info_label',300,multiple?280:220,()=>act('skill',{offer:skill.instanceId,...(multiple?{units:[...chosen],...(enemy?{target:enemy}:{}),...(secondaryTarget?{secondaryTarget}:{})}:isCell?{cell:target}:{target})}));
   $('detail-confirm').disabled=!entry.available||!multiple&&target===undefined;
   const box=document.createElement('div');box.className='skill-action-description'+(multiple?' multi-target':'');
   const description=document.createElement('div');description.className='skill-action-text';description.append(originalTextRenderer.element(skill.description,'font_text_2_cn_hd','#404040',270));
   box.append(originalTextRenderer.element(skill.name,'font_text_2_cn_hd','#404040'),description);
   const cost=document.createElement('div');cost.className='skill-action-cost';
   for(const [key,icon] of [['money','money'],['industry','industry'],['food','food']]){const span=document.createElement('span');span.append(uiImage('marker_'+icon+'.png',16),originalTextRenderer.element(skill.cost[key]||0,'font_char_2_hd','#404040'));cost.append(span);}if(!multiple||Object.values(skill.cost).some(v=>v>0))box.append(cost);
-  const targets=document.createElement('div');targets.className='skill-targets';
+  const targets=document.createElement('div');targets.className='skill-targets';let secondaryButtons=[];
   const summary=document.createElement('div');summary.className='skill-target-summary';
-  const refresh=()=>{if(!multiple)return;const text='自身默认受益，另选 '+chosen.size+' / '+entry.maximumTargets+' 支';summary.setAttribute('aria-label',text);summary.replaceChildren(originalTextRenderer.element(text,'font_text_2_cn_hd','#404040'));for(const b of targets.children){b.setAttribute('aria-pressed',String(chosen.has(b.dataset.unit)));b.disabled=!chosen.has(b.dataset.unit)&&chosen.size>=entry.maximumTargets;}};
+  const matchesSelection=(ids,complete=false)=>!entry.legalSelections||entry.legalSelections.some(s=>(s.enemy||null)===(enemy||null)&&(!complete||s.targets.length===ids.length)&&ids.every((id,i)=>s.targets[i]===id));
+  const refresh=()=>{if(!multiple)return;const text=(entry.includesSelf?'本部受益，另选 ':'按顺序选择 ')+chosen.size+' / '+entry.maximumTargets;summary.setAttribute('aria-label',text);summary.replaceChildren(originalTextRenderer.element(text,'font_text_2_cn_hd','#404040'));for(const b of targets.children){b.setAttribute('aria-pressed',String(chosen.has(b.dataset.unit)));b.disabled=!chosen.has(b.dataset.unit)&&(chosen.size>=entry.maximumTargets||!matchesSelection([...chosen,b.dataset.unit]));}const legalSecondary=entry.secondaryByEnemy?.[enemy]||entry.secondaryEnemies||[];if(secondaryTarget&&!legalSecondary.includes(secondaryTarget))secondaryTarget=null;for(const b of secondaryButtons){b.hidden=!!b.dataset.unit&&!legalSecondary.includes(b.dataset.unit);b.setAttribute('aria-pressed',String((b.dataset.unit||null)===(secondaryTarget||null)));}$('detail-confirm').disabled=!entry.available||chosen.size<(entry.minimumTargets||0)||entry.requiresEnemy&&!entry.enemyOptional&&!enemy||!matchesSelection([...chosen],true);};
   if(multiple)box.append(summary);
-  for(const id of choices){const t=isCell?null:state.units.find(u=>u.id===id),cell=isCell?id:t.cell,b=button('',()=>{if(multiple){if(chosen.has(id))chosen.delete(id);else if(chosen.size<entry.maximumTargets)chosen.add(id);refresh();}else{target=id;for(const n of targets.children)n.setAttribute('aria-pressed',String(n===b));}},targets);
-    b.dataset.unit=id;b.setAttribute('aria-pressed',String(!multiple&&id===target));b.append(originalTextRenderer.element((isCell?'':visualProfile(t).name+' ')+'('+(cell%state.width)+','+Math.floor(cell/state.width)+')','font_text_2_cn_hd','#404040'));}
+  for(const id of choices){const stay=id==='stay',synthetic=typeof id==='string'&&id.startsWith('cell.'),t=isCell||synthetic?null:state.units.find(u=>u.id===id),cell=isCell?id:synthetic?Number(id.slice(5)):t?.cell;if(cell===undefined&&!stay)continue;const b=button('',()=>{if(multiple){if(chosen.has(id))chosen.delete(id);else if(chosen.size<entry.maximumTargets)chosen.add(id);refresh();}else{target=id;for(const n of targets.children)n.setAttribute('aria-pressed',String(n===b));}},targets);
+    b.dataset.unit=id;b.setAttribute('aria-pressed',String(!multiple&&id===target));b.append(originalTextRenderer.element(stay?'留在原位，跳过本队':(t?visualProfile(t).name+' ':'地块 ')+'('+(cell%state.width)+','+Math.floor(cell/state.width)+')','font_text_2_cn_hd','#404040'));}
   refresh();
-  box.append(targets);body.append(box);
+  box.append(targets);
+  if(multiple&&enemies.length){const enemyChoices=document.createElement('div');enemyChoices.className='skill-targets';const chooseEnemy=(id,b)=>{enemy=id;for(const n of enemyChoices.children)n.setAttribute('aria-pressed',String(n===b));refresh();};
+    if(entry.enemyOptional){const b=button('不指定敌军',()=>chooseEnemy(null,b),enemyChoices);}
+    for(const id of enemies){const t=state.units.find(u=>u.id===id),cell=typeof id==='string'&&id.startsWith('cell.')?Number(id.slice(5)):t?.cell;if(cell===undefined)continue;const b=button('',()=>chooseEnemy(id,b),enemyChoices);b.setAttribute('aria-pressed',String(id===enemy));b.append(originalTextRenderer.element((t?'敌军 '+visualProfile(t).name:entry.siteTarget?'本国设施':'敌方设施')+' ('+(cell%state.width)+','+Math.floor(cell/state.width)+')','font_text_2_cn_hd','#404040'));}box.append(enemyChoices);}
+  if(multiple&&entry.secondaryEnemies?.length){const extra=document.createElement('div');extra.className='skill-targets';for(const id of [null,...entry.secondaryEnemies]){const t=id&&state.units.find(u=>u.id===id);const b=button('',()=>{secondaryTarget=id;refresh();},extra);b.dataset.unit=id||'';secondaryButtons.push(b);b.setAttribute('aria-pressed',String(!id));b.append(originalTextRenderer.element(t?(entry.secondaryOwn?'执行步兵 ':'后续敌军 ')+visualProfile(t).name+' ('+(t.cell%state.width)+','+Math.floor(t.cell/state.width)+')':entry.secondaryOwn?'自动选择合法执行队':'不指定后续敌军','font_text_2_cn_hd','#404040'));}box.append(extra);refresh();}
+  body.append(box);
 }
 let pendingAction=null;
 function closeSingleAction(){pendingAction=null;$('single-action').hidden=true;}

@@ -80,8 +80,9 @@ function check(value, message) { assert.ok(value, message); report.checks++; }
             const image = getComputedStyle(el).backgroundImage;
             const name = Object.keys(manifest.atlases.image_menu_hd).find(n => image.includes('/' + n));
             const art = manifest.atlases.image_menu_hd[name];
+            const sidebar = manifest.campaignSelection?.chapters?.find(c => c.sidebarImage && image.includes(c.sidebarImage));
             return before.width === el.offsetWidth && before.height === el.offsetHeight && other.offsetWidth === el.offsetWidth && other.offsetHeight === el.offsetHeight
-              && Math.abs(parseFloat(getComputedStyle(el).width) - art.w / 2) < .01 && Math.abs(parseFloat(getComputedStyle(el).height) - art.h / 2) < .01
+              && Math.abs(parseFloat(getComputedStyle(el).width) - (sidebar ? sidebar.sidebarWidth : art.w / 2)) < .01 && Math.abs(parseFloat(getComputedStyle(el).height) - (sidebar ? sidebar.sidebarHeight : art.h / 2)) < .01
               && Math.abs(rect.right - list.right) <= 1 && Math.abs(list.right - innerWidth) <= 1 && other.getBoundingClientRect().left > rect.left + 5;
           }, beforeSize), 'Selection moves original-size art left while covering screen right edge: ' + chapters[index].name + ' ' + edge);
         }

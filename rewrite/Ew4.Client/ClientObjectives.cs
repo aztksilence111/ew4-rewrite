@@ -45,8 +45,8 @@ public sealed partial class ClientGame
         else if (command.Op is not ("" or "list")) throw new RuleViolation("objectives.command", "Unknown objective command");
         var context = game == null || content.Extensions.Metagame.Objectives.Count == 0 ? null : ObjectiveContext(game.Session);
         return new { account.Revision, account.Medals, account.Badges,
-            entries = content.Extensions.Metagame.Objectives.Where(o => !o.Hidden || account.CompletedObjectives.Contains(o.Id)
-                || account.ClaimedRewards.Contains("objective." + o.Id)).Select(o => new {
+            entries = content.Extensions.Metagame.Objectives.Where(o => !o.Internal && (!o.Hidden || account.CompletedObjectives.Contains(o.Id)
+                || account.ClaimedRewards.Contains("objective." + o.Id))).Select(o => new {
                 o.Id, o.Kind, name = content.Label(o.Name), description = content.Label(o.Description), o.Reward,
                 completed = account.CompletedObjectives.Contains(o.Id), claimed = account.ClaimedRewards.Contains("objective." + o.Id),
                 conditions = o.Conditions.Select(c => MetagameObjectives.Progress(account, o, c, context)) }) };

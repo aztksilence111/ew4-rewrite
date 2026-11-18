@@ -11,6 +11,11 @@ public sealed partial class RuleEventBus
     {
         double health = 0, range = 0;
         bool food = false, terrain = false;
+        if (OrdersEnabled)
+        {
+            var plans = Bound(unit).Where(p => p.Skill.Kind == "passive").Select(p => p.Skill.Order?.Plan).ToArray();
+            health += plans.Contains("master_training_health") ? 12 : plans.Contains("training_health") ? 8 : 0;
+        }
         foreach (var (skill, slot) in Bound(unit).Where(p => p.Skill.Kind == "passive"))
             foreach (var effect in skill.Effects.Where(e => e.Event == "unit.attributes"
                 && (e.TargetTag == null || unit.Profile.Traits.Contains(e.TargetTag))

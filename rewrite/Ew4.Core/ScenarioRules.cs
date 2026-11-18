@@ -360,7 +360,7 @@ public static class ScenarioRules
                         transferCells.ExceptWith(WorldUnitLayers.Surface(next).Where(u => !WorldDiplomacy.Allied(next, u.Owner, owner)).Select(u => u.Cell));
                     if (WorldUnitLayers.Surface(next).Any(u => transferCells.Contains(u.Cell) && !WorldDiplomacy.Allied(next, u.Owner, owner)))
                         throw new RuleViolation("scenario.occupants", "Transfer occupants first before changing hostile territory");
-                    next = next with { Cells = next.Cells.Select((c, i) => transferCells.Contains(i) ? c with { Owner = owner } : c).ToArray() }; break;
+                    next = CommandOrders.SitesChanged(next, next with { Cells = next.Cells.Select((c, i) => transferCells.Contains(i) ? c with { Owner = owner } : c).ToArray() }); break;
                 case "unit_owner":
                     var unit = next.Units.Single(u => u.Id == e.Unit);
                     if (e.ExpectedOwner != null && unit.Owner != e.ExpectedOwner)
