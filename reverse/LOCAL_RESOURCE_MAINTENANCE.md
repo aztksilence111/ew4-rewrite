@@ -1,5 +1,7 @@
 # 本地资源维护
 
+2026-11-18 0.2.45正式发布后两盘清理：C/E共1122目标52505文件9927795978字节，解除2依赖junction，残留0／428保护0变／双Git保持。只留45/44/43三批9包；本轮QA、冻结副本、测试账户头像、重复编译/APK、旧作者不可变副本及42包已清。签名、原始输入、作者project/exports/_work、玩家资料及活动36数据保留。56259/60迁至本批web且192原玩家文件SHA保持，56180未停；141跨版本头像检查通过。结果先存E:/Workplace/game/o4mod/build/release-0.2.45-20261118/cleanup.json，详见[发行记录](../rewrite/RELEASE_PROGRESS_0.2.45_20261118.md)，随后短锚点、日志最后。
+
 2026-11-18 作者包1.1.10：主检出 E:/Workplace/game/o4mod 的 build/author-kit-0.2.44-1.1.10-20261118 已生成兼容已发布.44的作者包，内置用户要求的原发行密钥及独立重签工具，JSON指南覆盖工程／Mod／APK实际路径。本检出 tools/author-kit、publish_mod_kit.ps1、verify_author_kit.py 已更新，供下一版沿用，未改同期游戏开发。13流程9874检查0错，原证书／2909内容条目／16 KiB对齐通过，无手机安装。完成／校验先存于主检出 build/author-signing-maintenance-20261118；指定处理器预检后清7014文件1104967446字节，残留0／11保护0改／两检出Git保持。保留原密钥、.44正式附件、最终作者目录／ZIP、玩家服务和资料；GitHub未更新。锚点随后，日志最后。
 
 2026-11-18 游戏内物品图库：先存rewrite/ITEM_GALLERY_20261118.md及E:/Workplace/game/o4mod/build/item-gallery-20261118/completion.json、三份显式清理收据。仅停QA56261，清隔离qa3154文件250807689字节、两个预览迁走后的旧skin-carousel/runtime357文件115694614字节，共3511文件366502303字节；另清临时前端依赖链接1个，残留0／31保护文件0改／双Git保持。56259／56260沿原档案在本批runtime运行，6原文件SHA保持，56180未停且HTTP200。保留当前必要runtime／共用compat／原档案及两张实际演示；275检查通过，无新APK或Android入口编译。随后短锚点，WORK_LOG最后。

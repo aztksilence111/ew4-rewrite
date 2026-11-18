@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Ew4.Client"><HintPath>$(Ew4RuntimeRoot)/Ew4.Client.dll</HintPath></Reference>
+    <Reference Include="Ew4.Core"><HintPath>$(Ew4RuntimeRoot)/Ew4.Core.dll</HintPath></Reference>
+    <Reference Include="Ew4.Legacy"><HintPath>$(Ew4RuntimeRoot)/Ew4.Legacy.dll</HintPath></Reference>
+    <Reference Include="Ew4.Persistence"><HintPath>$(Ew4RuntimeRoot)/Ew4.Persistence.dll</HintPath></Reference>
+    <Reference Include="StbImageWriteSharp"><HintPath>$(Ew4RuntimeRoot)/StbImageWriteSharp.dll</HintPath></Reference>
+  </ItemGroup>
+</Project>
