@@ -1,5 +1,11 @@
 using System.Text.Json;
 using Ew4.Core;
+if (args.ElementAtOrDefault(1) == "--item-textures-only")
+{
+    string project = Path.GetFullPath(args[0]);
+    Console.WriteLine(JsonSerializer.Serialize(new { itemTextureChecks = ItemTextureChecks.Run(project,
+        Path.GetFullPath(args.ElementAtOrDefault(2) ?? Path.Combine(project, "build/item-gallery/qa/core"))), errors = 0 })); return;
+}
 if (args.ElementAtOrDefault(1) == "--portrait-gallery-only")
 {
     string project = Path.GetFullPath(args[0]);
@@ -139,6 +145,11 @@ if (args.ElementAtOrDefault(1) == "--diplomacy-only")
     Console.WriteLine(JsonSerializer.Serialize(new { saveCompatibility = SaveCompatibilityChecks.Run(Path.GetFullPath(args[0])), errors = 0 }));
     Console.WriteLine(JsonSerializer.Serialize(new { paidSurrender = PaidSurrenderChecks.Run(), errors = 0 }));
     Console.WriteLine(JsonSerializer.Serialize(new { diplomacyChecks = DiplomacyChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
+}
+
+if (args.ElementAtOrDefault(1) == "--item-quantity-only")
+{
+    Console.WriteLine(JsonSerializer.Serialize(new { itemQuantityChecks = ItemQuantityChecks.Run(Path.GetFullPath(args[0])), errors = 0 })); return;
 }
 
 if (args.ElementAtOrDefault(1) == "--commerce-only")
@@ -453,6 +464,7 @@ int legacyFactionChecks = LegacyFactionChecks.Run(root);
 int legacyCombatChecks = LegacyCombatChecks.Run(root);
 int legacyActionAiChecks = LegacyActionAiChecks.Run(root);
 int legacyCommerceChecks = LegacyCommerceChecks.Run(root);
+legacyCommerceChecks += ItemQuantityChecks.Run(root);
 int sessionAccountChecks = SessionAccountChecks.Run(root);
 int rosterDeploymentChecks = RosterDeploymentChecks.Run(root);
 int legacyTechnologyChecks = LegacyTechnologyChecks.Run(root);

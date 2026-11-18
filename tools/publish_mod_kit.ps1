@@ -4,10 +4,14 @@ param(
     [string]$Destination = '',
     [string]$BuildRoot = '',
     [string]$ExamplePackage = '',
-    [string]$SourceRef = 'fd6a6a4731166120d6803c63b347821d704269aa',
-    [string]$GameVersion = '0.2.34',
-    [string]$KitVersion = '1.0.0',
-    [string]$Date = '20261109'
+    [string]$ExistingKitArchive = '',
+    [string]$SigningKeyStore = (Join-Path $env:USERPROFILE '.codex/keys/ew4-release-debug.keystore'),
+    [string]$AndroidBuildTools = (Join-Path $env:USERPROFILE '.codex/tools/android-sdk/build-tools/36.0.0'),
+    [string]$SigningJavaHome = (Join-Path $env:USERPROFILE '.codex/tools/android-jdk'),
+    [Parameter(Mandatory)][string]$SourceRef,
+    [Parameter(Mandatory)][string]$GameVersion,
+    [Parameter(Mandatory)][string]$KitVersion,
+    [Parameter(Mandatory)][string]$Date
 )
 $ErrorActionPreference = 'Stop'
 $Root = (Resolve-Path -LiteralPath $Root).Path
@@ -24,6 +28,7 @@ foreach ($path in @($Destination, $BuildRoot, $archivePath)) {
 }
 $utf8 = New-Object Text.UTF8Encoding($false)
 $utf8Bom = New-Object Text.UTF8Encoding($true)
+Add-Type -AssemblyName System.IO.Compression.FileSystem
 function Write-Json([string]$Path, $Value) {
     [IO.File]::WriteAllText($Path, ($Value | ConvertTo-Json -Depth 30), $utf8)
 }
@@ -41,12 +46,46 @@ if ($LASTEXITCODE -ne 0) { throw 'CLI source differs from the requested release;
 $releaseInfo = Get-Content -LiteralPath (Join-Path $RuntimeRoot 'release-info.json') -Raw | ConvertFrom-Json
 if ($releaseInfo.version -ne $GameVersion -or $releaseInfo.source -ne (& git -C $Root rev-parse $SourceRef).Trim()) { throw 'Author package runtime version/source mismatch.' }
 New-Item -ItemType Directory -Path $BuildRoot -Force | Out-Null
-& dotnet publish (Join-Path $Root 'rewrite/Ew4.ModTool/Ew4.ModTool.csproj') `
-    -c Release -r win-x64 --self-contained true `
-    ('-p:Ew4RuntimeRoot=' + $RuntimeRoot) `
-    --artifacts-path (Join-Path $BuildRoot 'compiler') `
-    -o $Destination --nologo --verbosity minimal
-if ($LASTEXITCODE -ne 0) { throw 'Author CLI publish failed.' }
+if ($ExistingKitArchive) {
+    # A documentation/signing-only update reuses exactly the published CLI/runtime.
+    # Extract only manifest-listed immutable files; never copy an author's project or outputs.
+    $seed = [IO.Compression.ZipFile]::OpenRead((Resolve-Path -LiteralPath $ExistingKitArchive).Path)
+    try {
+        $metaEntries = @($seed.Entries | Where-Object { $_.FullName -match '^[^/]+/author-kit\.json$' })
+        if ($metaEntries.Count -ne 1) { throw 'Expected one author package root.' }
+        $prefix = $metaEntries[0].FullName.Substring(0, $metaEntries[0].FullName.LastIndexOf('/') + 1)
+        function Read-SeedJson([string]$Name) {
+            $reader = New-Object IO.StreamReader($seed.GetEntry($prefix + $Name).Open(), [Text.Encoding]::UTF8)
+            try { return ($reader.ReadToEnd() | ConvertFrom-Json) } finally { $reader.Dispose() }
+        }
+        $seedInfo = Read-SeedJson 'author-kit.json'
+        if ($seedInfo.gameVersion -ne $GameVersion -or $seedInfo.sourceCommit -ne $releaseInfo.source) { throw 'Seed author package is for a different game/source.' }
+        foreach ($entry in (Read-SeedJson 'files.sha256.json').files) {
+            $target = [IO.Path]::GetFullPath((Join-Path $Destination $entry.path))
+            if (!$target.StartsWith($Destination + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or $entry.path -match '^(project|exports|_work)/') { throw 'Unsafe seed entry.' }
+            $zipEntry = $seed.GetEntry($prefix + $entry.path)
+            if (!$zipEntry -or $zipEntry.Length -ne $entry.bytes) { throw ('Missing seed content: ' + $entry.path) }
+            if ($entry.path -match '^signing/') {
+                $stream = $zipEntry.Open()
+                $hasher = [Security.Cryptography.SHA256]::Create()
+                try { $hash = [BitConverter]::ToString($hasher.ComputeHash($stream)).Replace('-', '').ToLowerInvariant() }
+                finally { $stream.Dispose(); $hasher.Dispose() }
+                if ($hash -ne $entry.sha256) { throw ('Seed hash mismatch: ' + $entry.path) }
+                continue
+            }
+            New-Item -ItemType Directory -Path (Split-Path $target -Parent) -Force | Out-Null
+            [IO.Compression.ZipFileExtensions]::ExtractToFile($zipEntry, $target, $false)
+            if ((Sha256 $target) -ne $entry.sha256) { throw ('Seed hash mismatch: ' + $entry.path) }
+        }
+    } finally { $seed.Dispose() }
+} else {
+    & dotnet publish (Join-Path $Root 'rewrite/Ew4.ModTool/Ew4.ModTool.csproj') `
+        -c Release -r win-x64 --self-contained true `
+        ('-p:Ew4RuntimeRoot=' + $RuntimeRoot) `
+        --artifacts-path (Join-Path $BuildRoot 'compiler') `
+        -o $Destination --nologo --verbosity minimal
+    if ($LASTEXITCODE -ne 0) { throw 'Author CLI publish failed.' }
+}
 
 $libraries = @('Ew4.Mods', 'Ew4.Client', 'Ew4.Core', 'Ew4.Legacy', 'Ew4.Persistence',
     'MoonSharp.Interpreter', 'AssetRipper.TextureDecoder', 'StbImageSharp', 'StbImageWriteSharp')
@@ -67,10 +106,16 @@ if ($LASTEXITCODE -ne 0) { throw 'Cannot snapshot matching documentation.' }
 Expand-Archive -LiteralPath (Join-Path $BuildRoot 'reference.zip') -DestinationPath (Join-Path $BuildRoot 'reference-source')
 Copy-Tree (Join-Path $BuildRoot 'reference-source/rewrite/mod-kit') (Join-Path $Destination 'reference')
 Copy-Tree (Join-Path $Root 'tools/author-kit') $Destination
+$referenceGuide = Join-Path $Destination 'reference/docs/CONFIG_REFERENCE.md'
+[IO.File]::WriteAllText($referenceGuide, ([IO.File]::ReadAllText($referenceGuide) + "`n`n作者工程、Mod 与 R 版 APK 内的实际位置见[JSON 路径指南](../../JSON_PATHS.zh-CN.md)，同签名重签见[Android 说明](../../ANDROID_SIGNING.zh-CN.md)。`n"), $utf8)
+$skillGuide = Join-Path $Destination 'reference/examples/legacy-skill-parameters/README.md'
+[IO.File]::WriteAllText($skillGuide, ([IO.File]::ReadAllText($skillGuide) + "`n`n作者工程放在 project/rewrite/definitions/legacy-skill-parameters.json；R 版 APK 内放在 assets/rewrite/definitions/legacy-skill-parameters.json，并在各自 rewrite/extension.json 注册。完整流程见[JSON 路径指南](../../../JSON_PATHS.zh-CN.md)。`n"), $utf8)
 $readmePath = Join-Path $Destination 'README.zh-CN.md'
 [IO.File]::WriteAllText($readmePath, ([IO.File]::ReadAllText($readmePath).Replace('0.2.34', $GameVersion)), $utf8)
-$launcherSource = [IO.File]::ReadAllText((Join-Path $Destination 'author.ps1'), [Text.Encoding]::UTF8)
-[IO.File]::WriteAllText((Join-Path $Destination 'author.ps1'), ($launcherSource -replace "`r?`n", "`r`n"), $utf8Bom)
+foreach ($script in @('author.ps1', 'sign-apk.ps1')) {
+    $launcherSource = [IO.File]::ReadAllText((Join-Path $Destination $script), [Text.Encoding]::UTF8)
+    [IO.File]::WriteAllText((Join-Path $Destination $script), ($launcherSource -replace "`r?`n", "`r`n"), $utf8Bom)
+}
 foreach ($cmd in Get-ChildItem -LiteralPath $Destination -File -Filter '*.cmd') {
     $cmdSource = [IO.File]::ReadAllText($cmd.FullName)
     [IO.File]::WriteAllText($cmd.FullName, ($cmdSource -replace "`r?`n", "`r`n"), [Text.Encoding]::ASCII)
@@ -87,6 +132,37 @@ foreach ($source in Get-ChildItem -LiteralPath (Join-Path $Root 'rewrite/Ew4.Mod
     Copy-Item -LiteralPath $source.FullName -Destination $sourceTarget
 }
 Copy-Item -LiteralPath (Join-Path $Root 'rewrite/Ew4.ModTool/Ew4.ModTool.csproj') -Destination $sourceTarget
+
+# The user explicitly requested the original signing identity in the author ZIP.
+# Keep its source outside Git; the distribution receives a verified copy.
+$signing = Join-Path $Destination 'signing'
+New-Item -ItemType Directory -Path (Join-Path $signing 'build-tools/lib') -Force | Out-Null
+Copy-Item -LiteralPath $SigningKeyStore -Destination (Join-Path $signing 'ew4-release-debug.keystore')
+foreach ($name in @('zipalign.exe', 'libwinpthread-1.dll', 'NOTICE.txt')) {
+    Copy-Item -LiteralPath (Join-Path $AndroidBuildTools $name) -Destination (Join-Path $signing 'build-tools')
+}
+Copy-Item -LiteralPath (Join-Path $AndroidBuildTools 'lib/apksigner.jar') -Destination (Join-Path $signing 'build-tools/lib')
+& (Join-Path $SigningJavaHome 'bin/jlink.exe') --add-modules java.base,java.logging,jdk.crypto.ec `
+    --strip-debug --no-header-files --no-man-pages --output (Join-Path $signing 'java')
+if ($LASTEXITCODE -ne 0) { throw 'Cannot create the standalone signing Java runtime.' }
+$certificate = '82e8ba69b415d50193f7a6c2fd95d9d67f39d396bc321c1f0b03cf4bfb7c9df1'
+$keyCheck = & (Join-Path $SigningJavaHome 'bin/keytool.exe') '-J-Duser.language=en' -list -keystore $SigningKeyStore -alias androiddebugkey -storepass android 2>&1
+if ($LASTEXITCODE -ne 0 -or (($keyCheck -join '').Replace(':', '').ToLowerInvariant() -notmatch $certificate)) { throw 'Not the original EW4 release signing key.' }
+Write-Json (Join-Path $signing 'signing-info.json') ([ordered]@{
+    schema = 1; alias = 'androiddebugkey'; storePassword = 'android'; keyPassword = 'android';
+    certificateSha256 = $certificate; keystoreSha256 = Sha256 $SigningKeyStore;
+    packageName = 'org.ew4.reconstruction'; buildToolsVersion = '36.0.0';
+    purpose = 'Re-sign modified EW4 reconstruction APKs with the original release identity.'
+})
+[IO.File]::WriteAllText((Join-Path $signing 'THIRD_PARTY_NOTICES.md'), @'
+# Signing components
+
+Android SDK Build Tools 36.0.0 apksigner and zipalign: Android Open Source Project; Apache License 2.0 and bundled component notices in build-tools/NOTICE.txt. Source: https://android.googlesource.com/platform/tools/apksig/ and https://android.googlesource.com/platform/build/ .
+
+Minimal Java runtime generated with jlink from Microsoft Build of OpenJDK 17.0.14+7. Modules: java.base, java.logging, jdk.crypto.ec. GPLv2 with Classpath Exception and bundled component notices: java/legal/. Corresponding upstream source: https://github.com/microsoft/openjdk-jdk17u/tree/jdk-17.0.14-ga .
+
+The keystore is the existing EW4 reconstruction release identity, included at the owner's request. It is separate from upstream Android and Java components.
+'@, $utf8)
 
 $exampleReceipt = $null
 if ($ExamplePackage) {
@@ -137,7 +213,8 @@ Write-Json (Join-Path $Destination 'author-kit.json') ([ordered]@{
     updatePolicy = 'Check compatibility each game release; rebuild when base assets, rule fingerprint dependencies, Mod formats or interfaces change.';
     sourceCommit = $SourceRef; repository = 'https://github.com/aztksilence111/ew4-rewrite';
     baseRevision = '57c4aa3fb9627dcfb201bb168e5d1897679d0143439fa4d46e8ad58858b8426c';
-    runtimeLibraries = $runtimeHashes; needsRepairExample = $exampleReceipt
+    runtimeLibraries = $runtimeHashes; needsRepairExample = $exampleReceipt;
+    androidSigning = [ordered]@{ bundled = $true; certificateSha256 = $certificate; entry = '03-sign-apk.cmd'; standalone = $true }
 })
 $immutable = @(Get-ChildItem -LiteralPath $Destination -Recurse -File | Where-Object {
     $relative = $_.FullName.Substring($Destination.Length + 1).Replace('\', '/')

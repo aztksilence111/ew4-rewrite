@@ -48,6 +48,8 @@ internal static class SaveImportChecks
                 ["builtin/check/saves/mode-2/slot-1.json"] = [0,255,1,2],
                 ["mods/sample/logic/saves/mode-2/slot-1.json.bak"] = [3,4,5],
                 ["builtin/check/portraits/library.json"] = Encoding.UTF8.GetBytes("{\"schema\":1}"),
+                ["builtin/check/item-textures/library.json"] = Encoding.UTF8.GetBytes("{\"schema\":1}"),
+                ["builtin/check/item-textures/"+new string('b',64)+".png"] = [137,80,78,71,0,128],
                 ["builtin/check/portraits/"+new string('a',64)+".png"] = [137,80,78,71,0,255] };
             var result = store.ImportSaves(new MemoryStream(Bundle(original)));
             Check(result.Imported && result.Files == original.Count, "new archive imports without requiring readable save payloads");

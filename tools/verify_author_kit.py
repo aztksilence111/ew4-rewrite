@@ -1,6 +1,7 @@
 """Exercise the distributed ZIP through Windows PowerShell 5 and its actual CMD launchers."""
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -13,6 +14,7 @@ def sha(data):
 
 
 archive_path, scratch, report_path = map(lambda value: Path(value).resolve(), sys.argv[1:4])
+signing_apk = Path(sys.argv[4]).resolve() if len(sys.argv) > 4 else None
 if scratch.exists():
     raise SystemExit("Preserve existing scratch; choose a new directory")
 scratch.mkdir(parents=True)
@@ -27,8 +29,8 @@ def check(condition, label):
         raise AssertionError(label)
 
 
-def command(arguments, label, expected=0):
-    completed = subprocess.run(arguments, capture_output=True, timeout=480)
+def command(arguments, label, expected=0, environment=None):
+    completed = subprocess.run(arguments, capture_output=True, timeout=480, env=environment)
     (scratch / (label + ".stdout.txt")).write_bytes(completed.stdout)
     (scratch / (label + ".stderr.txt")).write_bytes(completed.stderr)
     check(completed.returncode == expected, label + " exit=" + str(completed.returncode))
@@ -138,12 +140,76 @@ try:
     immutable_file.write_bytes(original_bytes + b"\n")
     command('cmd.exe /d /s /c ""' + str(kit / "00-check-toolkit.cmd") + '" --no-pause"', "detect-toolkit-change", expected=1)
     immutable_file.write_bytes(original_bytes)
+    signing_verified = False
+    if info.get("androidSigning", {}).get("bundled"):
+        check(signing_apk is not None, "Bundled signing requires an APK fixture")
+        check((kit / "sign-apk.ps1").read_bytes().startswith(b"\xef\xbb\xbf"), "Signing script PowerShell 5 BOM")
+        settings = json.loads((kit / "signing/signing-info.json").read_text("utf-8-sig"))
+        check(sha((kit / "signing/ew4-release-debug.keystore").read_bytes()) == settings["keystoreSha256"], "Original signing key bytes")
+        check(settings["certificateSha256"] == "82e8ba69b415d50193f7a6c2fd95d9d67f39d396bc321c1f0b03cf4bfb7c9df1", "Original signing certificate")
+        for filename in ("JSON_PATHS.zh-CN.md", "ANDROID_SIGNING.zh-CN.md"):
+            guide = (kit / filename).read_text("utf-8-sig")
+            check("assets/rewrite/" in guide or "JSON_PATHS.zh-CN.md" in guide, "APK path documentation " + filename)
+        input_hash = sha(signing_apk.read_bytes())
+        changed_apk = scratch / "修改 数值 中文.apk"
+        parameters = {"schema": 1, "skills": {"ew4.skill.4": {"multiplier": 2}, "ew4.skill.31": {"percent": 25}}}
+        skill_project = scratch / "技能 JSON 路径 工程"
+        shutil.copytree(kit / "project", skill_project)
+        (skill_project / "author-project.json").write_text(json.dumps({"id": "skill-json-paths", "name": "技能参数", "version": "1.0.0"}, ensure_ascii=False), encoding="utf-8")
+        (skill_project / "rewrite/definitions").mkdir()
+        (skill_project / "rewrite/definitions/legacy-skill-parameters.json").write_text(json.dumps(parameters), encoding="utf-8")
+        (skill_project / "rewrite/extension.json").write_text(json.dumps({"schema": 1, "apiVersion": 3, "legacySkillParameters": "rewrite/definitions/legacy-skill-parameters.json"}), encoding="utf-8")
+        cmd_launcher(kit, "02-build-mod.cmd", skill_project, "build-documented-skill-json-project")
+        skill_exports = [p for p in (kit / "exports").glob("*.ew4mod") if p != exported]
+        check(len(skill_exports) == 1, "One skill parameter Mod export")
+        with zipfile.ZipFile(skill_exports[0]) as skill_mod:
+            check(json.loads(skill_mod.read("rewrite/definitions/legacy-skill-parameters.json")) == parameters, "Documented Mod parameter path")
+        with zipfile.ZipFile(signing_apk) as original, zipfile.ZipFile(changed_apk, "w") as modified:
+            extension = json.loads(original.read("assets/rewrite/extension.json"))
+            extension["legacySkillParameters"] = "rewrite/definitions/legacy-skill-parameters.json"
+            for item in original.infolist():
+                if item.filename == "assets/rewrite/definitions/legacy-skill-parameters.json":
+                    continue
+                data = original.read(item)
+                if item.filename == "assets/rewrite/extension.json":
+                    data = json.dumps(extension).encode("utf-8")
+                modified.writestr(item, data)
+            modified.writestr("assets/rewrite/definitions/legacy-skill-parameters.json", json.dumps(parameters).encode("utf-8"))
+        restricted_env = os.environ.copy()
+        restricted_env.pop("JAVA_HOME", None)
+        restricted_env.pop("ANDROID_HOME", None)
+        restricted_env.pop("ANDROID_SDK_ROOT", None)
+        system32 = Path(os.environ["SystemRoot"]) / "System32"
+        restricted_env["PATH"] = os.pathsep.join((str(system32), str(system32 / "WindowsPowerShell/v1.0")))
+        signing_cmd = 'cmd.exe /d /s /c ""' + str(kit / "03-sign-apk.cmd") + '" "' + str(changed_apk) + '" --no-pause"'
+        command(signing_cmd, "resign-modified-apk-without-sdk-java", environment=restricted_env)
+        signed_receipts = list((kit / "exports").glob("apk-*/signing-result.json"))
+        check(len(signed_receipts) == 1, "One signed APK receipt")
+        signed_receipt = json.loads(signed_receipts[0].read_text("utf-8-sig"))
+        check(signed_receipt["payloadUnchanged"] and signed_receipt["signatureVerified"] and signed_receipt["pageAlignmentKiB"] == 16, "Signature and payload validation")
+        signed_output = Path(signed_receipt["output"])
+        check(sha(signed_output.read_bytes()) == signed_receipt["sha256"], "Signed APK checksum")
+        check(sha(signing_apk.read_bytes()) == input_hash, "Official APK preserved")
+        with zipfile.ZipFile(signed_output) as signed:
+            check(json.loads(signed.read("assets/rewrite/definitions/legacy-skill-parameters.json")) == parameters, "APK parameter file preserved")
+            check(json.loads(signed.read("assets/rewrite/extension.json")) == extension, "APK existing registrations preserved")
+        check(not list(signed_output.parent.glob("*.tmp.apk")), "Signing temporary files removed")
+        key_path = kit / "signing/ew4-release-debug.keystore"
+        key_bytes = key_path.read_bytes()
+        try:
+            key_path.write_bytes(key_bytes + b"\0")
+            command(signing_cmd, "reject-modified-keystore", expected=1, environment=restricted_env)
+        finally:
+            key_path.write_bytes(key_bytes)
+        check(len(list((kit / "exports").glob("apk-*/signing-result.json"))) == 1, "Rejected key produces no APK")
+        signing_verified = True
     report = {"archiveSha256": sha(archive_path.read_bytes()), "archiveBytes": archive_path.stat().st_size,
               "immutableFiles": len(immutable), "checks": checks, "failures": 0, "results": results,
               "windowsPowerShellCmdLaunchers": True, "chineseAndSpacePaths": True,
               "validExportReimportedAndActivated": True, "invalidProjectRejected": True,
               "gameVersion": info["gameVersion"], "sourceCommit": info["sourceCommit"],
-              "mobileDeviceExecution": False}
+              "mobileDeviceExecution": False, "apkSigningVerified": signing_verified,
+              "signingWithoutInstalledSdkOrJava": signing_verified}
 except Exception as error:
     report = {"checks": checks, "failures": 1, "error": str(error), "results": results}
 finally:

@@ -11,7 +11,7 @@ public sealed partial class ClientGame
         string key = definition.Equipment.Id, name = (string)e.Attribute("name")!;
         long quantity = account.Inventory.GetValueOrDefault(key);
         long assigned = account.Roster.Sum(c => c.Items.LongCount(item => item == key));
-        return (object)new { id = key, name = content.Label("name_" + name), image = name + ".png",
+        return (object)new { id = key, displayId = content.ItemDisplayIds[key], name = content.Label("name_" + name), image = name + ".png",
             description = ItemDescription(definition.Equipment, name), definition.Price, definition.Unique,
             definition.Equipment.Consumable, quantity, available = quantity - assigned };
     }).ToArray();
@@ -30,7 +30,7 @@ public sealed partial class ClientGame
         if (!refresh && account.HeadquartersStock != null) return account.HeadquartersStock;
         if (refresh) account = RefreshUses.Consume(account, "shop", RefreshPolicy("shop"), Now());
         var previous = account.HeadquartersStock;
-        // Native 5d434 defaults: five consumables, two distinct unowned permanent items.
+        // Five consumables and two distinct permanent items, including already owned equipment.
         var slots = content.Extensions.Metagame.ShopSlots ?? Enumerable.Range(0, 5).Select(i => new MarketSlot(i))
             .Concat(Enumerable.Range(7, 2).Select(i => new MarketSlot(i, "equipment", Quantity: null))).ToArray();
         var offers = new List<ItemTradeOffer>();
@@ -42,10 +42,12 @@ public sealed partial class ClientGame
             var choices = content.Catalogs.Items.Items.Values.Where(d =>
                 (slot.Items == null || slot.Items.Contains(d.Equipment.Id))
                 && (slot.Pool == "any" || d.Equipment.Consumable == (slot.Pool == "consumable"))
-                && (d.Equipment.Consumable || !account.Inventory.ContainsKey(d.Equipment.Id)
-                    && !offers.Any(o => o.ItemId == d.Equipment.Id))).ToArray();
+                && (d.Equipment.Consumable || (!d.Unique || !account.Inventory.ContainsKey(d.Equipment.Id))
+                    && !offers.Any(o => content.ItemDisplayIds[o.ItemId] == content.ItemDisplayIds[d.Equipment.Id])))
+                .GroupBy(d => content.ItemDisplayIds[d.Equipment.Id], StringComparer.Ordinal)
+                .Select(g => g.OrderBy(d => d.Equipment.Id == g.Key ? 0 : 1).ThenBy(d => d.Equipment.Id, StringComparer.Ordinal).First()).ToArray();
             if (choices.Length == 0) continue;
-            var fresh = choices.Where(d => d.Equipment.Id != old?.ItemId).ToArray();
+            var fresh = choices.Where(d => old == null || content.ItemDisplayIds[d.Equipment.Id] != content.ItemDisplayIds[old.ItemId]).ToArray();
             if (fresh.Length > 0) choices = fresh;
             offers.Add(new(id, choices[Random.Shared.Next(choices.Length)].Equipment.Id, slot.Quantity));
         }

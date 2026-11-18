@@ -107,7 +107,10 @@ internal static class LegacyCommerceChecks
         Check(bought.Account.Medals == empty.Medals - 652 && bought.Account.Inventory["ew4.item.0"] == 1 && bought.Account.Revision == 1, "actual medal purchase");
         Check(before.SequenceEqual(JsonSerializer.SerializeToUtf8Bytes(empty)) && marketBefore.SequenceEqual(JsonSerializer.SerializeToUtf8Bytes(example)), "purchase input unchanged");
         Reject(() => ItemTrading.Buy(bought.Account, 0, bought.Market, "star", 0, trade), "account.revision");
-        Reject(() => ItemTrading.Buy(bought.Account, 1, bought.Market, "horse", 0, trade), "trading.unavailable");
+        var boughtAgain = ItemTrading.Buy(bought.Account, 1, bought.Market, "horse", 0, trade);
+        Check(boughtAgain.Account.Inventory["ew4.item.0"] == 2, "permanent equipment can be bought repeatedly");
+        Reject(() => ItemTrading.Buy(bought.Account, 1, bought.Market, "horse", 0,
+            trade with { Definitions = trade.Definitions.ToDictionary(p => p.Key, p => p.Value with { Unique = true }) }), "trading.unavailable");
         Reject(() => ItemTrading.Sell(bought.Account, 1, bought.Market, "ew4.item.0", 0, ["ew4.item.0"], trade), "trading.unavailable");
         var sold = ItemTrading.Sell(bought.Account, 1, bought.Market, "ew4.item.0", 5, [], trade);
         Check(sold.Account.Inventory.Count == 0 && sold.Account.Medals == empty.Medals && sold.Account.Revision == 2, "sale returns real medals and clears ownership");

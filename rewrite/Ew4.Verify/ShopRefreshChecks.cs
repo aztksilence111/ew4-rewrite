@@ -44,7 +44,8 @@ internal static class ShopRefreshChecks
         string purchased = equipment.GetProperty("itemId").GetString()!;
         shop = Call("commerce", new { op = "buy", revision = Revision(shop), offer = equipment.GetProperty("id").GetString() });
         shop = Call("commerce", new { op = "refresh", revision = Revision(shop) });
-        Check(shop.GetProperty("offers").EnumerateArray().All(o => o.GetProperty("itemId").GetString() != purchased), "owned unique equipment stays out of refresh pool");
+        Check(shop.GetProperty("items").EnumerateArray().Single(i => i.GetProperty("id").GetString() == purchased)
+            .GetProperty("quantity").GetInt64() == 1, "refresh preserves purchased equipment");
         var view = Call("start", new { scenario = "conquest1", country = "fra" });
         var beforeWorld = view;
         shop = Call("commerce", new { op = "refresh", revision = Revision(shop) });
@@ -54,7 +55,7 @@ internal static class ShopRefreshChecks
         Call("commerce", new { cell = 0, op = "refresh", revision = Revision(view) }, "trading.command");
         Check(Call("action", new { op = "state" }).GetRawText() == view.GetRawText(), "map refresh rejection changes no world state");
 
-        // Exhaust the permanent-item pool to exercise the empty equipment slots.
+        // Owning every permanent item must still leave equipment available for purchase.
         string profilePath = Path.Combine(saves, "account.json");
         var profile = JsonSerializer.Deserialize<PlayerAccount>(File.ReadAllBytes(profilePath), ClientGame.Json)!;
         var inventory = profile.Inventory.ToDictionary(p => p.Key, p => p.Value);
@@ -63,7 +64,9 @@ internal static class ShopRefreshChecks
         File.WriteAllBytes(profilePath, JsonSerializer.SerializeToUtf8Bytes(profile, ClientGame.Json));
         host = new ClientGame(content, saves);
         shop = Call("commerce", new { op = "refresh", revision = profile.Revision });
-        Check(shop.GetProperty("offers").GetArrayLength() == 5, "exhausted equipment pool leaves empty slots without duplicates");
+        Check(shop.GetProperty("offers").GetArrayLength() == 7, "fully owned equipment pool still fills both equipment slots");
+        Check(shop.GetProperty("offers").EnumerateArray().Where(o => o.GetProperty("slot").GetInt32() >= 7)
+            .All(o => o.GetProperty("available").GetBoolean()), "owned equipment remains purchasable after refresh");
         return checks;
     }
 }

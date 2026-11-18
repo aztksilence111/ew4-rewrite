@@ -10,7 +10,7 @@ public sealed record ClientCommand(string Op = "", long Revision = -1, string? S
     IReadOnlyList<string>? LocalPlayers = null, string? Tag = null, IReadOnlyList<string>? TaggedCommanders = null, bool Delta = false,
     string? KnownVersion = null, string[]? Units = null, string? Policy = null, bool? AutoBattle = null, int[]? Goals = null,
     int? TaskId = null, string? Kind = null, int? Radius = null, int[]? Line = null, bool? DeployFirst = null, bool Compact = false, string? SecondaryTarget = null,
-    string? Portrait = null, string? Marker = null);
+    string? Portrait = null, string? Marker = null, string? Texture = null);
 public sealed record ClientSlot(string Scenario, string? Country, byte[] Session, MovementHistoryState? MovementHistory = null, JsonElement? Tutorial = null,
     int Round = 0, DateTimeOffset? SavedAt = null, IReadOnlyList<string>? LocalPlayers = null, string? DisplayCountry = null,
     IReadOnlyList<int>? TechnologySnapshot = null, string? ModName = null, string? SaveIdentity = null);
@@ -82,6 +82,7 @@ public sealed partial class ClientGame(ClientContent content, string saveDirecto
                     "/api/local-players" => LocalPlayers(Command(body)),
                     "/api/headquarters" => Headquarters(),
                     "/api/portraits" => PortraitGallery(Command(body)),
+                    "/api/item-textures" => ItemTextureGallery(Command(body)),
                     "/api/technology" => Technology(Command(body)),
                     "/api/objectives" => Objectives(Command(body)),
                     "/api/pause-objectives" => PauseObjectives(Command(body)),

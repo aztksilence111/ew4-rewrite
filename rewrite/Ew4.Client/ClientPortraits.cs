@@ -116,7 +116,7 @@ public sealed partial class ClientGame
             string? portrait = choice == "custom" && uploaded != null ? "portraits/"+uploaded.Portrait+".png" : skin?.Image;
             string? marker = choice == "custom" && uploaded != null ? "portraits/"+uploaded.Marker+".png" : skin?.Marker ?? skin?.Image;
             return new { d.id,d.legacyId,d.name,d.image,d.country,d.rating,d.owned,portrait,marker,selected=choice,custom=uploaded!=null,
-                skins=skins.Where(s=>s.Commander==d.id).Select(s=>new {s.Id,name=content.Label(s.Name),s.Image,s.Marker,unlocked=Unlocked(s),s.Automatic,
+                skins=skins.Where(s=>s.Commander==d.id).Select(s=>new {s.Id,name=content.Label(s.Name),s.Image,s.Marker,unlocked=Unlocked(s),s.Automatic,s.Priority,
                     unlockDescription=s.UnlockDescription==null ? "完成对应任务或成就后解锁" : content.Label(s.UnlockDescription)}) };
         }).ToArray();
         return new { profile.Revision, entries=rows, identity=saveIdentity ?? "builtin" };

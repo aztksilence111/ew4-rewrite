@@ -95,8 +95,9 @@
   <div id="settings" class="modal" hidden><div class="dialog settings-dialog">
     <header class="menu-bar"><button id="close-settings" class="close-icon" aria-label="关闭" title="关闭"></button><h2 data-label="settings_label">设定</h2></header>
     <div id="settings-content" tabindex="0" role="region" aria-label="设定选项">
-      <div id="save-export-row" class="setting-row"><span>存档管理</span><div class="save-transfer-actions"><button id="save-manager" class="native-command blue" type="button">备份槽</button><button id="save-import" class="native-command blue" type="button">导入</button><button id="save-export" class="native-command blue" type="button">导出存档</button></div><input id="save-import-file" type="file" accept=".zip,application/zip" hidden></div>
-      <div id="portrait-settings-row" class="setting-row"><span>将领头像</span><div class="save-transfer-actions"><button id="portrait-gallery-open" class="native-command blue" type="button">头像图库</button></div></div>
+      <div id="save-export-row" class="setting-row settings-action-row"><span>存档管理</span><div class="save-transfer-actions"><button id="save-manager" class="native-command blue" type="button">备份槽</button><button id="save-import" class="native-command blue" type="button">导入</button><button id="save-export" class="native-command blue" type="button">导出存档</button></div><input id="save-import-file" type="file" accept=".zip,application/zip" hidden></div>
+      <div id="portrait-settings-row" class="setting-row settings-action-row"><span>将领头像</span><div class="save-transfer-actions"><button id="portrait-gallery-open" class="native-command blue" type="button">头像图库</button></div></div>
+      <div id="item-texture-settings-row" class="setting-row settings-action-row" aria-label="物品贴图"><span>物品贴图</span><div class="save-transfer-actions"><button id="item-gallery-open" class="native-command blue" type="button" aria-label="物品图库">物品图库</button></div></div>
       <div class="settings-audio">
         <label class="volume music"><span data-label="name_music">音乐</span><input id="music-volume" type="range" min="0" max="100" aria-label="音乐音量"></label>
         <label class="volume sound"><span data-label="name_sound">音效</span><input id="sound-volume" type="range" min="0" max="100" aria-label="音效音量"></label>
@@ -123,7 +124,12 @@
     </div>
     <div class="portrait-workspace"><div class="portrait-list-pane"><div id="portrait-grid" role="group" aria-label="将领列表"></div><div class="portrait-pagination"><button id="portrait-prev" type="button">上一页</button><span id="portrait-count" aria-live="polite"></span><button id="portrait-next" type="button">下一页</button></div></div>
       <div id="portrait-editor"><h3 id="portrait-selected-name"></h3><div id="portrait-selected-image"></div><div id="portrait-choices" aria-label="头像与皮肤选择"></div>
-        <p id="portrait-requirements"></p><div class="portrait-actions"><button id="portrait-upload" type="button">上传图片</button><button id="portrait-remove" type="button" hidden>移除上传</button></div><input id="portrait-file" type="file" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" hidden>
+        <div id="skin-picker" hidden><div class="skin-carousel">
+          <button id="skin-prev" class="skin-arrow" type="button" aria-label="上一款皮肤"><span aria-hidden="true"></span></button>
+          <div id="skin-window" tabindex="0" role="group" aria-roledescription="轮播图" aria-label="皮肤预览，可左右滑动或按左右方向键"><div id="skin-track"></div></div>
+          <button id="skin-next" class="skin-arrow" type="button" aria-label="下一款皮肤"><span aria-hidden="true"></span></button>
+        </div><div class="skin-footer"><div id="skin-position" aria-live="polite"></div><p id="portrait-skin-status"></p><button id="skin-confirm" type="button">确认使用</button></div></div>
+        <p id="portrait-requirements"></p><div id="portrait-upload-actions" class="portrait-actions"><button id="portrait-upload" type="button">上传图片</button><button id="portrait-restore" type="button" title="恢复当前将领在原版或当前 Mod 中的默认外观，并跟随剧情自动皮肤；保留已上传图片。">恢复默认</button><button id="portrait-remove" type="button" hidden>移除上传</button></div><input id="portrait-file" type="file" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" hidden>
         <div id="portrait-crop" hidden><div class="portrait-crop-images"><canvas id="portrait-crop-preview" aria-label="立绘裁剪预览"></canvas><canvas id="portrait-marker-preview" aria-label="局内小头像预览"></canvas></div>
           <label class="portrait-crop-control">缩放<input id="portrait-zoom" type="range" min="1" max="4" step="0.01" value="1"></label>
           <label class="portrait-crop-control">横向<input id="portrait-x" type="range" min="-100" max="100" step="1" value="0"></label>
@@ -134,6 +140,15 @@
     </div><div id="portrait-message" role="status" aria-live="polite"></div>
   </section></div>
   <div id="notice" role="alert" hidden></div>
+  <div id="item-gallery" class="modal" hidden><section class="dialog item-gallery-dialog" role="dialog" aria-modal="true" aria-labelledby="item-gallery-title">
+    <header class="menu-bar"><button id="item-gallery-close" class="close-icon" aria-label="关闭物品图库"></button><h2 id="item-gallery-title">物品图库</h2></header>
+    <div class="portrait-toolbar"><label>搜索<input id="item-gallery-search" type="search" placeholder="物品名称或 ID" aria-label="搜索物品"></label><label>显示<select id="item-gallery-filter" aria-label="物品贴图筛选"><option value="">全部物品</option><option value="custom">已上传</option></select></label></div>
+    <div class="item-gallery-workspace"><div class="item-gallery-list"><div id="item-gallery-grid" aria-label="物品贴图列表"></div><div class="portrait-pagination"><button id="item-gallery-prev" type="button">上一页</button><span id="item-gallery-count"></span><button id="item-gallery-next" type="button">下一页</button></div></div>
+      <div id="item-gallery-editor"><h3 id="item-gallery-name"></h3><img id="item-gallery-preview" alt="当前物品贴图"><p id="item-gallery-status"></p><p>支持 PNG、JPG、WebP，单张不超过 10 MiB，最长边不超过 4096 像素。保留透明背景，可调整缩放与位置。</p><div class="item-gallery-actions"><button id="item-gallery-upload" type="button">上传图片</button><button id="item-gallery-restore" type="button">恢复默认</button></div><input id="item-gallery-file" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+        <div id="item-gallery-crop" hidden><canvas id="item-gallery-canvas" width="128" height="128" aria-label="物品贴图预览"></canvas><label>缩放<input id="item-gallery-zoom" type="range" min="0.25" max="4" step="0.01" value="1"></label><label>水平<input id="item-gallery-x" type="range" min="-100" max="100" value="0"></label><label>垂直<input id="item-gallery-y" type="range" min="-100" max="100" value="0"></label><div class="item-gallery-actions"><button id="item-gallery-save" type="button">保存贴图</button><button id="item-gallery-cancel" type="button">取消</button></div></div>
+      </div>
+    </div><div id="item-gallery-message" role="status" aria-live="polite"></div>
+  </section></div>
   <div id="mod-manager" class="modal" hidden><div class="dialog mod-dialog">
     <header class="menu-bar"><button id="mod-close" class="close-icon" title="关闭" aria-label="关闭"></button><h2>本地 Mod</h2></header>
     <div class="mod-import-row"><label>标识<input id="mod-id" placeholder="自动识别" maxlength="64" spellcheck="false" aria-label="Mod 标识"></label><label>名称<input id="mod-name" placeholder="自动识别" maxlength="80" aria-label="Mod 名称"></label><button id="mod-select" class="native-command blue">选择文件</button><button id="mod-import" class="native-command" disabled>导入</button><input id="mod-file" type="file" accept=".apk,.zip,.ew4mod" hidden></div>
@@ -184,6 +199,8 @@
   <script src="turn-ui.js?v=20261028.1"></script>
   <link rel="stylesheet" href="portrait-gallery.css">
   <script src="portrait-gallery.js"></script>
+  <link rel="stylesheet" href="item-gallery.css">
+  <script src="item-gallery.js"></script>
   <script src="app.js?v=20261029.1"></script>
   <script src="mods.js?v=20261020.4"></script>
   <script src="save-export.js?v=20261027.1"></script>

@@ -92,6 +92,7 @@ const menus = new Ew4Menus.Menus({rpc,button,uiImage,countryImage,labels:labelIm
   updateResources:resources=>{const player=state?.factions.find(f=>f.id===state.playerFaction);if(player){player.resources=resources;refreshResources();}},
   refresh:async()=>{if(state&&!$('play').hidden){await installState(await rpc('action',{op:'state',revision:state.revision}));}},get menuArt(){return menuArt;},closeDetail,acquisitionEffect});
 window.ew4Portraits=new Ew4PortraitGallery.Library({notice,changed:()=>{imageRevision++;requestRender();},countryName:id=>catalog?.countries?.[id]?.name||manifest?.strings['name_'+id]||id,original:name=>{const atlas=['princesses_hd','commanders1_hd','commanders2_hd'].find(a=>manifest?.atlases[a]?.[name]);return '/content/ui/'+(atlas?atlas+'/'+name:'image_ui_hd/button_add_generals.png');},updated:()=>{if(menus.data&&!$('hq-screen').hidden)menus.drawRoster();}});
+window.ew4ItemTextures=new Ew4ItemGallery.Library({notice,original:name=>'/content/ui/image_item_hd/'+encodeURIComponent(name)});
 let chosenScenario, chosenCountry, countryChoices = [], showGrid = false, selectedAt = 0;
 const turnUi=new Ew4TurnUI.Turns({
   state:()=>state,get manifest(){return manifest;},rpc,button,detail:detailWindow,close:closeDetail,notice,
@@ -1035,7 +1036,7 @@ async function findNextUnit(){
 function uiImage(name,width,height=width){
   const atlas=['image_recruit_hd','image_recruit_hd2','image_recruit_hd3','image_ui_hd','image_menu_hd','image_item_hd','image_newgame_hd','princesses_hd','princesses_sketch_hd','commanders1_hd','commanders2_hd','image_ui'].find(a=>manifest.atlases[a]?.[name]);
   const img=document.createElement('img');img.alt='';img.width=width;img.height=height;
-  if(atlas){const original='/content/ui/'+atlas+'/'+name;img.dataset.commanderPortrait=name;img.dataset.originalPortrait=original;img.src=window.ew4Portraits?.url(name)||original;}else console.warn('Missing original UI image',name);return img;
+  if(atlas){const original='/content/ui/'+atlas+'/'+name;if(atlas==='image_item_hd'){img.dataset.itemTexture=name;img.dataset.originalItemTexture=original;img.src=window.ew4ItemTextures?.url(name)||original;}else{img.dataset.commanderPortrait=name;img.dataset.originalPortrait=original;img.src=window.ew4Portraits?.url(name)||original;}}else console.warn('Missing original UI image',name);return img;
 }
 function toolButton(icon,title,action){const b=button('',action,$('actions'));b.title=title;b.setAttribute('aria-label',title);
   if(icon==='disband'){const img=new Image(33,33);img.alt='';img.src='/disband.png';b.append(img);}
@@ -1611,6 +1612,7 @@ window.ew4Back=()=>{
   if(mapViews.close())return 'handled';
   if(pendingAction){closeSingleAction();return 'handled';}
   if(!$('portrait-gallery').hidden){window.ew4Portraits.close();return 'handled';}
+  if(!$('item-gallery').hidden){window.ew4ItemTextures.close();return 'handled';}
   const visible=id=>!$(id).hidden;
   const modal=document.querySelector('dialog[open]');
   if(modal){modal.close();return 'handled';}
@@ -1658,6 +1660,7 @@ async function initializeClient(){
     window.ew4UiSkin?.dispose();
     catalog=c;manifest=m;cityNames=names;conquestPages=pages;menuArt=art;
     await window.ew4Portraits.refresh().catch(error=>notice('头像图库暂不可用：'+error.message));
+    await window.ew4ItemTextures.refresh().catch(error=>notice('物品图库暂不可用：'+error.message));
     window.ew4UiSkin=new Ew4UiPresentation.Skin(m);window.ew4UiSkin.apply();
     const buildInfo=await startupJson('/build-info.json');
     performanceLog.build=buildInfo.source.slice(0,12)+'/'+(c.build||'unknown').slice(0,8)+'/'+(c.buildVariant||'unknown');

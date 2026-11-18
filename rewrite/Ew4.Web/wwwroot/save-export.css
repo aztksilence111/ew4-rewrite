@@ -1,12 +1,15 @@
-#save-export-row .save-transfer-actions{position:absolute;left:112px;top:3px;display:flex;gap:4px;height:32px}
-.save-transfer-actions button{position:static!important;width:64px;height:32px;font-size:12px;min-width:0;padding:0 3px}
+.settings-dialog .settings-action-row{display:grid;grid-template-columns:92px minmax(0,1fr);align-items:center;gap:8px;height:44px;padding:3px 8px;box-sizing:border-box}
+.settings-dialog .settings-action-row>span{position:static;width:auto;height:32px;white-space:nowrap}
+.settings-action-row .save-transfer-actions{position:static;display:flex;justify-content:flex-end;gap:4px;height:32px;min-width:0}
+.settings-action-row .save-transfer-actions button{position:static!important;flex:1;max-width:96px;width:64px;height:32px;font-size:12px;min-width:0;padding:0 3px;white-space:nowrap}
+.settings-action-row .save-transfer-actions button:only-child,.settings-dialog .settings-action-row>button{position:static;justify-self:end;flex:0 1 96px;width:96px;height:32px;font-size:12px}
 .save-mod-name{position:absolute;left:3px;right:32px;bottom:0;height:14px;line-height:14px;font:600 10px/14px sans-serif;color:#203c50;background:#fff4cf;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 3px;border:1px solid #667780;box-sizing:border-box}
 .save-slots .save-date{height:11px}
 .save-slots .save-slot:not(:first-of-type) .save-country{top:35px}
 .save-manager-dialog{width:min(760px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;transform:none!important;box-sizing:border-box;padding:12px;letter-spacing:0;background:#353a3b;color:#eee}
 #save-manager-modal{z-index:220}
 #settings>.settings-dialog{--popup-rest:scale(var(--settings-scale));--popup-start:scale(calc(var(--settings-scale)*.15));--popup-overshoot:scale(calc(var(--settings-scale)*1.03))}
-#main-save-manager{position:absolute;left:72px;bottom:12px;width:64px;height:28px;font-size:13px}
+#main-save-manager{position:absolute;left:calc(var(--menu-safe-left,0px) + 52px);bottom:12px;margin-bottom:var(--menu-safe-bottom,0px);width:64px;height:28px;font-size:13px}
 .save-manager-dialog .menu-bar{position:relative!important;height:44px}
 .save-manager-dialog h2{font-size:22px;margin:6px 0;text-align:center}
 .save-manager-identity{font-size:14px;margin:10px 0;overflow-wrap:anywhere;color:#f2db88}

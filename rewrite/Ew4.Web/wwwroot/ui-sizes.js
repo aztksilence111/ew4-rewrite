@@ -13,7 +13,7 @@
     if(root.Ew4ModImport)return;
     settings.uiSizes=normalize(settings.uiSizes);
     const content=document.getElementById('settings-content'),entry=document.createElement('div');
-    entry.id='ui-sizes-row';entry.className='setting-row';
+    entry.id='ui-sizes-row';entry.className='setting-row settings-action-row';
     const title=document.createElement('span');title.textContent='界面尺寸';
     const open=document.createElement('button');open.id='ui-sizes-open';open.type='button';open.className='native-command blue';open.textContent='调整';
     entry.append(title,open);content.insertBefore(entry,content.querySelector('.settings-audio'));

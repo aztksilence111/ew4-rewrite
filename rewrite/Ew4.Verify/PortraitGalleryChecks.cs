@@ -47,12 +47,13 @@ internal static class PortraitGalleryChecks
         extension["rewrite/extension.json"]=JsonSerializer.SerializeToUtf8Bytes(new{schema=1,apiVersion=3,metagame="rewrite/metagame.json"});
         byte[] ModRead(string path)=>extension.TryGetValue(path,out var data)?data:Read(path);
         string priorRevision=ExtensionLoader.Load(ModRead).Revision;
-        extension[CommanderSkinLibrary.Path]=JsonSerializer.SerializeToUtf8Bytes(new CommanderSkinLibrary(1,[new("skin.red",id,"Red","rewrite/skins/red.png",Unlock:["skin.task"],Automatic:true)]),ClientGame.Json);
+        extension[CommanderSkinLibrary.Path]=JsonSerializer.SerializeToUtf8Bytes(new CommanderSkinLibrary(1,[new("skin.red",id,"Red","rewrite/skins/red.png",Unlock:["skin.task"],Automatic:true,Priority:20)]),ClientGame.Json);
         var modContent=new ClientContent(ModRead,["conquest1.btl"]);
         Check(modContent.Extensions.Revision==priorRevision,"cosmetic skin configuration preserves rules fingerprint");
         client=new ClientGame(modContent,Path.Combine(folder,"mod"),saveIdentity:"mods/test/logic");view=Call(new{});
         var skinRow=view.GetProperty("entries").EnumerateArray().Single(e=>e.GetProperty("id").GetString()==id);
         Check(!skinRow.GetProperty("skins")[0].GetProperty("unlocked").GetBoolean()&&skinRow.GetProperty("portrait").ValueKind==JsonValueKind.Null,"locked skin not applied");
+        Check(skinRow.GetProperty("skins")[0].GetProperty("priority").GetInt32()==20,"skin priority exposed for automatic carousel preview");
         Result(new{op="select",commander=id,revision=0,knownVersion="mods/test/logic",offer="skin.red"},false);
         var account=new PlayerAccount{Id="test",ContentRevision=modContent.Catalogs.Accounts.SourceRevision,Medals=100000,Badges=100000,
             Roster=[modContent.Catalogs.Accounts.FromDefinition(row.GetProperty("legacyId").GetInt32(),"test.owned")]};

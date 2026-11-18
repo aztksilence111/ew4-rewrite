@@ -330,9 +330,11 @@ public sealed partial class MainActivity : Activity
     protected override void OnActivityResult(int requestCode, Result resultCode, Intent? data)
     {
         base.OnActivityResult(requestCode, resultCode, data);
-        if (requestCode == 444)
+        if (requestCode is 444 or 445)
         {
             if (resultCode != Result.Ok || data?.Data is not { } portraitUri) return;
+            string selectedCallback = requestCode == 445 ? "ew4ItemTextureFileSelected" : "ew4PortraitFileSelected";
+            string errorCallback = requestCode == 445 ? "ew4ItemTextureFileError" : "ew4PortraitFileError";
             _ = Task.Run(() =>
             {
                 try
@@ -345,9 +347,9 @@ public sealed partial class MainActivity : Activity
                         output.Write(buffer,0,count);
                     }
                     string json = System.Text.Json.JsonSerializer.Serialize(new { name="portrait", type=ContentResolver.GetType(portraitUri), base64=Convert.ToBase64String(output.ToArray()) });
-                    RunOnUiThread(() => web?.EvaluateJavascript("window.ew4PortraitFileSelected?.("+json+")",null));
+                    RunOnUiThread(() => web?.EvaluateJavascript("window."+selectedCallback+"?.("+json+")",null));
                 }
-                catch (Exception error) { RunOnUiThread(() => web?.EvaluateJavascript("window.ew4PortraitFileError?.("+System.Text.Json.JsonSerializer.Serialize(error.Message)+")",null)); }
+                catch (Exception error) { RunOnUiThread(() => web?.EvaluateJavascript("window."+errorCallback+"?.("+System.Text.Json.JsonSerializer.Serialize(error.Message)+")",null)); }
             });
             return;
         }
@@ -426,6 +428,21 @@ public sealed partial class MainActivity : Activity
         public string PortraitCommand(string json) => json.Length > 3000000
             ? "{\"ok\":false,\"message\":\"头像请求过大\"}"
             : activity.store!.Value.Dispatch("/api/portraits",json);
+        [JavascriptInterface, Java.Interop.Export("chooseItemTexture")]
+        public void ChooseItemTexture() => activity.RunOnUiThread(() =>
+        {
+            try
+            {
+                var intent = new Intent(Intent.ActionOpenDocument); intent.AddCategory(Intent.CategoryOpenable); intent.SetType("image/*");
+                intent.PutExtra(Intent.ExtraMimeTypes, new[] { "image/png", "image/jpeg", "image/webp" });
+                activity.StartActivityForResult(intent, 445);
+            }
+            catch (Exception error) { activity.web?.EvaluateJavascript("window.ew4ItemTextureFileError?.(" + System.Text.Json.JsonSerializer.Serialize(error.Message) + ")", null); }
+        });
+        [JavascriptInterface, Java.Interop.Export("itemTextureCommand")]
+        public string ItemTextureCommand(string json) => json.Length > 1500000
+            ? "{\"ok\":false,\"message\":\"物品贴图请求过大\"}"
+            : activity.store!.Value.Dispatch("/api/item-textures", json);
         [JavascriptInterface, Java.Interop.Export("exportSaves")]
         public void ExportSaves() => activity.PickSaveExport();
         [JavascriptInterface, Java.Interop.Export("importSaves")]

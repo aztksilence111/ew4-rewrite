@@ -2,6 +2,8 @@
 
 适用于 Windows 10/11 x64，配套游戏 **0.2.34**。自带运行环境，不需要安装 .NET、Python 或编译器。先将整个 ZIP 解压到可写目录，再操作其中的文件；不要在压缩软件的预览窗口里直接运行。
 
+想知道某个接口 JSON 应该放在哪，先看 **[JSON 路径指南](JSON_PATHS.zh-CN.md)**：逐项列出基础资源、作者工程、Mod 内容及 R 版 APK 内的位置，说明入口注册与完整文件替换，并提供技能数值修改的完整流程。APK 重签与覆盖安装看 **[Android 重签说明](ANDROID_SIGNING.zh-CN.md)**。本包按所有者要求包含原发行密钥和独立签名组件。
+
 ## 三步制作
 
 1. 修改 `project/` 中的资源。`project/author-project.json` 填写 Mod 标识、名称和版本。覆盖路径直接是 `legacy/`、`rewrite/`、`client/`、`original/` 或 `frontend/`，没有 `data/` 前缀。工具自带的 `data/` 是配套游戏原始基底，请编辑 `project/` 中的副本。
@@ -35,6 +37,8 @@
 ## 工具、文档和目录
 
 - **00-check-toolkit.cmd**：检查工具、基底及参考材料是否与分发摘要一致。用户工程和导出文件不在检查范围内，修改工程后仍可检查工具。
+- **03-sign-apk.cmd**：将修改后的 APK 拖到此文件，使用本包原发行密钥对齐、重签并验证，成品在 `exports/apk-*/`。自带签名工具和 Java，无须额外安装 SDK。
+- **signing/**：原发行 keystore、签名参数、zipalign、apksigner、精简 Java 及许可证。原证书指纹见重签说明。
 - **Ew4.ModTool.exe**：完整命令行工具，包括 pack、verify、import、export、split-catalog，以及国家／辖区／胜负配置命令。
 - **data/**：正式0.2.34基础资源。全部独立规则 JSON、五张地图、原始剧本、图像、音频等均配套，支持从中复制资源到自己的工程修改。
 - **reference/**：固定到同次正式发行的中文文档、配置索引和源码示例；从 `reference/README.md`、`reference/docs/CONFIG_REFERENCE.md`、`reference/docs/porting/SPLIT_CATALOG.md` 开始。
@@ -64,4 +68,4 @@
 
 手工命令默认将工具内容库写入工具同目录的 `mods/`、`saves/`；双击脚本使用 `_work/` 下的独立目录。已有工程的稳定ID不要随意更换，文件与规则摘要由工具按真实内容生成，不手工伪造。不要用DLL／SO／DEX承载Mod新增机制；支持范围以配套接口文档为准。
 
-此为额外作者工具包，不包含游戏账户、真实存档、签名材料或玩家已安装Mod。原游戏安装包不作替换。使用条件和第三方材料声明见 `reference/THIRD_PARTY_NOTICES.md`、`reference/licenses/` 及运行时附带声明。
+此为额外作者工具包，包含项目所有者明确要求提供的原发行签名材料，不包含游戏账户、真实存档或玩家已安装 Mod。游戏版本、作者包版本与来源提交以 `author-kit.json` 为准；游戏资源基底及工具版本分别核对，下一版应重新验证配套关系。使用条件和第三方材料声明见 `reference/THIRD_PARTY_NOTICES.md`、`reference/licenses/`、`signing/THIRD_PARTY_NOTICES.md` 及运行时附带声明。

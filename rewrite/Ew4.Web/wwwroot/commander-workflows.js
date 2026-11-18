@@ -4,6 +4,24 @@
   proto.native=function(id,onClose){return new Ew4NativeUI.Layout(this.api,id,onClose);};
   proto.held=function(id){return this.data.roster.find(c=>c.id===id);};
   proto.definition=function(held){return this.data.definitions.find(d=>d.id===held.definitionId);};
+  proto.inventoryItems=function(items,held=[]){
+    const groups=new Map();
+    for(const item of items){const key=item.displayId||item.id;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(item);}
+    return Array.from(groups.values(),copies=>{
+      // Commands use an actual spare copy's legacy ID; grouping never rewrites the account.
+      const item=copies.find(i=>i.available>0&&!held.includes(i.id))||copies.find(i=>i.available>0)||copies[0];
+      return {...item,quantity:copies.reduce((n,i)=>n+i.quantity,0),available:copies.reduce((n,i)=>n+i.available,0)};
+    });
+  };
+  proto.shopOffers=function(data){
+    const items=new Map(data.items.map(i=>[i.id,i])),selected=new Map();
+    for(const offer of data.offers){
+      const item=items.get(offer.itemId);if(!item||item.consumable)continue;
+      const key=item.displayId||item.id,old=selected.get(key);
+      if(!old||!old.available&&offer.available)selected.set(key,offer);
+    }
+    return data.offers.filter(offer=>{const item=items.get(offer.itemId);return !item||item.consumable||selected.get(item.displayId||item.id)===offer;});
+  };
   proto.progressionBadge=function(track,state){
     const threshold=this.data.progression?.[track]?.[state.level],capped=threshold===null,known=Number.isFinite(threshold)&&threshold>0;
     const ratio=capped?1:known?Math.max(0,Math.min(1,state.experience/threshold)):0;
@@ -130,7 +148,7 @@
     for(let i=0;i<(this.data.equipmentCapacity??2);i++){
       const item=this.data.items.find(d=>d.id===held.items[i]);let b=this.itemButton(item,0,()=>item&&choose(item,true,b));b.disabled=!item;l.get('lbox_equipitem').append(b);
     }
-    for(const item of this.data.items.filter(i=>i.available>0)){
+    for(const item of this.inventoryItems(this.data.items,held.items).filter(i=>i.available>0)){
       let b=this.itemButton(item,item.available,()=>choose(item,false,b));l.get('grid_items').append(b);
     }
     l.action('btn_equip',this.text('btn_equip'),()=>{},false);l.text('intitle_desc','');
@@ -166,7 +184,7 @@
     }
     const consumables=editable?await this.api.rpc('items',{unit:held.unit}):null;
     if(!l.current())return;
-    for(const item of this.data.items.filter(i=>editable&&(i.consumable||i.available>0)).map(i=>i.consumable?{...i,...consumables.items.find(c=>c.id===i.id)}:i)){
+    for(const item of this.inventoryItems(this.data.items,held.items).filter(i=>editable&&(i.consumable||i.available>0)).map(i=>i.consumable?{...i,...consumables.items.find(c=>c.id===i.id)}:i)){
       let b=this.itemButton(item,item.available,()=>choose(item,false,b));l.get('grid_items').append(b);
     }
   };
@@ -334,11 +352,15 @@
     };
     const renderSeller=()=>{
       const grid=l.get('grid_seller');grid.replaceChildren();
-      for(let slot=0;slot<14;slot++){const offer=data.offers.find(o=>o.slot===slot),item=offer&&data.items.find(i=>i.id===offer.itemId);let b=this.itemButton(item,offer?.remaining,()=>offer&&choose(item,true,b,offer));b.disabled=!offer;if(offer)b.classList.toggle('unavailable-item',!offer.available);grid.append(b);}
+      const offers=this.shopOffers(data);
+      for(let slot=0;slot<14;slot++){
+        const offer=offers.find(o=>o.slot===slot),item=offer&&data.items.find(i=>i.id===offer.itemId);
+        let b=this.itemButton(item,offer?.remaining,()=>offer&&choose(item,true,b,offer));b.disabled=!offer;if(offer)b.classList.toggle('unavailable-item',!offer.available);grid.append(b);
+      }
     };
     const renderBuyer=()=>{
       const grid=l.get('grid_buyer');grid.replaceChildren();
-      for(const item of data.items.filter(i=>i.quantity>0)){let b=this.itemButton(item,item.quantity,()=>choose(item,false,b));grid.append(b);}
+      for(const item of this.inventoryItems(data.items).filter(i=>i.quantity>0)){let b=this.itemButton(item,item.quantity,()=>choose(item,false,b));grid.append(b);}
       while(grid.children.length<14){const b=this.itemButton(null,0,()=>{});b.disabled=true;grid.append(b);}
     };
     const clearSelection=()=>{chosen=null;buying=false;l.hide('btn_buy');l.text('group_info/text_name','');l.text('text_desc',this.text('text_sellersays'),{color:'235,230,225,255'});l.text('text_price','');};

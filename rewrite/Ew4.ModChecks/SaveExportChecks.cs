@@ -24,6 +24,9 @@ internal static class SaveExportChecks
             var fixtures = new Dictionary<string, byte[]> {
                 ["account.json"] = Encoding.UTF8.GetBytes("{\"medals\":17}"),
                 ["portraits/library.json"] = Encoding.UTF8.GetBytes("{\"schema\":1}"),
+                ["item-textures/library.json"] = Encoding.UTF8.GetBytes("{\"schema\":1}"),
+                ["item-textures/"+new string('b',64)+".png"] = [137,80,78,71,0,128],
+                ["mods/sample/logic/item-textures/library.json"] = Encoding.UTF8.GetBytes("{\"schema\":1}"),
                 ["portraits/"+new string('a',64)+".png"] = [137,80,78,71,0,255],
                 ["mods/sample/logic/portraits/library.json"] = Encoding.UTF8.GetBytes("{\"schema\":1}"),
                 ["account.json.bak"] = Encoding.UTF8.GetBytes("{\"medals\":16}"),

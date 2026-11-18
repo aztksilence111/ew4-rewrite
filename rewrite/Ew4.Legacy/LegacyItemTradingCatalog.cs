@@ -34,7 +34,7 @@ public sealed class LegacyItemTradingCatalog
             if (correctItems) equipment = LegacyEquipmentCorrections.Apply(equipment, (string)element.Attribute("name")!);
             if (configuredItems != null) equipment = configuredItems[id];
             if (id < 0 || price < 0 || consumable is not (0 or 1) || flag is not (0 or 1) || string.IsNullOrWhiteSpace(target)
-                || !items.TryAdd(id, new(equipment, price, consumable == 0)))
+                || !items.TryAdd(id, new(equipment, price, Unique: false)))
                 throw new RuleViolation("legacy.item_definition", "Invalid or duplicate item definition");
         }
         return new(items, xml);
@@ -49,7 +49,7 @@ public sealed class LegacyItemTradingCatalog
             if (slot.ItemId < 0) continue;
             if (!Items.TryGetValue(slot.ItemId, out var definition) || slot.Quantity < 0)
                 throw new RuleViolation("legacy.market_item", "Unknown item or negative stock");
-            // Native availability ignores quantity for nonconsumables and checks global ownership instead.
+            // Permanent equipment has unlimited stock and may be bought repeatedly.
             offers.Add(new(id + "." + i.ToString(CultureInfo.InvariantCulture), definition.Equipment.Id, definition.Equipment.Consumable ? slot.Quantity : null));
         }
         if (string.IsNullOrWhiteSpace(id)) throw new RuleViolation("legacy.market_identity", "Empty market identity");

@@ -97,6 +97,7 @@ public sealed partial class ClientContent
             }
         Strings = strings;
         ItemDefinitions = XDocument.Parse(Text("def_item.xml")).Root!.Elements("item").ToArray();
+        ItemDisplayIds = BuildItemDisplayIds();
         PrincessDefinitions = XDocument.Parse(Text("def_princess.xml")).Root!.Elements("Princess").ToArray();
         var battleEntries = XDocument.Parse(Text("def_battlelist.xml")).Root!.Elements("battle").ToArray();
         bool Hidden(string id, bool original)
